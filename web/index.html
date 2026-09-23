@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#10231e">
+  <title>Bractwo — Pogranicze</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <canvas id="world" aria-label="Otwarty świat Bractwa — Pogranicze"></canvas>
+  <div id="vignette"></div>
+  <main id="authScreen" class="auth-screen">
+    <div class="intro">
+      <div class="eyebrow">OTWARTY ŚWIAT · RPG ONLINE</div>
+      <h1>Bractwo<br><em>Pogranicze</em></h1>
+      <p>Od zielonych marchii po lodowe pustkowia.<br>Dwadzieścia krain. Pięć odległych miast. Twoja wyprawa.</p>
+      <div class="intro-bottom">CZTERY KLASY <i></i> JEDEN ŚWIAT</div>
+    </div>
+    <section class="auth-card" aria-label="Wejście do gry">
+      <div class="eyebrow">ŚCIEŻKI POGRANICZA</div>
+      <h2>Twoja droga przez Pogranicze.</h2>
+      <p class="muted">Rozwijaj postać bez limitu poziomów.<br>Postęp i wyposażenie są zapisywane.</p>
+      <div class="tabs" role="tablist" aria-label="Rodzaj konta">
+        <button id="loginTab" class="active" type="button" role="tab" aria-selected="true">Mam postać</button>
+        <button id="registerTab" type="button" role="tab" aria-selected="false">Nowa postać</button>
+      </div>
+      <form id="authForm">
+        <label for="nameInput">Imię postaci</label>
+        <input id="nameInput" name="username" autocomplete="username" minlength="3" maxlength="20" required placeholder="Twoje imię">
+        <label for="passwordInput">Hasło</label>
+        <input id="passwordInput" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required placeholder="Co najmniej 8 znaków">
+        <fieldset id="classPicker" class="class-picker" hidden><legend>Wybierz klasę — wybór jest stały</legend>
+          <button type="button" data-class="knight" class="class-option selected" aria-pressed="true"><span>⚔</span><strong>Rycerz</strong><small>Miecz · obrona i prowokacja</small></button>
+          <button type="button" data-class="paladin" class="class-option" aria-pressed="false"><span>➶</span><strong>Paladyn</strong><small>Łuk · mocny strzał</small></button>
+          <button type="button" data-class="mage" class="class-option" aria-pressed="false"><span>✧</span><strong>Mag</strong><small>Kostur · atak obszarowy</small></button>
+          <button type="button" data-class="druid" class="class-option" aria-pressed="false"><span>❋</span><strong>Druid</strong><small>Kostur · leczenie drużyny</small></button>
+        </fieldset>
+        <details class="server-settings"><summary>Adres serwera</summary><label class="sr-only" for="serverInput">WebSocket serwera</label><input id="serverInput" type="url" spellcheck="false" placeholder="ws://127.0.0.1:8080/ws"><p>Lokalnie: WS. W internecie: szyfrowane WSS.</p></details>
+        <p id="authError" class="auth-error" role="alert"></p>
+        <button id="connectButton" class="primary" type="submit">Wejdź do doliny <span>↗</span></button>
+      </form>
+      <div class="auth-foot"><span class="status-dot"></span> SZCZYTY I GŁĘBINY 0.6.0 · KOMPUTER I TELEFON</div>
+    </section>
+  </main>
+
+  <section id="gameUI" class="game-ui" hidden aria-label="Panel gry">
+    <output id="fpsCounter" class="fps-counter" aria-label="Liczba klatek na sekundę">— FPS</output>
+    <header class="topbar">
+      <div class="brand"><span>⚔</span><div>BRACTWO<small>POGRANICZE</small></div></div>
+      <div class="player-card">
+        <div class="player-top"><strong id="playerName">Wędrowiec</strong><span id="playerLevel">POZ. 1</span></div>
+        <div class="player-sub"><span id="classText">Rycerz</span><span id="xpText">0 / 100 PD</span></div>
+        <div class="health-track"><div id="healthFill"></div><span id="healthText">100 / 100</span></div>
+        <div class="mana-track"><div id="manaFill"></div><span id="manaText">50 / 50</span></div>
+        <div class="xp-track"><div id="xpFill"></div></div>
+      </div>
+      <div class="gold-chip" title="Złoto"><span>◆</span> <b id="goldText">0</b></div>
+      <div class="top-actions"><span id="connectionStatus"><i></i> ONLINE</span><button id="progressionButton" class="icon-button" title="Rozwój, czary i atlas [K]" aria-label="Księga rozwoju">✦</button><button id="journalButton" class="icon-button" title="Dziennik wypraw [J]" aria-label="Dziennik wypraw">▤</button><button id="inventoryButton" class="icon-button" title="Ekwipunek [I]" aria-label="Ekwipunek">▣</button><button id="partyButton" class="icon-button" title="Gracze i drużyna [P]" aria-label="Gracze i drużyna">♙</button><button id="mapButton" class="icon-button" title="Mapa [M]" aria-label="Pokaż lub ukryj mapę">◈</button><button id="helpButton" class="icon-button" title="Pomoc [H]" aria-label="Sterowanie i zasady">?</button><button id="logoutButton" class="icon-button" title="Wyloguj" aria-label="Wyloguj">↪</button></div>
+    </header>
+    <div class="world-status"><strong id="regionName">Dolina Zapomnianych</strong><span id="movementStatus"></span><span id="zoneStatus">Bezpieczna osada</span><span id="combatStatus" hidden></span><button id="chooseClassButton" hidden>Wybierz klasę</button></div>
+    <div class="pvp-bar"><button id="safetyButton" class="safety-button" aria-pressed="true">PvP: blokada</button><div id="targetCard" class="target-card" hidden><span>Cel: <b id="targetName"></b></span><button id="clearTarget" aria-label="Usuń cel">×</button></div><span id="skullStatus" hidden></span></div>
+    <div id="minimapCard" class="minimap-card"><canvas id="minimap" width="224" height="160" aria-label="Mapa doliny"></canvas><div><span id="onlineCount">1 gracz</span><button id="atlasButton" class="atlas-link">ATLAS ↗</button></div></div>
+    <button id="questTracker" class="quest-tracker" title="Otwórz dziennik [J]"><span class="tracker-eyebrow">TWOJA WYPRAWA <kbd>J</kbd></span><strong id="questTrackerTitle">Porozmawiaj ze strażniczką</strong><span id="questTrackerProgress">Nowa przygoda czeka w Przystani.</span><span id="questTrackerDirection" class="tracker-direction"></span></button>
+    <div id="battleList" class="battle-list" hidden><div class="section-label">W POBLIŻU</div><div id="battleEnemies"></div></div>
+    <div id="noticeFeed" class="notice-feed" aria-live="polite"></div>
+    <div id="interactPrompt" class="interact-prompt" hidden><span>E</span><div><small>HANDEL I ODPOCZYNEK</small><strong id="interactName">Kupiec</strong></div></div>
+    <div id="partyInvite" class="party-invite" hidden><span id="inviteText"></span><div><button id="acceptInvite">Dołącz</button><button id="declineInvite">Odrzuć</button></div></div>
+
+    <aside id="sidePanel" class="side-panel" hidden aria-label="Ekwipunek i gracze">
+      <div class="panel-head"><div class="tabs"><button id="inventoryTab" class="active">Ekwipunek</button><button id="playersTab">Gracze</button><button id="journalTab">Dziennik</button><button id="progressionTab">Rozwój</button></div><button id="closePanel" class="close-button" aria-label="Zamknij panel">×</button></div>
+      <div id="progressionView" class="panel-content" hidden><div class="eyebrow">KSIĘGA WĘDROWCA</div><h2 id="progressionSubtitle"></h2><div id="progressionNav" class="progress-nav"><button data-view="spells">Czary</button><button data-view="growth">Rozwój</button><button data-view="atlas">Atlas</button><button data-view="services">Usługi</button><button data-view="premium">Premium</button></div><div id="progressionContent"></div></div>
+      <div id="inventoryView" class="panel-content"><div class="stat-line"><span id="combatStats">Atak 0 · Pancerz 0</span><span id="inventoryCount">0 / 40</span></div><div id="equipmentSlots" class="equipment-slots"></div><div class="section-label">PLECAK</div><div id="inventoryList" class="inventory-list"></div>
+        <section class="merchant-section"><div class="section-label">KUPIEC</div><p id="merchantHint" class="muted">Podejdź do kupca w osadzie, aby handlować.</p><div class="shop-row"><span>Mikstura zdrowia <small id="healthPrice"></small></span><button id="buyHealth">Kup</button></div><div class="shop-row"><span>Mikstura many <small id="manaPrice"></small></span><button id="buyMana">Kup</button></div><button id="restButton" class="text-button">Odpocznij u kupca</button></section>
+      </div>
+      <div id="journalView" class="panel-content" hidden><div class="journal-intro"><span class="eyebrow">WYPRAWY POGRANICZA</span><h2>Twoja historia.</h2><p>Przyjmuj zlecenia u mieszkańców. Odkrywaj miejsca, zdobywaj łupy i wracaj po nagrodę.</p></div><div id="questList"></div><div class="section-label discoveries-heading">ATLAS ODKRYĆ <span id="discoveryCount"></span></div><div id="discoveryList"></div></div>
+      <div id="playersView" class="panel-content" hidden><div class="section-label">TWOJA DRUŻYNA</div><p id="partySummary" class="muted">Podróżujesz samotnie.</p><button id="leaveParty" class="text-button" hidden>Opuść drużynę</button><p class="panel-tip">Do 4 osób. Walczcie blisko siebie, aby dzielić doświadczenie i zdobywać osobne łupy.</p><div class="section-label">GRACZE W DOLINIE</div><p class="panel-tip">„Cel PvP” wybiera gracza. Atak wymaga jeszcze wyłączenia blokady PvP.</p><div id="playersList"></div></div>
+    </aside>
+
+    <div class="movement-controls"><div id="joystick" class="joystick" aria-label="Joystick ruchu"><span class="joystick-cross">+</span><div id="joystickKnob"></div></div><div class="keyboard-hint">W A S D <span>/</span> STRZAŁKI</div></div>
+    <div class="quickbar"><button id="healthPotion" class="potion-button health-potion" title="Mikstura zdrowia [1]"><kbd>1</kbd><span>♥</span><small>Zdrowie</small><b id="healthCount">0</b></button><button id="manaPotion" class="potion-button mana-potion" title="Mikstura many [2]"><kbd>2</kbd><span>✦</span><small>Mana</small><b id="manaCount">0</b></button><button id="abilityButton" class="ability-button" title="Umiejętność klasy [F]"><kbd>F</kbd><span id="abilityIcon">⚔</span><small id="abilityName">Umiejętność</small><b id="abilityCooldown"></b></button></div>
+    <div id="spellbar" class="spellbar"><button id="healSpell" title="Leczenie [3]">3 · ♥</button><button id="hasteSpell" title="Przyspieszenie [4]">4 · »</button><button id="advancedSpell" title="Czar zaawansowany [5]">5 · ✦</button><button id="masterSpell" title="Czar mistrzowski [6]">6 · ✹</button><button id="runeSpell" title="Wybrana runa [7]">7 · ▣</button><button id="bookSpell" title="Księga [K]">K · Czary</button></div><div class="combat-controls"><button id="interactButton" class="action-button interact-button"><span>◆</span><small>Rozmawiaj</small><kbd>E</kbd></button><button id="attackButton" class="action-button attack-button"><span>⚔</span><small id="attackLabel">Atakuj</small><kbd>SPACJA</kbd></button></div>
+    <div class="chat-wrap"><div id="chatLog" class="chat-log" role="log" aria-label="Rozmowy graczy"><div class="chat-hint">Enter — napisz do graczy w dolinie</div></div><button id="chatButton" class="chat-button">Czat <kbd>Enter</kbd></button><form id="chatForm" hidden><input id="chatInput" maxlength="160" autocomplete="off" placeholder="Napisz do graczy…"><button type="submit" aria-label="Wyślij wiadomość">↗</button></form></div>
+    <div id="deathPanel" class="death-panel" hidden><div>✦</div><h2>Podróż jeszcze się nie kończy.</h2><p id="deathText">Powrót do osady…</p><p>Część złota i postępu poziomu została utracona.</p></div>
+    <div id="disconnectPanel" class="disconnect-panel" hidden><h2>Utracono połączenie</h2><p>Postęp jest zapisywany. Jeśli trwa walka PvP, postać pozostaje w świecie do wygaśnięcia blokady walki.</p><button id="reconnectButton" class="primary">Wróć do logowania</button></div>
+    <div id="legacyClassPanel" class="modal-panel" hidden><div class="eyebrow">POSTAĆ Z WCZEŚNIEJSZEJ WERSJI</div><h2>Wybierz swoją drogę.</h2><p>Poziom i złoto zostają. Klasę możesz wybrać raz, w bezpiecznej osadzie.</p><div id="legacyChoices" class="class-picker"></div><button id="closeLegacy" class="text-button">Wybiorę później</button></div>
+    <div id="helpPanel" class="help-panel" hidden><button id="closeHelp" class="close-button" aria-label="Zamknij pomoc">×</button><div class="eyebrow">PRZEWODNIK POGRANICZA</div><h2>Rozwijaj postać. Walcz razem.</h2><p>Przeciwnicy i boss odradzają się. Zdobywaj doświadczenie, złoto i wyposażenie. Poziomy nie mają ustalonego limitu. Drogi przez dolinę są otwarte. Strażniczka Mira ma pierwsze zlecenie. Odkrywaj miejsca z atlasu; każde daje jednorazową nagrodę. Ruch przyspiesza stopniowo z poziomem.</p><dl><dt>Ruch</dt><dd>WASD / strzałki / joystick</dd><dt>Atak podstawowy</dt><dd>Przytrzymaj spację lub Atakuj</dd><dt>Księga rozwoju i atlas</dt><dd>K · czary 3/4/5/6 · runa 7 · schody E</dd><dt>Umiejętność klasy</dt><dd>F / przycisk umiejętności</dd><dt>Mikstury</dt><dd>1 — zdrowie · 2 — mana</dd><dt>Kupiec · ekwipunek</dt><dd>E · I</dd><dt>Dziennik wypraw</dt><dd>J · rozmawiaj z NPC pod E</dd><dt>Gracze · mapa · czat</dt><dd>P · M · Enter</dd><dt>Usuń cel / zamknij</dt><dd>Esc</dd></dl><p>Kliknij potwora lub jego wiersz na liście, aby wybrać cel. Spacja i Atakuj trafiają wybranego przeciwnika. Bez wybranego celu atakujesz najbliższego potwora. Umiejętności ofensywne działają na potwory. Druid leczy siebie i pobliską drużynę; nie leczy innych postaci uwikłanych w PvP.</p><div class="section-label">PvP Z KONSEKWENCJAMI</div><p id="pvpHelp">Osada i postacie poniżej 8. poziomu są chronione. Aby zaatakować gracza, wyłącz blokadę PvP i wybierz go kliknięciem w świecie lub na liście graczy. Biała czaszka oznacza agresora. Trzy nieuzasadnione zabójstwa w 24 godziny dają czerwoną czaszkę na 24 godziny. Walka blokuje wejście do osady i bezpieczne wylogowanie przez 20 sekund.</p><p id="deathHelp">Śmierć: −5% złota i −10% postępu bieżącego poziomu. Z czerwoną czaszką: −20% złota, −20% postępu i utrata jednego niezałożonego przedmiotu. Bez utraty poziomu. Za zabicie gracza nie ma doświadczenia.</p><div class="help-footer">Blokada PvP zapobiega twoim atakom. Poza strefą ochrony nie zapewnia nietykalności.</div></div>
+  </section>
+  <script src="runtime.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
