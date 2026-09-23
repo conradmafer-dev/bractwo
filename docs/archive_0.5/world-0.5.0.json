@@ -1,0 +1,22 @@
+{
+  "version": "0.5.0",
+  "width": 128000,
+  "height": 92160,
+  "cities": 5,
+  "regions": 20,
+  "dungeon_floors": 22,
+  "stairs": 44,
+  "habitats": 4169,
+  "enemy_spawn_points": 11130,
+  "enemy_types": 48,
+  "landmarks": 120,
+  "quests": 30,
+  "obstacles": 9394,
+  "mountains": 4616,
+  "roads": 153,
+  "road_length": 2617349,
+  "terrain_patches": 4169,
+  "welcome_bytes": 2412950,
+  "nearby_hints": 11,
+  "monster_types_within_starter_6500_square": 23
+}

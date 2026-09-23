@@ -1,0 +1,37 @@
+{
+  "version": "0.6.0",
+  "width": 128000,
+  "height": 92160,
+  "cities": 5,
+  "regions": 20,
+  "habitats": 4161,
+  "enemies": 11235,
+  "enemy_types": 48,
+  "landmarks": 159,
+  "quests": 30,
+  "obstacles": 9608,
+  "roads": 178,
+  "road_length": 2683785,
+  "dungeon_sites": 15,
+  "dungeon_floors": 30,
+  "elevations": 23,
+  "positive_floors": {
+    "1": 9,
+    "2": 9,
+    "3": 5
+  },
+  "stairs": 106,
+  "water_segments": 1111,
+  "water_length": 106264,
+  "bridge_segments": 166,
+  "canyons": 4,
+  "points_of_interest": {
+    "wind": 9,
+    "cache": 13,
+    "spring": 4,
+    "ward": 4
+  },
+  "item_templates": 102,
+  "welcome_bytes": 2751882,
+  "nearby_hints": 24
+}

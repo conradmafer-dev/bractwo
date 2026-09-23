@@ -1,0 +1,40 @@
+{
+  "before": {
+    "1": {
+      "step_ms": 0.115,
+      "snapshot_batch_ms": 0.432,
+      "mean_packet_bytes": 21651,
+      "monsters": 7729
+    },
+    "24": {
+      "step_ms": 13.241,
+      "snapshot_batch_ms": 6.585,
+      "mean_packet_bytes": 36249,
+      "monsters": 7729
+    }
+  },
+  "after": {
+    "1": {
+      "step_ms": 0.062,
+      "snapshot_batch_ms": 0.232,
+      "mean_packet_bytes": 1987,
+      "monsters": 7729
+    },
+    "24": {
+      "step_ms": 0.821,
+      "snapshot_batch_ms": 6.615,
+      "mean_packet_bytes": 16585,
+      "monsters": 7729
+    }
+  },
+  "client_logic": {
+    "terrain_command_comparisons": 90,
+    "terrain_commands_identical": true,
+    "static_objects": 2653,
+    "query_repeats": 9000,
+    "scan_ms": 221.14,
+    "index_ms": 27.57,
+    "mean_candidates_scanned_before": 2653,
+    "mean_cell_entries_visited_after": 33
+  }
+}

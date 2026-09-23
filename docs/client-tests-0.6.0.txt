@@ -1,0 +1,15 @@
+✔ spatial queries preserve every visible object at boundaries and across floors (34.268933ms)
+✔ FPS measures actual frame timestamps, including slow frames and reset (0.374846ms)
+✔ motion interpolates evenly and snaps on floor change or distant travel (0.376208ms)
+✔ picking uses drawn positions, ignores corpses/other floors, selects monsters and players (0.413793ms)
+✔ owner deltas retain unchanged bags but replace empty lists and never merge other accounts (0.295188ms)
+✔ surface index gives trails priority, curved segments, ellipse edges and floor stone (0.584997ms)
+✔ large monster picking follows species size and ignores other floors (0.266535ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 181.578541

@@ -1,0 +1,21 @@
+{
+  "ok": true,
+  "checks": [
+    "Enter immediately after login opens focused chat; WASD, F, Space and potion keys type only; Escape cancels without sending.",
+    "Knight and Druid registration creates distinct class stats in the same shared world.",
+    "Level-one movement is about 100 px/s and is visible to the second client.",
+    "E beside the merchant opens inventory despite overlapping NPC ranges; equipment changes authoritative armor and purchases without gold are disabled.",
+    "Party invitation and acceptance work between desktop and touch clients.",
+    "Enter opens chat with a HUD button focused; another client receives the public speech, draws it over the character and retains it in the chat log.",
+    "Real touch movement works; desktop, landscape, portrait and mobile inventory render without page overflow.",
+    "Explicit PvP target and safety toggle work; a protected beginner in town takes no damage and causes no skull.",
+    "Relog preserves account/class and resets PvP safety; localStorage contains no password.",
+    "E at the quest NPC opens the journal; accepting a real quest updates the tracker and J reopens its progress.",
+    "A fresh knight kills three rats with normal movement/attacks, levels up, cannot claim remotely, and returns to the NPC for the quest reward.",
+    "The mill is discovered in the atlas; returning grants a usable class weapon (+5 attack) and unlocks the goblin expedition.",
+    "A mage strafes while shooting: the real target and projectile endpoints stay fixed and attack aim differs from walking direction.",
+    "Mage fire ring emits a timed area effect, is captured at two animation phases, costs mana, and the potion hotkey consumes an owned potion.",
+    "All four registration choices were used against the real server; Paladin uses a bow."
+  ],
+  "errors": []
+}
