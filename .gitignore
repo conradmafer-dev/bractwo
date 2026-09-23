@@ -1,0 +1,12 @@
+.godot/
+.venv/
+__pycache__/
+*.pyc
+data/
+*.sqlite3*
+*.db*
+builds/*
+!builds/.keep
+export_credentials.cfg
+*.keystore
+node_modules/

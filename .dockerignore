@@ -1,0 +1,16 @@
+.git
+.github
+.godot
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-*
+data
+builds
+node_modules
+export_credentials.cfg
+*.keystore
