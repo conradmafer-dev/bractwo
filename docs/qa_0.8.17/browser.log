@@ -1,0 +1,18 @@
+Chromium ready; loading actual client and bridge
+Client loaded; creating QA account
+PASS 1: Clicking a real battle-list target leaves the wand idle and the main action ready, even after a full round.
+PASS 2: Keyboard 4 casts three Magic Missiles immediately on the selected monster; no prior Spark and no double action.
+PASS 3: Hotbar click queues Frost Ray and shows a countdown; reselecting the same monster does not erase the command.
+PASS 4: Movement keeps working while a targeted spell is pending.
+PASS 5: Holding Space while the queued spell becomes ready does not steal its action; Frost Ray casts once, costs no mana and clears its queue display.
+PASS 6: The wand does not resume automatic sparks after a cast or an idle interval.
+PASS 7: Manual Space still fires a 1d4 Spark; clearing the target cancels a subsequent queue without spending mana.
+PASS 8: F casts the actual most-used/recent tied spell into the selected target without a wand attack.
+PASS 9: The favorite F button displays the same server-confirmed queue countdown.
+PASS 10: The second hotbar row (F1) uses the same target and queue rules.
+PASS 11: Casting from the spellbook retains the enemy, acknowledges the pending cast and refreshes after it executes.
+PASS 12: 390x844: tapping the hotbar queues and casts without horizontal page overflow.
+PASS 13: 844x390: tapping the hotbar queues and casts without horizontal page overflow.
+PASS 14: Choosing a genuinely different target cancels the previous queue and never transfers a paid spell silently.
+PASS 15: The on-screen Attack button also retains the explicit manual Spark.
+PASS 16: No JavaScript exceptions; all actions used production UI and actual server handlers.

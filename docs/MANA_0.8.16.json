@@ -1,0 +1,706 @@
+{
+  "version": "0.8.16",
+  "mana_rules_version": 3,
+  "rows": [
+    {
+      "level": 1,
+      "mage_druid": 40,
+      "ranger": 40,
+      "knight": 30,
+      "recovery": 20
+    },
+    {
+      "level": 2,
+      "mage_druid": 51,
+      "ranger": 42,
+      "knight": 30,
+      "recovery": 22
+    },
+    {
+      "level": 3,
+      "mage_druid": 62,
+      "ranger": 44,
+      "knight": 30,
+      "recovery": 24
+    },
+    {
+      "level": 4,
+      "mage_druid": 73,
+      "ranger": 47,
+      "knight": 30,
+      "recovery": 27
+    },
+    {
+      "level": 5,
+      "mage_druid": 84,
+      "ranger": 49,
+      "knight": 30,
+      "recovery": 29
+    },
+    {
+      "level": 6,
+      "mage_druid": 96,
+      "ranger": 51,
+      "knight": 30,
+      "recovery": 31
+    },
+    {
+      "level": 7,
+      "mage_druid": 107,
+      "ranger": 53,
+      "knight": 30,
+      "recovery": 33
+    },
+    {
+      "level": 8,
+      "mage_druid": 118,
+      "ranger": 56,
+      "knight": 30,
+      "recovery": 36
+    },
+    {
+      "level": 9,
+      "mage_druid": 129,
+      "ranger": 58,
+      "knight": 30,
+      "recovery": 38
+    },
+    {
+      "level": 10,
+      "mage_druid": 140,
+      "ranger": 60,
+      "knight": 30,
+      "recovery": 40
+    },
+    {
+      "level": 11,
+      "mage_druid": 153,
+      "ranger": 68,
+      "knight": 30,
+      "recovery": 42
+    },
+    {
+      "level": 12,
+      "mage_druid": 166,
+      "ranger": 76,
+      "knight": 30,
+      "recovery": 44
+    },
+    {
+      "level": 13,
+      "mage_druid": 179,
+      "ranger": 84,
+      "knight": 30,
+      "recovery": 46
+    },
+    {
+      "level": 14,
+      "mage_druid": 192,
+      "ranger": 92,
+      "knight": 30,
+      "recovery": 48
+    },
+    {
+      "level": 15,
+      "mage_druid": 205,
+      "ranger": 100,
+      "knight": 30,
+      "recovery": 50
+    },
+    {
+      "level": 16,
+      "mage_druid": 218,
+      "ranger": 108,
+      "knight": 30,
+      "recovery": 52
+    },
+    {
+      "level": 17,
+      "mage_druid": 231,
+      "ranger": 116,
+      "knight": 30,
+      "recovery": 54
+    },
+    {
+      "level": 18,
+      "mage_druid": 244,
+      "ranger": 124,
+      "knight": 30,
+      "recovery": 56
+    },
+    {
+      "level": 19,
+      "mage_druid": 257,
+      "ranger": 132,
+      "knight": 30,
+      "recovery": 58
+    },
+    {
+      "level": 20,
+      "mage_druid": 270,
+      "ranger": 140,
+      "knight": 30,
+      "recovery": 60
+    },
+    {
+      "level": 21,
+      "mage_druid": 281,
+      "ranger": 143,
+      "knight": 30,
+      "recovery": 62
+    },
+    {
+      "level": 22,
+      "mage_druid": 292,
+      "ranger": 146,
+      "knight": 30,
+      "recovery": 64
+    },
+    {
+      "level": 23,
+      "mage_druid": 303,
+      "ranger": 149,
+      "knight": 30,
+      "recovery": 66
+    },
+    {
+      "level": 24,
+      "mage_druid": 314,
+      "ranger": 152,
+      "knight": 30,
+      "recovery": 68
+    },
+    {
+      "level": 25,
+      "mage_druid": 325,
+      "ranger": 155,
+      "knight": 30,
+      "recovery": 70
+    },
+    {
+      "level": 26,
+      "mage_druid": 336,
+      "ranger": 158,
+      "knight": 30,
+      "recovery": 72
+    },
+    {
+      "level": 27,
+      "mage_druid": 347,
+      "ranger": 161,
+      "knight": 30,
+      "recovery": 74
+    },
+    {
+      "level": 28,
+      "mage_druid": 358,
+      "ranger": 164,
+      "knight": 30,
+      "recovery": 76
+    },
+    {
+      "level": 29,
+      "mage_druid": 369,
+      "ranger": 167,
+      "knight": 30,
+      "recovery": 78
+    },
+    {
+      "level": 30,
+      "mage_druid": 380,
+      "ranger": 170,
+      "knight": 30,
+      "recovery": 80
+    },
+    {
+      "level": 31,
+      "mage_druid": 399,
+      "ranger": 180,
+      "knight": 30,
+      "recovery": 81
+    },
+    {
+      "level": 32,
+      "mage_druid": 418,
+      "ranger": 190,
+      "knight": 30,
+      "recovery": 82
+    },
+    {
+      "level": 33,
+      "mage_druid": 437,
+      "ranger": 200,
+      "knight": 30,
+      "recovery": 83
+    },
+    {
+      "level": 34,
+      "mage_druid": 456,
+      "ranger": 210,
+      "knight": 30,
+      "recovery": 84
+    },
+    {
+      "level": 35,
+      "mage_druid": 475,
+      "ranger": 220,
+      "knight": 30,
+      "recovery": 85
+    },
+    {
+      "level": 36,
+      "mage_druid": 494,
+      "ranger": 230,
+      "knight": 30,
+      "recovery": 86
+    },
+    {
+      "level": 37,
+      "mage_druid": 513,
+      "ranger": 240,
+      "knight": 30,
+      "recovery": 87
+    },
+    {
+      "level": 38,
+      "mage_druid": 532,
+      "ranger": 250,
+      "knight": 30,
+      "recovery": 88
+    },
+    {
+      "level": 39,
+      "mage_druid": 551,
+      "ranger": 260,
+      "knight": 30,
+      "recovery": 89
+    },
+    {
+      "level": 40,
+      "mage_druid": 570,
+      "ranger": 270,
+      "knight": 30,
+      "recovery": 90
+    },
+    {
+      "level": 41,
+      "mage_druid": 586,
+      "ranger": 275,
+      "knight": 30,
+      "recovery": 92
+    },
+    {
+      "level": 42,
+      "mage_druid": 602,
+      "ranger": 280,
+      "knight": 30,
+      "recovery": 94
+    },
+    {
+      "level": 43,
+      "mage_druid": 618,
+      "ranger": 285,
+      "knight": 30,
+      "recovery": 96
+    },
+    {
+      "level": 44,
+      "mage_druid": 634,
+      "ranger": 290,
+      "knight": 30,
+      "recovery": 98
+    },
+    {
+      "level": 45,
+      "mage_druid": 650,
+      "ranger": 295,
+      "knight": 30,
+      "recovery": 100
+    },
+    {
+      "level": 46,
+      "mage_druid": 666,
+      "ranger": 300,
+      "knight": 30,
+      "recovery": 102
+    },
+    {
+      "level": 47,
+      "mage_druid": 682,
+      "ranger": 305,
+      "knight": 30,
+      "recovery": 104
+    },
+    {
+      "level": 48,
+      "mage_druid": 698,
+      "ranger": 310,
+      "knight": 30,
+      "recovery": 106
+    },
+    {
+      "level": 49,
+      "mage_druid": 714,
+      "ranger": 315,
+      "knight": 30,
+      "recovery": 108
+    },
+    {
+      "level": 50,
+      "mage_druid": 730,
+      "ranger": 320,
+      "knight": 30,
+      "recovery": 110
+    },
+    {
+      "level": 51,
+      "mage_druid": 740,
+      "ranger": 326,
+      "knight": 30,
+      "recovery": 112
+    },
+    {
+      "level": 52,
+      "mage_druid": 750,
+      "ranger": 332,
+      "knight": 30,
+      "recovery": 114
+    },
+    {
+      "level": 53,
+      "mage_druid": 760,
+      "ranger": 338,
+      "knight": 30,
+      "recovery": 116
+    },
+    {
+      "level": 54,
+      "mage_druid": 770,
+      "ranger": 344,
+      "knight": 30,
+      "recovery": 118
+    },
+    {
+      "level": 55,
+      "mage_druid": 780,
+      "ranger": 350,
+      "knight": 30,
+      "recovery": 120
+    },
+    {
+      "level": 56,
+      "mage_druid": 790,
+      "ranger": 356,
+      "knight": 30,
+      "recovery": 122
+    },
+    {
+      "level": 57,
+      "mage_druid": 800,
+      "ranger": 362,
+      "knight": 30,
+      "recovery": 124
+    },
+    {
+      "level": 58,
+      "mage_druid": 810,
+      "ranger": 368,
+      "knight": 30,
+      "recovery": 126
+    },
+    {
+      "level": 59,
+      "mage_druid": 820,
+      "ranger": 374,
+      "knight": 30,
+      "recovery": 128
+    },
+    {
+      "level": 60,
+      "mage_druid": 830,
+      "ranger": 380,
+      "knight": 30,
+      "recovery": 130
+    },
+    {
+      "level": 61,
+      "mage_druid": 841,
+      "ranger": 386,
+      "knight": 30,
+      "recovery": 131
+    },
+    {
+      "level": 62,
+      "mage_druid": 852,
+      "ranger": 392,
+      "knight": 30,
+      "recovery": 132
+    },
+    {
+      "level": 63,
+      "mage_druid": 863,
+      "ranger": 398,
+      "knight": 30,
+      "recovery": 133
+    },
+    {
+      "level": 64,
+      "mage_druid": 874,
+      "ranger": 404,
+      "knight": 30,
+      "recovery": 134
+    },
+    {
+      "level": 65,
+      "mage_druid": 885,
+      "ranger": 410,
+      "knight": 30,
+      "recovery": 135
+    },
+    {
+      "level": 66,
+      "mage_druid": 896,
+      "ranger": 416,
+      "knight": 30,
+      "recovery": 136
+    },
+    {
+      "level": 67,
+      "mage_druid": 907,
+      "ranger": 422,
+      "knight": 30,
+      "recovery": 137
+    },
+    {
+      "level": 68,
+      "mage_druid": 918,
+      "ranger": 428,
+      "knight": 30,
+      "recovery": 138
+    },
+    {
+      "level": 69,
+      "mage_druid": 929,
+      "ranger": 434,
+      "knight": 30,
+      "recovery": 139
+    },
+    {
+      "level": 70,
+      "mage_druid": 940,
+      "ranger": 440,
+      "knight": 30,
+      "recovery": 140
+    },
+    {
+      "level": 71,
+      "mage_druid": 953,
+      "ranger": 453,
+      "knight": 30,
+      "recovery": 142
+    },
+    {
+      "level": 72,
+      "mage_druid": 966,
+      "ranger": 466,
+      "knight": 30,
+      "recovery": 144
+    },
+    {
+      "level": 73,
+      "mage_druid": 979,
+      "ranger": 479,
+      "knight": 30,
+      "recovery": 146
+    },
+    {
+      "level": 74,
+      "mage_druid": 992,
+      "ranger": 492,
+      "knight": 30,
+      "recovery": 148
+    },
+    {
+      "level": 75,
+      "mage_druid": 1005,
+      "ranger": 505,
+      "knight": 30,
+      "recovery": 150
+    },
+    {
+      "level": 76,
+      "mage_druid": 1018,
+      "ranger": 518,
+      "knight": 30,
+      "recovery": 152
+    },
+    {
+      "level": 77,
+      "mage_druid": 1031,
+      "ranger": 531,
+      "knight": 30,
+      "recovery": 154
+    },
+    {
+      "level": 78,
+      "mage_druid": 1044,
+      "ranger": 544,
+      "knight": 30,
+      "recovery": 156
+    },
+    {
+      "level": 79,
+      "mage_druid": 1057,
+      "ranger": 557,
+      "knight": 30,
+      "recovery": 158
+    },
+    {
+      "level": 80,
+      "mage_druid": 1070,
+      "ranger": 570,
+      "knight": 30,
+      "recovery": 160
+    },
+    {
+      "level": 81,
+      "mage_druid": 1086,
+      "ranger": 577,
+      "knight": 30,
+      "recovery": 162
+    },
+    {
+      "level": 82,
+      "mage_druid": 1102,
+      "ranger": 584,
+      "knight": 30,
+      "recovery": 164
+    },
+    {
+      "level": 83,
+      "mage_druid": 1118,
+      "ranger": 591,
+      "knight": 30,
+      "recovery": 166
+    },
+    {
+      "level": 84,
+      "mage_druid": 1134,
+      "ranger": 598,
+      "knight": 30,
+      "recovery": 168
+    },
+    {
+      "level": 85,
+      "mage_druid": 1150,
+      "ranger": 605,
+      "knight": 30,
+      "recovery": 170
+    },
+    {
+      "level": 86,
+      "mage_druid": 1166,
+      "ranger": 612,
+      "knight": 30,
+      "recovery": 172
+    },
+    {
+      "level": 87,
+      "mage_druid": 1182,
+      "ranger": 619,
+      "knight": 30,
+      "recovery": 174
+    },
+    {
+      "level": 88,
+      "mage_druid": 1198,
+      "ranger": 626,
+      "knight": 30,
+      "recovery": 176
+    },
+    {
+      "level": 89,
+      "mage_druid": 1214,
+      "ranger": 633,
+      "knight": 30,
+      "recovery": 178
+    },
+    {
+      "level": 90,
+      "mage_druid": 1230,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 91,
+      "mage_druid": 1250,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 92,
+      "mage_druid": 1270,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 93,
+      "mage_druid": 1290,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 94,
+      "mage_druid": 1310,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 95,
+      "mage_druid": 1330,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 96,
+      "mage_druid": 1330,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 97,
+      "mage_druid": 1330,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 98,
+      "mage_druid": 1330,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 99,
+      "mage_druid": 1330,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    },
+    {
+      "level": 100,
+      "mage_druid": 1330,
+      "ranger": 640,
+      "knight": 30,
+      "recovery": 180
+    }
+  ]
+}

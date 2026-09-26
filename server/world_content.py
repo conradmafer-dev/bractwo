@@ -6,44 +6,16 @@ No player-dependent scaling, downloaded assets, or global random generation.
 import math
 import random
 
-VERSION = '0.5.0'
+VERSION = '0.8.9'
 WIDTH, HEIGHT = 16000, 9216
 REGIONS, CITIES, STAIRS, DUNGEONS, SPAWNS, ROADS = [], [], [], [], [], []
-PROMOTIONS = {'knight':'Elitarny Rycerz', 'paladin':'Królewski Paladyn',
+PROMOTIONS = {'knight':'Elitarny Rycerz', 'ranger':'Królewski Łowca',
               'mage':'Mistrz Magii', 'druid':'Starszy Druid'}
-MILESTONES = [
-    (1, 'Trening przez walkę', 'Udane trafienia rozwijają broń; zużyta mana rozwija magię, otrzymane ciosy — obronę.'),
-    (8, 'Leczenie, przyspieszenie i statki', 'Dwa nowe czary oraz rejsy między pięcioma miastami. Kup zapasy przed długą wyprawą.'),
-    (12, 'Runy', 'Kupuj runy bojowe. Mag i druid mogą tworzyć je z many oraz punktów duszy.'),
-    (20, 'Promocja profesji', 'Mistrz w mieście nadaje wyższą rangę za 2000 złota: szybsza regeneracja i 200 punktów duszy.'),
-    (30, 'Zaawansowany czar profesji', 'Nowa technika każdej klasy: wir, salwa, fala ognia lub lodu. Wymaga promocji.'),
-    (40, 'Błogosławieństwo', 'Za 500 złota zmniejsza o połowę stratę złota i PD przy kolejnej śmierci bez czerwonej czaszki.'),
-    (50, 'Specjalizacja', 'Promowana postać otrzymuje punkt co 5 poziomów. Wybieraj siłę, witalność lub skupienie.'),
-    (60, 'Kontrakty na bossów', 'Jednorazowe wyprawy po potężną broń; bossowie odradzają się także po odebraniu nagrody.'),
-    (80, 'Mistrzowski czar', 'Najsilniejsza technika twojej profesji — wymaga promocji i dużego zapasu many.'),
-    (100, 'Pieczęć Otchłani', 'Dostęp do najgłębszej sali pod Morzem Popiołu. Zalecana drużyna poziomu 120+.'),
-]
-SPELLS = {
-    'mend': {'name':'Lekkie leczenie', 'words':'exura', 'min_level':8, 'mana':20, 'cooldown':3, 'kind':'heal', 'description':'Odnawia 35 + 3 × poziom + 2 × poziom magii zdrowia.'},
-    'haste': {'name':'Przyspieszenie', 'words':'utani hur', 'min_level':8, 'mana':35, 'cooldown':24, 'kind':'haste', 'description':'Zwiększa szybkość ruchu o 30% na 15 sekund.'},
-}
-for cls,names in {
-    'knight': [('whirl','Wir ostrzy','exori','sword'),('fury','Furia rycerza','exori gran','sword')],
-    'paladin': [('volley','Salwa strzał','exevo mas san','piercing_arrow'),('sunburst','Słoneczna salwa','exevo gran mas san','piercing_arrow')],
-    'mage': [('flame_wave','Fala ognia','exevo flam hur','fire_ring'),('inferno','Wielkie piekło','exevo gran mas flam','fire_ring')],
-    'druid': [('ice_wave','Fala lodu','exevo frigo hur','ice_ring'),('winter','Wieczna zima','exevo gran mas frigo','ice_ring')],
-}.items():
-    for i,(key,name,words,effect) in enumerate(names):
-        SPELLS[key] = {'name':name,'words':words,'min_level':30 if i==0 else 80,
-            'mana':60 if i==0 else 150,'cooldown':8 if i==0 else 16,'kind':'area',
-            'class_ids':[cls],'promotion':True,'effect':effect,
-            'radius':160 if cls=='knight' else 280, 'multiplier':2.4 if i==0 else 4.5,
-            'description':('Uderza pobliskie potwory. ' if cls=='knight' else 'Uderza potwory w obszarze. ')+('Spowalnia je na 4 sekundy.' if cls=='druid' else 'Nie trafia przez ściany ani między piętrami.')}
-RUNES = {
-    'fire': {'name':'Runa ognistej kuli','min_level':12,'price':35,'mana':70,'soul':4,'effect':'fire_ring','radius':180,'power':1.5},
-    'ice': {'name':'Runa lodowej burzy','min_level':30,'price':80,'mana':120,'soul':7,'effect':'ice_ring','radius':220,'power':2.1},
-    'death': {'name':'Runa nagłej śmierci','min_level':60,'price':180,'mana':220,'soul':12,'effect':'magic_bolt','radius':0,'power':4.2},
-}
+# Combat content is supplied by dnd_content.configure after world construction.
+# Keep a single live catalogue: no old incantations or rune bypasses.
+MILESTONES = []
+SPELLS = {}
+RUNES = {}
 TIER_LEVELS = {1:1,2:3,3:8,4:20,5:35,6:50,7:70,8:90,9:110}
 
 
@@ -124,7 +96,7 @@ def configure(items, zones, npcs, landmarks, quests, enemies, obstacles, merchan
         enemies[key]={'name':name,'hp':level*90,'damage':level*1.6,'range':100,'speed':55,'xp':level*45,'gold':level*12,
           'respawn':180,'aggro':300,'leash':530,'level':level,'tier':max(t for t,l in TIER_LEVELS.items() if l<=level),
           'appearance':appearance,'color':color,'boss':True}
-    for cls,noun in [('knight','Miecz'),('paladin','Łuk'),('mage','Kostur'),('druid','Laska')]:
+    for cls,noun in [('knight','Miecz'),('ranger','Łuk'),('mage','Kostur'),('druid','Laska')]:
         for tier,adj,damage,value in [(4,'weterana',23,150),(5,'runiczny',38,280),(6,'żywiołów',60,500),(7,'królewski',90,850),(8,'pradawny',125,1400),(9,'otchłani',170,2200)]:
             items[f'{cls}_weapon_{tier}']={**items[f'{cls}_weapon_3'],'name':f'{noun} {adj}',
               'attack':damage,'min_level':TIER_LEVELS[tier],'value':value,'rarity':'epic' if tier>=6 else 'rare'}

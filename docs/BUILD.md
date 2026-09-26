@@ -32,17 +32,18 @@ Materiały źródłowe:
 - [Eksport na Androida](https://docs.godotengine.org/en/4.5/tutorials/export/exporting_for_android.html)
 - [WebSocket w Godot](https://docs.godotengine.org/en/4.5/tutorials/networking/websocket.html)
 
-## Testy wersji 0.6.0
+## Testy bieżącej wersji 0.8.6
 
 ```bash
 python -m unittest discover -s tests -v
 node --check web/game.js
-node --test tests/test_client_runtime.cjs
+node --test tests/test_client_runtime.cjs tests/test_spell_vfx.cjs tests/test_level_up.cjs
+python tools/browser_086_smoke.py
 python tools/check_surfaces.py
 python tools/benchmark_living_world.py
 ```
 
-Testy tworzą tymczasowe bazy i uruchamiają lokalne serwery; nie używają zapisu graczy. `check_surfaces.py` porównuje rzeczywiste klasyfikacje podłoża Python/JS; `benchmark_living_world.py` mierzy obciążenie symulacji przy 1 i 24 postaciach. Nie mierzy FPS. `check_expedition.py` pozostaje historycznym scenariuszem 0.3. Historyczny scenariusz przeglądarkowy 0.3 `tools/browser_smoke.cjs` wymaga Playwright i osobno zainstalowanego Chromium; instrukcja uruchomienia jest na początku pliku. `python tools/run_browser_smoke.py` uruchamia odizolowany serwer i cały scenariusz (wymaga tych samych narzędzi przeglądarkowych). Skrypt przeglądarkowy nie obejmuje księgi, podróży ani podziemi 0.4 i nie był wykonany dla tego wydania. Aktualny raport wykonanych prób znajduje się w TEST_REPORT.md; wcześniejsze obrazy i wyniki przeniesiono do archive_0.3/.
+Testy tworzą tymczasowe bazy i uruchamiają lokalne serwery; nie używają zapisu graczy. `check_surfaces.py` porównuje rzeczywiste klasyfikacje podłoża Python/JS; `benchmark_living_world.py` mierzy obciążenie symulacji przy 1 i 24 postaciach. Nie mierzy FPS. `check_expedition.py` pozostaje historycznym scenariuszem 0.3. Historyczny scenariusz przeglądarkowy 0.3 `tools/browser_smoke.cjs` wymaga Playwright i osobno zainstalowanego Chromium; instrukcja uruchomienia jest na początku pliku. `python tools/run_browser_smoke.py` uruchamia odizolowany serwer i cały scenariusz (wymaga tych samych narzędzi przeglądarkowych). Skrypt przeglądarkowy nie obejmuje księgi, podróży ani podziemi 0.4 i nie był wykonany dla tego wydania. Bieżący test interfejsu 0.8.5 to `tools/browser_085_smoke.py` (kontrolowany most WS, nie natywna nawigacja Chromium). Aktualny raport wykonanych prób znajduje się w TEST_REPORT.md; wcześniejsze obrazy i wyniki przeniesiono do archive_0.3/.
 
 ## Internetowy test zamknięty — następny etap
 

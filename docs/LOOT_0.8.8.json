@@ -1,0 +1,4886 @@
+{
+  "version": "0.8.8",
+  "items": {
+    "goblin_cleaver": {
+      "name": "Tasak Zielonego Kła",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 3,
+      "value": 12,
+      "rarity": "common",
+      "weapon": "sword",
+      "weapon_dice": [
+        1,
+        6
+      ],
+      "damage_dice": "1k6",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "axe",
+      "icon": "assets/equipment/goblin_cleaver.svg",
+      "description": "",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "goblin",
+          "name": "Goblin Zielonego Kła",
+          "chance": 0.07
+        },
+        {
+          "kind": "troll",
+          "name": "Troll leśny",
+          "chance": 0.04
+        }
+      ]
+    },
+    "bandit_longsword": {
+      "name": "Miecz rozbójnika",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 5,
+      "value": 22,
+      "rarity": "common",
+      "weapon": "sword",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "sword",
+      "icon": "assets/equipment/bandit_longsword.svg",
+      "description": "",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "skeleton",
+          "name": "Szkielet wartownika",
+          "chance": 0.05
+        },
+        {
+          "kind": "bandit",
+          "name": "Rozbójnik",
+          "chance": 0.06
+        },
+        {
+          "kind": "skeleton_sentinel",
+          "name": "Szkielet pancerny",
+          "chance": 0.05
+        }
+      ]
+    },
+    "bandit_sabre": {
+      "name": "Szabla rabusia +1",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 8,
+      "value": 85,
+      "rarity": "rare",
+      "weapon": "sword",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "sabre",
+      "icon": "assets/equipment/bandit_sabre.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "boss",
+          "name": "Władca Twierdzy",
+          "chance": 0.18
+        },
+        {
+          "kind": "bandit",
+          "name": "Rozbójnik",
+          "chance": 0.03
+        },
+        {
+          "kind": "bandit_veteran",
+          "name": "Bandyta weteran",
+          "chance": 0.04
+        }
+      ]
+    },
+    "veteran_greatsword": {
+      "name": "Dwuręczny miecz weterana",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 12,
+      "value": 75,
+      "rarity": "uncommon",
+      "weapon": "sword",
+      "weapon_dice": [
+        2,
+        6
+      ],
+      "damage_dice": "2k6",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "greatsword",
+      "icon": "assets/equipment/veteran_greatsword.svg",
+      "description": "",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "minotaur",
+          "name": "Minotaur",
+          "chance": 0.05
+        },
+        {
+          "kind": "ogre",
+          "name": "Ogr maczugowy",
+          "chance": 0.04
+        },
+        {
+          "kind": "bandit_veteran",
+          "name": "Bandyta weteran",
+          "chance": 0.07
+        }
+      ]
+    },
+    "captain_greatsword": {
+      "name": "Rozkaz Herszta +1",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 20,
+      "value": 220,
+      "rarity": "rare",
+      "weapon": "sword",
+      "weapon_dice": [
+        2,
+        6
+      ],
+      "damage_dice": "2k6",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "greatsword",
+      "icon": "assets/equipment/captain_greatsword.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "bandit_captain",
+          "name": "Herszt Czarnego Traktu",
+          "chance": 0.18
+        }
+      ]
+    },
+    "orc_battleaxe": {
+      "name": "Topór orczego wojownika",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 12,
+      "value": 48,
+      "rarity": "common",
+      "weapon": "sword",
+      "weapon_dice": [
+        1,
+        10
+      ],
+      "damage_dice": "1k10",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "axe",
+      "icon": "assets/equipment/orc_battleaxe.svg",
+      "description": "",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "orc",
+          "name": "Ork wojownik",
+          "chance": 0.07
+        },
+        {
+          "kind": "minotaur",
+          "name": "Minotaur",
+          "chance": 0.06
+        },
+        {
+          "kind": "cyclops",
+          "name": "Cyklop skalny",
+          "chance": 0.04
+        }
+      ]
+    },
+    "orc_king_axe": {
+      "name": "Topór Króla Orków +1",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 25,
+      "value": 270,
+      "rarity": "rare",
+      "weapon": "sword",
+      "weapon_dice": [
+        1,
+        12
+      ],
+      "damage_dice": "1k12",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "axe",
+      "icon": "assets/equipment/orc_king_axe.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "orc_king",
+          "name": "Król Orków",
+          "chance": 0.2
+        }
+      ]
+    },
+    "dwarf_hammer": {
+      "name": "Młot Żelaznego Serca +1",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 25,
+      "value": 155,
+      "rarity": "rare",
+      "weapon": "sword",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "bludgeoning",
+      "art_kind": "hammer",
+      "icon": "assets/equipment/dwarf_hammer.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "dwarf",
+          "name": "Krasnoludzki strażnik",
+          "chance": 0.05
+        },
+        {
+          "kind": "frost_giant",
+          "name": "Lodowy olbrzym",
+          "chance": 0.03
+        }
+      ]
+    },
+    "crypt_blade": {
+      "name": "Ostrze strażnika krypty +1",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 30,
+      "value": 190,
+      "rarity": "rare",
+      "weapon": "sword",
+      "weapon_dice": [
+        1,
+        10
+      ],
+      "damage_dice": "1k10",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "greatsword",
+      "icon": "assets/equipment/crypt_blade.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "vampire",
+          "name": "Wampir",
+          "chance": 0.04
+        },
+        {
+          "kind": "crypt_guard",
+          "name": "Strażnik zapieczętowanej krypty",
+          "chance": 0.05
+        }
+      ]
+    },
+    "obsidian_greatsword": {
+      "name": "Obsydianowy miecz +2",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 80,
+      "value": 780,
+      "rarity": "epic",
+      "weapon": "sword",
+      "weapon_dice": [
+        2,
+        6
+      ],
+      "damage_dice": "2k6",
+      "attack": 2,
+      "attack_bonus": 2,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "greatsword",
+      "icon": "assets/equipment/obsidian_greatsword.svg",
+      "description": "",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "demon",
+          "name": "Demon",
+          "chance": 0.02
+        },
+        {
+          "kind": "ancient_dragon",
+          "name": "Pradawny Smok",
+          "chance": 0.12
+        },
+        {
+          "kind": "obsidian_knight",
+          "name": "Obsydianowy rycerz",
+          "chance": 0.03
+        }
+      ]
+    },
+    "abyss_blade": {
+      "name": "Ostrze Władcy Otchłani +3",
+      "slot": "weapon",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 120,
+      "value": 1500,
+      "rarity": "legendary",
+      "weapon": "sword",
+      "weapon_dice": [
+        2,
+        6
+      ],
+      "damage_dice": "2k6",
+      "attack": 3,
+      "attack_bonus": 3,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "slashing",
+      "art_kind": "greatsword",
+      "icon": "assets/equipment/abyss_blade.svg",
+      "description": "",
+      "enchantment": 3,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "abyss_walker",
+          "name": "Wędrowiec Otchłani",
+          "chance": 0.006
+        },
+        {
+          "kind": "abyss_lord",
+          "name": "Władca Otchłani",
+          "chance": 0.09
+        }
+      ]
+    },
+    "skeleton_shortbow": {
+      "name": "Łuk kościanego wartownika",
+      "slot": "weapon",
+      "class_ids": [
+        "ranger"
+      ],
+      "min_level": 5,
+      "value": 22,
+      "rarity": "common",
+      "weapon": "bow",
+      "weapon_dice": [
+        1,
+        6
+      ],
+      "damage_dice": "1k6",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "piercing",
+      "art_kind": "bow",
+      "icon": "assets/equipment/skeleton_shortbow.svg",
+      "description": "",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "skeleton_archer",
+          "name": "Szkielet łucznik",
+          "chance": 0.07
+        }
+      ]
+    },
+    "crypt_bow": {
+      "name": "Łuk z krypty +1",
+      "slot": "weapon",
+      "class_ids": [
+        "ranger"
+      ],
+      "min_level": 8,
+      "value": 95,
+      "rarity": "rare",
+      "weapon": "bow",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "piercing",
+      "art_kind": "bow",
+      "icon": "assets/equipment/crypt_bow.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "boss",
+          "name": "Władca Twierdzy",
+          "chance": 0.12
+        },
+        {
+          "kind": "skeleton_archer",
+          "name": "Szkielet łucznik",
+          "chance": 0.015
+        }
+      ]
+    },
+    "bandit_longbow": {
+      "name": "Długi łuk rozbójnika",
+      "slot": "weapon",
+      "class_ids": [
+        "ranger"
+      ],
+      "min_level": 5,
+      "value": 30,
+      "rarity": "common",
+      "weapon": "bow",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "piercing",
+      "art_kind": "bow",
+      "icon": "assets/equipment/bandit_longbow.svg",
+      "description": "",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "bandit_archer",
+          "name": "Bandyta łucznik",
+          "chance": 0.07
+        }
+      ]
+    },
+    "captain_bow": {
+      "name": "Łuk Czarnego Traktu +1",
+      "slot": "weapon",
+      "class_ids": [
+        "ranger"
+      ],
+      "min_level": 20,
+      "value": 180,
+      "rarity": "rare",
+      "weapon": "bow",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "piercing",
+      "art_kind": "bow",
+      "icon": "assets/equipment/captain_bow.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "bandit_captain",
+          "name": "Herszt Czarnego Traktu",
+          "chance": 0.1
+        }
+      ]
+    },
+    "elven_bow": {
+      "name": "Cisowy łuk elfów +1",
+      "slot": "weapon",
+      "class_ids": [
+        "ranger"
+      ],
+      "min_level": 15,
+      "value": 130,
+      "rarity": "rare",
+      "weapon": "bow",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "piercing",
+      "art_kind": "bow",
+      "icon": "assets/equipment/elven_bow.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "elf",
+          "name": "Elf łowca",
+          "chance": 0.04
+        }
+      ]
+    },
+    "frost_bow": {
+      "name": "Łuk Zimowej Straży +2",
+      "slot": "weapon",
+      "class_ids": [
+        "ranger"
+      ],
+      "min_level": 50,
+      "value": 480,
+      "rarity": "epic",
+      "weapon": "bow",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 2,
+      "attack_bonus": 2,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "piercing",
+      "art_kind": "bow",
+      "icon": "assets/equipment/frost_bow.svg",
+      "description": "",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "ice_queen",
+          "name": "Królowa Lodu",
+          "chance": 0.15
+        },
+        {
+          "kind": "frost_ranger",
+          "name": "Łucznik Zimowej Straży",
+          "chance": 0.03
+        }
+      ]
+    },
+    "dragon_bow": {
+      "name": "Łuk Smoczego Skarbca +2",
+      "slot": "weapon",
+      "class_ids": [
+        "ranger"
+      ],
+      "min_level": 90,
+      "value": 760,
+      "rarity": "epic",
+      "weapon": "bow",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 2,
+      "attack_bonus": 2,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "piercing",
+      "art_kind": "bow",
+      "icon": "assets/equipment/dragon_bow.svg",
+      "description": "",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "dragon_lord",
+          "name": "Smoczy władca",
+          "chance": 0.015
+        },
+        {
+          "kind": "ancient_dragon",
+          "name": "Pradawny Smok",
+          "chance": 0.18
+        }
+      ]
+    },
+    "abyss_bow": {
+      "name": "Łuk Popielnej Korony +3",
+      "slot": "weapon",
+      "class_ids": [
+        "ranger"
+      ],
+      "min_level": 120,
+      "value": 1450,
+      "rarity": "legendary",
+      "weapon": "bow",
+      "weapon_dice": [
+        1,
+        8
+      ],
+      "damage_dice": "1k8",
+      "attack": 3,
+      "attack_bonus": 3,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "piercing",
+      "art_kind": "bow",
+      "icon": "assets/equipment/abyss_bow.svg",
+      "description": "",
+      "enchantment": 3,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "abyss_lord",
+          "name": "Władca Otchłani",
+          "chance": 0.09
+        }
+      ]
+    },
+    "acolyte_wand": {
+      "name": "Różdżka grobowego akolity +1",
+      "slot": "weapon",
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 15,
+      "value": 110,
+      "rarity": "rare",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        4
+      ],
+      "damage_dice": "1k4 (Iskra różdżki)",
+      "attack": 0,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "fire",
+      "art_kind": "wand",
+      "icon": "assets/equipment/acolyte_wand.svg",
+      "description": "Zwiększa trafienie czarami i ST obrony przed nimi. Iskra: 1k4 bez skalowania; nie zastępuje sztuczek.",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "grave_acolyte",
+          "name": "Grobowy akolita",
+          "chance": 0.04
+        }
+      ]
+    },
+    "mummy_wand": {
+      "name": "Różdżka mumii +1",
+      "slot": "weapon",
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 20,
+      "value": 170,
+      "rarity": "rare",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        4
+      ],
+      "damage_dice": "1k4 (Iskra różdżki)",
+      "attack": 0,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "fire",
+      "art_kind": "wand",
+      "icon": "assets/equipment/mummy_wand.svg",
+      "description": "Zabalsamowany fokus ozdobiony złotym skarabeuszem. Zwiększa trafienie czarami i ST obrony przed nimi. Iskra: 1k4 bez skalowania; nie zastępuje sztuczek.",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "mummy",
+          "name": "Mumia",
+          "chance": 0.05
+        }
+      ]
+    },
+    "hierophant_wand": {
+      "name": "Berło Hierofanty +2",
+      "slot": "weapon",
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 40,
+      "value": 450,
+      "rarity": "epic",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        4
+      ],
+      "damage_dice": "1k4 (Iskra różdżki)",
+      "attack": 0,
+      "attack_bonus": 2,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "fire",
+      "art_kind": "wand",
+      "icon": "assets/equipment/hierophant_wand.svg",
+      "description": "Zwiększa trafienie czarami i ST obrony przed nimi. Iskra: 1k4 bez skalowania; nie zastępuje sztuczek.",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "sand_queen",
+          "name": "Królowa Piasków",
+          "chance": 0.05
+        },
+        {
+          "kind": "mummy_hierophant",
+          "name": "Mumia Hierofanta",
+          "chance": 0.15
+        }
+      ]
+    },
+    "necromancer_wand": {
+      "name": "Różdżka nekromanty +1",
+      "slot": "weapon",
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 30,
+      "value": 195,
+      "rarity": "rare",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        4
+      ],
+      "damage_dice": "1k4 (Iskra różdżki)",
+      "attack": 0,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "fire",
+      "art_kind": "wand",
+      "icon": "assets/equipment/necromancer_wand.svg",
+      "description": "Zwiększa trafienie czarami i ST obrony przed nimi. Iskra: 1k4 bez skalowania; nie zastępuje sztuczek.",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "necromancer",
+          "name": "Nekromanta",
+          "chance": 0.05
+        }
+      ]
+    },
+    "lich_wand": {
+      "name": "Różdżka wiecznej nocy +2",
+      "slot": "weapon",
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 60,
+      "value": 590,
+      "rarity": "epic",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        4
+      ],
+      "damage_dice": "1k4 (Iskra różdżki)",
+      "attack": 0,
+      "attack_bonus": 2,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "fire",
+      "art_kind": "wand",
+      "icon": "assets/equipment/lich_wand.svg",
+      "description": "Zwiększa trafienie czarami i ST obrony przed nimi. Iskra: 1k4 bez skalowania; nie zastępuje sztuczek.",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "lich",
+          "name": "Licz",
+          "chance": 0.03
+        },
+        {
+          "kind": "lich_king",
+          "name": "Król Nieumarłych",
+          "chance": 0.16
+        }
+      ]
+    },
+    "abyss_wand": {
+      "name": "Różdżka Rozdarcia +3",
+      "slot": "weapon",
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 120,
+      "value": 1500,
+      "rarity": "legendary",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        4
+      ],
+      "damage_dice": "1k4 (Iskra różdżki)",
+      "attack": 0,
+      "attack_bonus": 3,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "fire",
+      "art_kind": "wand",
+      "icon": "assets/equipment/abyss_wand.svg",
+      "description": "Zwiększa trafienie czarami i ST obrony przed nimi. Iskra: 1k4 bez skalowania; nie zastępuje sztuczek.",
+      "enchantment": 3,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "abyss_walker",
+          "name": "Wędrowiec Otchłani",
+          "chance": 0.006
+        },
+        {
+          "kind": "abyss_lord",
+          "name": "Władca Otchłani",
+          "chance": 0.09
+        }
+      ]
+    },
+    "thorn_staff": {
+      "name": "Kostur Ciernistego Kręgu +1",
+      "slot": "weapon",
+      "class_ids": [
+        "druid"
+      ],
+      "min_level": 12,
+      "value": 110,
+      "rarity": "rare",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        6
+      ],
+      "damage_dice": "1k6",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "bludgeoning",
+      "art_kind": "nature_staff",
+      "icon": "assets/equipment/thorn_staff.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "thorn_shaman",
+          "name": "Szaman Ciernistego Kręgu",
+          "chance": 0.05
+        }
+      ]
+    },
+    "orc_shaman_staff": {
+      "name": "Kostur orczego szamana +1",
+      "slot": "weapon",
+      "class_ids": [
+        "druid"
+      ],
+      "min_level": 18,
+      "value": 140,
+      "rarity": "rare",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        6
+      ],
+      "damage_dice": "1k6",
+      "attack": 1,
+      "attack_bonus": 1,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "bludgeoning",
+      "art_kind": "nature_staff",
+      "icon": "assets/equipment/orc_shaman_staff.svg",
+      "description": "",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "orc_shaman",
+          "name": "Ork szaman",
+          "chance": 0.05
+        }
+      ]
+    },
+    "root_staff": {
+      "name": "Kostur starych korzeni +2",
+      "slot": "weapon",
+      "class_ids": [
+        "druid"
+      ],
+      "min_level": 50,
+      "value": 500,
+      "rarity": "epic",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        6
+      ],
+      "damage_dice": "1k6",
+      "attack": 2,
+      "attack_bonus": 2,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "bludgeoning",
+      "art_kind": "nature_staff",
+      "icon": "assets/equipment/root_staff.svg",
+      "description": "",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "lich_king",
+          "name": "Król Nieumarłych",
+          "chance": 0.08
+        }
+      ]
+    },
+    "winter_staff": {
+      "name": "Kostur Królowej Lodu +2",
+      "slot": "weapon",
+      "class_ids": [
+        "druid"
+      ],
+      "min_level": 80,
+      "value": 820,
+      "rarity": "epic",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        6
+      ],
+      "damage_dice": "1k6",
+      "attack": 2,
+      "attack_bonus": 2,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "bludgeoning",
+      "art_kind": "nature_staff",
+      "icon": "assets/equipment/winter_staff.svg",
+      "description": "",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "ice_queen",
+          "name": "Królowa Lodu",
+          "chance": 0.12
+        }
+      ]
+    },
+    "abyss_staff": {
+      "name": "Kostur Odrodzenia +3",
+      "slot": "weapon",
+      "class_ids": [
+        "druid"
+      ],
+      "min_level": 120,
+      "value": 1450,
+      "rarity": "legendary",
+      "weapon": "staff",
+      "weapon_dice": [
+        1,
+        6
+      ],
+      "damage_dice": "1k6",
+      "attack": 3,
+      "attack_bonus": 3,
+      "armor": 0,
+      "ac_bonus": 0,
+      "damage_type": "bludgeoning",
+      "art_kind": "nature_staff",
+      "icon": "assets/equipment/abyss_staff.svg",
+      "description": "",
+      "enchantment": 3,
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "abyss_lord",
+          "name": "Władca Otchłani",
+          "chance": 0.09
+        }
+      ]
+    },
+    "bandit_leather": {
+      "name": "Skórzany kaftan rabusia",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 3,
+      "value": 22,
+      "rarity": "uncommon",
+      "base_ac": 11,
+      "armor_kind": "light",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "light",
+      "icon": "assets/equipment/bandit_leather.svg",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "goblin",
+          "name": "Goblin Zielonego Kła",
+          "chance": 0.04
+        }
+      ],
+      "armor_summary": "Lekki pancerz · KP 11 + Zręczność"
+    },
+    "studded_raider": {
+      "name": "Ćwiekowana skóra rozbójnika",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 8,
+      "value": 55,
+      "rarity": "uncommon",
+      "base_ac": 12,
+      "armor_kind": "light",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "light",
+      "icon": "assets/equipment/studded_raider.svg",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "bandit",
+          "name": "Rozbójnik",
+          "chance": 0.05
+        },
+        {
+          "kind": "bandit_archer",
+          "name": "Bandyta łucznik",
+          "chance": 0.05
+        }
+      ],
+      "armor_summary": "Lekki pancerz · KP 12 + Zręczność"
+    },
+    "elven_leather": {
+      "name": "Skóra leśnego zwiadowcy +1",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 15,
+      "value": 140,
+      "rarity": "rare",
+      "base_ac": 12,
+      "armor_kind": "light",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "light",
+      "icon": "assets/equipment/elven_leather.svg",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "elf",
+          "name": "Elf łowca",
+          "chance": 0.03
+        }
+      ],
+      "armor_summary": "Lekki pancerz · KP 12 + Zręczność +1"
+    },
+    "thorn_leather": {
+      "name": "Ciernista skóra +1",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 18,
+      "value": 160,
+      "rarity": "rare",
+      "base_ac": 12,
+      "armor_kind": "light",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "light",
+      "icon": "assets/equipment/thorn_leather.svg",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "thorn_shaman",
+          "name": "Szaman Ciernistego Kręgu",
+          "chance": 0.02
+        }
+      ],
+      "armor_summary": "Lekki pancerz · KP 12 + Zręczność +1"
+    },
+    "frost_leather": {
+      "name": "Skóra Zimowej Straży +1",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 45,
+      "value": 340,
+      "rarity": "rare",
+      "base_ac": 12,
+      "armor_kind": "light",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "light",
+      "icon": "assets/equipment/frost_leather.svg",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: zimno.",
+      "resistances": [
+        "cold"
+      ],
+      "sources": [
+        {
+          "kind": "ice_queen",
+          "name": "Królowa Lodu",
+          "chance": 0.15
+        },
+        {
+          "kind": "frost_ranger",
+          "name": "Łucznik Zimowej Straży",
+          "chance": 0.05
+        }
+      ],
+      "armor_summary": "Lekki pancerz · KP 12 + Zręczność +1"
+    },
+    "night_leather": {
+      "name": "Skóra wampirzego łowcy +2",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 60,
+      "value": 650,
+      "rarity": "epic",
+      "base_ac": 12,
+      "armor_kind": "light",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 2,
+      "ac_bonus": 2,
+      "art_kind": "light",
+      "icon": "assets/equipment/night_leather.svg",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "lich_king",
+          "name": "Król Nieumarłych",
+          "chance": 0.05
+        }
+      ],
+      "armor_summary": "Lekki pancerz · KP 12 + Zręczność +2"
+    },
+    "raider_chainshirt": {
+      "name": "Koszulka kolcza najemnika",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 8,
+      "value": 60,
+      "rarity": "uncommon",
+      "base_ac": 13,
+      "armor_kind": "medium",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "medium",
+      "icon": "assets/equipment/raider_chainshirt.svg",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "skeleton",
+          "name": "Szkielet wartownika",
+          "chance": 0.03
+        },
+        {
+          "kind": "boss",
+          "name": "Władca Twierdzy",
+          "chance": 0.15
+        },
+        {
+          "kind": "dwarf",
+          "name": "Krasnoludzki strażnik",
+          "chance": 0.06
+        },
+        {
+          "kind": "bandit_veteran",
+          "name": "Bandyta weteran",
+          "chance": 0.06
+        }
+      ],
+      "armor_summary": "Średni pancerz · KP 13 + Zręczność (maks. +2)"
+    },
+    "orc_scale": {
+      "name": "Łuski orczego wojownika",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 12,
+      "value": 85,
+      "rarity": "uncommon",
+      "base_ac": 14,
+      "armor_kind": "medium",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "medium",
+      "icon": "assets/equipment/orc_scale.svg",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "orc",
+          "name": "Ork wojownik",
+          "chance": 0.06
+        }
+      ],
+      "armor_summary": "Średni pancerz · KP 14 + Zręczność (maks. +2)"
+    },
+    "thorn_hide": {
+      "name": "Pancerz z kory i skór",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 7,
+      "value": 40,
+      "rarity": "uncommon",
+      "base_ac": 12,
+      "armor_kind": "medium",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "medium",
+      "icon": "assets/equipment/thorn_hide.svg",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "troll",
+          "name": "Troll leśny",
+          "chance": 0.03
+        },
+        {
+          "kind": "orc_shaman",
+          "name": "Ork szaman",
+          "chance": 0.06
+        },
+        {
+          "kind": "thorn_shaman",
+          "name": "Szaman Ciernistego Kręgu",
+          "chance": 0.07
+        }
+      ],
+      "armor_summary": "Średni pancerz · KP 12 + Zręczność (maks. +2)"
+    },
+    "crypt_breastplate": {
+      "name": "Napierśnik krypty +1",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 30,
+      "value": 270,
+      "rarity": "rare",
+      "base_ac": 14,
+      "armor_kind": "medium",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "medium",
+      "icon": "assets/equipment/crypt_breastplate.svg",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "crypt_guard",
+          "name": "Strażnik zapieczętowanej krypty",
+          "chance": 0.04
+        }
+      ],
+      "armor_summary": "Średni pancerz · KP 14 + Zręczność (maks. +2) +1"
+    },
+    "sand_halfplate": {
+      "name": "Półpłyta pustynnego strażnika +1",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 35,
+      "value": 330,
+      "rarity": "rare",
+      "base_ac": 15,
+      "armor_kind": "medium",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "medium",
+      "icon": "assets/equipment/sand_halfplate.svg",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "sand_queen",
+          "name": "Królowa Piasków",
+          "chance": 0.1
+        },
+        {
+          "kind": "mummy_hierophant",
+          "name": "Mumia Hierofanta",
+          "chance": 0.1
+        }
+      ],
+      "armor_summary": "Średni pancerz · KP 15 + Zręczność (maks. +2) +1"
+    },
+    "dragon_scale": {
+      "name": "Smoczy pancerz łuskowy +1",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 70,
+      "value": 650,
+      "rarity": "rare",
+      "base_ac": 14,
+      "armor_kind": "medium",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "medium",
+      "icon": "assets/equipment/dragon_scale.svg",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: ogień.",
+      "resistances": [
+        "fire"
+      ],
+      "sources": [
+        {
+          "kind": "dragon_lord",
+          "name": "Smoczy władca",
+          "chance": 0.02
+        },
+        {
+          "kind": "ancient_dragon",
+          "name": "Pradawny Smok",
+          "chance": 0.2
+        }
+      ],
+      "armor_summary": "Średni pancerz · KP 14 + Zręczność (maks. +2) +1"
+    },
+    "root_breastplate": {
+      "name": "Napierśnik żywych korzeni +2",
+      "slot": "armor",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "druid"
+      ],
+      "min_level": 65,
+      "value": 650,
+      "rarity": "epic",
+      "base_ac": 14,
+      "armor_kind": "medium",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 2,
+      "ac_bonus": 2,
+      "art_kind": "medium",
+      "icon": "assets/equipment/root_breastplate.svg",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: trucizna.",
+      "resistances": [
+        "poison"
+      ],
+      "sources": [
+        {
+          "kind": "lich_king",
+          "name": "Król Nieumarłych",
+          "chance": 0.05
+        }
+      ],
+      "armor_summary": "Średni pancerz · KP 14 + Zręczność (maks. +2) +2"
+    },
+    "sentry_chainmail": {
+      "name": "Kolczuga szkieletowego strażnika",
+      "slot": "armor",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 12,
+      "value": 110,
+      "rarity": "uncommon",
+      "base_ac": 16,
+      "armor_kind": "heavy",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "heavy",
+      "icon": "assets/equipment/sentry_chainmail.svg",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "skeleton_sentinel",
+          "name": "Szkielet pancerny",
+          "chance": 0.06
+        }
+      ],
+      "armor_summary": "Ciężki pancerz · KP 16"
+    },
+    "captain_splint": {
+      "name": "Zbroja paskowa herszta",
+      "slot": "armor",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 20,
+      "value": 210,
+      "rarity": "uncommon",
+      "base_ac": 17,
+      "armor_kind": "heavy",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "heavy",
+      "icon": "assets/equipment/captain_splint.svg",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "bandit_captain",
+          "name": "Herszt Czarnego Traktu",
+          "chance": 0.12
+        }
+      ],
+      "armor_summary": "Ciężki pancerz · KP 17"
+    },
+    "dwarf_plate": {
+      "name": "Płytowa zbroja Żelaznego Serca",
+      "slot": "armor",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 25,
+      "value": 350,
+      "rarity": "uncommon",
+      "base_ac": 18,
+      "armor_kind": "heavy",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "heavy",
+      "icon": "assets/equipment/dwarf_plate.svg",
+      "enchantment": 0,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "dwarf",
+          "name": "Krasnoludzki strażnik",
+          "chance": 0.025
+        },
+        {
+          "kind": "orc_king",
+          "name": "Król Orków",
+          "chance": 0.1
+        }
+      ],
+      "armor_summary": "Ciężki pancerz · KP 18"
+    },
+    "crypt_plate": {
+      "name": "Płyta grobowego strażnika +1",
+      "slot": "armor",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 35,
+      "value": 430,
+      "rarity": "rare",
+      "base_ac": 18,
+      "armor_kind": "heavy",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "heavy",
+      "icon": "assets/equipment/crypt_plate.svg",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "crypt_guard",
+          "name": "Strażnik zapieczętowanej krypty",
+          "chance": 0.025
+        }
+      ],
+      "armor_summary": "Ciężki pancerz · KP 18 +1"
+    },
+    "obsidian_plate": {
+      "name": "Obsydianowa płyta +2",
+      "slot": "armor",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 80,
+      "value": 1000,
+      "rarity": "epic",
+      "base_ac": 18,
+      "armor_kind": "heavy",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 2,
+      "ac_bonus": 2,
+      "art_kind": "heavy",
+      "icon": "assets/equipment/obsidian_plate.svg",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "obsidian_knight",
+          "name": "Obsydianowy rycerz",
+          "chance": 0.02
+        }
+      ],
+      "armor_summary": "Ciężki pancerz · KP 18 +2"
+    },
+    "ancient_plate": {
+      "name": "Płyta pradawnych strażników +2",
+      "slot": "armor",
+      "class_ids": [
+        "knight"
+      ],
+      "min_level": 110,
+      "value": 1350,
+      "rarity": "epic",
+      "base_ac": 18,
+      "armor_kind": "heavy",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 2,
+      "ac_bonus": 2,
+      "art_kind": "heavy",
+      "icon": "assets/equipment/ancient_plate.svg",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: ogień.",
+      "resistances": [
+        "fire"
+      ],
+      "sources": [
+        {
+          "kind": "ancient_guardian",
+          "name": "Pradawny strażnik",
+          "chance": 0.015
+        },
+        {
+          "kind": "abyss_lord",
+          "name": "Władca Otchłani",
+          "chance": 0.12
+        }
+      ],
+      "armor_summary": "Ciężki pancerz · KP 18 +2"
+    },
+    "acolyte_robe": {
+      "name": "Szata grobowego akolity",
+      "slot": "armor",
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "min_level": 8,
+      "value": 70,
+      "rarity": "rare",
+      "base_ac": 10,
+      "armor_kind": "none",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "robe",
+      "icon": "assets/equipment/acolyte_robe.svg",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "grave_acolyte",
+          "name": "Grobowy akolita",
+          "chance": 0.07
+        }
+      ],
+      "armor_summary": "Szata · KP 10 + Zręczność +1"
+    },
+    "mummy_robe": {
+      "name": "Szata zapieczętowanego grobowca",
+      "slot": "armor",
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "min_level": 20,
+      "value": 130,
+      "rarity": "rare",
+      "base_ac": 10,
+      "armor_kind": "none",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "robe",
+      "icon": "assets/equipment/mummy_robe.svg",
+      "enchantment": 1,
+      "content_version": "0.8.8",
+      "description": "",
+      "sources": [
+        {
+          "kind": "mummy",
+          "name": "Mumia",
+          "chance": 0.04
+        },
+        {
+          "kind": "necromancer",
+          "name": "Nekromanta",
+          "chance": 0.06
+        }
+      ],
+      "armor_summary": "Szata · KP 10 + Zręczność +1"
+    },
+    "hierophant_robe": {
+      "name": "Szata Hierofanty",
+      "slot": "armor",
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "min_level": 40,
+      "value": 420,
+      "rarity": "epic",
+      "base_ac": 10,
+      "armor_kind": "none",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 2,
+      "ac_bonus": 2,
+      "art_kind": "robe",
+      "icon": "assets/equipment/hierophant_robe.svg",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: obrażenia nekrotyczne.",
+      "resistances": [
+        "necrotic"
+      ],
+      "sources": [
+        {
+          "kind": "mummy_hierophant",
+          "name": "Mumia Hierofanta",
+          "chance": 0.12
+        }
+      ],
+      "armor_summary": "Szata · KP 10 + Zręczność +2"
+    },
+    "lich_robe": {
+      "name": "Szata wiecznej nocy",
+      "slot": "armor",
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "min_level": 60,
+      "value": 630,
+      "rarity": "epic",
+      "base_ac": 10,
+      "armor_kind": "none",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 2,
+      "ac_bonus": 2,
+      "art_kind": "robe",
+      "icon": "assets/equipment/lich_robe.svg",
+      "enchantment": 2,
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: zimno.",
+      "resistances": [
+        "cold"
+      ],
+      "sources": [
+        {
+          "kind": "lich",
+          "name": "Licz",
+          "chance": 0.03
+        },
+        {
+          "kind": "lich_king",
+          "name": "Król Nieumarłych",
+          "chance": 0.12
+        }
+      ],
+      "armor_summary": "Szata · KP 10 + Zręczność +2"
+    },
+    "grave_ring": {
+      "name": "Pierścień ciszy grobowej",
+      "slot": "ring",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "mage",
+        "druid"
+      ],
+      "min_level": 30,
+      "value": 230,
+      "rarity": "rare",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "ring",
+      "icon": "assets/equipment/grave_ring.svg",
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: obrażenia nekrotyczne.",
+      "resistances": [
+        "necrotic"
+      ],
+      "sources": [
+        {
+          "kind": "mummy",
+          "name": "Mumia",
+          "chance": 0.008
+        },
+        {
+          "kind": "vampire",
+          "name": "Wampir",
+          "chance": 0.01
+        },
+        {
+          "kind": "necromancer",
+          "name": "Nekromanta",
+          "chance": 0.012
+        },
+        {
+          "kind": "mummy_hierophant",
+          "name": "Mumia Hierofanta",
+          "chance": 0.05
+        }
+      ]
+    },
+    "venom_ring": {
+      "name": "Pierścień jadowej pieczęci",
+      "slot": "ring",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "mage",
+        "druid"
+      ],
+      "min_level": 25,
+      "value": 170,
+      "rarity": "rare",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "ring",
+      "icon": "assets/equipment/venom_ring.svg",
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: trucizna.",
+      "resistances": [
+        "poison"
+      ],
+      "sources": [
+        {
+          "kind": "sand_queen",
+          "name": "Królowa Piasków",
+          "chance": 0.12
+        }
+      ]
+    },
+    "winter_ring": {
+      "name": "Pierścień zimowego ogniska",
+      "slot": "ring",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "mage",
+        "druid"
+      ],
+      "min_level": 50,
+      "value": 380,
+      "rarity": "rare",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "ring",
+      "icon": "assets/equipment/winter_ring.svg",
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: zimno.",
+      "resistances": [
+        "cold"
+      ],
+      "sources": [
+        {
+          "kind": "frost_giant",
+          "name": "Lodowy olbrzym",
+          "chance": 0.01
+        },
+        {
+          "kind": "ice_queen",
+          "name": "Królowa Lodu",
+          "chance": 0.08
+        },
+        {
+          "kind": "frost_ranger",
+          "name": "Łucznik Zimowej Straży",
+          "chance": 0.01
+        }
+      ]
+    },
+    "ember_ring": {
+      "name": "Pierścień smoczego żaru",
+      "slot": "ring",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "mage",
+        "druid"
+      ],
+      "min_level": 70,
+      "value": 580,
+      "rarity": "epic",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 0,
+      "ac_bonus": 0,
+      "art_kind": "ring",
+      "icon": "assets/equipment/ember_ring.svg",
+      "content_version": "0.8.8",
+      "description": "Połowa obrażeń: ogień.",
+      "resistances": [
+        "fire"
+      ],
+      "sources": [
+        {
+          "kind": "dragon_lord",
+          "name": "Smoczy władca",
+          "chance": 0.005
+        },
+        {
+          "kind": "demon",
+          "name": "Demon",
+          "chance": 0.006
+        },
+        {
+          "kind": "ancient_dragon",
+          "name": "Pradawny Smok",
+          "chance": 0.08
+        }
+      ]
+    },
+    "captain_ring": {
+      "name": "Pierścień herszta",
+      "slot": "ring",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "mage",
+        "druid"
+      ],
+      "min_level": 20,
+      "value": 175,
+      "rarity": "rare",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "ring",
+      "icon": "assets/equipment/captain_ring.svg",
+      "content_version": "0.8.8",
+      "description": "Klasa Pancerza +1.",
+      "sources": [
+        {
+          "kind": "orc_king",
+          "name": "Król Orków",
+          "chance": 0.06
+        },
+        {
+          "kind": "bandit_captain",
+          "name": "Herszt Czarnego Traktu",
+          "chance": 0.04
+        }
+      ]
+    },
+    "king_ring": {
+      "name": "Pieczęć Króla Nieumarłych",
+      "slot": "ring",
+      "class_ids": [
+        "knight",
+        "ranger",
+        "mage",
+        "druid"
+      ],
+      "min_level": 65,
+      "value": 700,
+      "rarity": "epic",
+      "attack": 0,
+      "attack_bonus": 0,
+      "armor": 1,
+      "ac_bonus": 1,
+      "art_kind": "ring",
+      "icon": "assets/equipment/king_ring.svg",
+      "content_version": "0.8.8",
+      "description": "Klasa Pancerza +1. Połowa obrażeń: obrażenia nekrotyczne.",
+      "resistances": [
+        "necrotic"
+      ],
+      "sources": [
+        {
+          "kind": "lich_king",
+          "name": "Król Nieumarłych",
+          "chance": 0.06
+        }
+      ]
+    },
+    "loot_trophy_rat": {
+      "name": "Szczurzy ogon",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 1,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_rat.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "rat",
+          "name": "Szczur polny",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_boar": {
+      "name": "Szabla dzika",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 3,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_boar.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "boar",
+          "name": "Dzik",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_wolf": {
+      "name": "Wilcza skóra",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 4,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_wolf.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "wolf",
+          "name": "Wilk cienia",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_bear": {
+      "name": "Niedźwiedzie futro",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 12,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_bear.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "bear",
+          "name": "Niedźwiedź brunatny",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_frost_wolf": {
+      "name": "Polarne futro",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 40,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_frost_wolf.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "frost_wolf",
+          "name": "Wilk polarny",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_crocodile": {
+      "name": "Skóra krokodyla",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 14,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_crocodile.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "crocodile",
+          "name": "Krokodyl bagienny",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_nightmare": {
+      "name": "Grzywa koszmaru",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 65,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_nightmare.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "nightmare",
+          "name": "Koszmar",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_spider": {
+      "name": "Pajęczy jedwab",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 6,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_spider.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "spider",
+          "name": "Szmaragdowy pająk",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_spitting_spider": {
+      "name": "Worek pajęczego jadu",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 10,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_spitting_spider.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "spitting_spider",
+          "name": "Plujący pająk",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_scorpion": {
+      "name": "Żądło skorpiona",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 15,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_scorpion.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "scorpion",
+          "name": "Skorpion piaskowy",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_scarab": {
+      "name": "Złoty pancerzyk",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 24,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_scarab.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "scarab",
+          "name": "Złoty skarabeusz",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_harpy": {
+      "name": "Pióro harpii",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 18,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_harpy.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "harpy",
+          "name": "Harpia skalna",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_ghoul": {
+      "name": "Ghulowy pazur",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 10,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_ghoul.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "ghoul",
+          "name": "Ghul cmentarny",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_wisp": {
+      "name": "Okruch błędnego światła",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 8,
+      "rarity": "uncommon",
+      "art_kind": "essence",
+      "icon": "assets/equipment/loot_trophy_wisp.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "wisp",
+          "name": "Błędny ognik",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_guardian": {
+      "name": "Odłamek ożywionego kamienia",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 20,
+      "rarity": "uncommon",
+      "art_kind": "essence",
+      "icon": "assets/equipment/loot_trophy_guardian.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "guardian",
+          "name": "Kamienny strażnik",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_golem": {
+      "name": "Rdzeń żelaznego golema",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 38,
+      "rarity": "uncommon",
+      "art_kind": "essence",
+      "icon": "assets/equipment/loot_trophy_golem.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "golem",
+          "name": "Żelazny golem",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_ice_elemental": {
+      "name": "Lodowa esencja",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 50,
+      "rarity": "uncommon",
+      "art_kind": "essence",
+      "icon": "assets/equipment/loot_trophy_ice_elemental.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "ice_elemental",
+          "name": "Żywiołak lodu",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_fire_elemental": {
+      "name": "Płomienna esencja",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 48,
+      "rarity": "uncommon",
+      "art_kind": "essence",
+      "icon": "assets/equipment/loot_trophy_fire_elemental.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "fire_elemental",
+          "name": "Żywiołak ognia",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_dragon": {
+      "name": "Smocza łuska",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 60,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_dragon.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "dragon",
+          "name": "Smok",
+          "chance": 0.32
+        }
+      ]
+    },
+    "loot_trophy_dragon_lord": {
+      "name": "Łuska smoczego władcy",
+      "slot": "trophy",
+      "class_ids": [],
+      "min_level": 1,
+      "value": 90,
+      "rarity": "uncommon",
+      "art_kind": "trophy",
+      "icon": "assets/equipment/loot_trophy_dragon_lord.svg",
+      "description": "Trofeum na sprzedaż u kupca.",
+      "content_version": "0.8.8",
+      "sources": [
+        {
+          "kind": "dragon_lord",
+          "name": "Smoczy władca",
+          "chance": 0.32
+        }
+      ]
+    }
+  },
+  "monsters": {
+    "rat": {
+      "name": "Szczur polny",
+      "level": 1,
+      "hp": 4,
+      "armor_class": 10,
+      "boss": false,
+      "loot": {
+        "family": "beast",
+        "tier": 1,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_rat",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "boar": {
+      "name": "Dzik",
+      "level": 2,
+      "hp": 11,
+      "armor_class": 11,
+      "boss": false,
+      "loot": {
+        "family": "beast",
+        "tier": 1,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_boar",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "goblin": {
+      "name": "Goblin Zielonego Kła",
+      "level": 3,
+      "hp": 7,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "raider",
+        "tier": 2,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "goblin_cleaver",
+            "chance": 0.07
+          },
+          {
+            "kind": "item",
+            "template": "bandit_leather",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "spider": {
+      "name": "Szmaragdowy pająk",
+      "level": 5,
+      "hp": 16,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "vermin",
+        "tier": 2,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_spider",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "skeleton": {
+      "name": "Szkielet wartownika",
+      "level": 8,
+      "hp": 13,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "bandit_longsword",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "raider_chainshirt",
+            "chance": 0.03
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "wolf": {
+      "name": "Wilk cienia",
+      "level": 3,
+      "hp": 11,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "beast",
+        "tier": 2,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_wolf",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "wisp": {
+      "name": "Błędny ognik",
+      "level": 6,
+      "hp": 18,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "abyss",
+        "tier": 2,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_wisp",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "guardian": {
+      "name": "Kamienny strażnik",
+      "level": 8,
+      "hp": 45,
+      "armor_class": 16,
+      "boss": false,
+      "loot": {
+        "family": "stone",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_guardian",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "boss": {
+      "name": "Władca Twierdzy",
+      "level": 8,
+      "hp": 90,
+      "armor_class": 16,
+      "boss": true,
+      "loot": {
+        "family": "stone",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "bandit_sabre",
+            "chance": 0.18
+          },
+          {
+            "kind": "item",
+            "template": "crypt_bow",
+            "chance": 0.12
+          },
+          {
+            "kind": "item",
+            "template": "raider_chainshirt",
+            "chance": 0.15
+          },
+          {
+            "kind": "item",
+            "template": "trophy_stone",
+            "chance": 1.0
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.15
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.15
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Skarbiec i zdobycze"
+    },
+    "troll": {
+      "name": "Troll leśny",
+      "level": 7,
+      "hp": 26,
+      "armor_class": 11,
+      "boss": false,
+      "loot": {
+        "family": "stone",
+        "tier": 2,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "goblin_cleaver",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "thorn_hide",
+            "chance": 0.03
+          },
+          {
+            "kind": "item",
+            "template": "trophy_stone",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "bandit": {
+      "name": "Rozbójnik",
+      "level": 10,
+      "hp": 11,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "raider",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "bandit_longsword",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "bandit_sabre",
+            "chance": 0.03
+          },
+          {
+            "kind": "item",
+            "template": "studded_raider",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "orc": {
+      "name": "Ork wojownik",
+      "level": 15,
+      "hp": 45,
+      "armor_class": 11,
+      "boss": false,
+      "loot": {
+        "family": "raider",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "orc_battleaxe",
+            "chance": 0.07
+          },
+          {
+            "kind": "item",
+            "template": "orc_scale",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "orc_shaman": {
+      "name": "Ork szaman",
+      "level": 20,
+      "hp": 52,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "raider",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "orc_shaman_staff",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "thorn_hide",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "crocodile": {
+      "name": "Krokodyl bagienny",
+      "level": 12,
+      "hp": 39,
+      "armor_class": 11,
+      "boss": false,
+      "loot": {
+        "family": "beast",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_crocodile",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "elf": {
+      "name": "Elf łowca",
+      "level": 18,
+      "hp": 52,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "raider",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "elven_bow",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "elven_leather",
+            "chance": 0.03
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "minotaur": {
+      "name": "Minotaur",
+      "level": 25,
+      "hp": 65,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "stone",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "veteran_greatsword",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "orc_battleaxe",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "trophy_stone",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "scarab": {
+      "name": "Złoty skarabeusz",
+      "level": 28,
+      "hp": 71,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "vermin",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_scarab",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "mummy": {
+      "name": "Mumia",
+      "level": 35,
+      "hp": 91,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 5,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "mummy_wand",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "mummy_robe",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "grave_ring",
+            "chance": 0.008
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "vampire": {
+      "name": "Wampir",
+      "level": 40,
+      "hp": 97,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 5,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "crypt_blade",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "grave_ring",
+            "chance": 0.01
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "necromancer": {
+      "name": "Nekromanta",
+      "level": 40,
+      "hp": 97,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 5,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "necromancer_wand",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "mummy_robe",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "grave_ring",
+            "chance": 0.012
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "dwarf": {
+      "name": "Krasnoludzki strażnik",
+      "level": 30,
+      "hp": 78,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "raider",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "dwarf_hammer",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "dwarf_plate",
+            "chance": 0.025
+          },
+          {
+            "kind": "item",
+            "template": "raider_chainshirt",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "golem": {
+      "name": "Żelazny golem",
+      "level": 45,
+      "hp": 110,
+      "armor_class": 15,
+      "boss": false,
+      "loot": {
+        "family": "stone",
+        "tier": 5,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_golem",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "frost_wolf": {
+      "name": "Wilk polarny",
+      "level": 42,
+      "hp": 104,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "beast",
+        "tier": 5,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_frost_wolf",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "ice_elemental": {
+      "name": "Żywiołak lodu",
+      "level": 60,
+      "hp": 143,
+      "armor_class": 14,
+      "boss": false,
+      "loot": {
+        "family": "frost",
+        "tier": 6,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_ice_elemental",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "fire_elemental": {
+      "name": "Żywiołak ognia",
+      "level": 55,
+      "hp": 130,
+      "armor_class": 14,
+      "boss": false,
+      "loot": {
+        "family": "abyss",
+        "tier": 6,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_fire_elemental",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "dragon": {
+      "name": "Smok",
+      "level": 65,
+      "hp": 156,
+      "armor_class": 14,
+      "boss": false,
+      "loot": {
+        "family": "dragon",
+        "tier": 6,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_dragon",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "frost_giant": {
+      "name": "Lodowy olbrzym",
+      "level": 78,
+      "hp": 182,
+      "armor_class": 15,
+      "boss": false,
+      "loot": {
+        "family": "frost",
+        "tier": 7,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "dwarf_hammer",
+            "chance": 0.03
+          },
+          {
+            "kind": "item",
+            "template": "winter_ring",
+            "chance": 0.01
+          },
+          {
+            "kind": "item",
+            "template": "trophy_frost",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "lich": {
+      "name": "Licz",
+      "level": 70,
+      "hp": 162,
+      "armor_class": 14,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 7,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "lich_wand",
+            "chance": 0.03
+          },
+          {
+            "kind": "item",
+            "template": "lich_robe",
+            "chance": 0.03
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "nightmare": {
+      "name": "Koszmar",
+      "level": 80,
+      "hp": 188,
+      "armor_class": 15,
+      "boss": false,
+      "loot": {
+        "family": "beast",
+        "tier": 7,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_nightmare",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "dragon_lord": {
+      "name": "Smoczy władca",
+      "level": 95,
+      "hp": 221,
+      "armor_class": 16,
+      "boss": false,
+      "loot": {
+        "family": "dragon",
+        "tier": 8,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "dragon_bow",
+            "chance": 0.015
+          },
+          {
+            "kind": "item",
+            "template": "dragon_scale",
+            "chance": 0.02
+          },
+          {
+            "kind": "item",
+            "template": "ember_ring",
+            "chance": 0.005
+          },
+          {
+            "kind": "item",
+            "template": "loot_trophy_dragon_lord",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Skarbiec i zdobycze"
+    },
+    "demon": {
+      "name": "Demon",
+      "level": 100,
+      "hp": 234,
+      "armor_class": 16,
+      "boss": false,
+      "loot": {
+        "family": "abyss",
+        "tier": 8,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "obsidian_greatsword",
+            "chance": 0.02
+          },
+          {
+            "kind": "item",
+            "template": "ember_ring",
+            "chance": 0.006
+          },
+          {
+            "kind": "item",
+            "template": "trophy_abyss",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "ancient_guardian": {
+      "name": "Pradawny strażnik",
+      "level": 120,
+      "hp": 273,
+      "armor_class": 19,
+      "boss": false,
+      "loot": {
+        "family": "stone",
+        "tier": 9,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "ancient_plate",
+            "chance": 0.015
+          },
+          {
+            "kind": "item",
+            "template": "trophy_stone",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "abyss_walker": {
+      "name": "Wędrowiec Otchłani",
+      "level": 140,
+      "hp": 318,
+      "armor_class": 18,
+      "boss": false,
+      "loot": {
+        "family": "abyss",
+        "tier": 9,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "abyss_wand",
+            "chance": 0.006
+          },
+          {
+            "kind": "item",
+            "template": "abyss_blade",
+            "chance": 0.006
+          },
+          {
+            "kind": "item",
+            "template": "trophy_abyss",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "orc_king": {
+      "name": "Król Orków",
+      "level": 28,
+      "hp": 162,
+      "armor_class": 14,
+      "boss": true,
+      "loot": {
+        "family": "raider",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "orc_king_axe",
+            "chance": 0.2
+          },
+          {
+            "kind": "item",
+            "template": "dwarf_plate",
+            "chance": 0.1
+          },
+          {
+            "kind": "item",
+            "template": "captain_ring",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 1.0
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.15
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.15
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "sand_queen": {
+      "name": "Królowa Piasków",
+      "level": 50,
+      "hp": 273,
+      "armor_class": 15,
+      "boss": true,
+      "loot": {
+        "family": "undead",
+        "tier": 6,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "venom_ring",
+            "chance": 0.12
+          },
+          {
+            "kind": "item",
+            "template": "sand_halfplate",
+            "chance": 0.1
+          },
+          {
+            "kind": "item",
+            "template": "hierophant_wand",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 1.0
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.15
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.15
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Skarbiec i zdobycze"
+    },
+    "lich_king": {
+      "name": "Król Nieumarłych",
+      "level": 75,
+      "hp": 403,
+      "armor_class": 17,
+      "boss": true,
+      "loot": {
+        "family": "undead",
+        "tier": 7,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "lich_wand",
+            "chance": 0.16
+          },
+          {
+            "kind": "item",
+            "template": "lich_robe",
+            "chance": 0.12
+          },
+          {
+            "kind": "item",
+            "template": "king_ring",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "root_staff",
+            "chance": 0.08
+          },
+          {
+            "kind": "item",
+            "template": "root_breastplate",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "night_leather",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 1.0
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.15
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.15
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Skarbiec i zdobycze"
+    },
+    "ice_queen": {
+      "name": "Królowa Lodu",
+      "level": 95,
+      "hp": 500,
+      "armor_class": 18,
+      "boss": true,
+      "loot": {
+        "family": "frost",
+        "tier": 8,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "frost_bow",
+            "chance": 0.15
+          },
+          {
+            "kind": "item",
+            "template": "winter_staff",
+            "chance": 0.12
+          },
+          {
+            "kind": "item",
+            "template": "frost_leather",
+            "chance": 0.15
+          },
+          {
+            "kind": "item",
+            "template": "winter_ring",
+            "chance": 0.08
+          },
+          {
+            "kind": "item",
+            "template": "trophy_frost",
+            "chance": 1.0
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.15
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.15
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Skarbiec i zdobycze"
+    },
+    "ancient_dragon": {
+      "name": "Pradawny Smok",
+      "level": 110,
+      "hp": 578,
+      "armor_class": 19,
+      "boss": true,
+      "loot": {
+        "family": "dragon",
+        "tier": 9,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "dragon_bow",
+            "chance": 0.18
+          },
+          {
+            "kind": "item",
+            "template": "dragon_scale",
+            "chance": 0.2
+          },
+          {
+            "kind": "item",
+            "template": "ember_ring",
+            "chance": 0.08
+          },
+          {
+            "kind": "item",
+            "template": "obsidian_greatsword",
+            "chance": 0.12
+          },
+          {
+            "kind": "item",
+            "template": "trophy_dragon",
+            "chance": 1.0
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.15
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.15
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Skarbiec i zdobycze"
+    },
+    "abyss_lord": {
+      "name": "Władca Otchłani",
+      "level": 150,
+      "hp": 780,
+      "armor_class": 21,
+      "boss": true,
+      "loot": {
+        "family": "abyss",
+        "tier": 9,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "abyss_blade",
+            "chance": 0.09
+          },
+          {
+            "kind": "item",
+            "template": "abyss_bow",
+            "chance": 0.09
+          },
+          {
+            "kind": "item",
+            "template": "abyss_wand",
+            "chance": 0.09
+          },
+          {
+            "kind": "item",
+            "template": "abyss_staff",
+            "chance": 0.09
+          },
+          {
+            "kind": "item",
+            "template": "ancient_plate",
+            "chance": 0.12
+          },
+          {
+            "kind": "item",
+            "template": "trophy_abyss",
+            "chance": 1.0
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.15
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.15
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Skarbiec i zdobycze"
+    },
+    "bandit_archer": {
+      "name": "Bandyta łucznik",
+      "level": 11,
+      "hp": 11,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "raider",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "bandit_longbow",
+            "chance": 0.07
+          },
+          {
+            "kind": "item",
+            "template": "studded_raider",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "skeleton_archer": {
+      "name": "Szkielet łucznik",
+      "level": 9,
+      "hp": 13,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "skeleton_shortbow",
+            "chance": 0.07
+          },
+          {
+            "kind": "item",
+            "template": "crypt_bow",
+            "chance": 0.015
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "spitting_spider": {
+      "name": "Plujący pająk",
+      "level": 8,
+      "hp": 26,
+      "armor_class": 11,
+      "boss": false,
+      "loot": {
+        "family": "vermin",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_spitting_spider",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "cyclops": {
+      "name": "Cyklop skalny",
+      "level": 24,
+      "hp": 65,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "stone",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "orc_battleaxe",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "trophy_stone",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "bear": {
+      "name": "Niedźwiedź brunatny",
+      "level": 12,
+      "hp": 34,
+      "armor_class": 11,
+      "boss": false,
+      "loot": {
+        "family": "beast",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_bear",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "harpy": {
+      "name": "Harpia skalna",
+      "level": 22,
+      "hp": 58,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "stone",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_harpy",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "ghoul": {
+      "name": "Ghul cmentarny",
+      "level": 14,
+      "hp": 22,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_ghoul",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "ogre": {
+      "name": "Ogr maczugowy",
+      "level": 31,
+      "hp": 59,
+      "armor_class": 11,
+      "boss": false,
+      "loot": {
+        "family": "stone",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "veteran_greatsword",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "trophy_stone",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "scorpion": {
+      "name": "Skorpion piaskowy",
+      "level": 18,
+      "hp": 52,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "vermin",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "loot_trophy_scorpion",
+            "chance": 0.32
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Trofea"
+    },
+    "bandit_veteran": {
+      "name": "Bandyta weteran",
+      "level": 16,
+      "hp": 39,
+      "armor_class": 14,
+      "boss": false,
+      "loot": {
+        "family": "raider",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "veteran_greatsword",
+            "chance": 0.07
+          },
+          {
+            "kind": "item",
+            "template": "bandit_sabre",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "raider_chainshirt",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "bandit_captain": {
+      "name": "Herszt Czarnego Traktu",
+      "level": 24,
+      "hp": 110,
+      "armor_class": 16,
+      "boss": true,
+      "loot": {
+        "family": "raider",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "captain_greatsword",
+            "chance": 0.18
+          },
+          {
+            "kind": "item",
+            "template": "captain_bow",
+            "chance": 0.1
+          },
+          {
+            "kind": "item",
+            "template": "captain_splint",
+            "chance": 0.12
+          },
+          {
+            "kind": "item",
+            "template": "captain_ring",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 1.0
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.15
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.15
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "skeleton_sentinel": {
+      "name": "Szkielet pancerny",
+      "level": 18,
+      "hp": 39,
+      "armor_class": 16,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "sentry_chainmail",
+            "chance": 0.06
+          },
+          {
+            "kind": "item",
+            "template": "bandit_longsword",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "grave_acolyte": {
+      "name": "Grobowy akolita",
+      "level": 22,
+      "hp": 45,
+      "armor_class": 12,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 4,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "acolyte_wand",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "acolyte_robe",
+            "chance": 0.07
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "thorn_shaman": {
+      "name": "Szaman Ciernistego Kręgu",
+      "level": 18,
+      "hp": 39,
+      "armor_class": 13,
+      "boss": false,
+      "loot": {
+        "family": "raider",
+        "tier": 3,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "thorn_staff",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "thorn_hide",
+            "chance": 0.07
+          },
+          {
+            "kind": "item",
+            "template": "thorn_leather",
+            "chance": 0.02
+          },
+          {
+            "kind": "item",
+            "template": "trophy_raider",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "crypt_guard": {
+      "name": "Strażnik zapieczętowanej krypty",
+      "level": 38,
+      "hp": 91,
+      "armor_class": 17,
+      "boss": false,
+      "loot": {
+        "family": "undead",
+        "tier": 5,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "crypt_blade",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "crypt_plate",
+            "chance": 0.025
+          },
+          {
+            "kind": "item",
+            "template": "crypt_breastplate",
+            "chance": 0.04
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "mummy_hierophant": {
+      "name": "Mumia Hierofanta",
+      "level": 48,
+      "hp": 220,
+      "armor_class": 16,
+      "boss": true,
+      "loot": {
+        "family": "undead",
+        "tier": 5,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "hierophant_wand",
+            "chance": 0.15
+          },
+          {
+            "kind": "item",
+            "template": "hierophant_robe",
+            "chance": 0.12
+          },
+          {
+            "kind": "item",
+            "template": "sand_halfplate",
+            "chance": 0.1
+          },
+          {
+            "kind": "item",
+            "template": "grave_ring",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "trophy_undead",
+            "chance": 1.0
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.15
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.15
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "frost_ranger": {
+      "name": "Łucznik Zimowej Straży",
+      "level": 52,
+      "hp": 117,
+      "armor_class": 15,
+      "boss": false,
+      "loot": {
+        "family": "frost",
+        "tier": 6,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "frost_bow",
+            "chance": 0.03
+          },
+          {
+            "kind": "item",
+            "template": "frost_leather",
+            "chance": 0.05
+          },
+          {
+            "kind": "item",
+            "template": "winter_ring",
+            "chance": 0.01
+          },
+          {
+            "kind": "item",
+            "template": "trophy_frost",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_2",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_2",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    },
+    "obsidian_knight": {
+      "name": "Obsydianowy rycerz",
+      "level": 90,
+      "hp": 221,
+      "armor_class": 19,
+      "boss": false,
+      "loot": {
+        "family": "abyss",
+        "tier": 8,
+        "equipment_chance": 0,
+        "trophy_chance": 0,
+        "potion_chance": 0,
+        "unique_chance": 0,
+        "legendary_chance": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "template": "obsidian_greatsword",
+            "chance": 0.03
+          },
+          {
+            "kind": "item",
+            "template": "obsidian_plate",
+            "chance": 0.02
+          },
+          {
+            "kind": "item",
+            "template": "trophy_abyss",
+            "chance": 0.32
+          },
+          {
+            "kind": "potion",
+            "template": "health_potion_3",
+            "chance": 0.04
+          },
+          {
+            "kind": "potion",
+            "template": "mana_potion_3",
+            "chance": 0.04
+          }
+        ],
+        "independent": true
+      },
+      "loot_origin": "Ekwipunek przeciwnika"
+    }
+  },
+  "hunts": [
+    {
+      "id": "loot_hunt_bandit_veteran",
+      "name": "Bandyta weteran",
+      "kind": "bandit_veteran",
+      "x": 5085,
+      "y": 14163,
+      "floor": 0,
+      "region": "Marchie Przystani",
+      "level": 16,
+      "count": 18
+    },
+    {
+      "id": "loot_hunt_bandit_captain",
+      "name": "Herszt Czarnego Traktu",
+      "kind": "bandit_captain",
+      "x": 34288,
+      "y": 10267,
+      "floor": 0,
+      "region": "Bory Szeptów",
+      "level": 24,
+      "count": 1
+    },
+    {
+      "id": "loot_hunt_skeleton_sentinel",
+      "name": "Szkielet pancerny",
+      "kind": "skeleton_sentinel",
+      "x": 15715,
+      "y": 5191,
+      "floor": 0,
+      "region": "Marchie Przystani",
+      "level": 18,
+      "count": 18
+    },
+    {
+      "id": "loot_hunt_grave_acolyte",
+      "name": "Grobowy akolita",
+      "kind": "grave_acolyte",
+      "x": 15755,
+      "y": 5151,
+      "floor": 0,
+      "region": "Marchie Przystani",
+      "level": 22,
+      "count": 16
+    },
+    {
+      "id": "loot_hunt_thorn_shaman",
+      "name": "Szaman Ciernistego Kręgu",
+      "kind": "thorn_shaman",
+      "x": 37752,
+      "y": 6832,
+      "floor": 0,
+      "region": "Bory Szeptów",
+      "level": 18,
+      "count": 16
+    },
+    {
+      "id": "loot_hunt_crypt_guard",
+      "name": "Strażnik zapieczętowanej krypty",
+      "kind": "crypt_guard",
+      "x": 6010,
+      "y": 74991,
+      "floor": 0,
+      "region": "Miasto Pod Korzeniami",
+      "level": 38,
+      "count": 18
+    },
+    {
+      "id": "loot_hunt_mummy_hierophant",
+      "name": "Mumia Hierofanta",
+      "kind": "mummy_hierophant",
+      "x": 120026,
+      "y": 10944,
+      "floor": 0,
+      "region": "Wydmy Zapomnianych",
+      "level": 48,
+      "count": 1
+    },
+    {
+      "id": "loot_hunt_frost_ranger",
+      "name": "Łucznik Zimowej Straży",
+      "kind": "frost_ranger",
+      "x": 60330,
+      "y": 49374,
+      "floor": 0,
+      "region": "Śnieżna Granica",
+      "level": 52,
+      "count": 20
+    },
+    {
+      "id": "loot_hunt_obsidian_knight",
+      "name": "Obsydianowy rycerz",
+      "kind": "obsidian_knight",
+      "x": 87853,
+      "y": 72002,
+      "floor": 0,
+      "region": "Obsydianowy Bastion",
+      "level": 90,
+      "count": 18
+    }
+  ]
+}

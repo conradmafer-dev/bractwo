@@ -1,6 +1,6 @@
 """Server-owned species loot; chances are independent, per eligible player.
 
-Bosses guarantee tier-based equipment; named family items roll separately.
+Legacy caches retain tier-based equipment; 0.8.8 monsters use explicit species entries.
 Trophies are valuable trade goods, never equippable. Potions use existing stacks.
 """
 RARITIES = {'common': 'Pospolity', 'uncommon': 'Niepospolity', 'rare': 'Rzadki',
@@ -18,13 +18,13 @@ FAMILIES = {
 
 
 def configure(items, enemies, tier_levels):
-    classes = ['knight', 'paladin', 'mage', 'druid']
+    classes = ['knight', 'ranger', 'mage', 'druid']
     for family, (trophy, value, name, tier, kinds) in FAMILIES.items():
         items[f'trophy_{family}'] = {'name': trophy, 'slot': 'trophy', 'class_ids': [], 'min_level': 1,
                                     'value': value, 'rarity': 'uncommon', 'description': 'Trofeum. Kupcy skupują je za złoto; można przechować w depozycie.'}
         for vocation in classes:
             base = items[f'{vocation}_weapon_{tier}']
-            items[f'unique_{family}_{vocation}'] = {**base, 'name': f'{name} · '+{'knight': 'ostrze', 'paladin': 'łuk', 'mage': 'różdżka', 'druid': 'kostur'}[vocation],
+            items[f'unique_{family}_{vocation}'] = {**base, 'name': f'{name} · '+{'knight': 'ostrze', 'ranger': 'łuk', 'mage': 'różdżka', 'druid': 'kostur'}[vocation],
                 'attack': base.get('attack', 0)+max(2, tier*2), 'value': base['value']*3, 'rarity': 'rare' if tier < 6 else 'epic',
                 'description': 'Rzadki łup charakterystyczny dla tej rodziny potworów.'}
         base = items['hunter_ring'] if tier <= 3 else items[f'ring_{tier}']
@@ -61,6 +61,10 @@ def unique(vocation, family, rng):
 
 def roll(vocation, spec, rng):
     table = spec['loot']; result = []
+    if 'entries' in table:
+        # Authored species loot is independent of the receiver vocation.
+        return [(e['kind'], e['template']) for e in table['entries']
+                if e['chance'] > 0 and rng.random() < e['chance']]
     if rng.random() < table['equipment_chance']:
         result.append(('item', ordinary(vocation, table['tier'], rng)))
     if rng.random() < table['trophy_chance']:

@@ -1,4 +1,4 @@
-"""Pogranicze: authoritative shared-world RPG prototype, version 0.6.0.
+"""Pogranicze: authoritative shared-world RPG prototype, version 0.8.17.
 
 One process owns a SQLite database; all economy, combat and crimes are server-owned.
 """
@@ -12,7 +12,6 @@ import hashlib
 import hmac
 import json
 import math
-import os
 from pathlib import Path
 from types import SimpleNamespace
 import random
@@ -23,14 +22,30 @@ import time
 from aiohttp import web, WSMsgType
 try:
     from . import world_content as content
-    from . import living_world, vertical_world, loot_tables
+    from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content
+    from .combat_rules import CombatRounds
+    from .dnd_game import DNDGame
+    from . import dnd_content
     from .monster_ai import MonsterAI
+    from . import level_up, spell_scaling, inventory_rules, fighter_rules
+    from .fighter_rules import FighterGame
+    from . import equipment_rules, caster_rules
+    from .caster_game import CasterGame
     from .progression import ExpansionGame, same_floor, near, train, skill_level, private_state
+    from . import progression_guide
 except ImportError:
     import world_content as content
-    import living_world, vertical_world, loot_tables
+    import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content
+    from combat_rules import CombatRounds
+    from dnd_game import DNDGame
+    import dnd_content
     from monster_ai import MonsterAI
+    import level_up, spell_scaling, inventory_rules, fighter_rules
+    from fighter_rules import FighterGame
+    import equipment_rules, caster_rules
+    from caster_game import CasterGame
     from progression import ExpansionGame, same_floor, near, train, skill_level, private_state
+    import progression_guide
 
 WIDTH, HEIGHT, SPEED, RADIUS = content.WIDTH, content.HEIGHT, 100, 18
 MAX_CONNECTIONS, MAX_PLAYERS, MAX_MESSAGE = 48, 24, 2048
@@ -70,24 +85,12 @@ PVP_RULES = {"min_level": 8, "white_seconds": 120, "combat_seconds": 20,
              "red_item_loss": "one_unequipped; transferred_to_killer_if_space_else_destroyed"}
 POTIONS = {"health_potion": {"name": "Mikstura zdrowia", "price": 15, "restore": 65},
            "mana_potion": {"name": "Mikstura many", "price": 12, "restore": 55}}
-CLASSES = {
-    "knight": {"name": "Rycerz", "description": "Dużo zdrowia i pancerza; walka mieczem.",
-               "weapon": "sword", "hp": 150, "hp_growth": 18, "mana": 45, "mana_growth": 4,
-               "damage": 22, "armor": 3, "ability_name": "Bastion", "ability_cost": 15, "ability_cooldown": 12},
-    "paladin": {"name": "Paladyn", "description": "Łuk i mocny strzał z dystansu.",
-                "weapon": "bow", "hp": 115, "hp_growth": 13, "mana": 70, "mana_growth": 7,
-                "damage": 18, "armor": 1, "ability_name": "Przeszywający strzał", "ability_cost": 18, "ability_cooldown": 7},
-    "mage": {"name": "Mag", "description": "Mało zdrowia, dużo many i obrażenia obszarowe.",
-             "weapon": "staff", "hp": 85, "hp_growth": 9, "mana": 120, "mana_growth": 12,
-             "damage": 21, "armor": 0, "ability_name": "Krąg ognia", "ability_cost": 30, "ability_cooldown": 9},
-    "druid": {"name": "Druid", "description": "Leczenie siebie i drużyny podczas wypraw.",
-              "weapon": "staff", "hp": 100, "hp_growth": 11, "mana": 105, "mana_growth": 10,
-              "damage": 16, "armor": 1, "ability_name": "Odnowa", "ability_cost": 25, "ability_cooldown": 9},
-}
-WEAPONS = {"sword": {"range": 108, "cooldown": .55}, "bow": {"range": 310, "cooldown": .8},
-           "staff": {"range": 285, "cooldown": .85}}
+CLASSES = dict(dnd_content.CLASS_SPECS)
+
+WEAPONS = {"sword": {"range": 108, "cooldown": combat_rules.ROUND_SECONDS}, "bow": {"range": 310, "cooldown": combat_rules.ROUND_SECONDS},
+           "staff": {"range": 285, "cooldown": combat_rules.ROUND_SECONDS}}
 ITEMS = {}
-for class_id, weapon, noun in [("knight", "sword", "Miecz"), ("paladin", "bow", "Łuk"),
+for class_id, weapon, noun in [("knight", "sword", "Miecz"), ("ranger", "bow", "Łuk"),
                               ("mage", "staff", "Kostur maga"), ("druid", "staff", "Laska druida")]:
     for tier, adjective, damage, level, value, rarity in [
         (1, "podróżnika", 0, 1, 4, "common"), (2, "strażnika", 5, 3, 24, "uncommon"),
@@ -177,10 +180,26 @@ content.expand_wilderness(ZONES, NPCS, LANDMARKS, OBSTACLES)
 living_world.configure(content, OBSTACLES, LANDMARKS, QUESTS, ENEMY_TYPES)
 vertical_world.configure(content, OBSTACLES, LANDMARKS, ZONES, ENEMY_TYPES)
 loot_tables.configure(ITEMS, ENEMY_TYPES, content.TIER_LEVELS)
+combat_rules.configure(ITEMS, ENEMY_TYPES)
+hunt_content.configure(ENEMY_TYPES)
+loot_content.configure(ITEMS, ENEMY_TYPES, content.TIER_LEVELS)
+hunt_content.place(content, OBSTACLES, LANDMARKS)
+content.VERSION = "0.8.17"
 WIDTH, HEIGHT = content.WIDTH, content.HEIGHT
 for prefix, label in (("health", "zdrowia"), ("mana", "many")):
     for tier, level, amount, cost in ((2, 20, 220, 45), (3, 50, 520, 95), (4, 80, 950, 165)):
         POTIONS[f"{prefix}_potion_{tier}"] = {"name": f"Mikstura {label} {tier}", "price": cost, "restore": amount, "min_level": level}
+
+dnd_content.configure(content, CLASSES, POTIONS)
+inventory_rules.configure(ITEMS, POTIONS)
+fighter_rules.configure(ITEMS, dnd_content.SPELLS, CLASSES)
+equipment_rules.configure(ITEMS)
+caster_rules.configure(dnd_content.SPELLS, CLASSES, dnd_content.STATUS_SPECS)
+dnd_content.DEFAULT_HOTBARS["knight"] = ["second_wind", "action_surge"]
+dnd_content.STATUS_SPECS.update({
+    "sap": dict(name="Osłabienie",icon="⚔",description="Następny rzut ataku z utrudnieniem. Efekt kończy się po tym ataku lub przed kolejną rundą wojownika.",harmful=True),
+    "prone": dict(name="Powalenie",icon="↘",description="Wstawanie: 1,5 s bez ruchu. Własne ataki z utrudnieniem; ataki z bliska z ułatwieniem, z daleka z utrudnieniem.",harmful=True),
+})
 
 def distance(a, b):
     return math.hypot(a.x - b.x, a.y - b.y)
@@ -226,6 +245,17 @@ class Player:
     home_city: str = "przystan"
     blessed: bool = False
     mastery: dict = field(default_factory=dict)
+    primal_order: str = ""
+    training_feats: dict = field(default_factory=dict)
+    caster_rules_version: int = 0
+    legacy_medium_grace: bool = False
+    casting_channel: dict = field(default_factory=dict)
+    familiar_state: dict = field(default_factory=dict)
+    caster_messages: list = field(default_factory=list)
+    form_attack_index: int = 0
+    fighting_style: str = ""
+    weapon_grip: str = "one"
+    fighter_rules_version: int = 0
     spell_cooldowns: dict = field(default_factory=dict)
     spell_ready: float = 0
     rune_ready: float = 0
@@ -236,9 +266,11 @@ class Player:
     ward_until: float = 0
     premium_demo_until: float = 0
     current_wall_time: float = 0
-    hp: float = 150
+    hp: float = 12
     mana: float = 45
     level: int = 1
+    level_up_batches: list = field(default_factory=list)
+    _level_up_cache: object = None
     xp: int = 0
     gold: int = 0
     class_id: str = "knight"
@@ -249,7 +281,10 @@ class Player:
     relics: list = field(default_factory=list)
     chests: list = field(default_factory=list)
     inventory: list = field(default_factory=list)
-    equipment: dict = field(default_factory=lambda: {"weapon": "", "armor": "", "ring": ""})
+    equipment: dict = field(default_factory=lambda: {"weapon": "", "armor": "", "ring": "", "shield": ""})
+    inventory_rules_version: int = 0
+    potion_slots: dict = field(default_factory=lambda: {"q":"health_potion", "r":"mana_potion"})
+    loot_discoveries: dict = field(default_factory=dict)
     potions: dict = field(default_factory=lambda: {"health_potion": 3, "mana_potion": 3})
     facing: list = field(default_factory=lambda: [0, 1])
     attack_facing: list = field(default_factory=lambda: [0, 1])
@@ -260,6 +295,7 @@ class Player:
     attack_until: float = 0
     attack_ready: float = 0  # compatibility: simulation animation only; cooldown uses wall time
     attack_cooldown_until: float = 0
+    last_roll: dict = field(default_factory=dict)
     ability_cooldown_until: float = 0
     potion_cooldown_until: float = 0
     bulwark_until: float = 0
@@ -280,36 +316,80 @@ class Player:
     dy: float = 0
     input_time: float = -10
     chat_at: float = -10
+    rules_version: int = 8
+    mana_rules_version: int = dnd_content.MANA_RULES_VERSION
+    mana_recovery_until: float = 0
+    _hotbar_level: tuple = field(default_factory=tuple)
+    hotbar: list = field(default_factory=list)
+    spell_history: list = field(default_factory=list)
+    spell_circle_choices: dict = field(default_factory=dict)
+    _spell_profiles_cache: object = None
+    ensnaring_armed: bool = False  # one-shot intent; never restored across login
+    concentration_profile: dict = field(default_factory=dict)
+    buffs: dict = field(default_factory=dict)
+    concentration: str = ""
+    concentration_until: float = 0
+    condition_targets: list = field(default_factory=list)
+    mark_target: str = ""
+    mark_target_kind: str = "enemy"
+    form: str = ""
+    form_until: float = 0
+    temp_hp: float = 0
+    bonus_cooldown_until: float = 0
+    reaction_ready: float = 0
+    shield_armed: bool = False
+    combat_log: list = field(default_factory=list)
+    auto_enemy_id: str = ""
+    auto_target_id: str = ""
+    auto_enabled: bool = False
+    pending_spell: dict = field(default_factory=dict)
 
     @property
     def spec(self):
         return CLASSES[self.class_id]
 
     @property
+    def base_speed(self):
+        return player_speed(self.level)
+
+    @property
     def speed(self):
-        return player_speed(self.level)*(1.3 if self.haste_until > self.current_wall_time else 1)*(1.2 if self.premium_demo_until > self.current_wall_time else 1)*(1.15 if self.wind_until > self.current_wall_time else 1)*living_world.SURFACES[content.SURFACE_MAP.at(self.x,self.y,self.floor)]["speed"]
+        surface=living_world.SURFACES[content.SURFACE_MAP.at(self.x,self.y,self.floor)]["speed"]
+        freedom=combat_rules.active_buff(self,'freedom')
+        if freedom:surface=max(1.0,surface)
+        slow=0.0 if combat_rules.active_buff(self,'restrained') else .25 if combat_rules.active_buff(self,'growth') else .5 if combat_rules.active_buff(self,'slow') else 1.0
+        if combat_rules.active_buff(self,"prone"):return 0
+        return (self.base_speed*(caster_rules.form_spec(self).get('speed',30)/30 if self.form else 1)-equipment_rules.armor_speed_penalty(self)+(dnd_content.LONGSTRIDER_SPEED_BONUS if combat_rules.active_buff(self,'longstrider') else 0))*(1.2 if self.premium_demo_until > self.current_wall_time else 1)*(1.15 if self.wind_until > self.current_wall_time else 1)*surface*(1.0 if freedom else slow)
 
     @property
     def max_hp(self):
-        return self.spec["hp"] + (self.level - 1) * self.spec["hp_growth"] + self.mastery.get("vitality", 0)*12
+        return combat_rules.max_hp(self)
 
     @property
     def max_mana(self):
-        return self.spec["mana"] + (self.level - 1) * self.spec["mana_growth"] + self.mastery.get("focus", 0)*8
+        return dnd_content.max_mana(self)
 
     def gear_bonus(self, stat):
+        if self.form:return 0
         equipped = set(self.equipment.values())
         return sum(ITEMS[i["template"]].get(stat, 0) for i in self.inventory if i["uid"] in equipped)
 
     @property
     def attack(self):
-        skill = "melee" if self.class_id == "knight" else "distance" if self.class_id == "paladin" else "magic"
-        bonus = skill_level(self, skill)-(1 if skill == "magic" else 10)
-        return self.spec["damage"] + (self.level - 1) * 2 + self.gear_bonus("attack") + bonus*2 + self.mastery.get("power", 0)*3 + self.mastery.get("focus", 0)
+        n, sides, modifier = combat_rules.weapon_dice(self)
+        return round(n*(sides+1)/2+modifier, 1)
 
     @property
     def armor(self):
-        return self.spec["armor"] + (self.level - 1) // 4 + self.gear_bonus("armor") + (skill_level(self, "shielding")-10)//2
+        return max(0, self.armor_class-10)
+
+    @property
+    def armor_class(self):
+        return combat_rules.armor_class(self)
+
+    @property
+    def attack_bonus(self):
+        return combat_rules.attack_bonus(self)
 
     @property
     def alive(self):
@@ -326,11 +406,12 @@ class Player:
         self.current_wall_time = now
         skull = self.skull(now)
         result = {"id": self.id, "name": self.name, "x": round(self.x, 2), "y": round(self.y, 2),
-                  "hp": round(max(0, self.hp), 1), "max_hp": self.max_hp, "mana": round(self.mana, 1),
-                  "max_mana": self.max_mana, "level": self.level, "weapon": self.spec["weapon"],
+                  "hp": round(max(0, self.hp), 1), "max_hp": self.max_hp, "form": self.form, "temp_hp": self.temp_hp, "mana": round(self.mana, 1),
+                  "max_mana": self.max_mana, "level": self.level, "weapon": equipment_rules.weapon(self).get("weapon",self.spec["weapon"]),
+                  "shield_equipped": fighter_rules.shield_bonus(self)>0, "weapon_type": fighter_rules.weapon_kind(self), "two_handed": fighter_rules.two_handed(self),
                   "floor": self.floor, "promoted": self.promoted, "class_id": self.class_id, "class_chosen": self.class_chosen,
-                  "attack": self.attack, "armor": self.armor, "kills": self.kills, "boss_kills": self.boss_kills,
-                  "ability_name": self.spec["ability_name"], "ability_cooldown": max(0, self.ability_cooldown_until-now),
+                  "attack": self.attack, "armor": self.armor, "armor_class": self.armor_class, "attack_bonus": self.attack_bonus, "kills": self.kills, "boss_kills": self.boss_kills,
+                  "ability_name": self.spec["ability_name"], "ability_cooldown": max(0, self.spell_cooldowns.get(self.spec["default_ability"],0)-now),
                   "facing": list(self.facing), "attack_facing": list(self.attack_facing),
                   "speech_text": self.speech_text if self.speech_until > simulation_time else "",
                   "speech_until": self.speech_until, "speed": round(self.speed, 3),
@@ -340,13 +421,43 @@ class Player:
                   "combat_remaining": max(0, self.combat_until-now),
                   "pvp_combat_remaining": max(0, self.pvp_combat_until-now), "disconnected": self.disconnected,
                   "party_id": self.party_id, "party_members": party_members or []}
+        result["status_effects"] = dnd_content.status_effects(self.buffs,now,self)
         if private:
+            inventory_rules.ensure(self, ITEMS, POTIONS, make_item)
+            try:
+                from .character_sheet import build as sheet_data
+            except ImportError:
+                from character_sheet import build as sheet_data
+            result['character_sheet'] = sheet_data(self)
+            result['item_previews'] = equipment_rules.shop_previews(self)
+            result['spell_profiles'] = spell_scaling.client_profiles(self)
+            result.update(level_up.pending(self))
+            if self._hotbar_level != (self.class_id,self.level):dnd_content.sync_hotbar(self)
             result.update(private_state(self, now))
+            result.update({"action_remaining": round(max(0, self.attack_cooldown_until-now), 3),
+                           "action_duration": combat_rules.ROUND_SECONDS,
+                           "damage_dice": combat_rules.dice_text(combat_rules.weapon_dice(self)),
+                           "save_bonus": combat_rules.save_bonus(self), "save_dc": combat_rules.spell_dc(self),
+                           "last_roll": self.last_roll if self.last_roll.get("expires_at", 0) > now else {}})
+            result.update({"hotbar": list(self.hotbar), "hotbar_page_size": dnd_content.HOTBAR_PAGE_SIZE, "hotbar_row_size": dnd_content.HOTBAR_ROW_SIZE, "favorite_spell": dnd_content.favorite_spell(self), "mana_budget": dnd_content.mana_budget_info(self),
+                           "mana_recovery_remaining": max(0,self.mana_recovery_until-now), "attributes": combat_rules.attributes(self),
+                           "proficiency": combat_rules.proficiency(self), "effective_level": combat_rules.effective_level(self),
+                           "spell_circle": dnd_content.circle_for(self.class_id,self.level),
+                           "attacks_per_round": combat_rules.attacks_per_round(self), "attack_range": combat_rules.attack_range(self),
+                           "bonus_remaining": max(0,self.bonus_cooldown_until-now), "shield_armed": self.shield_armed, "ensnaring_armed": self.ensnaring_armed,
+                           "concentration": self.concentration if self.concentration_until>now else "", "concentration_remaining": max(0,self.concentration_until-now),
+                           "statuses": {k:round(v['until']-now,1) for k,v in self.buffs.items() if v.get('until',0)>now},
+                           "form_remaining": max(0,self.form_until-now), "auto_enemy_id": self.auto_enemy_id,
+                           "auto_target_id": self.auto_target_id, "auto_enabled": self.auto_enabled,
+                           "weapon_auto_attack": combat_rules.weapon_autoattack(self),
+                           "queued_spell": self.pending_spell.get('spell',''),
+                           "combat_log": self.combat_log[-8:]})
             result.update({"xp": self.xp, "xp_next": xp_next(self.level), "gold": self.gold,
                            "pvp_safety": self.pvp_safety, "unjust_kills": len([t for t in self.unjust_kills if t > now-86400]),
-                           "inventory": [dict(i) for i in self.inventory], "equipment": dict(self.equipment),
-                           "potions": dict(self.potions), "potion_cooldown": max(0, self.potion_cooldown_until-now),
+                           "inventory": [inventory_rules.public_item(self, i, ENEMY_TYPES) for i in self.inventory], "equipment": dict(self.equipment),
+                           "potions": dict(self.potions), "potion_slots": dict(self.potion_slots), "known_loot": inventory_rules.known_loot(self, ENEMY_TYPES), "potion_cooldown": max(0, self.potion_cooldown_until-now),
                            "quests": self.quest_entries(), "discoveries": list(self.discoveries)})
+            result["depot"] = [inventory_rules.public_item(self, i, ENEMY_TYPES) for i in self.depot]
         return result
 
     def quest_entries(self):
@@ -372,8 +483,12 @@ class Player:
 
     def save_data(self):
         return {key: getattr(self, key) for key in (
+            "primal_order", "training_feats", "caster_rules_version", "legacy_medium_grace",
+            "fighting_style", "weapon_grip", "fighter_rules_version",
+            "level_up_batches", "rules_version", "mana_rules_version", "mana_recovery_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
             "site_cooldowns", "wind_until", "ward_until", "premium_demo_until", "floor", "skill_tries", "promoted", "soul", "runes", "bank_gold", "depot", "home_city", "blessed", "mastery", "spell_cooldowns", "spell_ready", "rune_ready", "haste_until", "transition_ready",
             "x", "y", "hp", "mana", "level", "xp", "gold", "class_id", "class_chosen", "weapon", "kills", "boss_kills",
+            "inventory_rules_version", "potion_slots", "loot_discoveries",
             "relics", "chests", "inventory", "equipment", "potions", "quest_progress", "discoveries", "attack_cooldown_until", "ability_cooldown_until",
             "potion_cooldown_until", "bulwark_until", "combat_until", "pvp_combat_until", "white_until", "red_until",
             "unjust_kills", "aggressors", "respawn_until", "last_pvp_attacker", "last_pvp_unjust", "last_pvp_hit_until")}
@@ -409,21 +524,35 @@ class Enemy:
     special_count: int = 0
     ranged_ready: float = 0
     mobile_cast: bool = False
+    # Runtime-only pursuit state. A disengaged monster holds its actual position.
+    has_engaged: bool = False
+    chase_id: str = ""
+    last_seen_x: float = 0
+    last_seen_y: float = 0
+    last_seen_until: float = 0
+    regen_at: float = 0
+    return_at: float = 0
+    search_x: float = 0
+    search_y: float = 0
+    home_trail: list = field(default_factory=list)
+    returning: bool = False
+    conditions: dict = field(default_factory=dict)
 
     @property
     def max_hp(self):
         return ENEMY_TYPES[self.kind]["hp"]
 
-    def public(self):
+    def public(self, now=0):
         return {"id": self.id, "kind": self.kind, "name": ENEMY_TYPES[self.kind]["name"], "x": round(self.x, 2),
                 "y": round(self.y, 2), "floor": self.floor, "hp": round(self.hp, 1), "max_hp": self.max_hp, "alive": self.alive,
-                "attack_until": self.attack_until, "facing": self.facing, "size": ENEMY_TYPES[self.kind].get("size", 1)}
+                "attack_until": self.attack_until, "facing": self.facing, "armor_class": ENEMY_TYPES[self.kind]["armor_class"], "attack_bonus": ENEMY_TYPES[self.kind]["attack_bonus"], "damage_dice": combat_rules.dice_text(ENEMY_TYPES[self.kind]["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
 
 
-class Game(ExpansionGame, MonsterAI):
+class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
     def __init__(self, db_path, clock=None):
         self.clock = clock or time.time
         self.rng = random.Random()
+        self.combat_rng = random.Random()  # independent from loot and world generation
         self.db = sqlite3.connect(str(db_path))
         self.db.execute("PRAGMA journal_mode=WAL")
         self.db.executescript("""
@@ -440,6 +569,7 @@ class Game(ExpansionGame, MonsterAI):
         self.time, self.tick, self.last_save, self.task = 0.0, 0, 0, None
         self.effects, self.effect_serial = [], 0
         self.hazards = []
+        self.init_dnd()
         for i, (kind, x, y) in enumerate([
             ("wolf", 600, 790), ("wolf", 650, 620), ("wolf", 970, 640), ("wolf", 1090, 870),
             ("wolf", 990, 280), ("wolf", 1280, 840),
@@ -459,10 +589,11 @@ class Game(ExpansionGame, MonsterAI):
             e = Enemy(f"world_{i}", kind, x, y, ENEMY_TYPES[kind]["hp"], x, y, floor=floor)
             self.enemies[e.id] = e
         self.legacy_enemies = [e for e in self.enemies.values() if not e.id.startswith("world_")]
-        self.enemy_cells = {}
+        self.enemy_cells, self.enemy_cell_keys = {}, {}
+        self.chasing_enemies = {}
+        self.recovering_enemies = {}
         for e in self.enemies.values():
-            if e.id.startswith("world_"):
-                self.enemy_cells.setdefault((e.floor, int(e.home_x//1024), int(e.home_y//1024)), []).append(e)
+            self.reindex_enemy(e)
         self.obstacle_cells = {}
         for obstacle in OBSTACLES:
             for cx in range(int(obstacle["x"]//256), int((obstacle["x"]+obstacle["w"]+36)//256)+1):
@@ -488,20 +619,22 @@ class Game(ExpansionGame, MonsterAI):
         return float(self.clock())
 
     def metadata(self):
-        return {"version": content.VERSION, "regions": content.REGIONS, "cities": content.CITIES, "stairs": content.STAIRS,
+        return {"version": content.VERSION, "combat_rules": combat_rules.RULES, "regions": content.REGIONS, "cities": content.CITIES, "stairs": content.STAIRS,
                 "terrain": content.TERRAIN, "surfaces": content.SURFACES, "premium": content.PREMIUM,
                 "elevations": content.ELEVATIONS, "waterways": content.WATERWAYS, "bridges": content.BRIDGES,
                 "pois": content.POIS, "canyons": content.CANYONS, "rarities": loot_tables.RARITIES,
                 "dungeons": content.DUNGEONS, "hunting_grounds": content.HUNTING_GROUNDS, "roads": content.ROADS, "safe_zones": content.CITIES,
-                "spells": content.SPELLS, "runes": content.RUNES, "milestones": [{"level":v[0], "name":v[1], "description":v[2]} for v in content.MILESTONES],
+                "spells": content.SPELLS, "class_progression": progression_guide.catalog(), "default_hotbars": dnd_content.DEFAULT_HOTBARS, "status_catalog": dnd_content.STATUS_SPECS, "runes": content.RUNES, "milestones": [{"level":v[0], "name":v[1], "description":v[2]} for v in content.MILESTONES],
                 "width": WIDTH, "height": HEIGHT, "sites": [], "chests": [], "obstacles": OBSTACLES,
                 "zones": ZONES, "npcs": NPCS, "landmarks": LANDMARKS, "quests": QUESTS,
-                "enemy_types": ENEMY_TYPES, "spawn": SPAWN, "river": RIVER, "trail_gate": TRAIL_GATE, "weapons": WEAPONS,
-                "classes": CLASSES, "items": ITEMS, "merchant": MERCHANT, "safe_zone": SAFE_ZONE,
+                "enemy_types": inventory_rules.metadata_enemies(ENEMY_TYPES), "loot_hunts": content.LOOT_HUNTS, "spawn": SPAWN, "river": RIVER, "trail_gate": TRAIL_GATE, "weapons": WEAPONS,
+                "nature_sites": [{k:v for k,v in s.items() if k not in ("text","hint_x","hint_y")} for s in self.nature_sites],
+                "classes": CLASSES, "items": inventory_rules.metadata_items(ITEMS), "merchant": MERCHANT, "safe_zone": SAFE_ZONE,
                 "pvp_rules": PVP_RULES, "potions": POTIONS, "inventory_cap": INVENTORY_CAP,
                 "party_rules": {"max_members": PARTY_CAP, "range": PARTY_RANGE, "bonus_per_extra_member": .10,
                                 "participation_seconds": 30, "max_level_ratio": 3},
-                "abilities": {"offense": "PvE_only", "druid_party_heal": "no_other_player_in_PvP_combat"}}
+                "abilities": {"offense": "PvE_and_unlocked_PvP", "druid_party_heal": "party_and_unlocked_PvP_support",
+                              "pvp_safety_applies_to": ["weapon", "spell", "field", "companion"]}}
 
     def snapshot(self, for_player=None, public_players=None):
         pid = for_player.id if isinstance(for_player, Player) else str(for_player or "")
@@ -512,7 +645,10 @@ class Game(ExpansionGame, MonsterAI):
         return {"type": "state", "tick": self.tick, "time": self.time,
                 "players": [self.players[pid].public(now, self.time, True, self.parties.get(self.players[pid].party_id, [])) if entry["id"] == pid else entry for entry in public_players] if public_players is not None else
                            [p.public(now, self.time, p.id == pid, self.parties.get(p.party_id, [])) for p in self.players.values()],
-                "enemies": [e.public() for e in (self.nearby_enemies(viewer, 1800) if viewer else self.enemies.values()) if visible(e)], "world": dict(self.flags),
+                "companions": [c.public() for c in (*self.companions.values(),*self.familiars.values()) if visible(c)],
+                "alarms": [dict(x=a["x"],y=a["y"],floor=a["floor"],remaining=max(0,a["until"]-now)) for owner,a in self.alarms.items() if owner==pid],
+                "enemies": [e.public(now) for e in (self.nearby_enemies(viewer, 1800) if viewer else self.enemies.values()) if visible(e)], "world": dict(self.flags),
+                "active_field_effects": [f.get("effect_id", "") for f in self.spell_fields],
                 "effects": [dict(effect) for effect in self.effects if self.time-effect["time"] <= max(1.5,effect.get("duration",0)) and (viewer is None or (same_floor(viewer, effect) and point_distance(viewer, effect) <= 1800))]}
 
     def persist(self, extra_players=()):
@@ -522,12 +658,18 @@ class Game(ExpansionGame, MonsterAI):
             self.db.execute("INSERT OR REPLACE INTO shared VALUES(1,?)", (json.dumps(self.flags),))
 
     def save_player(self, p):
+        inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
         self.db.execute("UPDATE accounts SET data=? WHERE id=?", (json.dumps(p.save_data()), p.id))
+        self.save_score(p)
 
     def starter(self, p):
-        p.inventory = [make_item(f"{p.class_id}_weapon_1"), make_item("cloth")]
+        p.hotbar = [];dnd_content.sync_hotbar(p)
+        p.inventory = [make_item(f"{p.class_id}_weapon_1"), make_item("druid_leather" if p.class_id=="druid" else "cloth")]
         p.equipment = {"weapon": p.inventory[0]["uid"], "armor": p.inventory[1]["uid"], "ring": ""}
         p.weapon = p.spec["weapon"]
+        self.migrate_fighter(p, make_item)
+        self.migrate_caster(p)
+        inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
 
     def load_player(self, pid, name, ws, saved):
         p = Player(pid, name, ws)
@@ -537,9 +679,17 @@ class Game(ExpansionGame, MonsterAI):
         if "class_id" not in saved:
             p.class_chosen = False
             p.class_id = "knight"
+        self.migrate_dnd(p,saved)
         if "inventory" not in saved:
             self.starter(p)
         p.weapon = p.spec["weapon"]
+        # Refresh canonical item stats without changing ownership or equipment UIDs.
+        for bag in (p.inventory, p.depot):
+            for item in bag:
+                item.update(ITEMS.get(item["template"], {}))
+        inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
+        self.migrate_fighter(p, make_item)
+        self.migrate_caster(p)
         if "mana" not in saved:
             p.mana = p.max_mana
         p.hp, p.mana = min(p.hp, p.max_hp), min(p.mana, p.max_mana)
@@ -575,7 +725,7 @@ class Game(ExpansionGame, MonsterAI):
         # Ordered WebSockets: send unchanged private catalogs only once per login.
         # Public actor fields always remain complete; legacy clients get full states.
         previous = self.owner_cache.setdefault(p.id, {})
-        private_keys = ("quests", "discoveries", "inventory", "equipment", "depot", "skills", "runes", "mastery", "potions")
+        private_keys = ("quests", "discoveries", "inventory", "equipment", "depot", "skills", "runes", "mastery", "potions", "hotbar", "character_sheet", "spell_profiles", "favorite_spell", "attributes", "combat_log", "pending_level_ups", "potion_slots", "known_loot", "item_previews")
         own = next(entry for entry in packet["players"] if entry["id"] == p.id)
         for key in private_keys:
             encoded = json.dumps(own[key], ensure_ascii=False, separators=(",", ":"))
@@ -680,12 +830,12 @@ class Game(ExpansionGame, MonsterAI):
         def allowed(x, y):
             if self.blocked(x, y, floor=obj.floor):
                 return False
-            if isinstance(obj, Player) and obj.pvp_combat_until > self.now():
+            if (isinstance(obj, Player) or getattr(obj, "is_companion", False)) and obj.pvp_combat_until > self.now():
                 for zone in content.CITIES:
                     new_distance = math.hypot(x-zone["x"], y-zone["y"])
                     if obj.floor == 0 and new_distance <= zone["radius"] and new_distance < point_distance(obj, zone):
                         return False
-            if isinstance(obj, Enemy) and obj.floor == 0 and any(math.hypot(x-zone["x"],y-zone["y"]) < zone["radius"] for zone in content.CITIES):
+            if isinstance(obj, Enemy) and obj.floor == 0 and any(math.hypot(x-zone["x"],y-zone["y"]) <= zone["radius"] for zone in content.CITIES):
                 return False
             return True
         for _ in range(parts):
@@ -693,6 +843,8 @@ class Game(ExpansionGame, MonsterAI):
                 obj.x += dx/parts
             if allowed(obj.x, obj.y+dy/parts):
                 obj.y += dy/parts
+        if isinstance(obj, Enemy):
+            self.reindex_enemy(obj)
 
     def line_clear(self, a, b):
         if not same_floor(a, b):
@@ -709,6 +861,7 @@ class Game(ExpansionGame, MonsterAI):
         levels = max(0, (math.isqrt(b*b+280*p.xp)-b)//70)
         if levels:
             p.xp -= levels*xp_next(p.level)+35*levels*(levels-1)//2
+            level_up.record(p, p.level+1, p.level+levels)
             p.level += levels
             p.hp = p.max_hp
             p.mana = p.max_mana
@@ -763,10 +916,9 @@ class Game(ExpansionGame, MonsterAI):
             if not p.class_chosen:
                 return await self.notice(p, "Najpierw wybierz klasę swojej dawnej postaci, aby otrzymać właściwą broń.")
             template = f"{p.class_id}_weapon_{template.rsplit('_', 1)[1]}"
-        if template and len(p.inventory) >= INVENTORY_CAP:
+        inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
+        if len(p.inventory) + int(bool(template)) + inventory_rules.slots_needed(p, reward.get("potions", {})) > INVENTORY_CAP:
             return await self.notice(p, "Zwolnij miejsce w plecaku. Gwarantowana nagroda pozostaje u zleceniodawcy.")
-        if any(p.potions.get(key, 0)+amount > 99 for key, amount in reward.get("potions", {}).items()):
-            return await self.notice(p, "Zrób miejsce na mikstury przed odebraniem nagrody (limit 99 każdego rodzaju).")
         # Validate everything before mutation. One SQLite commit includes claim, XP, gold and item.
         with self.db:
             p.quest_progress[quest_id]["claimed"] = True
@@ -774,7 +926,7 @@ class Game(ExpansionGame, MonsterAI):
             if template:
                 p.inventory.append(make_item(template))
             for key, amount in reward.get("potions", {}).items():
-                p.potions[key] = p.potions.get(key, 0)+amount
+                inventory_rules.add(p, key, amount, make_item, INVENTORY_CAP)
             self.save_player(p)
         item_text = f" · {ITEMS[template]['name']}" if template else ""
         await self.notice(p, f"Ukończono: {quest['title']} · +{reward['xp']} PD · +{reward['gold']} złota{item_text}")
@@ -794,7 +946,7 @@ class Game(ExpansionGame, MonsterAI):
         return effect
 
     def basic_effect(self, p, target):
-        kind = {"knight": "sword", "paladin": "arrow", "mage": "magic_bolt", "druid": "nature_bolt"}[p.class_id]
+        kind = "sword" if equipment_rules.melee(p) else "magic_bolt" if equipment_rules.is_focus(equipment_rules.weapon(p)) else "arrow"
         return self.combat_effect(p, kind, target, duration=.22 if kind == "sword" else .32)
 
     def tag(self, p, pvp=False):
@@ -802,21 +954,20 @@ class Game(ExpansionGame, MonsterAI):
         if pvp:
             p.pvp_combat_until = max(p.pvp_combat_until, p.combat_until)
 
-    def grant_loot(self, p, drops):
+    def grant_loot(self, p, drops, source_kind=None):
+        inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
         names, overflow = [], False
         for kind, template in drops:
             if kind == "potion":
-                if p.potions.get(template, 0) >= 99:
-                    overflow = True
-                else:
-                    p.potions[template] = p.potions.get(template, 0)+1
-                    names.append(POTIONS[template]["name"])
-            elif len(p.inventory) >= INVENTORY_CAP:
-                overflow = True
+                delivered = inventory_rules.add(p, template, 1, make_item, INVENTORY_CAP)
             else:
-                item = make_item(template)
-                p.inventory.append(item)
-                names.append(item["name"]+" ["+loot_tables.RARITIES[item["rarity"]]+"]")
+                delivered = len(p.inventory) < INVENTORY_CAP
+                if delivered:p.inventory.append(make_item(template))
+            if delivered:
+                names.append(ITEMS[template]["name"])
+                if source_kind:inventory_rules.discover(p, template, source_kind, ENEMY_TYPES)
+            else:overflow = True
+        inventory_rules.sync(p, POTIONS)
         return (" · Łup: "+", ".join(names) if names else "")+(" · Brak miejsca: część łupu przepadła." if overflow else "")
 
     def reward_groups(self, enemy):
@@ -854,6 +1005,9 @@ class Game(ExpansionGame, MonsterAI):
             return
         enemy.alive, enemy.hp = False, 0
         enemy.respawn_at = self.time+ENEMY_TYPES[enemy.kind]["respawn"]
+        self.chasing_enemies.pop(enemy.id, None)
+        self.recovering_enemies.pop(enemy.id, None)
+        self.reindex_enemy(enemy)  # lazy respawn is discoverable at the original spawn
         if enemy.kind == "boss":
             self.flags["boss_defeated"], self.flags["event_active"] = True, False
         groups = self.reward_groups(enemy)
@@ -873,7 +1027,7 @@ class Game(ExpansionGame, MonsterAI):
                     if enemy.kind == "boss" or spec.get("boss"):
                         p.boss_kills += 1
                     detail = f"{spec['name']}: +{xp} PD · +{gold} złota"
-                    detail += self.grant_loot(p, loot_tables.roll(p.class_id, spec, self.rng))
+                    detail += self.grant_loot(p, loot_tables.roll(p.class_id, spec, self.rng), source_kind=enemy.kind)
                     self.save_player(p)
                     notices.append((p, detail))
             self.db.execute("INSERT OR REPLACE INTO shared VALUES(1,?)", (json.dumps(self.flags),))
@@ -882,11 +1036,13 @@ class Game(ExpansionGame, MonsterAI):
             await self.notice(p, text)
 
     def pvp_error(self, p, target):
-        if target is None or target.id == p.id or not target.alive:
+        if not p.alive or target is None or target.id == p.id or not target.alive:
             return "Wskaż żywą postać przeciwnika."
+        if not same_floor(p,target):
+            return "Cel PvP jest na innym piętrze."
         if p.pvp_safety:
             return "Najpierw świadomie wyłącz ochronę przed atakowaniem graczy."
-        if p.level < 8 or target.level < 8:
+        if p.level < PVP_RULES["min_level"] or target.level < PVP_RULES["min_level"]:
             return "PvP jest dostępne od poziomu 8; początkujący są chronieni."
         if self.in_safe(p) or self.in_safe(target):
             return "Przystań jest bezpieczna: nie można tu walczyć."
@@ -896,7 +1052,7 @@ class Game(ExpansionGame, MonsterAI):
 
     def remember_attacker(self, enemy, p):
         enemy.contributors[p.id] = self.time
-        enemy.attacker_id, enemy.attacker_until = p.id, self.time+20
+        self.provoke_enemy(enemy, p)
 
     def selected_enemy(self, p, enemy_id, attack_range):
         enemy = self.enemies.get(enemy_id) if isinstance(enemy_id, str) else None
@@ -905,108 +1061,15 @@ class Game(ExpansionGame, MonsterAI):
         return None
 
     async def attack(self, p, target_id=None, enemy_id=None):
-        now = self.now()
-        if not p.alive or now < p.attack_cooldown_until:
-            return
-        spec = WEAPONS[p.spec["weapon"]]
-        if target_id is not None and enemy_id is not None:
-            return await self.notice(p, "Wybierz jeden cel ataku.")
-        if target_id is not None:
-            target = self.players.get(str(target_id)) if isinstance(target_id, (str, int)) else None
-            reason = self.pvp_error(p, target)
-            if reason:
-                return await self.notice(p, reason)
-            if distance(p, target) > spec["range"] or not self.line_clear(p, target):
-                return await self.notice(p, "Przeciwnik jest poza zasięgiem lub za ścianą.")
-            unjust = target.skull(now) == "none" and p.aggressors.get(target.id, 0) <= now
-            if unjust:
-                p.white_until = max(p.white_until, now+120)
-                target.aggressors[p.id] = now+120
-            self.tag(p, True)
-            self.tag(target, True)
-            p.attack_cooldown_until, p.attack_until = now+spec["cooldown"], self.time+.22
-            self.basic_effect(p, target)
-            self.damage_player(target, p.attack*.65, killer=p, unjust=unjust)
-            self.persist()
-            return
-        if self.in_safe(p):
-            return
-        if enemy_id is not None:
-            enemy = self.selected_enemy(p, enemy_id, spec["range"])
-            if enemy is None:
-                return await self.notice(p, "Wybrany potwór jest poza zasięgiem, za ścianą lub na innym piętrze.")
-            targets = [enemy]
-        else:
-            targets = [e for e in self.nearby_enemies(p, 360) if e.alive and distance(p, e) <= spec["range"] and self.line_clear(p, e)]
-        p.attack_cooldown_until, p.attack_until = now+spec["cooldown"], self.time+.22
-        if not targets:
-            return
-        enemy = min(targets, key=lambda e: distance(p, e))
-        self.basic_effect(p, enemy)
-        self.tag(p)
-        train(p, "melee" if p.class_id=="knight" else "distance" if p.class_id=="paladin" else "magic", 1 if p.class_id in ("knight", "paladin") else 2)
-        enemy.hp = max(0, enemy.hp-p.attack)
-        self.remember_attacker(enemy, p)
-        if enemy.hp <= 0:
-            await self.defeat(enemy)
+        return await self.dnd_attack(p,target_id,enemy_id)
 
-    async def ability(self, p, enemy_id=None):
-        now = self.now()
-        if not p.alive or now < p.ability_cooldown_until:
-            return
-        if p.mana < p.spec["ability_cost"]:
-            return await self.notice(p, "Za mało many.")
-        targets = [e for e in self.nearby_enemies(p, 360) if e.alive and distance(p, e) <= 320 and self.line_clear(p, e)]
-        if p.class_id == "paladin" and enemy_id is not None:
-            selected = self.selected_enemy(p, enemy_id, 320)
-            if selected is None:
-                return await self.notice(p, "Wybrany potwór jest poza zasięgiem lub za ścianą.")
-            targets = [selected]
-        if p.class_id in ("mage", "paladin", "knight") and (self.in_safe(p) or not targets):
-            return await self.notice(p, "Umiejętność wymaga potwora w zasięgu poza Przystanią.")
-        if p.class_id == "druid":
-            friends = [q for q in self.players.values() if q.alive and not q.disconnected
-                       and distance(p, q) <= 300 and self.line_clear(p, q)
-                       and (q.id == p.id or (p.party_id and p.party_id == q.party_id and q.pvp_combat_until <= now))
-                       and q.hp < q.max_hp]
-            if not friends:
-                return await self.notice(p, "Brak rannych sojuszników w zasięgu; leczenie innych graczy podczas PvP jest wyłączone.")
-        p.mana -= p.spec["ability_cost"]
-        train(p, "magic", p.spec["ability_cost"])
-        p.ability_cooldown_until = now+p.spec["ability_cooldown"]
-        p.attack_until = self.time+.35
-        if p.class_id == "knight":
-            self.combat_effect(p, "bulwark", radius=100, duration=.9)
-            p.bulwark_until = now+6
-            self.tag(p)
-            for e in targets:
-                e.taunt_id, e.taunt_until = p.id, self.time+6
-                self.remember_attacker(e, p)
-        elif p.class_id in ("mage", "paladin"):
-            self.tag(p)
-            if p.class_id == "paladin":
-                targets = [min(targets, key=lambda e: distance(p, e))]
-                self.combat_effect(p, "piercing_arrow", targets[0], duration=.4)
-            else:
-                self.combat_effect(p, "fire_ring", min(targets, key=lambda e: distance(p, e)), radius=320, duration=.9)
-            for e in targets:
-                e.hp = max(0, e.hp-p.attack*(2.2 if p.class_id == "paladin" else 1.6))
-                self.remember_attacker(e, p)
-            # Mark all hits before any await; repeat packets cannot reuse this skill.
-            for e in targets:
-                if e.hp <= 0:
-                    await self.defeat(e)
-        else:
-            for q in friends:
-                self.combat_effect(p, "heal", q, radius=65, duration=.9)
-                q.hp = min(q.max_hp, q.hp+45+p.level*4)
-                if q.combat_until > now:
-                    self.tag(p, q.pvp_combat_until > now)
-        self.persist()
+    async def ability(self, p, enemy_id=None, target_id=None):
+        return await self.cast_spell(p,dnd_content.favorite_spell(p),enemy_id,target_id)
 
     async def interact(self, p):
         if not p.alive:
             return
+        if await self.nature_interaction(p):return
         sites = [site for site in content.POIS if near(p, site) and self.line_clear(p, SimpleNamespace(**site))]
         if sites:
             site = min(sites, key=lambda s: point_distance(p, s))
@@ -1043,53 +1106,84 @@ class Game(ExpansionGame, MonsterAI):
         await self.notice(p, "Kupiec w Przystani sprzedaje mikstury, skupuje sprzęt i pozwala odpocząć.")
 
     async def inventory_command(self, p, kind, data):
+        inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
         if not p.alive:
             return
         uid = data.get("uid")
         item = next((i for i in p.inventory if i["uid"] == uid), None)
-        if kind == "equip":
+        if kind == "potion_bind":
+            slot = data.get("slot")
+            template = data.get("item", "")
+            if slot not in ("q", "r") or not isinstance(template, str):
+                return await self.notice(p, "Nieznany skrót mikstury.")
+            if template and (template not in POTIONS or not inventory_rules.count(p, template) or p.level < POTIONS[template].get("min_level", 1)):
+                return await self.notice(p, "Wybierz posiadaną miksturę odpowiednią dla swojego poziomu.")
+            p.potion_slots[slot] = template
+        elif kind == "equip":
             if item is None:
                 return await self.notice(p, "Nie masz tego przedmiotu.")
             spec = ITEMS[item["template"]]
-            if spec["slot"] not in ("weapon", "armor", "ring"):
+            if spec["slot"] not in ("weapon", "armor", "ring", "shield"):
                 return await self.notice(p, "Trofeum można sprzedać lub przechować; nie jest wyposażeniem.")
-            if p.class_id not in spec["class_ids"] or p.level < spec["min_level"]:
-                return await self.notice(p, "Niewłaściwa klasa lub za niski poziom.")
+            equip_error=equipment_rules.check_equip(p,spec)
+            if equip_error:return await self.notice(p,equip_error)
+            self.cancel_channel(p)
+            if spec["slot"] == "shield" and fighter_rules.two_handed(p):
+                return await self.notice(p, "Najpierw wybierz broń jednoręczną lub chwyt jednorącz.")
+            if spec["slot"] == "weapon":
+                p.weapon_grip = "one"
+                if spec.get("two_handed"):
+                    p.equipment["shield"] = ""
             p.equipment[spec["slot"]] = item["uid"]
+            if not equipment_rules.shillelagh_applies(p):p.buffs.pop("shillelagh",None)
         elif kind == "unequip":
+            if p.form:return await self.notice(p,"Zmień wyposażenie po zakończeniu przemiany.")
+            self.cancel_channel(p)
             slot = data.get("slot")
-            if slot not in ("weapon", "armor", "ring"):
+            if slot not in ("weapon", "armor", "ring", "shield"):
                 return await self.notice(p, "Nieznane miejsce wyposażenia.")
             p.equipment[slot] = ""
+            if slot=="weapon":p.buffs.pop("shillelagh",None)
         elif kind == "sell":
             if not self.merchant_near(p) or p.combat_until > self.now():
                 return await self.notice(p, "Sprzedaż jest dostępna przy kupcu, poza walką.")
             if item is None or uid in p.equipment.values():
                 return await self.notice(p, "Sprzedawać można tylko posiadany, niezałożony sprzęt.")
-            p.inventory.remove(item)
-            p.gold += ITEMS[item["template"]]["value"]
+            quantity = data.get("quantity", 1)
+            if type(quantity) is not int or not 1 <= quantity <= int(item.get("quantity", 1)):
+                return await self.notice(p, "Podaj posiadaną liczbę przedmiotów.")
+            if quantity == int(item.get("quantity", 1)):p.inventory.remove(item)
+            else:item["quantity"] -= quantity
+            p.gold += ITEMS[item["template"]]["value"] * quantity
         elif kind == "buy":
             if not self.merchant_near(p) or p.combat_until > self.now():
                 return await self.notice(p, "Podejdź do kupca poza walką.")
             kind_id = data.get("item")
-            spec = POTIONS.get(kind_id) if isinstance(kind_id, str) else None
-            if spec is None or p.level < spec.get("min_level", 1) or p.gold < spec["price"]:
-                return await self.notice(p, "Nieznana mikstura lub za mało złota.")
-            if p.potions.get(kind_id, 0) >= 99:
-                return await self.notice(p, "Możesz nosić do 99 mikstur każdego rodzaju.")
+            spec = ITEMS.get(kind_id) if isinstance(kind_id, str) else None
+            if spec is None or "price" not in spec or p.level < spec.get("min_level",1) or p.gold < spec["price"]:
+                return await self.notice(p,"Nieznany towar, za niski poziom lub za mało złota.")
+            if spec.get("slot") == "potion":
+                if not inventory_rules.add(p,kind_id,1,make_item,INVENTORY_CAP):
+                    return await self.notice(p,"Zwolnij miejsce w plecaku na mikstury.")
+            else:
+                if len(p.inventory)>=INVENTORY_CAP:return await self.notice(p,"Zwolnij miejsce w plecaku.")
+                p.inventory.append(make_item(kind_id))
             p.gold -= spec["price"]
-            p.potions[kind_id] = p.potions.get(kind_id, 0)+1
         elif kind == "potion":
-            kind_id = data.get("item")
+            kind_id = p.potion_slots.get(data.get("slot"), "") if "slot" in data and isinstance(data.get("slot"), str) else data.get("item")
             spec = POTIONS.get(kind_id) if isinstance(kind_id, str) else None
             if spec is None or p.level < spec.get("min_level", 1) or not p.potions.get(kind_id) or self.now() < p.potion_cooldown_until:
                 return
             attr, maximum = ("hp", p.max_hp) if kind_id.startswith("health_potion") else ("mana", p.max_mana)
             if getattr(p, attr) >= maximum:
                 return
-            p.potions[kind_id] -= 1
-            setattr(p, attr, min(maximum, getattr(p, attr)+spec["restore"]))
+            inventory_rules.consume(p, kind_id)
+            restored = combat_rules.roll_damage(self.combat_rng,spec["dice"]) if "dice" in spec else {"damage":spec["restore"],"damage_dice":str(spec["restore"]),"damage_rolls":[]}
+            amount=min(maximum-getattr(p,attr),restored["damage"])
+            setattr(p, attr, getattr(p, attr)+amount)
+            self.report_roll(p,p,{**restored,"check":"healing","hit":True,"healing":amount,"damage":0},spec["name"],p)
             p.potion_cooldown_until = self.now()+3
+        inventory_rules.sync(p, POTIONS)
         self.persist()
 
     def leave_party(self, p):
@@ -1145,11 +1239,47 @@ class Game(ExpansionGame, MonsterAI):
         kind = data["type"]
         if kind == "hello":
             return await self.hello(ws, data)
+        if kind == "ranking":
+            return await self.send(ws, self.ranking())
         if kind == "ping":
             return await self.send(ws, {"type": "pong"})
         p = next((p for p in self.players.values() if p.ws is ws), None)
         if p is None:
             return await self.error(ws, "Najpierw zaloguj postać.")
+        if kind == "dismiss_level_up":
+            if level_up.dismiss(p, data.get("id")):
+                self.persist()
+            return
+        if kind == "primal_order":return await self.select_primal_order(p,data.get("order"))
+        if kind == "training_feat":return await self.choose_training_feat(p,data.get("feat"),data.get("ability"))
+        if kind == "ritual":return await self.start_caster_channel(p,data.get("spell_id"),ritual=True)
+        if kind == "channel_cancel":self.cancel_channel(p);return
+        if kind == "familiar_command":return await self.familiar_command(p,data.get("mode"))
+        if kind == "nature_interact":return await self.nature_interaction(p,data.get("id"))
+        if kind == "fighting_style":
+            return await self.select_fighting_style(p,data.get("style"))
+        if kind == "weapon_grip":
+            return await self.set_weapon_grip(p,data.get("grip"))
+        if kind == "select_target":
+            return await self.select_combat_target(p,data)
+        if kind == "spell_power":
+            if not spell_scaling.choose_circle(p, data.get("spell_id"), data.get("circle")):
+                return await self.notice(p, "Wybierz dostępny krąg tego czaru.")
+            with self.db:self.save_player(p)
+            return
+        if kind == "escape_restraint":
+            return await self.escape_restraint(p,data.get("target_id"))
+        if kind == "stop_concentration":
+            self.break_concentration(p)
+            p.pending_spell = {}
+            return
+        if kind == "hotbar":
+            return await self.bind_spell(p,data.get("slot"),data.get("spell_id"))
+        if kind == "auto_pause":
+            if type(data.get("paused")) is bool:
+                p.auto_enabled = not data["paused"] and bool(p.auto_enemy_id or p.auto_target_id)
+                if data["paused"]:p.pending_spell={}
+            return
         if kind == "input":
             x, y = data.get("x"), data.get("y")
             if any(type(v) not in (int, float) or not math.isfinite(v) or abs(v) > 1e6 for v in (x, y)):
@@ -1157,6 +1287,7 @@ class Game(ExpansionGame, MonsterAI):
             norm = max(1, math.hypot(x, y))
             p.dx, p.dy, p.input_time = x/norm, y/norm, self.time
             if x or y:
+                self.cancel_channel(p)
                 p.facing = [x/norm, y/norm]
         elif kind == "premium_demo":
             enabled = data.get("enabled")
@@ -1175,22 +1306,25 @@ class Game(ExpansionGame, MonsterAI):
                 return await self.notice(p, "Nieprawidłowy cel potwora.")
             await self.attack(p, data.get("target_id"), data.get("enemy_id"))
         elif kind == "ability":
-            if data.get("target_id") is not None:
-                return await self.notice(p, "Ofensywne umiejętności klas działają tylko na potwory.")
             if "enemy_id" in data and (not isinstance(data["enemy_id"], str) or not data["enemy_id"]):
                 return await self.notice(p, "Nieprawidłowy cel potwora.")
-            await self.ability(p, data.get("enemy_id"))
+            await self.ability(p, data.get("enemy_id"), data.get("target_id"))
         elif kind in ("cast", "rune_use", "rune_craft", "rune_buy", "descend", "travel", "promote", "bless", "mastery", "mastery_reset", "bank_deposit", "bank_withdraw", "depot_store", "depot_take", "bind_city"):
             await self.expansion_command(p, kind, data)
         elif kind in ("quest_accept", "quest_claim"):
             await self.quest_command(p, kind, data)
-        elif kind in ("equip", "unequip", "sell", "buy", "potion"):
+        elif kind in ("equip", "unequip", "sell", "buy", "potion", "potion_bind"):
             await self.inventory_command(p, kind, data)
         elif kind == "pvp_safety":
             if type(data.get("enabled")) is not bool:
                 return await self.error(ws, "Ochrona wymaga true albo false.")
             p.pvp_safety = data["enabled"]
-            await self.notice(p, "Atakowanie graczy zablokowane." if p.pvp_safety else "Możesz wskazać cel PvP. Nieuzasadniony atak i zabójstwo mają kary.")
+            if p.pvp_safety:self.cancel_player_hostility(p)
+            elif p.auto_target_id:
+                target=self.players.get(p.auto_target_id)
+                p.auto_enabled=not bool(self.pvp_error(p,target))
+            with self.db:self.save_player(p)
+            await self.notice(p, "Ataki, czary i towarzysz nie atakują już graczy. Kary i czas walki pozostają." if p.pvp_safety else "PvP odblokowane: broń, czary, obszary i wilk. Obszar może trafić inne osoby; agresja podlega karom.")
         elif kind.startswith("party_") and kind in ("party_invite", "party_accept", "party_leave"):
             await self.party_command(p, kind, data)
         elif kind == "choose_class":
@@ -1211,6 +1345,7 @@ class Game(ExpansionGame, MonsterAI):
             if len(p.inventory) < INVENTORY_CAP:
                 p.inventory.append(new_item)
                 p.equipment["weapon"] = new_item["uid"]
+            p.hotbar = [];dnd_content.sync_hotbar(p)
             p.weapon, p.hp, p.mana = p.spec["weapon"], p.max_hp, p.max_mana
             self.persist()
             await self.notice(p, f"Klasa wybrana na stałe: {p.spec['name']}.")
@@ -1233,11 +1368,27 @@ class Game(ExpansionGame, MonsterAI):
         else:
             await self.error(ws, "Nieznana komenda.")
 
-    def damage_player(self, p, damage, killer=None, unjust=False):
+    def damage_player(self, p, damage, killer=None, unjust=False, rolled=False, damage_type="bludgeoning", damage_components=None):
         if not p.alive:
             return
         now = self.now()
-        actual = max(1, damage-p.armor)
+        if getattr(p,"is_companion",False):
+            p.hp=max(0,p.hp-max(0,int(damage)));self.tag(p)
+            return
+        p.current_wall_time=now
+        # Rolled combat uses KP for defense; do not subtract the old armor twice.
+        def resist(amount, kind):
+            amount=max(0,int(amount))
+            amount=int(amount*combat_rules.resistance_multiplier(p,kind))
+            return amount
+        # Separate mixed damage (Ice Storm, Meteor Swarm, Hunter's Mark) before resistance.
+        actual=sum(resist(c['damage'],c['type']) for c in damage_components) if damage_components is not None else resist(damage,damage_type)
+        if actual<=0:return
+        self.cancel_channel(p)
+        self.concentration_damage(p,actual)
+        if p.temp_hp>0:
+            absorbed=min(p.temp_hp,actual);p.temp_hp-=absorbed;actual-=absorbed
+            # Losing temporary HP does not end a 2024 Wild Shape.
         if p.bulwark_until > now:
             actual *= .5
         if killer is None and p.ward_until > now:
@@ -1281,6 +1432,8 @@ class Game(ExpansionGame, MonsterAI):
             if len(killer.unjust_kills) >= 3:
                 killer.red_until = now+86400
         p.last_pvp_attacker, p.last_pvp_hit_until, p.last_pvp_unjust = "", 0, False
+        self.stop_auto(p);self.break_concentration(p);self.companions.pop(p.id,None)
+        p.form="";p.form_until=0;p.temp_hp=0;p.buffs={}
         p.dx, p.dy = 0, 0
         p.respawn_until, p.respawn_at = now+4, self.time+4
         p.combat_until = p.pvp_combat_until = 0
@@ -1293,6 +1446,7 @@ class Game(ExpansionGame, MonsterAI):
         self.tick += 1
         self.effects = [effect for effect in self.effects if self.time-effect["time"] <= max(1.5,effect.get("duration",0))]
         now = self.now()
+        self.tick_dnd(dt)
         for p in tuple(self.players.values()):
             p.current_wall_time = now
             if not p.alive:
@@ -1311,11 +1465,12 @@ class Game(ExpansionGame, MonsterAI):
                 continue
             if not p.disconnected and self.time-p.input_time <= .35:
                 self.move(p, p.dx*p.speed*dt, p.dy*p.speed*dt)
-            if p.combat_until <= now:
-                p.mana = min(p.max_mana, p.mana+(3 if p.promoted else 1.5)*dt)
-                if self.in_safe(p):
-                    p.hp = min(p.max_hp, p.hp+10*dt)
-                    p.mana = min(p.max_mana, p.mana+6*dt)
+            if p.combat_until <= now and p.pvp_combat_until <= now:
+                safe=self.in_safe(p)
+                if now>=p.mana_recovery_until and not p.casting_channel:
+                    seconds=dnd_content.MANA_RECOVERY_SAFE_SECONDS if safe else dnd_content.MANA_RECOVERY_FIELD_SECONDS
+                    p.mana=min(p.max_mana,p.mana+p.max_mana/seconds*dt*(1.25 if p.promoted else 1))
+                if safe:p.hp = min(p.max_hp, p.hp+2*dt)
             if p.promoted and p.combat_until <= now:
                 p.hp = min(p.max_hp, p.hp+dt*2)
             if not p.disconnected:
@@ -1324,7 +1479,7 @@ class Game(ExpansionGame, MonsterAI):
             p.aggressors = {pid: until for pid, until in p.aggressors.items() if until > now}
         self.invites = {key: value for key, value in self.invites.items() if value[1] > now}
         player_cells, unsafe_ids = {}, set()
-        for p in self.players.values():
+        for p in (*self.players.values(), *self.companions.values(), *self.familiars.values()):
             if p.alive:
                 player_cells.setdefault((p.floor, int(p.x//1024), int(p.y//1024)), []).append(p)
                 if not self.in_safe(p):
@@ -1336,6 +1491,7 @@ class Game(ExpansionGame, MonsterAI):
         next_tick = loop.time()
         while True:
             self.step(.05)
+            await self.process_player_actions()
             if self.tick % 2 == 0:
                 await self.broadcast_states()
             if self.time-self.last_save >= 2:
@@ -1347,6 +1503,8 @@ class Game(ExpansionGame, MonsterAI):
             await asyncio.sleep(max(0, next_tick-loop.time()))
 
     def remove_player(self, p):
+        self.cancel_channel(p,'');self.familiars.pop(p.id,None);self.alarms.pop(p.id,None)
+        self.stop_auto(p);self.break_concentration(p);self.companions.pop(p.id,None)
         with self.db:
             self.save_player(p)
         self.leave_party(p)
@@ -1357,6 +1515,7 @@ class Game(ExpansionGame, MonsterAI):
     async def disconnect(self, ws):
         p = next((p for p in self.players.values() if p.ws is ws), None)
         if p:
+            self.stop_auto(p);self.companions.pop(p.id,None)
             p.ws, p.dx, p.dy, p.input_time = None, 0, 0, -10
             if p.alive and p.combat_until > self.now():
                 self.persist()
@@ -1452,42 +1611,30 @@ def create_app(db_path="world.sqlite3", clock=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":"0.6.0"})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION})
 
     app.router.add_get("/health",health)
+    async def ranking(request):
+        return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
+    app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/style.css","style.css")]:
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():
                 raise web.HTTPNotFound()
             return web.FileResponse(path,headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
         app.router.add_get(route,asset)
+    app.router.add_static("/assets/",web_dir/"assets",show_index=False)
     app.cleanup_ctx.append(lifecycle)
     return app
 
 
-def _runtime_defaults():
-    """Resolve local defaults plus Railway-provided runtime variables."""
-    host = os.environ.get("GAME_HOST", "127.0.0.1")
-    try:
-        port = int(os.environ.get("PORT", "8080"))
-    except ValueError:
-        port = 8080
-
-    db_path = os.environ.get("BRACTWO_DB")
-    if not db_path:
-        volume_path = os.environ.get("RAILWAY_VOLUME_MOUNT_PATH")
-        db_path = str(Path(volume_path) / "world.sqlite3") if volume_path else "world.sqlite3"
-    return host, port, db_path
-
-
 def main():
-    default_host, default_port, default_db = _runtime_defaults()
     parser=argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--host",default=default_host)
-    parser.add_argument("--port",type=int,default=default_port)
-    parser.add_argument("--db",default=default_db)
+    parser.add_argument("--host",default="127.0.0.1")
+    parser.add_argument("--port",type=int,default=8080)
+    parser.add_argument("--db",default="world.sqlite3")
     args=parser.parse_args()
     if args.db!=":memory:":
         Path(args.db).resolve().parent.mkdir(parents=True,exist_ok=True)

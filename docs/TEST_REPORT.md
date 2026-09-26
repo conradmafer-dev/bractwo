@@ -1,35 +1,84 @@
-# Weryfikacja Bractwo 0.6.0
+# Bractwo 0.8.17 — raport sprawdzenia
 
-Data: 2026-09-23. Sprawdzano źródła serwera, WWW i Godot.
+26.09.2026. Baza: dostarczony pełny ZIP 0.8.16. Ten raport opisuje bieżącą
+poprawkę. Starsze raporty, logi i zrzuty w paczce są historyczne.
+
+## Odtworzony błąd w 0.8.16
+
+Na rzeczywistych handlerach serwera, z zegarem testowym, stwierdzono:
+1. Sam wybór potwora wykonuje Iskrę i blokuje główną akcję na 3 s.
+2. Wskazanie ponownie tego samego potwora usuwa przyjęty Magiczny pocisk z kolejki.
+3. Komenda ręcznego ataku tuż przed klatką symulacji zabiera gotową akcję
+   oczekującemu zaklęciu; kolejny Spark opóźnia je o następną rundę.
 
 ## Wykonane sprawdzenia
 
-- **71/71 testów serwera** (23,780 s): realne lokalne WebSockety i tymczasowe SQLite. Wszystkie 60 wcześniejszych regresji plus 11 nowych scenariuszy; poprzednią liczbę pięter podziemnych zaktualizowano z 22 do 30.
-- **7/7 testów logiki JS**: indeks, interpolacja, licznik FPS, wybór dużych potworów, prywatne aktualizacje i podłoże.
-- **4965 zgodnych klasyfikacji podłoża Python/JS**, w tym nowe dodatnie piętra. Próba nie uruchamia renderera.
-- Poprawna składnia Python, JavaScript, 7 skryptów GDScript i skryptu startowego. `gdparse` nie zastępuje sprawdzenia typów/API przez silnik Godot.
-- Wszystkie 11235 punktów pojawiania się potworów i 106 przejść są poza kolizją. Każde z 30 pięter podziemnych ma trasę między komnatami. BFS na 23 tarasach potwierdza dostęp z miejsca wejścia do schodów oraz skrytek/kapliczek; krawędzie nie pozwalają zejść poza taras.
-- Sprawdzono osie wszystkich 178 dróg nie rzadziej niż co 20 jednostek z promieniem gracza 18, a także wszystkie pomosty. Dwie nowe łącznice przecinały skały; zmieniono ich przebieg i ponownie sprawdzono cały zbiór.
-- Nowe testy potwierdzają wejście na +3, powrót, zapis piętra, blokadę PvP i brak trafień między piętrami; woda zatrzymuje ruch.
-- Hybrydy faktycznie zbliżają się podczas zwykłego rzutu, dochodzą do zwarcia i zadają ciosy. Boss wznawia pościg po zapowiedzi; łucznik utrzymuje dystans. Dotychczasowy test paladyna krążącego z premium i pośpiechem również przechodzi.
-- Interakcje odrzucają użycie z daleka, z innego piętra, za niski poziom i walkę. Zweryfikowano efekt leczenia, szybkości i osłony PvE (bez osłony PvP), odnowienie po restarcie oraz blokadę skrytki przy pełnym plecaku.
-- Trofeum można sprzedać raz, nie można go założyć. Próbki wszystkich klas/gatunków wskazują istniejące, odpowiednie szablony. W 40000 losowaniach cyklopa częstości sprzętu, trofeum, mikstury i przedmiotu rodowego mieszczą się w 0,9 punktu procentowego od deklarowanych stawek.
+| Test | Wynik | Dowód |
+| --- | --- | --- |
+| Python unittest: kompletna regresja | **803/803** | `qa_0.8.17/server_tests.log` |
+| Nowe scenariusze różdżki, wliczone w powyższy wynik | **30/30** | `qa_0.8.17/wand_tests.log` |
+| JavaScript / Node | **117/117** | `qa_0.8.17/node_tests.log` |
+| Chromium + rzeczywiste handlery serwera | **16 sprawdzeń** | `qa_0.8.17/browser_results.json`, `browser.log` |
+| Lokalny proces + TCP/WebSocket + zapis/restart | **17/17** | `qa_0.8.17/local_process.log` |
+| Składnia Python i JS, zakres zmian | Poprawne | `qa_0.8.17/static_checks.json` |
 
-## Syntetyczne obciążenie serwera
+Zachowano wszystkie stare testy. Testy, które zakładały automatyczny Spark po
+samym zaznaczeniu, inicjują teraz jawny atak; sprawdzają nadal trzysekundową akcję
+i pierwszeństwo czaru. Test odblokowania automatycznego PvP wykonuje łowca z
+łukiem; dla maga osobny nowy przypadek sprawdza brak niezamówionej Iskry.
+Pierwsze synchroniczne uruchomienie pełnej regresji zostało przerwane limitem
+czasu narzędzia; komplet uruchomiono ponownie i zakończył się powyższym wynikiem.
 
-`tools/benchmark_living_world.py`: 300 kroków po rozgrzaniu, postacie przy oddzielnych siedliskach. Duże testowe HP zachowuje obciążenie walką do końca. Pomiar dotyczy CPU serwera na tym komputerze, **nie FPS klienta**.
+Środowisko: Python **3.13.5**, aiohttp **3.13.3**, Node **v22.16.0**, lokalny Chromium.
+Produkcyjne `requirements.txt` pozostało niezmienione: **aiohttp==3.13.5**.
+Testy nie są deklarowane jako wykonane na innym numerze biblioteki. Ostrzeżenia
+asyncio/AppKey w logach nie są pomijanymi niepowodzeniami testów.
 
-| Postacie | Średni krok | P95 | Maksimum | Przygotowanie stanów | Średnia wiadomość |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 0.229 ms | 0.326 ms | 0.601 ms | 0.305 ms | 6213 B |
-| 24 | 3.8 ms | 5.051 ms | 11.705 ms | 15.476 ms | 20348 B |
+## Pokrycie
 
-Budżet kroku 20 Hz: 50 ms. Przy 24 postaciach obrażenia otrzymały 23, wszystkie pozostały żywe. Katalog początkowy: 2751882 B JSON. Bufor Godota pozostaje 8 MiB. Woda, skały i pokoje mają indeksy przestrzenne; klienci korzystają z istniejącego cachowania i cullingu.
+- Wybór celu różdżką nie zmienia HP, many, akcji ani ruchu. Potem zaklęcie z
+  gotowej akcji działa od razu. Różdżka nie wraca samoczynnie do ostrzału.
+- Spacja/przycisk wciąż strzelają 1k4. Ręczny atak i czar nie sumują się w jednej
+  głównej akcji. Przytrzymanie Spacji nie odbiera terminu oczekującemu czarowi.
+- Wskazanie tego samego celu zachowuje komendę i termin. Inny cel / odznaczenie
+  ją kasuje. Nowy czar zastępuje poprzedni, także na granicy gotowości serwera.
+- Utrata życia celu, piętra, zasięgu, linii widzenia i many jest sprawdzana ponownie.
+  Nieudana komenda nie odpala zastępczego Sparka. Ochrona PvP pozostaje.
+- Reakcja Tarcza i Odzyskanie mocy nie kasują kolejki ani ruchu. Odnowienie 180 s
+  i stopniowa mana pozostają. Stare zapisy nadal działają bez migracji schematu.
+- Rycerz, łowca i druid z bronią wręcz nadal autoatakują. Kontrola zależy od broni,
+  nie od klasy: także zwykła broń w dłoni maga jest traktowana normalnie.
+- Wszystkie obecne fokusy, w tym ulepszone różdżki, są rozpoznane, a forma zwierzęca
+  zachowuje swoje ataki. Nowe prywatne pole poprawnie opisuje zachowanie broni.
+- GUI: rzeczywiste kliknięcie na liście potworów, 4, F, F1, Spacja, hotbar i księga,
+  potwierdzenie kolejki, ruch oraz anulowanie. Rozdzielczości 1440×900, 390×844,
+  844×390; bez poziomego przepełnienia strony. Zrzuty obejrzano wizualnie.
 
-## Ograniczenia
+## Granice sprawdzenia
 
-Nie przeprowadzono wizualnego uruchomienia tej wersji. Przeglądarka była zablokowana przez zasady środowiska; nie używano alternatywnej ścieżki obchodzącej tę blokadę. Silnik Godot i Android nie były dostępne; sprawdzono składnię GDScript, ale nie wykonano importu, eksportu ani testu urządzenia. Nowe powierzchnie HUD oraz rysunki wymagają prób w grze na docelowym urządzeniu. Licznik FPS jest zachowany, lecz brak pomiaru rzeczywistych FPS tego wydania. Historyczne zrzuty w archive_0.3 nie przedstawiają 0.6.0.
+Chromium nie może tu otworzyć lokalnego HTTP (`ERR_BLOCKED_BY_ADMINISTRATOR`),
+co sprawdzono bezpośrednio przed testem. Kod WWW osadzono w stronie testowej,
+a WebSocket obsługuje kontrolowany most Python do rzeczywistego aiohttp. Nie
+zastąpiono obrażeń ani stanu postaci atrapami. Zegar jest kontrolowany, AI
+potworów zatrzymana, używany jest produkcyjny cykl akcji. Test ma odporny cel
+z dodatkowym HP, nie służy do oceny balansu lub skali pasków HP przeciwników.
 
-Balans walki i rzadkości potwierdzono scenariuszami symulacji, nie wielogodzinnym playtestem. Zapis z miejsca zajętego przez nową wodę/skałę przenosi postać do Przystani przy logowaniu poza blokadą walki, jak w poprzedniej wersji. Przed migracją zachowaj kopię `data`.
+Osobno wykonano natywny TCP/WebSocket i dwa uruchomienia prawdziwego procesu,
+z SIGTERM, kopią i wczytaniem SQLite oraz zachowaniem ustawień i odnowień.
+Nie uruchomiono Godota, nie wygenerowano APK/AAB/EXE, nie zbudowano Dockera i nie
+wdrożono niczego na koncie Railway. Brak testu fizycznego urządzenia Android
+oraz długiej rozgrywki. Źródła Godota mają poprawione opisy i statusy kolejki.
 
-Surowe wyniki: server-tests-0.6.0.txt, client-tests-0.6.0.txt, surface-parity-0.6.0.json, performance-0.6.0.json, world-0.6.0.json.
+## Odtworzenie
+
+```text
+python -m unittest discover -s tests -v
+node --test tests/*.cjs
+python tools/browser_0817_wand.py
+python tests/smoke_railway.py
+```
+
+Skrypty odtworzenia testów znajdują się w pełnym ZIP-ie źródeł.
+Przeglądarka wymaga testowych zależności Playwright i Chromium. Nie dodano ich
+do produkcyjnych requirements. Oba archiwa mają osobne manifesty SHA-256;
+sprawdzono integralność ZIP-ów i zgodność wszystkich wymienionych plików.

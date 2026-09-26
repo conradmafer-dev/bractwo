@@ -1,0 +1,39 @@
+{
+  "python_compile": "passed",
+  "javascript_syntax": "passed (all web/*.js)",
+  "godot": "not executed; source only",
+  "production_changed": [
+    "README.md",
+    "client/export_presets.cfg",
+    "client/project.godot",
+    "client/scripts/character_sheet.gd",
+    "client/scripts/main.gd",
+    "server/combat_rules.py",
+    "server/dnd_game.py",
+    "server/server.py",
+    "web/character_sheet.js",
+    "web/game.js",
+    "web/hud_layout.css",
+    "web/index.html",
+    "web/runtime.js"
+  ],
+  "verified_byte_identical_to_0_8_16": [
+    "server/dnd_content.py",
+    "server/caster_rules.py",
+    "server/caster_game.py",
+    "server/spell_scaling.py",
+    "server/level_up.py",
+    "server/progression_guide.py",
+    "server/equipment_rules.py",
+    "server/monster_ai.py",
+    "server/fighter_rules.py",
+    "server/ranger_magic.py",
+    "requirements.txt",
+    "Dockerfile",
+    "run.py"
+  ],
+  "mana_rules_version": 3,
+  "save_schema_changed": false,
+  "scope": "wand action arbitration and short queue indicators; no combat values or content rebalance",
+  "version": "0.8.17"
+}

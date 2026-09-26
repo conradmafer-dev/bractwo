@@ -1,0 +1,712 @@
+TAP version 13
+# Subtest: Recovery is ready in combat and during main action cooldown
+ok 1 - Recovery is ready in combat and during main action cooldown
+  ---
+  duration_ms: 0.78736
+  type: 'test'
+  ...
+# Subtest: Recovery remains ready while moving
+ok 2 - Recovery remains ready while moving
+  ---
+  duration_ms: 0.220094
+  type: 'test'
+  ...
+# Subtest: Recovery is also ready outside combat
+ok 3 - Recovery is also ready outside combat
+  ---
+  duration_ms: 0.177191
+  type: 'test'
+  ...
+# Subtest: Full mana disables Recovery
+ok 4 - Full mana disables Recovery
+  ---
+  duration_ms: 0.086948
+  type: 'test'
+  ...
+# Subtest: Fractional missing mana enables Recovery
+ok 5 - Fractional missing mana enables Recovery
+  ---
+  duration_ms: 0.141809
+  type: 'test'
+  ...
+# Subtest: Cooldown and bonus action disable Recovery
+ok 6 - Cooldown and bonus action disable Recovery
+  ---
+  duration_ms: 2.399173
+  type: 'test'
+  ...
+# Subtest: Only living mage in normal form can use Recovery
+ok 7 - Only living mage in normal form can use Recovery
+  ---
+  duration_ms: 0.207696
+  type: 'test'
+  ...
+# Subtest: A ritual in progress must be cancelled first
+ok 8 - A ritual in progress must be cancelled first
+  ---
+  duration_ms: 0.093969
+  type: 'test'
+  ...
+# Subtest: Concentration and armor do not block Recovery
+ok 9 - Concentration and armor do not block Recovery
+  ---
+  duration_ms: 0.365408
+  type: 'test'
+  ...
+# Subtest: Readiness does not mutate client state
+ok 10 - Readiness does not mutate client state
+  ---
+  duration_ms: 0.372188
+  type: 'test'
+  ...
+# Subtest: world view fits the entire rectangular world without cropping
+ok 11 - world view fits the entire rectangular world without cropping
+  ---
+  duration_ms: 0.958201
+  type: 'test'
+  ...
+# Subtest: each left/right zoom doubles/halves bounded camera scale
+ok 12 - each left/right zoom doubles/halves bounded camera scale
+  ---
+  duration_ms: 0.275846
+  type: 'test'
+  ...
+# Subtest: zoom preserves cursor location except when camera reaches border
+ok 13 - zoom preserves cursor location except when camera reaches border
+  ---
+  duration_ms: 0.117533
+  type: 'test'
+  ...
+# Subtest: local camera includes player near world edge
+ok 14 - local camera includes player near world edge
+  ---
+  duration_ms: 0.289707
+  type: 'test'
+  ...
+# Subtest: zero coordinates are not mistaken for missing location
+ok 15 - zero coordinates are not mistaken for missing location
+  ---
+  duration_ms: 0.213494
+  type: 'test'
+  ...
+# Subtest: pan is bounded and does not zoom
+ok 16 - pan is bounded and does not zoom
+  ---
+  duration_ms: 0.210981
+  type: 'test'
+  ...
+# Subtest: all resets persistent camera after zoom and pan
+ok 17 - all resets persistent camera after zoom and pan
+  ---
+  duration_ms: 0.115019
+  type: 'test'
+  ...
+# Subtest: original starter river and its bridge are included along with expanded geometry
+ok 18 - original starter river and its bridge are included along with expanded geometry
+  ---
+  duration_ms: 0.652611
+  type: 'test'
+  ...
+# Subtest: all bridges draw after all water segments
+ok 19 - all bridges draw after all water segments
+  ---
+  duration_ms: 0.312721
+  type: 'test'
+  ...
+# Subtest: missing optional river and expanded geometry safely draw nothing
+ok 20 - missing optional river and expanded geometry safely draw nothing
+  ---
+  duration_ms: 0.283608
+  type: 'test'
+  ...
+# Subtest: projection uses same river coordinates in atlas and minimap
+ok 21 - projection uses same river coordinates in atlas and minimap
+  ---
+  duration_ms: 0.279101
+  type: 'test'
+  ...
+# Subtest: thin river remains at least one screen pixel at world zoom
+ok 22 - thin river remains at least one screen pixel at world zoom
+  ---
+  duration_ms: 0.23101
+  type: 'test'
+  ...
+# Subtest: offscreen river segments do not issue drawing calls on local map
+ok 23 - offscreen river segments do not issue drawing calls on local map
+  ---
+  duration_ms: 0.114999
+  type: 'test'
+  ...
+# Subtest: first druid path does not require a master
+ok 24 - first druid path does not require a master
+  ---
+  duration_ms: 0.818456
+  type: 'test'
+  ...
+# Subtest: reselection requires master
+ok 25 - reselection requires master
+  ---
+  duration_ms: 0.143351
+  type: 'test'
+  ...
+# Subtest: dead, combat, transformed and non-druid cannot pick path
+ok 26 - dead, combat, transformed and non-druid cannot pick path
+  ---
+  duration_ms: 0.157993
+  type: 'test'
+  ...
+# Subtest: simple and martial labels; no third/exotic fallback
+ok 27 - simple and martial labels; no third/exotic fallback
+  ---
+  duration_ms: 0.474639
+  type: 'test'
+  ...
+# Subtest: proficient weapon has no redundant affirmative proficiency row
+ok 28 - proficient weapon has no redundant affirmative proficiency row
+  ---
+  duration_ms: 0.121149
+  type: 'test'
+  ...
+# Subtest: missing weapon training shown once, does not subtract from actual attack twice
+ok 29 - missing weapon training shown once, does not subtract from actual attack twice
+  ---
+  duration_ms: 0.140067
+  type: 'test'
+  ...
+# Subtest: personalized zero spell bonus overrides staff nominal focus bonus for noncasters
+ok 30 - personalized zero spell bonus overrides staff nominal focus bonus for noncasters
+  ---
+  duration_ms: 0.092406
+  type: 'test'
+  ...
+# Subtest: mastery lock independent of proficiency
+ok 31 - mastery lock independent of proficiency
+  ---
+  duration_ms: 0.089051
+  type: 'test'
+  ...
+# Subtest: armor shows actual wearer AC and warns about missing training
+ok 32 - armor shows actual wearer AC and warns about missing training
+  ---
+  duration_ms: 0.253844
+  type: 'test'
+  ...
+# Subtest: untrained shield explicitly denies AC bonus
+ok 33 - untrained shield explicitly denies AC bonus
+  ---
+  duration_ms: 0.609688
+  type: 'test'
+  ...
+# Subtest: tooltip text remains text not injected HTML
+ok 34 - tooltip text remains text not injected HTML
+  ---
+  duration_ms: 0.348894
+  type: 'test'
+  ...
+# Subtest: shared staff and bow artwork follows type rather than former class restriction
+ok 35 - shared staff and bow artwork follows type rather than former class restriction
+  ---
+  duration_ms: 0.148319
+  type: 'test'
+  ...
+# Subtest: untrained armor warning renders the message, not its CSS class
+ok 36 - untrained armor warning renders the message, not its CSS class
+  ---
+  duration_ms: 0.242307
+  type: 'test'
+  ...
+# Subtest: spatial queries preserve every visible object at boundaries and across floors
+ok 37 - spatial queries preserve every visible object at boundaries and across floors
+  ---
+  duration_ms: 26.443051
+  type: 'test'
+  ...
+# Subtest: FPS measures actual frame timestamps, including slow frames and reset
+ok 38 - FPS measures actual frame timestamps, including slow frames and reset
+  ---
+  duration_ms: 0.376925
+  type: 'test'
+  ...
+# Subtest: motion interpolates evenly and snaps on floor change or distant travel
+ok 39 - motion interpolates evenly and snaps on floor change or distant travel
+  ---
+  duration_ms: 0.334352
+  type: 'test'
+  ...
+# Subtest: picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+ok 40 - picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+  ---
+  duration_ms: 0.451064
+  type: 'test'
+  ...
+# Subtest: owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+ok 41 - owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+  ---
+  duration_ms: 0.198492
+  type: 'test'
+  ...
+# Subtest: surface index gives trails priority, curved segments, ellipse edges and floor stone
+ok 42 - surface index gives trails priority, curved segments, ellipse edges and floor stone
+  ---
+  duration_ms: 0.413048
+  type: 'test'
+  ...
+# Subtest: large monster picking follows species size and ignores other floors
+ok 43 - large monster picking follows species size and ignores other floors
+  ---
+  duration_ms: 0.212853
+  type: 'test'
+  ...
+# Subtest: combat readout explains lower d20, misses, criticals and saving throws
+ok 44 - combat readout explains lower d20, misses, criticals and saving throws
+  ---
+  duration_ms: 0.558472
+  type: 'test'
+  ...
+# Subtest: companion cannot be accidentally selected as a hostile monster
+ok 45 - companion cannot be accidentally selected as a hostile monster
+  ---
+  duration_ms: 0.258711
+  type: 'test'
+  ...
+# Subtest: combat summary exposes actual damage dice and zero save damage
+ok 46 - combat summary exposes actual damage dice and zero save damage
+  ---
+  duration_ms: 0.344687
+  type: 'test'
+  ...
+# Subtest: paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+ok 47 - paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+  ---
+  duration_ms: 0.214987
+  type: 'test'
+  ...
+# Subtest: hotbar pages handle empty lists and exact twenty-four-slot boundaries
+ok 48 - hotbar pages handle empty lists and exact twenty-four-slot boundaries
+  ---
+  duration_ms: 0.105936
+  type: 'test'
+  ...
+# Subtest: status timer distinguishes six hundred rounds from real-world duration
+ok 49 - status timer distinguishes six hundred rounds from real-world duration
+  ---
+  duration_ms: 0.166725
+  type: 'test'
+  ...
+# Subtest: mana budget UI names mixed slot distribution and flexible pool
+ok 50 - mana budget UI names mixed slot distribution and flexible pool
+  ---
+  duration_ms: 0.159515
+  type: 'test'
+  ...
+# Subtest: spell profile overlays owner scaling without mutating the shared catalogue
+ok 51 - spell profile overlays owner scaling without mutating the shared catalogue
+  ---
+  duration_ms: 0.158233
+  type: 'test'
+  ...
+# Subtest: hotbar mana uses selected casting rank, never static base spell cost
+ok 52 - hotbar mana uses selected casting rank, never static base spell cost
+  ---
+  duration_ms: 0.110222
+  type: 'test'
+  ...
+# Subtest: repeating active concentration is free, other spell costs remain payable
+ok 53 - repeating active concentration is free, other spell costs remain payable
+  ---
+  duration_ms: 0.188778
+  type: 'test'
+  ...
+# Subtest: missing locked spell profile falls back to a safe base and empty slots stay empty
+ok 54 - missing locked spell profile falls back to a safe base and empty slots stay empty
+  ---
+  duration_ms: 0.192994
+  type: 'test'
+  ...
+# Subtest: owner delta replaces spell profiles completely and never leaks them across accounts
+ok 55 - owner delta replaces spell profiles completely and never leaks them across accounts
+  ---
+  duration_ms: 0.105916
+  type: 'test'
+  ...
+# Subtest: Initial warrior choice needs no master or points
+ok 56 - Initial warrior choice needs no master or points
+  ---
+  duration_ms: 0.765898
+  type: 'test'
+  ...
+# Subtest: Changing a chosen style requires the master
+ok 57 - Changing a chosen style requires the master
+  ---
+  duration_ms: 0.137874
+  type: 'test'
+  ...
+# Subtest: Dead warriors and active combat cannot change style
+ok 58 - Dead warriors and active combat cannot change style
+  ---
+  duration_ms: 0.092847
+  type: 'test'
+  ...
+# Subtest: No other class receives warrior-style choice
+ok 59 - No other class receives warrior-style choice
+  ---
+  duration_ms: 0.100177
+  type: 'test'
+  ...
+# Subtest: Four mastery/surge effects draw finite commands and balance the canvas stack
+ok 60 - Four mastery/surge effects draw finite commands and balance the canvas stack
+  ---
+  duration_ms: 0.787309
+  type: 'test'
+  ...
+# Subtest: Expired effects do not leave any marks on the canvas
+ok 61 - Expired effects do not leave any marks on the canvas
+  ---
+  duration_ms: 0.124784
+  type: 'test'
+  ...
+# Subtest: Old spell effects remain handled by their original renderer
+ok 62 - Old spell effects remain handled by their original renderer
+  ---
+  duration_ms: 0.146756
+  type: 'test'
+  ...
+# Subtest: Sap and prone overlays are visible only while authoritative status exists
+ok 63 - Sap and prone overlays are visible only while authoritative status exists
+  ---
+  duration_ms: 0.231791
+  type: 'test'
+  ...
+# Subtest: Graze is displayed as miss damage rather than a hit or harmless miss
+ok 64 - Graze is displayed as miss damage rather than a hit or harmless miss
+  ---
+  duration_ms: 0.406919
+  type: 'test'
+  ...
+# Subtest: compact potion includes strength and quantity, no zero weapon stats
+ok 65 - compact potion includes strength and quantity, no zero weapon stats
+  ---
+  duration_ms: 1.231634
+  type: 'test'
+  ...
+# Subtest: weapon shows actual personalized rolls without repeating enchantment
+ok 66 - weapon shows actual personalized rolls without repeating enchantment
+  ---
+  duration_ms: 0.241626
+  type: 'test'
+  ...
+# Subtest: armor and resistance use compact concrete descriptions
+ok 67 - armor and resistance use compact concrete descriptions
+  ---
+  duration_ms: 0.236508
+  type: 'test'
+  ...
+# Subtest: requirements display meaningful level but no class wall of text
+ok 68 - requirements display meaningful level but no class wall of text
+  ---
+  duration_ms: 0.16253
+  type: 'test'
+  ...
+# Subtest: all-class supplies need no class wall of text
+ok 69 - all-class supplies need no class wall of text
+  ---
+  duration_ms: 2.384912
+  type: 'test'
+  ...
+# Subtest: no source row until server provides owner-discovered sources
+ok 70 - no source row until server provides owner-discovered sources
+  ---
+  duration_ms: 0.248867
+  type: 'test'
+  ...
+# Subtest: negative window position remains on screen
+ok 71 - negative window position remains on screen
+  ---
+  duration_ms: 1.135042
+  type: 'test'
+  ...
+# Subtest: offscreen close header is clamped to viewport
+ok 72 - offscreen close header is clamped to viewport
+  ---
+  duration_ms: 0.131634
+  type: 'test'
+  ...
+# Subtest: oversized saved window remains reachable on mobile
+ok 73 - oversized saved window remains reachable on mobile
+  ---
+  duration_ms: 0.40693
+  type: 'test'
+  ...
+# Subtest: single line only contains name and the gained HP
+ok 74 - single line only contains name and the gained HP
+  ---
+  duration_ms: 1.099799
+  type: 'test'
+  ...
+# Subtest: each saving throw can be shown independently
+ok 75 - each saving throw can be shown independently
+  ---
+  duration_ms: 0.323336
+  type: 'test'
+  ...
+# Subtest: movement delta retains its units and decimal comma
+ok 76 - movement delta retains its units and decimal comma
+  ---
+  duration_ms: 0.352509
+  type: 'test'
+  ...
+# Subtest: spell unlock is a gain, not before and after
+ok 77 - spell unlock is a gain, not before and after
+  ---
+  duration_ms: 0.095491
+  type: 'test'
+  ...
+# Subtest: compact owner state preserves pending receipts until changed
+ok 78 - compact owner state preserves pending receipts until changed
+  ---
+  duration_ms: 0.319892
+  type: 'test'
+  ...
+# Subtest: authoritative empty queue clears receipt history
+ok 79 - authoritative empty queue clears receipt history
+  ---
+  duration_ms: 1.24898
+  type: 'test'
+  ...
+# Subtest: Polish drop chance percentages
+ok 80 - Polish drop chance percentages
+  ---
+  duration_ms: 16.136067
+  type: 'test'
+  ...
+# Subtest: Loot preview uses canonical item and unconditional chance
+ok 81 - Loot preview uses canonical item and unconditional chance
+  ---
+  duration_ms: 0.328353
+  type: 'test'
+  ...
+# Subtest: Potion previews use potion catalog
+ok 82 - Potion previews use potion catalog
+  ---
+  duration_ms: 0.113437
+  type: 'test'
+  ...
+# Subtest: Unknown species has no invented drops
+ok 83 - Unknown species has no invented drops
+  ---
+  duration_ms: 0.629607
+  type: 'test'
+  ...
+# Subtest: Atlas frame is always bounded for normal movement
+ok 84 - Atlas frame is always bounded for normal movement
+  ---
+  duration_ms: 6.583976
+  type: 'test'
+  ...
+# Subtest: Atlas idle and invalid movement safe default
+ok 85 - Atlas idle and invalid movement safe default
+  ---
+  duration_ms: 0.113788
+  type: 'test'
+  ...
+# Subtest: Atlas four walking frames loop in order
+ok 86 - Atlas four walking frames loop in order
+  ---
+  duration_ms: 0.214095
+  type: 'test'
+  ...
+# Subtest: intermediate pool tooltip does not equate smooth mana with old slots
+ok 87 - intermediate pool tooltip does not equate smooth mana with old slots
+  ---
+  duration_ms: 0.741281
+  type: 'test'
+  ...
+# Subtest: focus remains a separate bonus in the mana tooltip
+ok 88 - focus remains a separate bonus in the mana tooltip
+  ---
+  duration_ms: 0.106096
+  type: 'test'
+  ...
+# Subtest: knight tooltip has real pool and no imaginary next gain
+ok 89 - knight tooltip has real pool and no imaginary next gain
+  ---
+  duration_ms: 0.137081
+  type: 'test'
+  ...
+# Subtest: end cap tooltip does not promise further mana
+ok 90 - end cap tooltip does not promise further mana
+  ---
+  duration_ms: 0.120517
+  type: 'test'
+  ...
+# Subtest: award lines show only each earned delta
+ok 91 - award lines show only each earned delta
+  ---
+  duration_ms: 0.140057
+  type: 'test'
+  ...
+# Subtest: hotbar spell profile uses the server intermediate recovery amount
+ok 92 - hotbar spell profile uses the server intermediate recovery amount
+  ---
+  duration_ms: 0.758917
+  type: 'test'
+  ...
+# Subtest: Ranger uses per-class authoritative unlocks, including level-five Longstrider
+ok 93 - Ranger uses per-class authoritative unlocks, including level-five Longstrider
+  ---
+  duration_ms: 0.670577
+  type: 'test'
+  ...
+# Subtest: Concentration warning distinguishes preparation from immediate replacement
+ok 94 - Concentration warning distinguishes preparation from immediate replacement
+  ---
+  duration_ms: 0.217921
+  type: 'test'
+  ...
+# Subtest: Live ranger overlays are balanced and finite at all actor scales
+ok 95 - Live ranger overlays are balanced and finite at all actor scales
+  ---
+  duration_ms: 3.562817
+  type: 'test'
+  ...
+# Subtest: Caster concentration and armed intent never draw target overlays on caster
+ok 96 - Caster concentration and armed intent never draw target overlays on caster
+  ---
+  duration_ms: 0.165854
+  type: 'test'
+  ...
+# Subtest: Same target with multiple marks renders one readable symbol
+ok 97 - Same target with multiple marks renders one readable symbol
+  ---
+  duration_ms: 0.14896
+  type: 'test'
+  ...
+# Subtest: No live conditions means no lingering graphic
+ok 98 - No live conditions means no lingering graphic
+  ---
+  duration_ms: 0.206544
+  type: 'test'
+  ...
+# Subtest: New spell uses the same distinct vector icon in both clients
+ok 99 - New spell uses the same distinct vector icon in both clients
+  ---
+  duration_ms: 0.377707
+  type: 'test'
+  ...
+# Subtest: physical row one uses digits 1..0, Minus and Equal
+ok 100 - physical row one uses digits 1..0, Minus and Equal
+  ---
+  duration_ms: 1.274527
+  type: 'test'
+  ...
+# Subtest: F1..F12 occupy row two while adaptive F is not a slot
+ok 101 - F1..F12 occupy row two while adaptive F is not a slot
+  ---
+  duration_ms: 0.112606
+  type: 'test'
+  ...
+# Subtest: labels remain correct for second row and overflow bank
+ok 102 - labels remain correct for second row and overflow bank
+  ---
+  duration_ms: 0.192874
+  type: 'test'
+  ...
+# Subtest: all rendered shapes agree with Python geometry at sampled boundaries
+ok 103 - all rendered shapes agree with Python geometry at sampled boundaries
+  ---
+  duration_ms: 11.008843
+  type: 'test'
+  ...
+# Subtest: three missiles take distinct curved paths and converge at one target
+ok 104 - three missiles take distinct curved paths and converge at one target
+  ---
+  duration_ms: 0.795791
+  type: 'test'
+  ...
+# Subtest: missiles do not produce NaN when actor positions coincide
+ok 105 - missiles do not produce NaN when actor positions coincide
+  ---
+  duration_ms: 0.140507
+  type: 'test'
+  ...
+# Subtest: every current spell draws valid canvas commands and balances save/restore
+ok 106 - every current spell draws valid canvas commands and balances save/restore
+  ---
+  duration_ms: 15.372789
+  type: 'test'
+  ...
+# Subtest: legacy effects remain with the existing renderer
+ok 107 - legacy effects remain with the existing renderer
+  ---
+  duration_ms: 0.109221
+  type: 'test'
+  ...
+# Subtest: all upcast magic missiles have separate curves and converge on the target
+ok 108 - all upcast magic missiles have separate curves and converge on the target
+  ---
+  duration_ms: 0.54377
+  type: 'test'
+  ...
+# Subtest: eleven coincident-origin missiles remain finite at all animation phases
+ok 109 - eleven coincident-origin missiles remain finite at all animation phases
+  ---
+  duration_ms: 0.42765
+  type: 'test'
+  ...
+# Subtest: scaled missile volleys and scorching rays draw all animation phases without canvas imbalance
+ok 110 - scaled missile volleys and scorching rays draw all animation phases without canvas imbalance
+  ---
+  duration_ms: 5.215821
+  type: 'test'
+  ...
+# Subtest: only the server-acknowledged pending spell gets a queue caption
+ok 111 - only the server-acknowledged pending spell gets a queue caption
+  ---
+  duration_ms: 0.690166
+  type: 'test'
+  ...
+# Subtest: ready pending command remains visible until the server executes it
+ok 112 - ready pending command remains visible until the server executes it
+  ---
+  duration_ms: 0.174117
+  type: 'test'
+  ...
+# Subtest: no empty slot or absent player can show a phantom pending spell
+ok 113 - no empty slot or absent player can show a phantom pending spell
+  ---
+  duration_ms: 0.096602
+  type: 'test'
+  ...
+# Subtest: queue label disappears after completion or cancellation
+ok 114 - queue label disappears after completion or cancellation
+  ---
+  duration_ms: 0.09531
+  type: 'test'
+  ...
+# Subtest: hotbar, F and book share the same queue formatter
+ok 115 - hotbar, F and book share the same queue formatter
+  ---
+  duration_ms: 1.519848
+  type: 'test'
+  ...
+# Subtest: wand instruction is determined by actual weapon and mentions manual Space
+ok 116 - wand instruction is determined by actual weapon and mentions manual Space
+  ---
+  duration_ms: 0.523721
+  type: 'test'
+  ...
+# Subtest: native client mirrors the queue and actual weapon instruction
+ok 117 - native client mirrors the queue and actual weapon instruction
+  ---
+  duration_ms: 0.493247
+  type: 'test'
+  ...
+1..117
+# tests 117
+# suites 0
+# pass 117
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 875.773179

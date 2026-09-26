@@ -1,0 +1,36 @@
+PASS: HTTP health reports Bractwo 0.8.17
+PASS: All shipped web files and icons served byte-for-byte
+PASS: Save files and server source are not served over HTTP
+PASS: Register and enter as wizard using native WebSocket
+PASS: Two separate clients share the same world
+PASS: Server executes an actual first-circle spell
+PASS: Native WebSocket Recovery restores20 mana immediately without channeling
+PASS: Hotbar update round-trips through the real game server
+PASS: SIGTERM closes connected clients and exits cleanly within draining budget
+PASS: SQLite integrity check after shutdown
+PASS: Last hotbar change and actual spell history persist on shutdown
+PASS: Restart snapshots the existing save before opening the game
+PASS: Pre-start backup includes both accounts
+PASS: Same account logs in after process restart with its saved settings
+PASS: Arcane Recovery cooldown survives the real process restart without reset
+PASS: Public ranking works after restart
+PASS: Second shutdown exits successfully
+
+Server log:
+2026-09-26 12:57:18,378 INFO Bractwo 0.8.17 | 0.0.0.0:39873 | baza: /tmp/bractwo-railway-qa-7ftg7pxz/world.sqlite3
+======== Running on http://0.0.0.0:39873 ========
+(Press CTRL+C to quit)
+2026-09-26 12:57:19,132 INFO Zapisano stan gry; zamykam polaczenia.
+2026-09-26 12:57:23,416 INFO Kopia przed startem: /tmp/bractwo-railway-qa-7ftg7pxz/backups/bractwo-20260926T125723416116Z.sqlite3
+2026-09-26 12:57:23,467 INFO Bractwo 0.8.17 | 0.0.0.0:46143 | baza: /tmp/bractwo-railway-qa-7ftg7pxz/world.sqlite3
+======== Running on http://0.0.0.0:46143 ========
+(Press CTRL+C to quit)
+2026-09-26 12:57:23,605 INFO Zapisano stan gry; zamykam polaczenia.
+
+{
+  "checks": 17,
+  "passed": 17,
+  "aiohttp": "3.13.3",
+  "python": "3.13.5",
+  "scope": "local TCP and WebSocket; not Railway"
+}

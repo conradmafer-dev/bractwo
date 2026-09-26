@@ -1,0 +1,23 @@
+{
+  "version": "0.7.0",
+  "monsters": 11235,
+  "rendering_measured": false,
+  "1": {
+    "mean_step_ms": 0.242,
+    "p95_step_ms": 0.359,
+    "max_step_ms": 0.67,
+    "snapshot_batch_ms": 0.349,
+    "mean_packet_bytes": 8061,
+    "damaged_players": 1,
+    "alive_players": 1
+  },
+  "24": {
+    "mean_step_ms": 3.841,
+    "p95_step_ms": 5.227,
+    "max_step_ms": 6.044,
+    "snapshot_batch_ms": 16.234,
+    "mean_packet_bytes": 22522,
+    "damaged_players": 21,
+    "alive_players": 24
+  }
+}
