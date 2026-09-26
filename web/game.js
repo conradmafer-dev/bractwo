@@ -6,10 +6,10 @@
   const mini = $("minimap"), mctx = mini.getContext("2d");
   const ui = Object.fromEntries(Array.from(document.querySelectorAll("[id]"), element => [element.id, element]));
   const classInfo = {
-    knight: {name:"Rycerz",icon:"⚔",color:"#f8d377",cape:"#cc4845",ability:"Bastion",weapon:"sword"},
-    paladin: {name:"Paladyn",icon:"➶",color:"#f1d99c",cape:"#9e682e",ability:"Mocny strzał",weapon:"bow"},
-    mage: {name:"Mag",icon:"✧",color:"#b6c7ff",cape:"#4d65bd",ability:"Krąg ognia",weapon:"staff"},
-    druid: {name:"Druid",icon:"❋",color:"#c0e895",cape:"#478e4d",ability:"Odnowa",weapon:"staff"}
+    knight: {name:"Rycerz",icon:"⚔",color:"#f8d377",cape:"#cc4845",ability:"Drugi oddech",weapon:"sword"},
+    ranger: {name:"Łowca",icon:"➶",color:"#f1d99c",cape:"#9e682e",ability:"Znak łowcy",weapon:"bow"},
+    mage: {name:"Czarodziej",icon:"✧",color:"#b6c7ff",cape:"#4d65bd",ability:"Promień mrozu",weapon:"staff"},
+    druid: {name:"Druid",icon:"❋",color:"#c0e895",cape:"#478e4d",ability:"Shillelagh",weapon:"staff"}
   };
   let world = { width:3200,height:2304,spawn:{x:560,y:1180},obstacles:[],zones:[],river:{x:1500,y:0,w:180,h:2304,bridge_y:1080,bridge_h:150},merchant:{x:680,y:1180,name:"Kupiec"},safe_zone:{x:560,y:1180,radius:260},classes:{},pvp_rules:{min_level:8} };
   let snapshot = { players: [], enemies: [], world: {}, time: 0 };
@@ -23,7 +23,10 @@
   let nearby = null, selectedClass = "knight", selectedTarget = null, pendingInvite = null;
   let inventorySignature = "", playersSignature = "", legacyPrompted = false, lastTargetWarning = 0;
   let panelMode = "inventory", questSignature = "", activeGoal = null;
-  let groundChunks=new Map(), expansionTab='spells', expansionSignature='', selectedRune='fire', atlasMode='nearby', navigationGoal=null;
+  let groundChunks=new Map(), expansionTab='growth', expansionSignature='', selectedRune='fire', atlasMode='nearby', navigationGoal=null;
+  let hotbarPage=0;
+  let atlasView=null, atlasController=null;
+  let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null;
   let effects = new Map(), seenEffects = new Map(), floatingTexts = [];
   const touches = matchMedia("(pointer: coarse)").matches;
   const TAU = Math.PI * 2;
@@ -121,7 +124,8 @@
         world = { ...world, ...(packet.world || {}) };
         world.obstacles = world.obstacles || []; world.zones = world.zones || [];
         selectedTarget = null; selectedEnemy = null; battleRows.clear(); ui.battleEnemies.replaceChildren(); pendingInvite = null; legacyPrompted = false; expansionSignature = ""; navigationGoal = null;
-        inventorySignature = ""; playersSignature = ""; ui.sidePanel.hidden = true; ui.helpPanel.hidden = true;
+        levelUpPanels?.reset(); atlasView=null; atlasController=null;
+        inventorySignature = ""; playersSignature = ""; ui.sidePanel.hidden = true; characterSheet?.close(); lootPanel?.close(); merchantPanel?.close(); ui.helpPanel.hidden = true;
         ui.legacyClassPanel.hidden = true; ui.partyInvite.hidden = true; ui.chatForm.hidden = true; ui.chatInput.blur(); ui.chatInput.value = ""; questSignature = "";
         ui.minimapCard.hidden = viewport.w < 560;
         updateRules();
@@ -145,6 +149,7 @@
         ui.partyInvite.hidden = false;
       } else if (packet.type === "notice") {
         notice(packet.text, "reward");
+      } else if(packet.type === "nature_hint") {navigationGoal={x:packet.x,y:packet.y,floor:packet.floor||0,label:packet.name||"Wskazówka"};updateHUD();
       } else if (packet.type === "chat") {
         addChat(packet);
       }
@@ -180,8 +185,9 @@
     const ownIndex = snapshot.players.findIndex(player => String(player.id) === myId);
     if (ownIndex >= 0) snapshot.players[ownIndex] = Runtime.mergeOwner(previousMe, snapshot.players[ownIndex], packet.owner_delta === true);
     me = ownIndex >= 0 ? snapshot.players[ownIndex] : null;
+    levelUpPanels?.sync(me);
     const present = new Set();
-    for (const [kind, entities] of [["p", snapshot.players], ["e", snapshot.enemies]]) {
+    for (const [kind, entities] of [["p", snapshot.players], ["e", snapshot.enemies], ["c", packet.companions || []]]) {
       for (const entity of entities) {
         const key = `${kind}:${entity.id}`; present.add(key);
         let visual = visuals.get(key);
@@ -197,7 +203,11 @@
     if (me && (!previousMe || !sameFloor(me,previousMe) || distance(me,previousMe)>450 || (previousMe.hp <= 0 && me.hp > 0))) { camera.x = me.x; camera.y = me.y; }
     if (selectedTarget && !snapshot.players.some(player => String(player.id) === selectedTarget && player.hp > 0 && sameFloor(me,player))) clearTarget();
     if (selectedEnemy && (!me?.alive || !snapshot.enemies.some(enemy => String(enemy.id) === selectedEnemy && enemy.hp > 0 && sameFloor(me,enemy)))) clearTarget();
+    const activeFields=new Set(packet.active_field_effects||[]);
+    for(const[id,e]of effects)if(e.persistent&&!activeFields.has(id))effects.delete(id);
     for (const effect of packet.effects || []) {
+      if(effect.ended){effects.delete(String(effect.id));continue;}
+      if(effect.persistent&&!activeFields.has(String(effect.id)))continue;
       if (!seenEffects.has(String(effect.id))) {
         seenEffects.set(String(effect.id), Number(packet.time || 0));
         const duration = Number(effect.duration) || .32;
@@ -206,7 +216,7 @@
       }
     }
     for (const [id, time] of seenEffects) if (Number(packet.time || 0) - time > 4) seenEffects.delete(id);
-    if(me&&previousMe&&me.level>previousMe.level){for(const m of world.milestones||[])if(m.level>previousMe.level&&m.level<=me.level)notice(`Nowe możliwości: ${m.name}. Sprawdź księgę [K].`,"reward");}
+    // Exact, persistent advancement receipts replace generic milestone toasts.
     updateHUD();
   }
 
@@ -218,7 +228,7 @@
   function formatNumber(value) { return numberFormat.format(Number(value)||0); }
   function updateRules() {
     const rules=world.pvp_rules||{}, min=rules.min_level||8;
-    ui.pvpHelp.textContent=`Osada i postacie poniżej ${min}. poziomu są chronione. Aby zaatakować gracza, wyłącz blokadę PvP i wybierz go kliknięciem w świecie lub na liście graczy. Biała czaszka oznacza agresora. Trzy nieuzasadnione zabójstwa w 24 godziny dają czerwoną czaszkę na 24 godziny. Walka blokuje wejście do osady i bezpieczne wylogowanie przez 20 sekund.`;
+    ui.pvpHelp.textContent=`Osada i postacie poniżej ${min}. poziomu są chronione. Aby zaatakować gracza, wyłącz blokadę PvP i wybierz go kliknięciem w świecie lub na liście graczy. Odblokowanie obejmuje również czary, obszary i wilka. Obszar może trafić innych niechronionych graczy, nawet gdy celujesz w potwora. Wsparcie drużyny w PvP wymaga odblokowania i włącza leczącego do walki. Biała czaszka oznacza agresora. Trzy nieuzasadnione zabójstwa w 24 godziny dają czerwoną czaszkę na 24 godziny. Walka blokuje wejście do osady i bezpieczne wylogowanie przez 20 sekund.`;
   }
   function updateHUD() {
     if (!me) return;
@@ -228,6 +238,7 @@
     ui.healthText.textContent=`${Math.ceil(me.hp)} / ${formatNumber(me.max_hp)}`;
     ui.healthFill.style.width=`${Math.max(0,Math.min(100,me.hp/me.max_hp*100))}%`;
     ui.manaText.textContent=`${Math.floor(me.mana||0)} / ${formatNumber(me.max_mana)}`;
+    ui.manaText.parentElement.title=Runtime.manaBudgetText(me.mana_budget)+' Bez pasywnej regeneracji w walce; po 12 s od wydania many: około 4 min do pełna w terenie lub 20 s w osadzie.';
     ui.manaFill.style.width=`${Math.max(0,Math.min(100,(me.mana||0)/(me.max_mana||1)*100))}%`;
     ui.xpFill.style.width=`${Math.max(0,Math.min(100,(me.xp||0)/(me.xp_next||1)*100))}%`;
     ui.xpText.textContent=`${formatNumber(me.xp)} / ${formatNumber(me.xp_next)} PD`;
@@ -238,11 +249,17 @@
     ui.healthCount.textContent=me.potions?.health_potion||0; ui.manaCount.textContent=me.potions?.mana_potion||0;
     ui.healthPotion.disabled=!(me.potions?.health_potion>0) || me.hp<=0;
     ui.manaPotion.disabled=!(me.potions?.mana_potion>0) || me.hp<=0;
-    const cooldown=Math.max(0,Number(me.ability_cooldown)||0);
-    ui.abilityName.textContent=me.ability_name || world.classes?.[me.class_id]?.ability_name || info.ability;
-    ui.abilityIcon.textContent=info.icon; ui.abilityIcon.style.color=info.color;
-    ui.abilityCooldown.textContent=cooldown>0?`${Math.ceil(cooldown)}s`:"";
-    ui.abilityButton.classList.toggle("cooldown",cooldown>0); ui.abilityButton.disabled=cooldown>0 || me.hp<=0;
+    const favoriteId=me.favorite_spell||world.classes?.[me.class_id]?.default_ability;
+    const abilitySpec=world.spells?.[favoriteId];
+    const cooldown=Math.max(0,Number(me.spell_cooldowns?.[favoriteId])||0,Number(abilitySpec?.action==='extra'?0:abilitySpec?.action==='bonus'?me.bonus_remaining:me.action_remaining)||0);
+    ui.abilityName.textContent=abilitySpec?.name||'Brak czaru';
+    ui.abilityButton.title=`F · ${abilitySpec?.name||'Brak czaru'} — najczęściej używany z ostatnich 100 użyć`;
+    ui.abilityButton.dataset.spell=favoriteId||'';
+    if(ui.abilityIcon.dataset.spell!==favoriteId){ui.abilityIcon.dataset.spell=favoriteId||'';ui.abilityIcon.replaceChildren();if(abilitySpec){const img=document.createElement('img');img.src=abilitySpec.icon;img.alt='';ui.abilityIcon.append(img);}else ui.abilityIcon.textContent=info.icon;}
+    ui.abilityCooldown.textContent=Runtime.queuedSpellLabel(abilitySpec,me)|| (abilitySpec?.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cooldown>0?`${Math.ceil(cooldown)}s`:"");
+    ui.abilityButton.classList.toggle('queued',!!favoriteId&&me.queued_spell===favoriteId);
+    ui.abilityButton.classList.toggle("cooldown",cooldown>0); ui.abilityButton.disabled=me.hp<=0||!abilitySpec||!spellAvailable(abilitySpec)||(abilitySpec.kind!=='reaction'&&abilitySpec.kind!=='shape'&&(!!me.form||(me.mana<spellMana(abilitySpec)&&!(abilitySpec.kind==='weapon_trigger'&&me.ensnaring_armed))||(me.spell_cooldowns?.[favoriteId]||0)>0));
+    if(abilitySpec?.kind==='recovery')ui.abilityButton.disabled=!globalThis.BractwoCasterUI.canRecover(me);
     const zone=[...world.zones,...(world.regions||[])].find(item=>sameFloor(me,item)&&me.x>=item.x&&me.x<=item.x+item.w&&me.y>=item.y&&me.y<=item.y+item.h);
     ui.movementStatus.textContent=`${world.surfaces?.[me.surface]?.name||'Trawa'} · ${Number(me.speed||100).toFixed(0)}${me.premium_demo?' · Premium test':''}${me.wind_remaining>0?' · Wiatr +15%':''}${me.ward_remaining>0?' · Osłona PvE':''}`;
     ui.regionName.textContent=(zone?.name||"Dzikie Pogranicze")+(me.floor?` · piętro ${me.floor>0?'+':''}${me.floor}`:"");
@@ -258,8 +275,14 @@
     ui.skullStatus.textContent=me.skull==="red"?`☠ Czerwona czaszka · ${me.unjust_kills||0} nieuzasadnionych zabójstw`: `☠ Biała czaszka · ${Math.ceil(me.skull_remaining||0)} s`;
     ui.skullStatus.style.color=me.skull==="red"?"#f39f8a":"#edeadd";
     const target=selectedEnemy?snapshot.enemies.find(enemy=>String(enemy.id)===selectedEnemy):snapshot.players.find(player=>String(player.id)===selectedTarget);
-    ui.targetCard.hidden=!target; ui.targetName.textContent=target?.name||"";
-    ui.attackButton.classList.toggle("pvp-target",!!selectedTarget); ui.attackLabel.textContent=selectedEnemy?"Atakuj cel":target?(safety?"PvP blokada":"Atak PvP"):"Atakuj";
+    ui.targetLoot.hidden=!selectedEnemy||!target;
+    ui.targetCard.hidden=!target; ui.targetName.textContent=target?`${target.name} · KP ${target.armor_class}`:"";
+    ui.attackButton.classList.toggle("pvp-target",!!selectedTarget); ui.attackLabel.textContent=me.action_remaining>0?`${Number(me.action_remaining).toFixed(1)} s`:selectedEnemy?"Atakuj cel":target?(safety?"PvP blokada":"Atak PvP"):"Atakuj";
+    ui.attackButton.classList.toggle("recovering",me.action_remaining>0);
+    ui.actionProgress.style.width=`${100*(1-Math.min(1,(me.action_remaining||0)/(me.action_duration||3)))}%`;
+    ui.attackButton.title=(me.weapon_auto_attack===false?"Iskra różdżki tylko na Spację lub przycisk ataku. Zaznaczenie wybiera cel dla czarów i nie uruchamia Iskry. ":"Zaznaczenie uruchamia autoatak bronią. ")+`Atak [Spacja] · gotowość co ${me.action_duration||3} s · trafienie +${me.attack_bonus} · ${me.damage_dice} · KP ${me.armor_class}. Bez zaznaczania: najbliższy potwór w zasięgu. Oczekujący czar ma pierwszeństwo przed następnym atakiem.`;
+    ui.combatRoll.hidden=!me.last_roll?.id;
+    ui.combatRoll.textContent=Runtime.combatSummary(me.last_roll);
     nearby=nearestStair() || nearestSite() || nearestNpc() || (merchantNear()?nearestMerchant():null); ui.interactPrompt.hidden=!nearby || !ui.sidePanel.hidden;
     ui.interactButton.classList.toggle("available",!!nearby);
     ui.interactName.textContent=nearby?.name||"Mieszkańcy Przystani";
@@ -271,13 +294,11 @@
     if(me.class_chosen!==false)ui.legacyClassPanel.hidden=true;
     for(const button of ui.legacyChoices.querySelectorAll("button"))button.disabled=!safe||me.hp<=0;
     if(pendingInvite && me.party_id){pendingInvite=null;ui.partyInvite.hidden=true;}
-    for(const [id,key]of [['healSpell','mend'],['hasteSpell','haste'],['advancedSpell',spellByLevel(30)],['masterSpell',spellByLevel(80)]]){const spec=world.spells?.[key];ui[id].disabled=!spec||!spellAvailable(spec)||me.mana<spec.mana||me.spell_cooldowns?.[key]>0||me.hp<=0;}
-    ui.runeSpell.disabled=!(me.runes?.[selectedRune]>0)||me.rune_cooldown>0||me.hp<=0;
-    ui.runeSpell.title=`${world.runes?.[selectedRune]?.name||'Runa'} · ${me.runes?.[selectedRune]||0} [7]`;
-    ui.healthCount.textContent=Object.entries(me.potions||{}).filter(([k])=>k.startsWith('health')).reduce((n,[,v])=>n+v,0);
-    ui.manaCount.textContent=Object.entries(me.potions||{}).filter(([k])=>k.startsWith('mana')).reduce((n,[,v])=>n+v,0);
-    ui.healthPotion.disabled=Number(ui.healthCount.textContent)<1||me.hp<=0;ui.manaPotion.disabled=Number(ui.manaCount.textContent)<1||me.hp<=0;
+    updateHotbar();
+    updateEffects(target);
+    updatePotionButtons();
     updateQuestTracker(); updateBattleList();
+    characterSheet?.render();merchantPanel?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();
     if(!ui.sidePanel.hidden){if(panelMode==="inventory")renderInventory();else if(panelMode==="journal")renderJournal();else if(panelMode==="progression")renderExpansion();else renderPlayers();}
   }
   function nearestNpc(){
@@ -308,7 +329,7 @@
   }
   function updateQuestTracker(){
     if(!me)return;
-    if(navigationGoal){activeGoal=navigationGoal;ui.questTrackerTitle.textContent=navigationGoal.label;ui.questTrackerProgress.textContent='Cel nawigacji · usuń w Atlasie [K]';ui.questTrackerDirection.textContent=directionTo(navigationGoal);return;}
+    if(navigationGoal){activeGoal=navigationGoal;ui.questTrackerTitle.textContent=navigationGoal.label;ui.questTrackerProgress.textContent='Cel nawigacji · usuń w Atlasie';ui.questTrackerDirection.textContent=directionTo(navigationGoal);return;}
     const quests=me.quests||[];
     const quest=quests.find(q=>q.status==="ready")||quests.find(q=>q.status==="active")||quests.find(q=>q.status==="available");
     activeGoal=questGoal(quest);
@@ -387,13 +408,13 @@
   function element(tag,className,text){const node=document.createElement(tag);if(className)node.className=className;if(text!==undefined)node.textContent=text;return node;}
   function actionButton(text,handler,disabled=false,className=""){const button=element("button",className,text);button.type="button";button.disabled=disabled;button.addEventListener("click",handler);return button;}
   function slotName(slot){return {weapon:"Broń",armor:"Pancerz",ring:"Pierścień"}[slot]||slot;}
-  function itemStats(item){const parts=[];if(item.attack)parts.push(`Atak +${item.attack}`);if(item.armor)parts.push(`Pancerz +${item.armor}`);return parts.join(" · ")||"Bez premii do statystyk";}
+  function itemStats(item){const parts=[];if(item.damage_dice)parts.push(item.damage_dice);if(item.base_ac)parts.push(`Baza KP ${item.base_ac}`);if(item.attack)parts.push(`Obrażenia +${item.attack}`);if(item.attack_bonus)parts.push(`Trafienie +${item.attack_bonus}`);if(item.ac_bonus)parts.push(`KP +${item.ac_bonus}`);return parts.join(" · ")||"Bez premii do statystyk";}
   function renderInventory(){
     if(!me)return;
     const inv=me.inventory||[], equipment=me.equipment||{}, near=merchantNear(), trading=near&&!(me.combat_remaining>0);
-    const signature=JSON.stringify([inv,equipment,me.level,me.class_id,me.attack,me.armor,me.speed,me.gold,near,trading,me.hp>0]);
+    const signature=JSON.stringify([inv,equipment,me.level,me.class_id,me.attack,me.armor_class,me.attack_bonus,me.damage_dice,me.speed,me.gold,near,trading,me.hp>0]);
     if(signature===inventorySignature)return;inventorySignature=signature;
-    ui.combatStats.textContent=`Atak ${formatNumber(me.attack)} · Pancerz ${formatNumber(me.armor)} · Ruch ${Number(me.speed||100).toFixed(1)}`;
+    ui.combatStats.textContent=`Trafienie +${me.attack_bonus} · KP ${me.armor_class} · ${me.damage_dice} · Ruch ${Number(me.speed||100).toFixed(1)}`;
     ui.inventoryCount.textContent=`${inv.length} / 40`;
     ui.equipmentSlots.replaceChildren();
     for(const slot of ["weapon","armor","ring"]){
@@ -440,25 +461,25 @@
       const target=actionButton("Cel PvP",()=>selectTarget(String(player.id)),false,"target-button");target.dataset.target=player.id;target.dataset.action="target";target.dataset.playerId=player.id;actions.append(invite,target);row.append(actions);ui.playersList.append(row);
     }
   }
-  function setPanel(mode){resetControls();panelMode=mode;ui.sidePanel.hidden=false;ui.inventoryView.hidden=mode!=="inventory";ui.playersView.hidden=mode!=="players";ui.journalView.hidden=mode!=="journal";ui.progressionView.hidden=mode!=="progression";ui.progressionTab.classList.toggle("active",mode==="progression");ui.journalTab.classList.toggle("active",mode==="journal");ui.inventoryTab.classList.toggle("active",mode==="inventory");ui.playersTab.classList.toggle("active",mode==="players");ui.minimapCard.hidden=true;updateHUD();}
+  function setPanel(mode){merchantPanel?.close();characterSheet?.close();panelMode=mode;ui.sidePanel.hidden=false;ui.inventoryView.hidden=mode!=="inventory";ui.playersView.hidden=mode!=="players";ui.journalView.hidden=mode!=="journal";ui.progressionView.hidden=mode!=="progression";ui.progressionTab.classList.toggle("active",mode==="progression");ui.journalTab.classList.toggle("active",mode==="journal");ui.inventoryTab.classList.toggle("active",mode==="inventory");ui.playersTab.classList.toggle("active",mode==="players");ui.minimapCard.hidden=true;updateHUD();}
   function togglePanel(mode){if(!ui.sidePanel.hidden&&panelMode===mode){ui.sidePanel.hidden=true;updateHUD();}else setPanel(mode);}
-  function selectTarget(id){resetControls();selectedEnemy=null;selectedTarget=id;playersSignature="";ui.sidePanel.hidden=true;updateHUD();notice("Wybrano cel PvP. Atak wymaga wyłączonej blokady PvP.");}
+  function selectTarget(id){selectedEnemy=null;selectedTarget=id;send({type:"select_target",target_id:id});playersSignature="";ui.sidePanel.hidden=true;updateHUD();notice("Cel: gracz. Po odblokowaniu PvP działają ataki, czary i wilk. Czary wsparcia działają na drużynę.");}
   function selectEnemy(id){
     const enemy=snapshot.enemies.find(e=>String(e.id)===id&&e.hp>0&&sameFloor(me,e));if(!enemy)return;
-    selectedEnemy=id;selectedTarget=null;playersSignature="";ui.sidePanel.hidden=true;updateHUD();
+    selectedEnemy=id;selectedTarget=null;send({type:"select_target",enemy_id:id});playersSignature="";ui.sidePanel.hidden=true;updateHUD();
   }
-  function clearTarget(){resetControls();selectedTarget=null;selectedEnemy=null;playersSignature="";if(me)updateHUD();}
-  function typing() { return ["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement?.tagName); }
-  function canControl() { return playing && me && me.hp > 0 && !document.hidden && !blurPaused && ui.helpPanel.hidden && ui.disconnectPanel.hidden && ui.legacyClassPanel.hidden && ui.sidePanel.hidden && !typing(); }
+  function clearTarget(){send({type:"select_target"});selectedTarget=null;selectedEnemy=null;playersSignature="";if(me)updateHUD();}
+  function typing() { const active=document.activeElement; return ["INPUT", "TEXTAREA", "SELECT"].includes(active?.tagName) && !["button", "checkbox", "radio"].includes(active?.type) || !!active?.isContentEditable; }
+  function canControl() { return playing && me && me.hp > 0 && !document.hidden && !blurPaused && ui.disconnectPanel.hidden && ui.legacyClassPanel.hidden && !typing(); }
   function resetControls() {
     heldKeys.clear(); joystick.x = 0; joystick.y = 0; joystick.pointer = null; attackPointer = null; attackHeld = false;
     ui.joystickKnob.style.transform = ""; ui.attackButton.classList.remove("held");
     if (playing) send({ type: "input", x: 0, y: 0 });
   }
-  function interact(){if(!canControl())return;const stair=nearestStair();if(stair){send({type:'descend'});return;}if(nearestSite()){send({type:'interact'});return;}const npc=nearestNpc();if(npc?.service){openExpansion(npc.service==='master'?'growth':'services');return;}if(npc){setPanel('journal');const quest=Array.from(ui.questList.children).find(row=>row.dataset.npcId===npc.id);quest?.scrollIntoView({block:'nearest'});}else if(merchantNear()){send({type:'interact'});setPanel('inventory');}else openExpansion('atlas');}
-  function ability(){if(canControl())send({type:"ability"});}
+  function interact(){if(!canControl())return;if(merchantPanel?.visible){merchantPanel.close();return;}if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}const nature=(world.nature_sites||[]).find(s=>sameFloor(me,s)&&distance(me,s)<=110);if(nature){send({type:'nature_interact',id:nature.id});return;}const stair=nearestStair();if(stair){send({type:'descend'});return;}if(nearestSite()){send({type:'interact'});return;}const npc=nearestNpc();if(npc?.service==='merchant'){merchantPanel.open();return;}if(npc?.service){openExpansion(npc.service==='master'?'growth':'services');return;}if(npc){setPanel('journal');const quest=Array.from(ui.questList.children).find(row=>row.dataset.npcId===npc.id);quest?.scrollIntoView({block:'nearest'});}else if(merchantNear()){send({type:'interact'});merchantPanel.open();}else openExpansion('atlas');}
+  function ability(){if(canControl())cast(me.favorite_spell||world.classes?.[me.class_id]?.default_ability);}
   function potion(item){if(playing&&me?.hp>0)send({type:"potion",item});}
-  function toggleHelp(){resetControls();ui.helpPanel.hidden=!ui.helpPanel.hidden;}
+  function toggleHelp(){merchantPanel?.close();characterSheet?.close();ui.helpPanel.hidden=!ui.helpPanel.hidden;}
   function openChat(){
     if(!playing)return; resetControls(); ui.chatForm.hidden=false;
     ui.chatForm.parentElement.classList.add("writing"); ui.chatInput.focus({preventScroll:true});
@@ -471,21 +492,20 @@
     row.append(name,document.createTextNode(packet.text||""));ui.chatLog.append(row);
     while(ui.chatLog.children.length>60)ui.chatLog.firstChild.remove();ui.chatLog.scrollTop=ui.chatLog.scrollHeight;
   }
-  ui.progressionButton.addEventListener('click',()=>togglePanel('progression'));ui.progressionTab.addEventListener('click',()=>setPanel('progression'));
+  ui.progressionButton.addEventListener('click',()=>characterSheet.toggle());ui.progressionTab.addEventListener('click',()=>setPanel('progression'));
   ui.atlasButton.addEventListener('click',()=>openExpansion('atlas'));ui.bookSpell.addEventListener('click',()=>openExpansion('spells'));
   ui.progressionNav.addEventListener('click',event=>{if(event.target.dataset.view){expansionTab=event.target.dataset.view;expansionSignature='';renderExpansion();}});
-  ui.healSpell.addEventListener('click',()=>cast('mend'));ui.hasteSpell.addEventListener('click',()=>cast('haste'));ui.advancedSpell.addEventListener('click',()=>cast(spellByLevel(30)));ui.masterSpell.addEventListener('click',()=>cast(spellByLevel(80)));ui.runeSpell.addEventListener('click',()=>send({type:'rune_use',rune_id:selectedRune}));
   ui.helpButton.addEventListener("click",toggleHelp);ui.closeHelp.addEventListener("click",toggleHelp);
-  ui.mapButton.addEventListener("click",()=>{ui.minimapCard.hidden=!ui.minimapCard.hidden;ui.sidePanel.hidden=true;});
-  ui.inventoryButton.addEventListener("click",()=>togglePanel("inventory"));ui.partyButton.addEventListener("click",()=>togglePanel("players"));
+  ui.mapButton.addEventListener("click",()=>{characterSheet.close();ui.minimapCard.hidden=!ui.minimapCard.hidden;ui.sidePanel.hidden=true;});
+  ui.inventoryButton.addEventListener("click",()=>characterSheet.toggle("inventory"));ui.partyButton.addEventListener("click",()=>togglePanel("players"));
   ui.journalButton.addEventListener("click",()=>togglePanel("journal"));ui.questTracker.addEventListener("click",()=>setPanel("journal"));ui.journalTab.addEventListener("click",()=>setPanel("journal"));
-  ui.inventoryTab.addEventListener("click",()=>setPanel("inventory"));ui.playersTab.addEventListener("click",()=>setPanel("players"));
+  ui.inventoryTab.addEventListener("click",()=>characterSheet.open("inventory"));ui.playersTab.addEventListener("click",()=>setPanel("players"));
   ui.closePanel.addEventListener("click",()=>{ui.sidePanel.hidden=true;updateHUD();});
   ui.interactButton.addEventListener("click",interact);ui.abilityButton.addEventListener("click",ability);
-  ui.healthPotion.addEventListener("click",()=>useBestPotion("health_potion"));ui.manaPotion.addEventListener("click",()=>useBestPotion("mana_potion"));
+  ui.healthPotion.addEventListener("click",()=>useQuickPotion("q"));ui.manaPotion.addEventListener("click",()=>useQuickPotion("r"));
   ui.buyHealth.addEventListener("click",()=>send({type:"buy",item:"health_potion"}));ui.buyMana.addEventListener("click",()=>send({type:"buy",item:"mana_potion"}));
   ui.restButton.addEventListener("click",()=>send({type:"interact"}));
-  ui.safetyButton.addEventListener("click",()=>{if(!playing||!me)return;resetControls();send({type:"pvp_safety",enabled:me.pvp_safety===false});});
+  ui.safetyButton.addEventListener("click",()=>{if(!playing||!me)return;send({type:"pvp_safety",enabled:me.pvp_safety===false});});
   ui.clearTarget.addEventListener("click",clearTarget);
   ui.leaveParty.addEventListener("click",()=>send({type:"party_leave"}));
   ui.acceptInvite.addEventListener("click",()=>{if(pendingInvite)send({type:"party_accept",leader_id:pendingInvite.leader_id});pendingInvite=null;ui.partyInvite.hidden=true;});
@@ -500,12 +520,16 @@
     if(nearest){if(nearest.kind==='e')selectEnemy(String(nearest.entity.id));else selectTarget(String(nearest.entity.id));}
     else {
       const npc=(world.npcs||[]).find(n=>sameFloor(me,n)&&Math.hypot(n.x-x,n.y-20-y)<36);
-      if(npc?.service){openExpansion(npc.service==="master"?"growth":"services");}else if(npc){setPanel("journal");const row=Array.from(ui.questList.children).find(q=>q.dataset.npcId===npc.id);row?.scrollIntoView({block:"nearest"});}
+      if(npc?.service==="merchant"){merchantPanel.open();}else if(npc?.service){openExpansion(npc.service==="master"?"growth":"services");}else if(npc){setPanel("journal");const row=Array.from(ui.questList.children).find(q=>q.dataset.npcId===npc.id);row?.scrollIntoView({block:"nearest"});}
     }
   });
   // Capture Enter before a focused HUD button can consume it or submit another form.
   addEventListener("keydown",event=>{
     if(!playing)return;
+    if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
+    if(merchantPanel?.visible&&event.code==='Escape'){event.preventDefault();merchantPanel.close();return;}
+    if(lootPanel?.visible&&event.code==='Escape'){event.preventDefault();lootPanel.close();return;}
+    if(event.ctrlKey||event.metaKey||event.altKey)return;
     if(event.code==="Enter" && !event.isComposing){
       event.preventDefault();event.stopPropagation();
       if(!event.repeat){if(document.activeElement===ui.chatInput)submitChat();else openChat();}return;
@@ -514,23 +538,26 @@
       if(event.code==="Escape"){event.preventDefault();closeChat();}
       return;
     }
-    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(event.code))event.preventDefault();
-    if(event.code==="Escape"){event.preventDefault();clearTarget();ui.helpPanel.hidden=true;ui.legacyClassPanel.hidden=true;ui.sidePanel.hidden=true;closeChat();return;}
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(event.code)||Runtime.hotbarSlotForCode(event.code)>=0)event.preventDefault();
+    if(event.code==="Escape"){event.preventDefault();if(characterSheet.visible){characterSheet.close();return;}if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}if(!ui.helpPanel.hidden){ui.helpPanel.hidden=true;return;}if(!ui.legacyClassPanel.hidden){ui.legacyClassPanel.hidden=true;return;}clearTarget();return;}
     if(!event.repeat){
+      if(event.code==="PageUp"||event.code==="PageDown"){event.preventDefault();changeHotbarPage(event.code==="PageDown"?1:-1);return;}
       if(event.code==="KeyH"){toggleHelp();return;}
       if(event.code==="KeyM"){ui.mapButton.click();return;}
-      if(event.code==="KeyI"){togglePanel("inventory");return;}
+      if(event.code==="KeyI"){characterSheet.toggle("inventory");return;}
+      if(event.code==="KeyC"){characterSheet.toggle();return;}
       if(event.code==="KeyP"){togglePanel("players");return;}
-      if(event.code==="KeyK"){togglePanel("progression");return;}
+      if(event.code==="KeyK"){characterSheet.toggle("spells");return;}
       if(event.code==="KeyJ"){togglePanel("journal");return;}
     }
     if(!canControl())return;heldKeys.add(event.code);
-    if(!event.repeat){if(event.code==="KeyE")interact();if(event.code==="KeyF")ability();if(event.code==="Digit1")useBestPotion("health_potion");if(event.code==="Digit2")useBestPotion("mana_potion");if(event.code==="Digit3")cast("mend");if(event.code==="Digit4")cast("haste");if(event.code==="Digit5")cast(spellByLevel(30));if(event.code==="Digit6")cast(spellByLevel(80));if(event.code==="Digit7")send({type:"rune_use",rune_id:selectedRune});}
+    if(!event.repeat){if(event.code==="Space")attemptAttack();if(event.code==="KeyE")interact();if(event.code==="KeyF")ability();if(event.code==="KeyQ")useQuickPotion("q");if(event.code==="KeyR")useQuickPotion("r");const slot=Runtime.hotbarSlotForCode(event.code);if(slot>=0)cast(Runtime.hotbarKey(me.hotbar,hotbarPage,slot));}
   },true);
-  addEventListener("keyup", (event) => { heldKeys.delete(event.code); });
-  addEventListener("blur", () => { resetControls(); blurPaused = true; });
-  addEventListener("focus", () => { blurPaused = false; });
-  document.addEventListener("visibilitychange", () => { resetControls(); if (!document.hidden) blurPaused = false; });
+  // Capture release even when a focused window control consumes the event.
+  addEventListener("keyup", (event) => { heldKeys.delete(event.code); }, true);
+  addEventListener("blur", () => { resetControls(); blurPaused = true;send({type:"auto_pause",paused:true}); });
+  addEventListener("focus", () => { blurPaused = false;send({type:"auto_pause",paused:false}); });
+  document.addEventListener("visibilitychange", () => { resetControls(); if (!document.hidden) blurPaused = false;send({type:"auto_pause",paused:document.hidden}); });
   ui.joystick.addEventListener("pointerdown", (event) => {
     if (!canControl() || joystick.pointer !== null) return;
     event.preventDefault(); joystick.pointer = event.pointerId; ui.joystick.setPointerCapture(event.pointerId); updateJoystick(event);
@@ -553,9 +580,18 @@
   ui.joystick.addEventListener("lostpointercapture", releasePointer); ui.attackButton.addEventListener("lostpointercapture", releasePointer);
   ui.attackButton.addEventListener("pointerdown", (event) => {
     if (!canControl()) return;
-    event.preventDefault(); attackPointer = event.pointerId; attackHeld = true; ui.attackButton.setPointerCapture(event.pointerId); ui.attackButton.classList.add("held");
+    event.preventDefault(); attackPointer = event.pointerId; attackHeld = true; ui.attackButton.setPointerCapture(event.pointerId); ui.attackButton.classList.add("held"); attemptAttack();
   });
   ui.attackButton.addEventListener("contextmenu", (event) => event.preventDefault());
+  function attemptAttack() {
+    if (!canControl() || me.action_remaining>0 || performance.now()<nextAttackAt) return;
+    nextAttackAt=performance.now()+200;
+    if(selectedTarget && me.pvp_safety!==false){
+      if(performance.now()-lastTargetWarning>1800){notice("Blokada PvP jest włączona. Wyłącz ją świadomie przed atakiem.","error");lastTargetWarning=performance.now();}
+      return;
+    }
+    send(selectedEnemy?{type:"attack",enemy_id:selectedEnemy}:selectedTarget?{type:"attack",target_id:selectedTarget}:{type:"attack"});
+  }
   setInterval(() => {
     if (!playing || document.hidden || blurPaused) return;
     let x = 0, y = 0;
@@ -563,11 +599,7 @@
       x = Number(heldKeys.has("KeyD") || heldKeys.has("ArrowRight")) - Number(heldKeys.has("KeyA") || heldKeys.has("ArrowLeft")) + joystick.x;
       y = Number(heldKeys.has("KeyS") || heldKeys.has("ArrowDown")) - Number(heldKeys.has("KeyW") || heldKeys.has("ArrowUp")) + joystick.y;
       const length = Math.hypot(x, y); if (length > 1) { x /= length; y /= length; }
-      if ((attackHeld || heldKeys.has("Space")) && performance.now() >= nextAttackAt) {
-        if(selectedTarget && me.pvp_safety!==false){if(performance.now()-lastTargetWarning>1800){notice("Blokada PvP jest włączona. Wyłącz ją świadomie przed atakiem.","error");lastTargetWarning=performance.now();}}
-        else send(selectedEnemy?{type:"attack",enemy_id:selectedEnemy}:selectedTarget?{type:"attack",target_id:selectedTarget}:{type:"attack"});
-        nextAttackAt=performance.now()+200;
-      }
+      if (attackHeld || heldKeys.has("Space")) attemptAttack();
     }
     send({ type: "input", x, y });
   }, 50);
@@ -584,15 +616,37 @@
   function nearestSite(){return (world.pois||[]).filter(s=>sameFloor(me,s)&&distance(me,s)<=s.radius).sort((a,b)=>distance(me,a)-distance(me,b))[0];}
   function nearestStair(){return (world.stairs||[]).filter(s=>sameFloor(me,s)&&distance(me,s)<=s.radius).sort((a,b)=>distance(me,a)-distance(me,b))[0];}
   function spellsForClass(){return Object.entries(world.spells||{}).filter(([,s])=>!s.class_ids||s.class_ids.includes(me?.class_id));}
-  function spellAvailable(s){return me&&me.level>=s.min_level&&(!s.promotion||me.promoted);}
-  function cast(id){if(playing&&me?.hp>0)send({type:'cast',spell_id:id});}
-  function spellByLevel(level){return spellsForClass().find(([,s])=>s.min_level===level)?.[0];}
-  function useBestPotion(prefix){
-    const keys=Object.entries(world.potions||{}).filter(([k,s])=>k.startsWith(prefix)&&me?.potions?.[k]>0&&me.level>=(s.min_level||1)).sort((a,b)=>b[1].restore-a[1].restore);
-    potion(keys[0]?.[0]||prefix);
+  function spellGate(s){return Runtime.spellGate(s,me);}
+  function spellAvailable(s){return me&&(!s.class_ids||s.class_ids.includes(me.class_id))&&me.level>=spellGate(s);}
+  function cast(id){
+    if(!id||!playing||!me?.alive)return;
+    const spec=world.spells?.[id];if(!spec)return;
+    const packet={type:'cast',spell_id:id};
+    const friend=selectedTarget&&snapshot.players.find(q=>q.id===selectedTarget);
+    if(spec.targeting==='ally'&&friend&&(friend.id===me.id||me.party_id&&friend.party_id===me.party_id))packet.target_id=selectedTarget;
+    else if(['attack','save','missiles','mark','control','field'].includes(spec.kind)){
+      if(selectedEnemy)packet.enemy_id=selectedEnemy;
+      else if(selectedTarget)packet.target_id=selectedTarget;
+    }
+    send(packet);
   }
-  function openExpansion(tab='spells'){expansionTab=tab;expansionSignature='';setPanel('progression');}
-  function navigateTo(point,labelText){navigationGoal={...point,label:labelText||point.name};ui.sidePanel.hidden=true;notice(`Cel wyprawy: ${navigationGoal.label}`);updateHUD();}
+  function spellMana(spec){return Runtime.spellMana(spec,me);}
+  function spellByLevel(level){return spellsForClass().find(([,s])=>spellGate(s)===level)?.[0];}
+  function useQuickPotion(slot){if(playing&&me?.hp>0)send({type:'potion',slot});}
+  function updatePotionButtons(){
+    for(const [slot,id,countId] of [['q','healthPotion','healthCount'],['r','manaPotion','manaCount']]){
+      const key=me.potion_slots?.[slot]??(slot==='q'?'health_potion':'mana_potion'),spec=world.potions?.[key],button=ui[id],count=me.potions?.[key]||0;
+      ui[countId].textContent=count;
+      button.disabled=me.hp<=0||!spec||!count||me.level<(spec?.min_level||1)||(me.potion_cooldown||0)>0;
+      button.classList.toggle('cooldown',(me.potion_cooldown||0)>0);
+      const label=button.querySelector('small');label.textContent=(me.potion_cooldown||0)>0?Math.ceil(me.potion_cooldown)+' s':spec?(spec.potion_kind==='health'?'Zdrowie':'Mana'):'Przypisz';
+      button.title=slot.toUpperCase()+' · '+(spec?.name||'Brak mikstury — przypisz w plecaku')+(spec?' · '+(world.items?.[key]?.effect_summary||spec.restore):'');
+      button.dataset.potion=key||'';
+      const span=button.querySelector('span');if(span.dataset.potion!==key){span.dataset.potion=key;span.replaceChildren();if(spec?.icon){const img=document.createElement('img');img.src=spec.icon;img.alt='';span.append(img);}else span.textContent='+';}
+    }
+  }
+  function openExpansion(tab='spells'){if(tab==='spells'){characterSheet.open('spells');return;}expansionTab=tab;expansionSignature='';setPanel('progression');}
+  function navigateTo(point,labelText){navigationGoal={...point,label:labelText||point.name};notice(`Cel wyprawy: ${navigationGoal.label}`);updateHUD();}
   function guideRow(parent,title,detail,buttons=[]){
     const row=element('article','progress-entry');row.append(element('strong','',title),element('p','muted',detail));
     const actions=element('div','progress-actions');for(const b of buttons)actions.append(b);row.append(actions);parent.append(row);return row;
@@ -600,48 +654,36 @@
   function renderExpansion(){
     if(!me)return;
     const services=['captain','bank','master','merchant'].map(s=>!!nearbyService(s));services[3]=merchantNear();
-    const affordable=[...Object.values(world.spells||{}),...Object.values(world.runes||{})].map(s=>me.mana>=s.mana);
-    const signature=JSON.stringify([expansionTab,me.level,me.promoted,me.skills,me.gold,me.bank_gold,me.depot,me.inventory,me.equipment,me.mastery,me.blessed,me.runes,affordable,me.soul,me.potions,me.home_city,me.hp>0,services,me.floor,Math.floor(me.x/64),Math.floor(me.y/64),Math.ceil(me.combat_remaining),Math.ceil(me.rune_cooldown),Object.entries(me.spell_cooldowns||{}).map(([k,v])=>[k,Math.ceil(v)]),me.discoveries,atlasMode,me.premium_demo,Math.ceil((me.premium_demo_remaining||0)/86400)]);
+    const affordable=[...Object.values(world.spells||{}),...Object.values(world.runes||{})].map(s=>me.mana>=spellMana(s));
+    if(expansionTab==='atlas')atlasController?.update(me,navigationGoal);
+    const signature=JSON.stringify(expansionTab==='atlas'?[expansionTab,atlasMode,me.class_id,me.level,me.discoveries,me.floor]:[expansionTab,me.hotbar,me.form,me.concentration,me.shield_armed,me.bonus_remaining>0,me.action_remaining>0,me.level,me.promoted,me.skills,me.gold,me.bank_gold,me.depot,me.inventory,me.equipment,me.mastery,me.blessed,me.runes,affordable,me.soul,me.potions,me.home_city,me.hp>0,services,me.floor,Math.floor(me.x/64),Math.floor(me.y/64),Math.ceil(me.combat_remaining),Math.ceil(me.rune_cooldown),Object.entries(me.spell_cooldowns||{}).map(([k,v])=>[k,Math.ceil(v)]),me.discoveries,atlasMode,me.premium_demo,Math.ceil((me.premium_demo_remaining||0)/86400)]);
     if(signature===expansionSignature)return;expansionSignature=signature;
     const root=ui.progressionContent;root.replaceChildren();
-    ui.progressionSubtitle.textContent=`${me.profession||className(me.class_id)} · poziom ${me.level} · dusza ${me.soul||0}/${me.max_soul||100}`;
+    ui.progressionSubtitle.textContent=`${me.profession||className(me.class_id)} · poziom ${me.level} · krąg ${me.spell_circle||0}`;
     for(const b of ui.progressionNav.querySelectorAll('button'))b.classList.toggle('active',b.dataset.view===expansionTab);
-    if(expansionTab==='spells'){
-      root.append(element('p','panel-tip','Czary odblokowują się z poziomem. 3: leczenie · 4: przyspieszenie · 5: czar zaawansowany · 6: mistrzowski · 7: wybrana runa.'));
-      for(const [id,s]of spellsForClass()){
-        const cd=Math.ceil(me.spell_cooldowns?.[id]||0),ok=spellAvailable(s);
-        const b=actionButton(cd?`${cd} s`:ok?'Rzuć czar':`Poziom ${s.min_level}`,()=>cast(id),!ok||cd>0||me.mana<s.mana||me.hp<=0);
-        b.dataset.cast=id;
-        guideRow(root,`${ok?'✦':'◇'} ${s.name} · ${s.words}`,`Poz. ${s.min_level}${s.promotion?' · promocja':''} · ${s.mana} many · ${s.cooldown} s. ${s.description}`,[b]);
-      }
-      root.append(element('div','section-label','RUNY · PRZENOŚNA MAGIA'));
-      for(const[id,r]of Object.entries(world.runes||{})){
-        const ok=me.level>=r.min_level,count=me.runes?.[id]||0;
-        const use=actionButton('Użyj',()=>send({type:'rune_use',rune_id:id}),!ok||!count||me.rune_cooldown>0||me.hp<=0);use.dataset.rune=id;
-        const craft=actionButton('Stwórz',()=>send({type:'rune_craft',rune_id:id}),!ok||!['mage','druid'].includes(me.class_id)||me.mana<r.mana||me.soul<r.soul||me.rune_cooldown>0||count>=99);
-        const buy=actionButton(`Kup · ${r.price} zł`,()=>send({type:'rune_buy',rune_id:id}),!merchantNear()||me.combat_remaining>0||!ok||me.gold<r.price||count>=99);
-        const select=actionButton(selectedRune===id?'✓ Skrót 7':'Pod skrót 7',()=>{selectedRune=id;expansionSignature='';renderExpansion();});
-        guideRow(root,`${r.name} · ${count}/99`,`Poz. ${r.min_level}. Wytwarzanie: ${r.mana} many + ${r.soul} duszy; mag lub druid. Każda klasa może użyć zakupionej runy.`,[use,craft,buy,select]);
-      }
-    }else if(expansionTab==='growth'){
-      root.append(element('div','section-label','UMIEJĘTNOŚCI ROSNĄ PRZEZ UŻYWANIE'));
-      for(const[key,labelText]of Object.entries({melee:'Walka wręcz',distance:'Walka dystansowa',magic:'Poziom magiczny',shielding:'Obrona'})){
+    if(expansionTab==='growth'){
+      guideRow(root,`KP ${me.armor_class} · ${me.damage_dice} · ${me.attacks_per_round} atak/akcję`,`Biegłość +${me.proficiency} · ST czarów ${me.save_dc} · krąg ${me.spell_circle}. `+Object.entries(me.attributes||{}).map(([a,v])=>`${({strength:'SIŁ',dexterity:'ZRĘ',constitution:'KON',intelligence:'INT',wisdom:'MĄD',charisma:'CHA'})[a]} ${v}`).join(' · '));
+      root.append(element('p','panel-tip','Twoje statystyki i rzuty znajdziesz w C → Statystyki. Poniżej rozwój wyłącznie Twojej klasy.'));
+      root.append(element('div','section-label','TRENING · HISTORIA UŻYWANIA'));
+      root.append(element('p','muted','Liczniki treningu nie zwiększają premii trafienia, KP ani ST czarów.'));
+      for(const[key,labelText]of Object.entries({melee:'Walka wręcz',distance:'Walka dystansowa',magic:'Używanie magii',shielding:'Obrona'})){
         const v=me.skills?.[key]||{level:10,progress:0,next:30},row=guideRow(root,`${labelText} · ${v.level}`,`${v.progress} / ${v.next} do następnego poziomu`);
         const track=element('div','skill-track'),bar=element('i');bar.style.width=`${Math.min(100,v.progress/v.next*100)}%`;track.append(bar);row.append(track);
       }
       root.append(element('div','section-label','KOLEJNE MOŻLIWOŚCI'));
-      for(const m of world.milestones||[])guideRow(root,`${me.level>=m.level?'✓':'◇'} Poziom ${m.level} · ${m.name}`,m.description);
+      for(const m of world.class_progression?.[me.class_id]||[])guideRow(root,`${me.level>=m.level?'✓':'◇'} Poziom ${m.level} · ${m.name}`,m.description);
       const can=!!nearbyService('master')&&!me.combat_remaining;
-      guideRow(root,'Promocja profesji',me.promoted?'Masz wyższą rangę. Szybsza regeneracja i limit 200 punktów duszy.':'Poziom 20 · 2000 złota · porozmawiaj z mistrzem w mieście.',[actionButton(me.promoted?'✓ Promowany':'Kup promocję',()=>send({type:'promote'}),!can||me.promoted||me.level<20||me.gold<2000)]);
-      root.append(element('p','muted',`Punkty specjalizacji: ${me.mastery_points||0}. Pierwszy na poziomie 50, kolejne co 5 poziomów. Wymagana promocja i mistrz.`));
-      for(const[key,name,detail]of[['power','Siła','+3 do ataku'],['vitality','Witalność','+12 maksymalnego zdrowia'],['focus','Skupienie','+8 maksymalnej many i +1 do ataku']])guideRow(root,`${name} · ${me.mastery?.[key]||0}/20`,detail,[actionButton('Dodaj punkt',()=>send({type:'mastery',branch:key}),!can||!me.mastery_points||(me.mastery?.[key]||0)>=20)]);
-      root.append(actionButton('Wyzeruj specjalizację · 200 zł',()=>send({type:'mastery_reset'}),!can||me.gold<200));
+      guideRow(root,'Promocja profesji',me.promoted?'Masz wyższą rangę. Szybsza regeneracja poza walką; mistrzostwo od poziomu 50.':'Poziom 20 · 2000 złota · porozmawiaj z mistrzem w mieście.',[actionButton(me.promoted?'✓ Promowany':'Kup promocję',()=>send({type:'promote'}),!can||me.promoted||me.level<20||me.gold<2000)]);
+      root.append(element('p','muted',`Punkty specjalizacji: ${me.mastery_points||0}. Pierwszy na poziomie 50, kolejne co 5 poziomów. Wymagana promocja. Punkt przydzielisz poza walką w C → Statystyki.`));
+      for(const[key,name,detail]of[['power','Potęga',me.class_id==='mage'?'Nie wzmacnia Iskry ani czarów.':'Ataki bronią +1 obrażeń co 10 punktów, maksymalnie +2. Bez premii do przemian i czarów.'],['vitality','Witalność','+2 maksymalnego zdrowia za punkt'],['focus','Skupienie','+4 maksymalnej many za punkt']])guideRow(root,`${name} · ${me.mastery?.[key]||0}/20`,detail,[actionButton('Dodaj punkt',()=>send({type:'mastery',branch:key}),me.combat_remaining>0||!me.promoted||me.level<50||!me.mastery_points||(me.mastery?.[key]||0)>=20)]);
+      root.append(actionButton('Wyzeruj specjalizację · 200 zł',()=>send({type:'mastery_reset'}),!can||me.gold<200||!Object.values(me.mastery||{}).some(n=>n>0)));
     }else if(expansionTab==='atlas'){
-      root.append(element('p','panel-tip','20 krain · 5 odległych miast · 11 dwupiętrowych podziemi. Poziomy krain to zalecenie. Kliknij miejsce na mapie albo wybierz cel poniżej. Nawigacja wskazuje kierunek; nie prowadzi automatycznie.'));
-      const map=document.createElement('canvas');map.id='atlasCanvas';map.width=700;map.height=505;map.className='atlas-canvas';root.append(map);ui.atlasCanvas=map;
-      drawAtlas(map);map.addEventListener('click',event=>{const box=map.getBoundingClientRect(),x=(event.clientX-box.left)/box.width*world.width,y=(event.clientY-box.top)/box.height*world.height;const poi=[...(world.cities||[]),...(world.stairs||[]).filter(s=>s.floor===0)].sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];navigateTo(poi&&Math.hypot(poi.x-x,poi.y-y)<4500?poi:{x,y,floor:0,name:'Punkt na mapie'});});
+      root.append(element('p','panel-tip',`${(world.regions||[]).length} krain · ${(world.cities||[]).length} miast. Poziomy krain to zalecenie. Mapa nie zamyka się po kliknięciu.`));
+      if(!atlasView)atlasView=new globalThis.BractwoAtlas.View(world.width,world.height);
+      atlasController=globalThis.BractwoAtlas.mount(root,{world,view:atlasView,player:me,goal:navigationGoal,navigate:navigateTo});
+      ui.atlasCanvas=atlasController.canvas;
       const filters=element('div','progress-actions');for(const[id,labelText]of[['nearby','Okolica'],['regions','Krainy'],['cities','Miasta'],['caves','Podziemia']])filters.append(actionButton(labelText,()=>{atlasMode=id;expansionSignature='';renderExpansion();},false,atlasMode===id?'active':''));root.append(filters);
-      guideRow(root,'Wysokości i łupy','Schody E: piętra −2, −1, 0, +1, +2, +3. Źródła leczą; kamienie wiatru przyspieszają; kapliczki chronią przed potworami. Skrytki odnawiają się co 30 min. Łupy: wyposażenie 12%, trofeum 24%, mikstura 7%; uprawnione gatunki mają 1,5% szansy na przedmiot rodowy. Boss: 100% wyposażenie, 80% trofeum, 35% mikstura, do 8% przedmiot rodowy; boss 110+: 0,2% legendarny relikt. Rzuty są niezależne.');
+      guideRow(root,'Podróże i łupy','E: schody, rozmowy i miejsca do użycia. Przedmioty mają osobne szanse u konkretnych potworów. W podglądzie pokazujemy tylko łupy i źródła, które ta postać rzeczywiście odkryła.');
       const rows=atlasMode==='nearby'?(world.landmarks||[]).filter(l=>l.hint||me.discoveries?.includes(l.id)).sort((a,b)=>distance(me,a)-distance(me,b)).slice(0,14):atlasMode==='cities'?world.cities:atlasMode==='caves'?(world.stairs||[]).filter(s=>s.floor===0):world.regions;
       for(const item of rows||[]){
         const goal=atlasMode==='regions'?{x:item.x+item.w/2,y:item.y+item.h/2,floor:0}:item;
@@ -679,20 +721,9 @@
       root.append(element('div','section-label','MIKSTURY NA DALSZE WYPRAWY'));
       for(const[id,s]of Object.entries(world.potions||{})){
         const count=me.potions?.[id]||0;
-        guideRow(root,`${s.name} · ${count}/99`,`Poz. ${s.min_level||1} · odnawia ${s.restore} · ${s.price} złota. Skróty 1 i 2 używają najsilniejszej posiadanej mikstury.`,[actionButton('Kup',()=>send({type:'buy',item:id}),!merchantNear()||!safe||me.level<(s.min_level||1)||me.gold<s.price||count>=99)]);
+        guideRow(root,`${s.name} · ${count}`,`Poz. ${s.min_level||1} · odnawia ${s.restore} · ${s.price} złota. Mikstury przypisujesz do Q/R w plecaku.`,[actionButton('Kup',()=>send({type:'buy',item:id}),!merchantNear()||!safe||me.level<(s.min_level||1)||me.gold<s.price||count>=99)]);
       }
     }
-  }
-  function drawAtlas(canvas){
-    if(!canvas)return;const g=canvas.getContext('2d'),sx=canvas.width/world.width,sy=canvas.height/world.height;
-    g.fillStyle='#192728';g.fillRect(0,0,canvas.width,canvas.height);
-    for(const r of world.regions||[]){g.fillStyle=r.color;g.fillRect(r.x*sx,r.y*sy,r.w*sx,r.h*sy);g.fillStyle='#10191670';g.fillRect(r.x*sx,r.y*sy,r.w*sx,r.h*sy);g.strokeStyle='#eeeecc25';g.strokeRect(r.x*sx,r.y*sy,r.w*sx,r.h*sy);g.fillStyle='#e9e4c7';g.textAlign='center';g.font='12px system-ui';const words=r.name.split(' ');g.fillText(words.slice(0,2).join(' '),(r.x+r.w/2)*sx,(r.y+r.h/2)*sy-8);g.fillText(words.slice(2).join(' '),(r.x+r.w/2)*sx,(r.y+r.h/2)*sy+7);g.fillStyle='#d8c888';g.font='10px system-ui';g.fillText(`${r.min_level}–${r.max_level}`,(r.x+r.w/2)*sx,(r.y+r.h/2)*sy+22);}
-    g.strokeStyle='#dfc89070';g.lineWidth=1;for(const road of world.roads||[])line(g,road.map(([x,y])=>[x*sx,y*sy]),'#cfc08465',1);
-    for(const r of world.waterways||[])line(g,[r.a,r.b].map(([x,y])=>[x*sx,y*sy]),'#67b4c7',2);
-    for(const s of world.stairs||[])if(s.floor===0){g.fillStyle='#ddb8e9';g.fillRect(s.x*sx-3,s.y*sy-3,6,6);}
-    for(const c of world.cities||[]){ellipse(g,c.x*sx,c.y*sy,5,5,'#ffd989');g.font='bold 11px system-ui';g.textAlign=c.x*sx<70?'left':'center';g.fillStyle='#fff1c8';g.fillText(c.name,Math.max(7,c.x*sx),Math.max(15,c.y*sy-10));}
-    if(me){ellipse(g,me.x*sx,me.y*sy,4,4,'#fff');g.strokeStyle='#163123';g.strokeRect(me.x*sx-5,me.y*sy-5,10,10);}
-    if(navigationGoal){g.strokeStyle='#ffe392';g.beginPath();g.arc(navigationGoal.x*sx,navigationGoal.y*sy,8,0,TAU);g.stroke();}
   }
   function buildStaticIndex(){
     surfaceMap=new Runtime.SurfaceMap(world);
@@ -789,7 +820,7 @@
       for(const[dx,dy]of[[-82,18],[101,-28]]){block(ctx,x+dx-22,y+dy-45,44,25,'#443e35');ctx.fillStyle='#a58858';ctx.beginPath();ctx.moveTo(x+dx-26,y+dy-46);ctx.lineTo(x+dx,y+dy-82);ctx.lineTo(x+dx+26,y+dy-46);ctx.fill();block(ctx,x+dx-7,y+dy-44,14,23,'#403b32');}
       block(ctx,x-75,y+52,51,16,'#89683e');for(const dx of[-70,-32]){ellipse(ctx,x+dx,y+72,10,10,'#594832');ellipse(ctx,x+dx,y+72,5,5,'#bd965b');}
     }else if(deco==='web'){
-      for(const[dx,dy]of[[-75,12],[25,-50],[82,30]]){const xx=x+dx,yy=y+dy;for(let i=0;i<8;i++){const a=i/8*TAU;line(ctx,[[xx,yy],[xx+Math.cos(a)*43,yy+Math.sin(a)*25]],'#e2e3c080',1);}for(const r of[12,24,39]){ctx.strokeStyle='#e2e3c095';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(xx,yy,r,r*.58,0,0,TAU);ctx.stroke();}}block(ctx,x-15,y+15,13,23,'#dfdec0');
+      for(const[dx,dy]of[[-75,12],[25,-50],[82,30]]){const xx=x+dx,yy=y+dy;for(let i=0;i<24;i++){const a=i/8*TAU;line(ctx,[[xx,yy],[xx+Math.cos(a)*43,yy+Math.sin(a)*25]],'#e2e3c080',1);}for(const r of[12,24,39]){ctx.strokeStyle='#e2e3c095';ctx.lineWidth=1;ctx.beginPath();ctx.ellipse(xx,yy,r,r*.58,0,0,TAU);ctx.stroke();}}block(ctx,x-15,y+15,13,23,'#dfdec0');
     }else if(deco==='den'){
       ellipse(ctx,x,y,53,27,'#665b45');ellipse(ctx,x+4,y-2,39,19,'#2d382a');for(const[dx,dy]of[[-55,24],[35,-13],[6,44]]){line(ctx,[[x+dx-14,y+dy],[x+dx+17,y+dy-7]],'#bcac78',3);block(ctx,x+dx,y+dy-5,5,8,'#e2d7b4');}
     }else if(deco==='crypt'||deco==='ruin'){
@@ -1007,7 +1038,7 @@
       else{block(ctx,x+7,y+h-9,Math.min(29,w-8),7,"#6e9a55");block(ctx,x+w-25,y+3,19,6,"#82a764");}
     }
   }
-  function humanoid(x,y,kind,facing=[0,1],phase=0,dead=false){
+  function humanoid(x,y,kind,facing=[0,1],phase=0,dead=false,gear=null){
     const info=classInfo[kind]||{cape:kind==="merchant"?"#c38b40":kind==="goblin"?"#aa6945":"#72836b",color:"#efcf87"};
     ctx.save();ctx.translate(Math.round(x),Math.round(y));if(facing[0]<-.3)ctx.scale(-1,1);if(dead){ctx.rotate(-Math.PI/2);ctx.globalAlpha=.65;}
     const bob=Math.round(Math.sin(phase*8)),step=Math.round(Math.sin(phase*9)*2),cape=info.cape;
@@ -1015,8 +1046,8 @@
     block(ctx,-12,-25+bob,24,26,"#364536");block(ctx,-10,-25+bob,20,27,cape);block(ctx,-10,-24+bob,4,24,"#ffffff20");block(ctx,8,-22+bob,4,23,"#00000024");
     if(kind==="knight"){
       block(ctx,-9,-25+bob,19,19,"#c1c6bb");block(ctx,-7,-23+bob,6,13,"#edf0d5");block(ctx,2,-23+bob,6,13,"#929f9d");block(ctx,-13,-25+bob,8,7,"#dce1cb");block(ctx,8,-25+bob,7,7,"#8f9e98");block(ctx,-9,-8+bob,19,4,"#ac844c");block(ctx,-2,-8+bob,5,4,"#e2c971");
-      block(ctx,-15,-17+bob,8,16,"#623d34");block(ctx,-14,-15+bob,6,11,"#b6473c");block(ctx,-12,-14+bob,2,9,"#eac36c");
-    }else if(kind==="paladin"){
+      if(gear===null||gear.shield_equipped){block(ctx,-19,-21+bob,12,22,"#596d78");block(ctx,-18,-20+bob,10,19,"#a8bdba");block(ctx,-16,-18+bob,6,15,"#314e63");block(ctx,-14,-16+bob,2,11,"#eacb7b");}
+    }else if(kind==="ranger"){
       block(ctx,-8,-23+bob,16,16,"#987045");block(ctx,-5,-23+bob,10,4,"#d3ad63");block(ctx,-8,-9+bob,17,4,"#574a2f");block(ctx,-2,-9+bob,4,4,"#dbb768");line(ctx,[[-7,-22+bob],[7,-9+bob]],"#d6b270",3);
     }else{block(ctx,-7,-24+bob,14,19,cape);block(ctx,-8,-7+bob,17,3,"#dcc079");block(ctx,-1,-24+bob,3,16,info.color);block(ctx,-8,-1+bob,18,3,info.color);}
     block(ctx,-16,-21+bob,5,13,cape);block(ctx,11,-21+bob,5,13,cape);block(ctx,-16,-9+bob,5,5,"#e5b57e");block(ctx,12,-9+bob,5,5,"#e5b57e");
@@ -1027,15 +1058,24 @@
     else if(kind==="mage"){block(ctx,-10,-38+bob,21,4,"#2f438b");block(ctx,-7,-44+bob,15,8,"#587cc9");block(ctx,-3,-49+bob,7,8,"#6f91dc");block(ctx,-2,-53+bob,4,6,"#a6b8eb");block(ctx,-7,-39+bob,15,3,"#dabf72");}
     else if(kind==="druid"){block(ctx,-8,-40+bob,17,7,"#467844");block(ctx,-5,-43+bob,12,6,"#80a451");block(ctx,-9,-37+bob,3,12,"#517e44");block(ctx,6,-37+bob,3,12,"#517e44");}
     else{block(ctx,-8,-40+bob,17,6,"#9d713e");block(ctx,-6,-43+bob,12,5,"#bd9355");block(ctx,-10,-38+bob,21,3,"#735736");}
-    if(kind==="knight"){block(ctx,18,-27+bob,3,22,"#d7e6db");block(ctx,18,-31+bob,2,5,"#f1f4d9");block(ctx,14,-8+bob,11,3,"#dbb964");block(ctx,18,-4+bob,3,7,"#77542e");}
-    else if(kind==="paladin"){line(ctx,[[19,-31+bob],[24,-24+bob],[27,-14+bob],[23,-4+bob],[19,2+bob]],"#d3ad66",3);line(ctx,[[19,-31+bob],[19,2+bob]],"#ede4b8",1);}
-    else if(kind!=="merchant"){block(ctx,19,-35+bob,3,39,"#8b6136");block(ctx,17,-40+bob,7,8,kind==="mage"?"#80bbfa":"#b7e481");block(ctx,19,-39+bob,3,4,"#eef7b9");}
+    if(kind!=="knight"&&gear?.shield_equipped){
+      block(ctx,-22,-21+bob,15,22,"#493d28");block(ctx,-21,-20+bob,13,19,"#987a45");
+      block(ctx,-19,-19+bob,2,17,"#c3a666");block(ctx,-14,-19+bob,2,17,"#695132");block(ctx,-18,-13+bob,7,6,"#b7c1aa");
+    }
+    const armament=gear?gear.weapon:(kind==="knight"?"sword":kind==="ranger"?"bow":kind==="merchant"?"none":"staff");
+    const wt=gear?.weapon_type||"";
+    if(armament==="bow"){line(ctx,[[19,-31+bob],[24,-24+bob],[27,-14+bob],[23,-4+bob],[19,2+bob]],"#d3ad66",3);line(ctx,[[19,-31+bob],[19,2+bob]],"#ede4b8",1);}
+    else if(wt==="maul"||wt==="warhammer"){block(ctx,15,-37+bob,4,43,"#9c733d");block(ctx,wt==="maul"?6:9,-43+bob,wt==="maul"?24:18,13,"#bdccc8");block(ctx,10,-41+bob,16,4,"#f0f3db");}
+    else if(["handaxe","battleaxe","greataxe"].includes(wt)){block(ctx,17,-36+bob,3,42,"#9c733d");block(ctx,20,-39+bob,12,15,"#becbc5");block(ctx,29,-38+bob,3,15,"#e4e7ca");if(wt==="greataxe")block(ctx,7,-39+bob,11,15,"#afbdb6");}
+    else if(armament==="staff"){block(ctx,19,-35+bob,3,39,"#8b6136");block(ctx,17,-40+bob,7,8,kind==="mage"?"#80bbfa":"#b7e481");block(ctx,19,-39+bob,3,4,"#eef7b9");if(gear?.two_handed)block(ctx,16,-15+bob,5,5,"#e5b57e");}
+    else if(armament!=="none"&&gear?.two_handed){block(ctx,16,-43+bob,5,42,"#d7e6db");block(ctx,17,-47+bob,3,6,"#fff2d0");block(ctx,8,-6+bob,20,4,"#dfbf65");block(ctx,17,-1+bob,3,12,"#805b39");}
+    else if(armament!=="none"){block(ctx,18,-27+bob,3,22,"#d7e6db");block(ctx,18,-31+bob,2,5,"#f1f4d9");block(ctx,14,-8+bob,11,3,"#dbb964");block(ctx,18,-4+bob,3,7,"#77542e");}
     ctx.restore();
   }
   function drawNPC(npc,t){
     if(!inView(npc.x,npc.y))return;
     ellipse(ctx,npc.x,npc.y+6,16,7,"#35452d66");
-    const type=npc.id==="strazniczka"?"knight":npc.id==="kartograf"?"mage":"paladin";
+    const type=npc.id==="strazniczka"?"knight":npc.id==="kartograf"?"mage":"ranger";
     humanoid(npc.x,npc.y,type,[0,1],0,false);
     const quests=(me?.quests||[]).filter(q=>q.npc_id===npc.id),ready=quests.some(q=>q.status==="ready"),available=quests.some(q=>q.status==="available"),active=quests.some(q=>q.status==="active");
     if(ready||available||active){const y=npc.y-72+Math.sin(t*3)*2;label(ready?"?":available?"!":"•",npc.x,y,ready?"#c8f889":available?"#fff29e":"#d3d8c1",21);}
@@ -1046,7 +1086,7 @@
     const{x,y}=l;if(!inView(x,y,130))return;const found=(me?.discoveries||[]).includes(l.id);
     if(l.action){drawSite(l,t);return;}
     if(l.decoration==='sign'){
-      block(ctx,x-3,y-57,6,62,'#77573a');block(ctx,x-43,y-57,86,17,'#c4a26c');block(ctx,x-34,y-35,69,16,'#b7955f');label('SZLAKI · K → Atlas',x,y-44,'#443b2c',9);
+      block(ctx,x-3,y-57,6,62,'#77573a');block(ctx,x-43,y-57,86,17,'#c4a26c');block(ctx,x-34,y-35,69,16,'#b7955f');label('SZLAKI · ATLAS',x,y-44,'#443b2c',9);
     }else if(l.id==="old_mill"){
       // Mill yard: sacks, cut wheat and a broken cart alongside the solid mill tower.
       for(const[dx,dy]of[[-22,8],[5,18],[25,7]]){block(ctx,x+dx-9,y+dy-12,18,19,"#af9460");block(ctx,x+dx-7,y+dy-14,14,6,"#dac185");block(ctx,x+dx-5,y+dy-6,3,9,"#cab078");}
@@ -1055,7 +1095,7 @@
       fire(x,y+7,t,1.3);for(let k=0;k<3;k++){const dx=(k-1)*55;block(ctx,x+dx-13,y+54,29,15,"#856640");block(ctx,x+dx-11,y+55,25,8,"#c09c60");}
       for(const dx of[-70,66]){block(ctx,x+dx,y-43,5,47,"#805335");block(ctx,x+dx-5,y-45,17,11,"#ded3a5");block(ctx,x+dx-2,y-41,3,3,"#765a3b");block(ctx,x+dx+5,y-41,3,3,"#765a3b");}
     }else if(l.id==="marsh_shrine"){
-      for(let i=0;i<8;i++){const a=i/8*TAU;block(ctx,x+Math.cos(a)*33-7,y+Math.sin(a)*23-5,14,10,"#c4c5a2");block(ctx,x+Math.cos(a)*33-5,y+Math.sin(a)*23-5,9,3,"#e0d8ac");}
+      for(let i=0;i<24;i++){const a=i/8*TAU;block(ctx,x+Math.cos(a)*33-7,y+Math.sin(a)*23-5,14,10,"#c4c5a2");block(ctx,x+Math.cos(a)*33-5,y+Math.sin(a)*23-5,9,3,"#e0d8ac");}
       ellipse(ctx,x,y,21,13,"#67bab9");ellipse(ctx,x,y-2,13,7,"#a6e8ce");for(let i=0;i<5;i++){const a=t+i*1.25,xx=x+Math.cos(a)*37,yy=y-20+Math.sin(a*1.2)*19;glow(xx,yy,12,"#a7e9d5",.3);block(ctx,xx,yy,3,3,"#eafcb1");}
     }else if(l.id==="dawn_ruins"){
       for(let i=0;i<4;i++){const dx=(i-1.5)*25;block(ctx,x+dx-10,y-5+Math.abs(i-1.5)*12,23,17,"#a8a791");block(ctx,x+dx-8,y-5+Math.abs(i-1.5)*12,19,4,"#d5c9a1");}
@@ -1073,14 +1113,23 @@
     const p=v.entity,x=v.x,y=v.y,isMe=String(p.id)===myId;if(!inView(x,y))return;
     if(String(p.id)===selectedTarget){ctx.strokeStyle="#f05942";ctx.lineWidth=2;ctx.strokeRect(x-20,y-44,40,50);}
     if(isMe){ctx.strokeStyle="#e5eeae88";ctx.lineWidth=1.5;ctx.strokeRect(x-16,y-14,32,28);}
-    ellipse(ctx,x,y+6,17,7,"#2c422e70");humanoid(x,y,p.class_id,p.facing||[0,1],v.move,p.hp<=0);
+    if(p.form&&p.hp>0){drawEnemy({...v,entity:{...p,id:'form_'+p.id,kind:p.form,name:'',is_companion:true}},t);}
+    else {ellipse(ctx,x,y+6,17,7,"#2c422e70");humanoid(x,y,p.class_id,p.facing||[0,1],v.move,p.hp<=0,p);}
     const color=p.skull==="red"?"#ff9b83":p.skull==="white"?"#fff6dc":isMe?"#fff2a8":me?.party_id&&p.party_id===me.party_id?"#a1eff2":"#c3f4a9";
     label(`${p.skull&&p.skull!=="none"?"☠ ":""}${p.name}${p.disconnected?" · offline":""}`,x,y-66,color,11);
     block(ctx,x-18,y-55,36,4,"#304232");block(ctx,x-17,y-54,34*Math.max(0,p.hp/p.max_hp),2,isMe?"#86df6b":"#9fd672");
   }
   function drawEnemy(v,t){
+    if(globalThis.BractwoCasterVFX.actor(ctx,v,t))return;
     if(String(v.entity.id)===selectedEnemy){const z=v.entity.size||1;ctx.strokeStyle='#f05942';ctx.lineWidth=2;ctx.strokeRect(v.x-30*z,v.y-62*z,60*z,70*z);}
-    const e=v.entity,x=v.x,y=v.y,spec=world.enemy_types?.[e.kind]||{},kind=spec.appearance||e.kind;if(["bear","harpy","cyclops","ghoul","scorpion"].includes(kind)){drawWildCreature(v,t,spec);return;}if(["dragon","demon"].includes(kind)){drawNewCreature(v,t,spec);return;}if(!inView(x,y)||e.alive===false||e.hp<=0)return;
+    const e=v.entity,x=v.x,y=v.y,spec=world.enemy_types?.[e.kind]||{},kind=spec.appearance||e.kind;
+    if(!inView(x,y)||e.alive===false||e.hp<=0)return;
+    if(spec.sprite&&globalThis.BractwoLootUI.drawMonster(ctx,v,spec,snapshot.time)){
+      const z=spec.size||1,yy=y-78*z,w=spec.boss?64:42;
+      label(e.name||kind,x,yy,spec.boss?'#f7d692':'#e5dbc1',spec.boss?11:9);
+      block(ctx,x-w/2,yy+9,w,4,'#3a453d');block(ctx,x-w/2+1,yy+10,(w-2)*Math.max(0,e.hp/e.max_hp),2,'#e87955');return;
+    }
+    if(["bear","harpy","cyclops","ghoul","scorpion"].includes(kind)){drawWildCreature(v,t,spec);return;}if(["dragon","demon"].includes(kind)){drawNewCreature(v,t,spec);return;}if(!inView(x,y)||e.alive===false||e.hp<=0)return;
     const phase=Math.round(Math.sin(v.move*8)*2),flip=(e.facing?.[0]||1)<0?-1:1;
     ellipse(ctx,x,y+6,kind==="boss"?34:kind==="rat"?11:20,kind==="boss"?13:7,"#3143316b");ctx.save();ctx.translate(Math.round(x),Math.round(y));ctx.scale(flip*(spec.size||1),spec.size||1);
     if(kind==="wolf"||kind==="boar"||kind==="rat"){
@@ -1143,8 +1192,13 @@
       const duration=e.duration||.32,age=(now-e.started)/1000,q=Math.max(0,Math.min(1,age/duration));if(age>duration){effects.delete(id);continue;}
       const x=e.x,y=e.y-17,tx=e.target_x??e.x,ty=(e.target_y??e.y)-17,angle=Math.atan2(ty-y,tx-x);
       ctx.save();
+      if(globalThis.BractwoFighterVFX.draw(ctx,e,q)){ctx.restore();continue;}
+      if(globalThis.BractwoSpellVFX.draw(ctx,e,q,now/1000)){ctx.restore();continue;}
       const enemyColor=({stone:'#d5bf8a',arrow:'#f5d48d',venom:'#b4dd68',fire:'#ff9856',ice:'#9ae1f6',shadow:'#ce9ee7',arcane:'#9ccaf2',feather:'#e3d9bd'})[e.element||e.kind.replace('enemy_','')]||'#efbd8c';
-      if(e.kind==='danger_zone'){
+      if(e.kind==='combat_roll'){
+        const text=e.graze?'DRAŚNIĘCIE · '+e.damage:e.check==='save'&&e.action?.includes('Powalenie')?(e.saved?'USTAŁ':'POWALENIE'):e.critical?'KRYTYK':!e.hit?'PUDŁO':e.saved?'OBRONA ½':'';
+        if(text){ctx.globalAlpha=1-q;label(text,tx,ty-65-q*16,e.critical?'#f4cf77':'#d6dccc',12);}
+      }else if(e.kind==='danger_zone'){
         ctx.fillStyle=e.special?'#ee755322':'#e0b0631c';ctx.beginPath();ctx.arc(tx,e.target_y,e.radius,0,TAU);ctx.fill();ctx.strokeStyle=enemyColor;ctx.lineWidth=e.special?3:2;ctx.setLineDash([8,6]);ctx.stroke();ctx.setLineDash([]);ctx.strokeStyle='#fff1c9';ctx.beginPath();ctx.arc(tx,e.target_y,Math.max(2,e.radius*q),-Math.PI/2,-Math.PI/2+TAU*q);ctx.stroke();if(e.special)label('UNIK!',tx,e.target_y-6,'#ffe4b2',11);
       }else if(e.kind==='enemy_impact'){
         ctx.globalAlpha=1-q;ctx.strokeStyle=enemyColor;ctx.lineWidth=4;ctx.beginPath();ctx.arc(x,e.y,e.radius*(.3+.7*q),0,TAU);ctx.stroke();for(let i=0;i<10;i++){const a=i/10*TAU;block(ctx,x+Math.cos(a)*e.radius*q,e.y+Math.sin(a)*e.radius*q-8,5,8,enemyColor);}
@@ -1203,7 +1257,7 @@
     for(const r of world.regions||[]){mctx.fillStyle=r.color;mctx.fillRect((r.x-left)*sx,(r.y-top)*sy,r.w*sx,r.h*sy);}
     if(me.floor){if(me.floor<0){mctx.fillStyle='#252831';mctx.fillRect(0,0,w,h);}for(const d of [...(world.dungeons||[]),...(world.elevations||[])])if(d.floor===me.floor)for(const r of d.rooms){mctx.fillStyle='#a1937a';mctx.fillRect((r.x-left)*sx,(r.y-top)*sy,r.w*sx,r.h*sy);}}
     else for(const edge of surfaceMap?.roads(left,top,left+mw,top+mh)||[])line(mctx,[edge.a,edge.b].map(([x,y])=>[(x-left)*sx,(y-top)*sy]),'#d5bd85',2);
-    if(!me.floor)for(const entry of staticIndex.query(left,top,left+mw,top+mh,0)){const r=entry.data;if(entry.kind==='waterway'||entry.kind==='bridge')line(mctx,[r.a,r.b].map(([x,y])=>[(x-left)*sx,(y-top)*sy]),entry.kind==='bridge'?'#e3c388':'#559ebc',entry.kind==='bridge'?2:Math.max(2,r.width*sx));}
+    if(!me.floor)globalThis.BractwoAtlas.drawWater(mctx,world,{x:left,y:top,w:mw,h:mh},w,h);
     for(const l of world.landmarks||[])if(l.hint&&sameFloor(me,l)){mctx.fillStyle='#f6dfa6';mctx.fillRect((l.x-left)*sx-2,(l.y-top)*sy-2,4,4);}
     for(const c of world.cities||[])if(sameFloor(me,c))ellipse(mctx,(c.x-left)*sx,(c.y-top)*sy,6,6,'#eac879');
     for(const stair of world.stairs||[])if(sameFloor(me,stair)){mctx.fillStyle='#e1bbff';mctx.fillRect((stair.x-left)*sx-2,(stair.y-top)*sy-2,4,4);}
@@ -1222,7 +1276,7 @@
     camera.x=Math.max(Math.min(halfW,world.width/2),Math.min(world.width-Math.min(halfW,world.width/2),camera.x));camera.y=Math.max(Math.min(halfH,world.height/2),Math.min(world.height-Math.min(halfH,world.height/2),camera.y));
     ctx.setTransform(viewport.dpr,0,0,viewport.dpr,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle="#668b48";ctx.fillRect(0,0,viewport.w,viewport.h);
     ctx.save();ctx.translate(Math.round(viewport.w/2),Math.round(viewport.h/2));ctx.scale(camera.scale,camera.scale);ctx.translate(-Math.round(camera.x),-Math.round(camera.y));
-    drawGround();if(!(me?.floor)){drawWaterways(t);drawRiver(t);drawSafeZone();drawVillage(t);}
+    drawGround();globalThis.BractwoCasterVFX.world(ctx,world,me,snapshot,t);if(!(me?.floor)){drawWaterways(t);drawRiver(t);drawSafeZone();drawVillage(t);}
     const objects=[];
     for(const entry of nearbyDrawables()){
       const o=entry.data;
@@ -1238,11 +1292,126 @@
       if(entry.kind==='camp'&&inView(o.x,o.y,150))objects.push({y:o.y,draw:()=>drawCamp(o,t)});
     }
     objects.sort((a,b)=>a.y-b.y);for(const o of objects)o.draw();
+    for(const v of visuals.values())if(v.entity.hp>0&&sameFloor(me,v.entity)&&inView(v.x,v.y)){globalThis.BractwoSpellVFX.drawStatuses(ctx,v.entity.status_effects||[],v.x,v.y,t,v.entity.size||1);globalThis.BractwoFighterVFX.statuses(ctx,v.entity,v.x,v.y,t);globalThis.BractwoCasterVFX.statuses(ctx,v.entity,v.x,v.y,t);}
     drawGoal();drawEffects(now);drawParticles(dt);for(const v of visuals.values())if(v.kind==="p"&&sameFloor(me,v.entity))drawSpeech(v,now);
     ctx.restore();drawMinimap();
     if(playing&&lastSnapshotAt&&now-lastSnapshotAt>5000)ui.connectionStatus.textContent="BRAK ODPOWIEDZI";else if(playing&&ui.connectionStatus.textContent!==" ONLINE")ui.connectionStatus.innerHTML="<i></i> ONLINE";
     requestAnimationFrame(frame);
   }
   document.addEventListener("visibilitychange",()=>fpsMeter.reset());
+
+  const spellIcons={longstrider:'»',mage_armor:'◇',burning_hands:'♨',healing_word:'♥',starry_wisp:'✧',shocking_grasp:'ϟ',fire_bolt:'✹',ray_of_frost:'❄',acid_splash:'◉',magic_missile:'✦',shield:'⬡',scorching_ray:'☄',fireball:'☀',misty_step:'»',shillelagh:'♧',thorn_whip:'⌁',produce_flame:'♨',cure_wounds:'♥',entangle:'♜',moonbeam:'☾',wild_shape_wolf:'♞',wild_shape_bear:'♟',animal_companion:'♞',hunters_mark:'⌖',ensnaring_strike:'⌁',second_wind:'♥'};
+  const hotbarButtons=Array.from({length:24},(_,slot)=>{
+    const button=document.createElement('button');button.className='hotbar-slot';button.dataset.slot=slot;
+    button.innerHTML=`<kbd>${Runtime.hotbarLabel(slot,false)}</kbd><span></span><small></small><b></b>`;
+    button.addEventListener('click',()=>cast(Runtime.hotbarKey(me?.hotbar,hotbarPage,slot)));
+    button.addEventListener('contextmenu',event=>{event.preventDefault();openExpansion('spells');});
+    (slot<12?ui.hotbarSlots:ui.hotbarFunctionSlots).append(button);return button;
+  });
+  function updateHotbar(){
+    if(!me)return;
+    const pages=Runtime.hotbarPageCount(me.hotbar);
+    hotbarPage=Math.min(hotbarPage,pages-1);
+    ui.hotbarPages.hidden=pages<=1;
+    ui.hotbarPageLabel.textContent=`${hotbarPage+1}/${pages}`;
+    for(let i=0;i<24;i++){
+      const id=Runtime.hotbarKey(me.hotbar,hotbarPage,i),s=Runtime.spellProfile(world.spells?.[id],me),b=hotbarButtons[i],available=s&&spellAvailable(s);
+      const revert=s?.kind==='shape'&&me.form;const cd=me.spell_cooldowns?.[id]||0;
+      b.dataset.spell=id||'';b.classList.toggle('empty',!s);
+      if(b.querySelector('span').dataset.spell!==id){const span=b.querySelector('span');span.dataset.spell=id;span.replaceChildren();if(s){const img=document.createElement('img');img.src=s.icon;img.className='spell-icon';img.alt='';span.append(img);}else span.textContent='·';}
+      b.querySelector('small').textContent=s?.name||'Pusty';
+      b.querySelector('b').textContent=!s?'':!available?'poz. '+spellGate(s):Runtime.queuedSpellLabel(s,me)|| (revert?'Powrót':s.kind==='reaction'?(me.shield_armed?'ON':'OFF'):s.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cd>0?Math.ceil(cd)+' s':spellMana(s)?spellMana(s)+' MP':'0 MP');
+      b.disabled=!s||!available||me.hp<=0||(!revert&&s.kind!=='reaction'&&!(s.kind==='weapon_trigger'&&me.ensnaring_armed)&&(cd>0||me.mana<spellMana(s)||!!me.form));
+      if(s?.kind==='recovery')b.disabled=!globalThis.BractwoCasterUI.canRecover(me);
+      b.classList.toggle('locked',!!s&&!available);b.classList.toggle('queued',!!id&&me.queued_spell===id);b.classList.toggle('active-spell',!!s&&(s.kind==='reaction'&&me.shield_armed||revert||!!(s.buff&&me.statuses?.[s.buff]>0)||me.concentration===id||s.kind==='weapon_trigger'&&me.ensnaring_armed));
+      b.title=s?`Zestaw ${hotbarPage+1} / ${Runtime.hotbarLabel(i,false)} · ${s.name} (${s.english}) · ${s.feature?'zdolność':s.circle?'krąg '+s.circle:'sztuczka'} · poz. ${spellGate(s)} · ${spellMana(s)} many\n${s.power_summary||''}\n${s.description}\n${Runtime.concentrationWarning(s,me,world.spells)}`:'Pusty slot — przypisz czar w księdze K';
+    }
+  }
+  function changeHotbarPage(delta){
+    if(!me)return;
+    hotbarPage=(hotbarPage+delta+Runtime.hotbarPageCount(me.hotbar))%Runtime.hotbarPageCount(me.hotbar);
+    updateHotbar();
+  }
+  ui.hotbarPrev.addEventListener('click',()=>changeHotbarPage(-1));
+  ui.hotbarNext.addEventListener('click',()=>changeHotbarPage(1));
+  lootPanel=globalThis.BractwoLootUI.create({world:()=>world,player:()=>me,prepare:()=>{characterSheet?.close();}});
+  ui.targetLoot.addEventListener('click',()=>{const enemy=snapshot.enemies.find(e=>String(e.id)===selectedEnemy);if(enemy)lootPanel.open({...world.enemy_types?.[enemy.kind],kind:enemy.kind});});
+  levelUpPanels=globalThis.BractwoLevelUp.create({send,ready:()=>playing&&socket?.readyState===WebSocket.OPEN,open:tab=>characterSheet.open(tab)});
+  let fighterPrompt=null,casterPrompt=null;
+  characterSheet=globalThis.BractwoCharacterSheet.create({
+    state:()=>({player:me,world}),send,cast,gate:spellGate,mana:spellMana,nearMaster:()=>!!nearbyService("master"),
+    canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
+    prepare:()=>{merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
+    changed:()=>{if(me)updateHUD();}
+  });
+  merchantPanel=globalThis.BractwoInventoryUI.createMerchant({state:()=>({player:me,world}),send,
+    canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
+    prepare:()=>{characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+  hudWindows=globalThis.BractwoWindows.create({levelLayout:()=>levelUpPanels?.layout()});
+  fighterPrompt=globalThis.BractwoFighterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
+  casterPrompt=globalThis.BractwoCasterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
+  ui.closeEffectDetail.addEventListener('click',()=>{ui.effectDetail.hidden=true;});
+  ui.escapeRestraint.addEventListener('click',()=>{const packet={type:'escape_restraint'};if(ui.escapeRestraint.dataset.target)packet.target_id=ui.escapeRestraint.dataset.target;send(packet);});
+  let selectedEffectId='';
+  function renderEffects(container,entries){
+    const wanted=new Set();
+    for(const effect of entries){
+      wanted.add(effect.id);
+      let chip=Array.from(container.children).find(b=>b.dataset.effect===effect.id);
+      if(!chip){
+        chip=document.createElement('button');chip.className='effect-chip';chip.dataset.effect=effect.id;
+        chip.addEventListener('click',()=>{selectedEffectId=container.id+':'+effect.id;ui.effectDetail.hidden=false;updateEffects();});
+        container.append(chip);
+      }
+      chip.classList.toggle('harmful',!!effect.harmful);chip.classList.toggle('concentration',!!effect.concentration);
+      chip.textContent=`${effect.icon||'✦'} ${effect.name} · ${Runtime.formatEffectTime(effect)}`;
+      const owner=container.id==='targetEffects'?'Cel · ':'Ty · ';
+      chip.title=owner+effect.description+' '+Runtime.formatEffectTime(effect);
+      chip.setAttribute('aria-label',owner+effect.name+' · '+Runtime.formatEffectTime(effect));
+      if(selectedEffectId===container.id+':'+effect.id&&!ui.effectDetail.hidden){
+        ui.effectDetailName.textContent=owner+effect.name+' · '+Runtime.formatEffectTime(effect);
+        ui.effectDetailText.textContent=effect.description+(effect.concentration?' Wymaga koncentracji.':'');
+        const ally=selectedTarget&&snapshot.players.find(q=>q.id===selectedTarget&&q.party_id&&q.party_id===me.party_id);
+        const other=container.id==='targetEffects';
+        ui.escapeRestraint.hidden=!effect.escape_action||(other&&!ally);
+        ui.escapeRestraint.dataset.target=other&&ally?ally.id:'';
+        ui.escapeRestraint.textContent=other?'Uwolnij sojusznika · akcja':'Wyrwij się · akcja';
+        ui.escapeRestraint.disabled=me.action_remaining>0||!me.alive;
+      }
+    }
+    for(const chip of [...container.children])if(!wanted.has(chip.dataset.effect)){
+      if(selectedEffectId===container.id+':'+chip.dataset.effect)ui.effectDetail.hidden=true;
+      chip.remove();
+    }
+  }
+  function updateEffects(target){
+    if(!me)return;
+    if(!target)target=selectedEnemy?snapshot.enemies.find(e=>String(e.id)===selectedEnemy):snapshot.players.find(p=>String(p.id)===selectedTarget);
+    const own=me.status_effects||[],other=target?.hp>0?(target.status_effects||[]):[];
+    renderEffects(ui.ownEffects,own);renderEffects(ui.targetEffects,other);
+    ui.ownEffectsRow.hidden=!own.length;ui.targetEffectsRow.hidden=!other.length;
+    ui.effectsPanel.hidden=!own.length&&!other.length;
+  }
+  ui.controlTip.hidden=readRemembered('bractwo.controlTip.dismissed')==='1';
+  ui.closeControlTip.addEventListener('click',()=>{remember('bractwo.controlTip.dismissed','1');ui.controlTip.hidden=true;});
+  let rankingSocket=null,rankingRequest=0;
+  function refreshRanking(){
+    if(playing)return;const serial=++rankingRequest;
+    try{
+      const address=validateServer(ui.serverInput.value);if(rankingSocket)rankingSocket.close();
+      const ws=rankingSocket=new WebSocket(address);ui.rankingList.textContent='Wczytywanie rankingu…';
+      const timeout=setTimeout(()=>{ws.close();if(serial===rankingRequest&&ui.rankingList.textContent==='Wczytywanie rankingu…')ui.rankingList.textContent='Ranking niedostępny — sprawdź serwer.';},8000);
+      ws.addEventListener('open',()=>ws.send(JSON.stringify({type:'ranking'})));
+      ws.addEventListener('message',event=>{let data;try{data=JSON.parse(event.data);}catch(_){return;}if(data.type!=='ranking'||serial!==rankingRequest)return;
+        clearTimeout(timeout);ui.rankingList.replaceChildren();
+        for(const player of data.ranking||[]){const row=element('div','ranking-row');row.append(element('b','',String(player.rank)),element('span','',player.name),element('small','',className(player.class_id)),element('strong','',String(player.level)));row.title=`${player.online?'Online':'Offline'} · ${player.kills} pokonanych potworów`;row.classList.toggle('online',player.online);ui.rankingList.append(row);}
+        if(!ui.rankingList.children.length)ui.rankingList.textContent='Świat czeka na pierwszego bohatera.';ws.close();
+      });
+      ws.addEventListener('error',()=>{if(serial===rankingRequest)ui.rankingList.textContent='Ranking niedostępny — sprawdź serwer.';});
+    }catch(_){ui.rankingList.textContent='Podaj adres serwera, by zobaczyć ranking.';}
+  }
+  ui.serverInput.addEventListener('change',refreshRanking);
+  setTimeout(refreshRanking,150);setInterval(refreshRanking,30000);
+
   requestAnimationFrame(frame);
 })();

@@ -1,17 +1,18 @@
-FROM python:3.12-slim
+FROM python:3.13-slim
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1 \
-    GAME_HOST=0.0.0.0
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app
+COPY requirements.txt ./requirements.txt
+RUN python -m pip install --no-cache-dir -r requirements.txt
 
-COPY server/requirements.txt /app/server/requirements.txt
-RUN python -m pip install --upgrade pip \
-    && python -m pip install -r /app/server/requirements.txt
+# Explicit copies prevent saves, secrets and test accounts entering the image.
+COPY server/ ./server/
+COPY web/ ./web/
+COPY run.py LICENSE-SRD.txt ./
 
-COPY . /app
-
-# Railway injects PORT at runtime. server.py reads it directly.
-CMD ["python", "server/server.py"]
+EXPOSE 8080
+STOPSIGNAL SIGTERM
+CMD ["python", "run.py"]

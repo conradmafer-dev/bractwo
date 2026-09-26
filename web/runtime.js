@@ -88,7 +88,7 @@
     let selected = null, best = Infinity;
     for (const v of visuals) {
       const e = v.entity;
-      if (e.hp <= 0 || e.alive === false || (e.floor || 0) !== floor || (v.kind === 'p' && String(e.id) === String(myId))) continue;
+      if (e.is_companion || e.hp <= 0 || e.alive === false || (e.floor || 0) !== floor || (v.kind === 'p' && String(e.id) === String(myId))) continue;
       const tall = e.kind === 'dragon' || e.kind === 'dragon_lord' || e.kind === 'demon' || e.kind === 'abyss_walker' || /lord|queen|ancient/.test(e.kind || '');
       const size = Number(e.size)||1;
       const d = Math.hypot(v.x - x, v.y - (tall ? 38 : 22)*size - y);
@@ -96,7 +96,70 @@
     }
     return selected;
   }
-  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor };
+  const HOTBAR_ROW_SIZE=12,HOTBAR_PAGE_SIZE=24;
+  const HOTBAR_KEYS=['Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digit8','Digit9','Digit0','Minus','Equal',...Array.from({length:12},(_,i)=>'F'+(i+1))];
+  function hotbarPageCount(bar) { return Math.max(1,Math.ceil((bar?.length||0)/HOTBAR_PAGE_SIZE)); }
+  function hotbarKey(bar,page,slot) { return Array.isArray(bar)&&Number.isInteger(page)&&page>=0&&Number.isInteger(slot)&&slot>=0&&slot<HOTBAR_PAGE_SIZE?bar[page*HOTBAR_PAGE_SIZE+slot]||'':''; }
+  function hotbarSlotForCode(code) { return HOTBAR_KEYS.indexOf(code); }
+  function hotbarLabel(index,withBank=true) { const slot=index%24;const label=slot<12?['1','2','3','4','5','6','7','8','9','0','-','='][slot]:'F'+(slot-11);return (withBank&&index>=24?'Zestaw '+(Math.floor(index/24)+1)+' · ':'')+label; }
+  function formatEffectTime(effect) {
+    if(effect.remaining===null||effect.remaining===undefined)return 'aktywne';
+    const seconds=Math.max(0,Math.ceil(Number(effect.remaining)||0));
+    const rounds=Math.max(0,Math.ceil(Number(effect.rounds)||0));
+    if(seconds>=60)return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')} · ${rounds} r.`;
+    return `${seconds} s · ${rounds} r.`;
+  }
+  function manaBudgetText(budget) {
+    if(budget?.progression==='per_level') {
+      const bonus=budget.bonus?` + ${budget.bonus} premii`:'';
+      const next=budget.next_level_gain>0?` Następny poziom: +${budget.next_level_gain} many.`:'';
+      return `Pełna pula: ${budget.base} many${bonus}. Wspólna mana.${next}`;
+    }
+    if(!budget?.slots?.length)return 'Mana na zdolności klasy.';
+    const slots=budget.slots.map((n,i)=>`${n}× krąg ${i+1}`).join(' + ');
+    return `Pełna pula: ${budget.base} many${budget.bonus?` + ${budget.bonus} premii`:''}, odpowiednik ${slots}. Wspólna mana: proporcje używanych kręgów możesz zmieniać.`;
+  }
+  function spellProfile(spec,player) {
+    if(!spec)return spec;
+    return {...spec,...(player?.spell_profiles?.[spec.id]||{})};
+  }
+  function spellGate(spec,player) {
+    const cls=player?.class_id;
+    if(spec?.class_levels?.[cls]!==undefined)return Number(spec.class_levels[cls]);
+    if(cls==='ranger'&&spec?.circle>0)return spec.circle===1?1:(spec.circle-1)*20;
+    return Number(spec?.min_level)||1;
+  }
+  function concentrationWarning(spec,player,spells={}) {
+    const current=player?.concentration;
+    if(!spec?.concentration||!current||current===spec.id)return '';
+    return (spec.kind==='weapon_trigger'?'Po trafieniu zastąpi: ':'Zastąpi: ')+(spells[current]?.name||current);
+  }
+  function spellMana(spec,player) {
+    const s=spellProfile(spec,player);
+    return s?.recast&&player?.concentration===s.id?0:Number(s?.mana)||0;
+  }
+  function queuedSpellLabel(spec,player) {
+    if(!spec?.id||player?.queued_spell!==spec.id)return '';
+    const remaining=Math.max(0,Number(player.action_remaining)||0);
+    return remaining>0?`Za ${remaining.toFixed(1)} s`:'W kolejce';
+  }
+  function combatSummary(roll) {
+    if (!roll || !roll.id) return "";
+    const who=roll.target_name||'',name=roll.action||'';
+    if(roll.check==='save'&&roll.action?.includes('Powalenie'))return `${name} · ${who}: k20 ${roll.roll} + ${roll.bonus} / ST ${roll.defense} · ${roll.saved?'utrzymana równowaga':'powalenie'}`;
+    if(roll.graze)return `${name} · ${who}: pudło · Draśnięcie → ${roll.damage} obr.`;
+    if(roll.check==='healing')return `${name} · ${who}: ${roll.damage_dice} → +${Math.round(roll.healing||0)}`;
+    if(roll.check==='automatic')return `${name} · ${who}: ${roll.damage_dice||''} → ${roll.immune?'odporność':roll.damage+' obr.'}`;
+    const rolls=roll.rolls||[roll.roll];
+    const die=roll.disadvantage||roll.advantage?`k20 [${rolls.join(', ')}] → ${roll.roll}`:`k20 ${roll.roll}`;
+    const saving=roll.check==='save'||roll.check==='concentration'||roll.check==='escape';
+    const check=`${die} ${roll.bonus<0?'−':'+'} ${Math.abs(roll.bonus||0)} = ${roll.total} / ${saving?'ST':'KP'} ${roll.defense}`;
+    if(roll.check==='escape')return `${name} · ${who}: ${check} · ${roll.saved?'uwolnienie':'pnącza trzymają'} · akcja zużyta`;
+    if(roll.check==='concentration')return `${check} · koncentracja ${roll.saved?'utrzymana':'przerwana'}`;
+    const result=roll.check==='save'?(roll.saved?(roll.save_half?'obrona · połowa':'obrona · brak obrażeń'):'nieudana obrona'):roll.shielded?'TARCZA':roll.critical?'KRYTYK':roll.hit?'trafienie':'PUDŁO';
+    return `${name} · ${who}: ${check} · ${result}${roll.hit?` · ${roll.damage_dice} → ${roll.damage} obr.`:''}`;
+  }
+  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, queuedSpellLabel, combatSummary };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BractwoRuntime = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

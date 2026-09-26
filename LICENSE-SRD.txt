@@ -1,0 +1,7 @@
+System Reference Document attribution
+
+This work includes material from the System Reference Document 5.2.1 (“SRD 5.2.1”) by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.
+
+Modifications: original Polish summaries and game implementations; mana instead of spell slots; delayed class progression; real-time action timing; adjusted ranges, durations and selected effects; custom monster variants, animal companion and Wild Shape progression. These changes are described in docs/RULES_0.8.md. This is an independent adaptation, not a product endorsed by Wizards of the Coast. This notice covers the referenced SRD material and does not purport to relicense unrelated original project assets or code.
+
+Additional 0.8.14 adaptations: shared mana recovery, short real-time ritual channels, session-only familiar and Alarm, modified Magician path, trained-equipment feats and four Wild Shape forms. See docs/PROTOCOL_0.8.14.md and README.md for the distinctions from the reference rules. New 0.8.14 icons and visual effects are original project artwork.

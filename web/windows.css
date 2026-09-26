@@ -1,0 +1,101 @@
+/* 0.8.10 — flow-based HUD defaults, arbitrary saved placement and item windows. */
+[data-hud-hidden]{display:none!important}
+#hudLeftRail,#hudRightRail{position:absolute;display:flex;flex-direction:column;gap:8px;pointer-events:none;z-index:6}
+#hudLeftRail{left:18px;width:250px;top:118px}#hudRightRail{right:18px;top:118px;width:190px}
+#hudLeftRail>.world-status,#hudLeftRail>.pvp-bar,#hudLeftRail>#questTracker,#hudRightRail>#minimapCard,#hudRightRail>#battleList{position:relative;inset:auto;transform:none;width:100%;box-sizing:border-box;margin:0;pointer-events:auto}
+#hudLeftRail>.world-status{padding:10px 25px 10px 12px;min-height:72px;display:flex;flex-direction:column;gap:3px}
+#hudLeftRail>.pvp-bar{display:flex;flex-direction:column;align-items:stretch;gap:5px;background:transparent;max-width:none;overflow:visible}
+#hudLeftRail .safety-button{align-self:flex-start;max-width:100%}#hudLeftRail .target-card{max-width:100%;box-sizing:border-box;display:flex;flex-wrap:wrap;gap:4px;padding-right:20px}#targetCard[hidden]{display:none!important}#targetCard>span{flex:1;min-width:0;overflow-wrap:anywhere}#targetCard button{flex-shrink:0}#skullStatus{white-space:normal}
+#hudLeftRail>#questTracker{display:flex;flex-direction:column;padding:10px 25px 10px 12px;text-align:left}#hudRightRail .minimap-card canvas{width:100%;height:auto}
+.hud-visibility{position:relative;display:flex;gap:5px;pointer-events:auto;flex-wrap:wrap;padding-right:24px}
+.hud-visibility>button{background:#17362ded;border:1px solid #a1b48670;color:#e6d99f;min-height:30px;padding:4px 10px;border-radius:4px;font:12px system-ui}
+#hudVisibilityMenu{width:100%;max-height:260px;overflow:auto;background:#153329fa;border:1px solid #bbaa7580;border-radius:5px;padding:8px;box-sizing:border-box}
+#hudVisibilityMenu[hidden]{display:none}#hudVisibilityMenu label{display:flex;align-items:center;gap:7px;padding:4px;font:12px system-ui;color:#deead3;cursor:pointer}#hudVisibilityMenu input{width:16px;min-width:16px;height:16px;margin:0;accent-color:#cbb467}#hudVisibilityMenu small{font:10px/15px system-ui;display:block;color:#aabf9e;padding:5px}
+#effectsPanel:not(.hud-floating){left:var(--status-left,282px);right:226px;top:var(--status-top,118px);bottom:auto;max-height:74px}
+#levelUpCascade:not(.hud-floating){left:var(--levels-x,282px);top:var(--levels-y,162px);bottom:auto;height:var(--levels-height,410px);width:310px}
+#levelUpCascade{z-index:25}#levelUpCascade>.window-grip{right:-2px;top:0;z-index:9}.level-up-counter{margin-right:24px}
+/* Left-hand chat and potion buttons line up with both hotbar rows. */
+.action-dock{align-items:stretch}.action-dock .chat-wrap{height:calc(var(--slot-height)*2 + 4px);display:flex;flex-direction:column;justify-content:flex-end;pointer-events:auto}
+.action-dock .chat-log{flex:1;min-height:0;max-height:none;overflow-y:auto}.action-dock .chat-button{min-height:30px;box-sizing:border-box}.action-dock .quickbar{align-self:stretch;justify-content:space-between}.action-dock .quickbar>button{margin:0}.action-dock .quickbar img{width:29px;height:29px}.potion-button small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.quickbar .potion-button{position:relative}
+[data-movable]{isolation:isolate}.window-handle{cursor:grab}.window-handle:active{cursor:grabbing}.window-grip{position:absolute;top:1px;right:1px;width:19px;min-width:19px;height:22px;min-height:22px;padding:0!important;line-height:20px!important;border:1px solid #b5c69238!important;background:#153028cc!important;color:#c0c9a0!important;font:13px system-ui!important;z-index:8;border-radius:3px;opacity:.25;pointer-events:auto;cursor:grab;touch-action:none}
+[data-movable]:hover>.window-grip,.window-grip:focus-visible{opacity:1}.window-grip:focus-visible{outline:2px solid #e8cb79}.top-actions{position:relative;inset:auto;padding-right:22px}.gold-chip{position:relative;padding-right:21px}
+#actionDock>.window-grip,#spellbar>.window-grip,.quickbar>.window-grip{top:-23px}#effectsPanel>.window-grip{right:-21px}
+.hud-floating{position:fixed!important;left:var(--float-x)!important;top:var(--float-y)!important;right:auto!important;bottom:auto!important;width:var(--float-width)!important;max-width:calc(100vw - 12px)!important;max-height:calc(100dvh - 12px)!important;transform:none!important;margin:0!important;z-index:var(--float-z,110)!important;box-sizing:border-box!important}
+.level-up-card.hud-floating{pointer-events:auto;max-height:min(470px,calc(100dvh - 12px))!important}
+#levelUpCascade.hud-floating{height:min(470px,calc(100dvh - 12px))!important}
+.character-panel.hud-floating,.merchant-panel.hud-floating{height:min(760px,calc(100dvh - 12px));overflow:hidden}
+.sheet-bag-cell{position:relative}.sheet-equipment-card{cursor:pointer}.sheet-equipment-card.selected{border-color:#f3d77d;background:#2c4b38}.sheet-equipment-card:focus-visible{outline:2px solid #f3d77d;outline-offset:2px}
+.item-stack{position:absolute;right:5px;bottom:3px;color:#ffe5a2;background:#10261bd9;border-radius:3px;padding:1px 4px;font:700 12px system-ui}.item-binding{position:absolute;left:3px;top:2px;color:#f4daa0;background:#10261bea;border-radius:3px;padding:1px 4px;font:700 9px system-ui}
+.item-preview-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}.item-preview-head img{width:40px;height:40px}.item-preview-head strong{font:600 17px Georgia,serif}.item-facts{display:flex;flex-direction:column;gap:5px;font:12px/17px system-ui;color:#d1dbc5}.item-actions{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin-top:12px;padding-top:10px;border-top:1px solid #aeaa7344;clear:both}.item-actions button{margin:0!important;min-height:34px;padding:6px 12px!important}
+.sheet-loot-sources{margin-top:12px;font:11px/18px system-ui}.sheet-loot-sources summary{cursor:pointer;color:#e5d493}.sheet-loot-sources>div{padding:2px 0}
+.item-tooltip{position:fixed;z-index:10000;pointer-events:none;max-width:min(330px,calc(100vw - 16px));padding:12px 15px;box-sizing:border-box;border:1px solid #baa86e;background:#122b25fa;box-shadow:0 5px 18px #0007;border-radius:7px;font:12px/18px system-ui;color:#d8e3cd}.item-tooltip[hidden]{display:none}.item-tooltip strong{display:block;font:600 16px/20px Georgia,serif;color:#f1d99e;margin-bottom:8px}.item-tooltip div+div{margin-top:4px}
+.merchant-panel{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(760px,calc(100% - 24px));max-height:calc(100% - 32px);height:min(700px,calc(100% - 32px));z-index:60;background:linear-gradient(135deg,#1b3a2e,#102a23);border:1px solid #a5ad7a99;border-radius:12px;display:flex;flex-direction:column;pointer-events:auto;color:#ebdfb8;box-shadow:0 15px 55px #0007;overflow:hidden}
+.merchant-panel[hidden]{display:none}.merchant-header{display:flex;justify-content:space-between;align-items:center;padding:17px 20px 10px;flex-shrink:0}.merchant-header h2{font:600 28px Georgia,serif;margin:0}.merchant-panel button{color:#e8d8a5;background:#2b4b34;border:1px solid #a9b17966;border-radius:4px;padding:5px 10px;cursor:pointer;font:12px system-ui}.merchant-panel button:disabled{opacity:.4;cursor:default}.merchant-header>button{font-size:23px}.merchant-tabs{display:flex;gap:8px;padding:0 20px;border-bottom:1px solid #c9c89b33;flex-shrink:0}.merchant-tabs>button{flex:1;padding:12px;background:transparent;border:0;border-bottom:2px solid transparent;border-radius:0}.merchant-tabs>button.active{border-bottom-color:#ead392;background:#52705033}.merchant-summary{font:12px system-ui;margin:12px 20px;color:#bed0b3}.merchant-content{padding:0 20px;overflow-y:auto;flex:1;min-height:0;scrollbar-width:thin}.merchant-panel>footer{padding:10px 20px;margin:10px 0 0;flex-shrink:0;justify-content:space-between;background:#142f25}
+.merchant-item{display:grid;grid-template-columns:44px minmax(0,1fr) 100px;align-items:center;gap:12px;padding:10px;margin-bottom:8px;background:#224432;border:1px solid #9cab7344;border-radius:5px}.merchant-item>img{width:44px;height:44px}.merchant-item-text strong{font:600 15px Georgia,serif;display:block}.merchant-item-text small{font:11px/16px system-ui;display:block;color:#becbab;margin-top:6px}.merchant-item-actions{display:flex;flex-direction:column;gap:5px}.merchant-item-actions>span{font:11px system-ui;text-align:center;color:#ddc783}
+@media(max-width:700px) and (orientation:portrait){
+ #hudLeftRail{left:10px;width:192px;gap:5px}#hudRightRail{right:10px;width:135px;gap:5px}#hudLeftRail>.world-status{padding:6px 22px 6px 9px;min-height:0}#hudLeftRail>.world-status strong{font-size:14px}#hudLeftRail>.world-status span{font-size:10px;line-height:14px}
+ #hudLeftRail>#questTracker{padding:6px 22px 6px 9px;gap:2px}#hudLeftRail>#questTracker strong{font-size:12px;line-height:16px}#questTrackerProgress,#questTracker .tracker-eyebrow{display:none!important}#questTrackerDirection{font-size:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+ #hudLeftRail .safety-button{font-size:10px;padding:4px 8px}.target-card{font-size:10px}.hud-visibility>button{font-size:10px;min-height:27px;padding:3px 8px}#hudVisibilityMenu{max-height:180px}#battleList{padding:6px}.battle-enemy{font-size:9px}.battle-list .section-label{font-size:8px}
+ #effectsPanel:not(.hud-floating){left:12px;right:12px;top:calc(var(--status-top,140px) - 32px);height:26px;max-height:26px;display:flex;gap:4px}#effectsPanel .effects-row{min-width:0;flex:1}#effectsPanel .effect-chip{font-size:8px;min-height:23px}#effectsPanel>.window-grip{right:0}
+ #levelUpCascade:not(.hud-floating){width:calc(100% - 24px)}.level-up-header{min-height:32px}.level-up-title{font-size:14px!important;min-height:32px}.level-up-footer{padding:5px}.level-up-close{min-height:30px}
+ .action-dock .chat-wrap{height:29px}.action-dock .chat-log{max-height:110px}.action-dock .quickbar{align-self:auto;justify-content:flex-start}.action-dock .quickbar>.window-grip{left:98px;top:10px}.action-dock #spellbar>.window-grip{left:110px;right:auto;top:-32px}
+ .merchant-header{padding:12px}.merchant-header h2{font-size:23px}.merchant-tabs{padding:0 12px}.merchant-summary{margin:10px 12px}.merchant-content{padding:0 10px}.merchant-item{grid-template-columns:35px minmax(0,1fr) 78px;gap:7px;padding:8px}.merchant-item>img{width:35px;height:35px}.merchant-item-text strong{font-size:13px}.merchant-item-actions button{font-size:10px;padding:5px}.merchant-panel>footer{padding:8px 12px}.item-facts{font-size:11px}.item-preview-head strong{font-size:15px}
+ .window-grip{opacity:.65}
+}
+@media(max-height:540px) and (orientation:landscape){
+ #hudLeftRail{left:10px;width:208px;gap:4px}#hudLeftRail>.world-status{padding:5px 23px 5px 9px;min-height:0}#hudLeftRail>.world-status strong{font-size:13px}#hudLeftRail>.world-status span{font-size:9px;line-height:12px}#hudLeftRail>#questTracker{padding:5px 23px 5px 9px}#hudLeftRail #questTrackerProgress,#hudLeftRail #questTrackerDirection,#hudLeftRail .tracker-eyebrow{display:none}#hudLeftRail>#questTracker strong{font-size:12px}
+ #hudRightRail{width:134px;right:9px}#hudVisibilityMenu{max-height:124px}.hud-visibility>button{min-height:24px;font-size:10px;padding:2px 6px}#levelUpCascade:not(.hud-floating){width:240px}.action-dock{left:230px;right:149px}.action-dock .chat-wrap{height:23px}#effectsPanel:not(.hud-floating){right:154px;max-height:46px}#effectsPanel .effect-chip{font-size:8px}#controlTip{display:none}
+ #hudLeftRail .target-card{font-size:10px}#hudLeftRail .safety-button{font-size:9px;padding:3px 6px}
+}
+
+@media(max-width:700px) and (orientation:portrait){
+ .topbar .top-actions:not(.hud-floating){position:relative;inset:auto;margin-left:0;flex-basis:100%;justify-content:flex-end}
+}
+
+/* Existing status-dependent legacy rules must not re-position flow children. */
+#hudLeftRail>.world-status:not(.hud-floating),#hudLeftRail>.pvp-bar:not(.hud-floating),#hudLeftRail>#questTracker:not(.hud-floating),#hudRightRail>#minimapCard:not(.hud-floating),#hudRightRail>#battleList:not(.hud-floating){inset:auto!important;position:relative!important}
+@media(max-width:700px) and (orientation:portrait){
+ .topbar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:7px;align-items:start}
+ .topbar .player-card:not(.hud-floating){width:100%;max-width:none;box-sizing:border-box}
+ .topbar .gold-chip:not(.hud-floating){grid-column:2;max-width:90px;gap:4px;font-size:11px;margin-top:8px;white-space:nowrap}
+ .topbar .top-actions:not(.hud-floating){grid-column:1/-1;position:relative;inset:auto;margin:0;justify-content:flex-end}
+ #hudLeftRail,#hudRightRail{scrollbar-width:thin;overscroll-behavior:contain}
+ #hudLeftRail>#levelUpCascade:not(.hud-floating){position:relative;inset:auto;width:100%;flex-shrink:0;height:var(--levels-height,190px);margin-top:3px}
+ #hudLeftRail>*{flex-shrink:0}
+ #hudLeftRail>.hud-visibility{position:sticky;top:0;z-index:40;background:#163326e8;border-radius:4px}
+ #levelUpCascade .level-up-title{font-size:12px!important}.level-up-row{font-size:10px}
+}
+
+.quickbar>.potion-button:disabled{opacity:.62;filter:saturate(.65)}
+/* 0.8.11 atlas: controls never dismiss the world window. */
+.atlas-tools { display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:8px 0; }
+.atlas-tools button { padding:7px 10px; min-height:34px; }
+.atlas-zoom { margin-left:auto; color:var(--gold, #efd49a); font-size:12px; }
+.atlas-canvas { display:block; width:100%; height:auto; aspect-ratio:700/505; cursor:zoom-in; touch-action:none; }
+.atlas-canvas:active { cursor:grabbing; }
+.atlas-canvas.choosing-goal { cursor:crosshair; }
+.atlas-help { font-size:12px; line-height:1.5; color:#bdd3bd; margin:6px 0 12px; }
+/* Open books are windows, not part of the background HUD. Keep their controls
+   reachable above the left rail also when the viewport changes to portrait. */
+#sidePanel:not(.hud-floating),#helpPanel:not(.hud-floating){z-index:65}
+.atlas-tools button{font:11px system-ui,sans-serif;padding:6px 10px;border:1px solid #91a47766;border-radius:4px;color:#d3dfc0;background:#294432;cursor:pointer}
+.atlas-tools button:hover:not(:disabled),.atlas-tools button.active{border-color:#d7bd75;background:#435235;color:#fff0c3}
+.atlas-tools button:disabled{opacity:.4;cursor:default}
+.atlas-tools button:focus-visible{outline:2px solid #e1ca87;outline-offset:2px}
+#sidePanel .panel-head{padding-left:36px}
+#sidePanel .panel-head>.panel-grip{left:7px;right:auto;top:8px;opacity:.8}
+/* A landscape phone needs a taller book: the former HUD-sized slot left only
+   a thin strip of map. The left part of the world/joystick remains available. */
+@media(max-height:550px) and (min-width:560px){
+ #gameUI #sidePanel:not(.hud-floating){top:10px;bottom:10px;max-height:calc(100dvh - 20px)}
+}
+@media(max-height:550px) and (min-width:560px){
+ #progressionView:has(#atlasCanvas)>.eyebrow{display:none}
+ #progressionView:has(#atlasCanvas)>#progressionSubtitle{font-size:13px;line-height:1.3;margin:0 0 3px}
+ #progressionView:has(#atlasCanvas)>#progressionNav{margin:3px 0;padding:3px 0}
+ #progressionView:has(#atlasCanvas)>#progressionNav button{padding:6px 9px}
+ #progressionContent:has(#atlasCanvas)>.panel-tip{display:none}
+ #progressionContent .atlas-tools{gap:4px;margin:4px 0}
+ #progressionContent .atlas-tools button{min-height:30px;padding:5px 8px}
+ #progressionContent .atlas-zoom{display:none}
+}
