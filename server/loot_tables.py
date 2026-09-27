@@ -69,9 +69,10 @@ def roll(vocation, spec, rng):
         result.append(('item', ordinary(vocation, table['tier'], rng)))
     if rng.random() < table['trophy_chance']:
         result.append(('item', 'trophy_'+table['family']))
-    if rng.random() < table['potion_chance']:
+    # Keep the old health drop probability; the retired mana half drops nothing.
+    if rng.random() < table['potion_chance']*.5:
         suffix = '_3' if table['tier'] >= 7 else '_2' if table['tier'] >= 4 else ''
-        result.append(('potion', rng.choice(['health_potion', 'mana_potion'])+suffix))
+        result.append(('potion', 'health_potion'+suffix))
     if rng.random() < table['unique_chance']:
         result.append(('item', unique(vocation, table['family'], rng)))
     if rng.random() < table['legendary_chance']:

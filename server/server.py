@@ -76,16 +76,16 @@ OBSTACLES = [
 SITES, CHESTS = [], []
 SAFE_ZONE = {**SPAWN, "radius": 260}
 MERCHANT = {"x": 680, "y": 1180, "name": "Kupiec", "radius": 150,
-            "prices": {"health_potion": 15, "mana_potion": 12}}
+            "prices": {"health_potion": 15}}
 INVENTORY_CAP, PARTY_CAP, PARTY_RANGE = 40, 4, 650
 PVP_RULES = {"min_level": 8, "white_seconds": 120, "combat_seconds": 20,
              "red_kills": 3, "crime_window_seconds": 86400, "red_seconds": 86400,
              "normal_gold_loss": .05, "normal_xp_loss": .10,
              "red_gold_loss": .20, "red_xp_loss": .20,
              "red_item_loss": "one_unequipped; transferred_to_killer_if_space_else_destroyed"}
-REST_RULES = {"short_seconds": 6, "long_seconds": 15,
-              "short_hp_fraction": .25, "short_mana_fraction": .25,
-              "pve_delay_seconds": 3, "long_safe_only": True}
+REST_RULES = {"short_seconds": 15, "long_seconds": 15,
+              "short_hp_fraction": 1.0, "short_mana_fraction": 1.0,
+              "cooldown_seconds": 60, "pve_delay_seconds": 3, "long_safe_only": True}
 
 
 def rest_block_status(p, now, simulation_time):
@@ -105,11 +105,13 @@ def rest_block_status(p, now, simulation_time):
         return "combat_pvp", max(pvp, pve)
     if pve:
         return "combat_pve", pve
+    cooldown = max(0, p.rest_cooldown_until-now)
+    if cooldown:
+        return "cooldown", cooldown
     return "", 0
 
 
-POTIONS = {"health_potion": {"name": "Mikstura zdrowia", "price": 15, "restore": 65},
-           "mana_potion": {"name": "Mikstura many", "price": 12, "restore": 55}}
+POTIONS = {"health_potion": {"name": "Mikstura zdrowia", "price": 15, "restore": 65}}
 CLASSES = dict(dnd_content.CLASS_SPECS)
 
 WEAPONS = {"sword": {"range": 108, "cooldown": combat_rules.ROUND_SECONDS}, "bow": {"range": 310, "cooldown": combat_rules.ROUND_SECONDS},
@@ -165,7 +167,7 @@ QUESTS = [
     {"id": "q_rats", "title": "Szczury na łąkach", "description": "Mira prosi o oczyszczenie łąki za południowo-wschodnim wyjściem. Pokonaj 3 szczury i wróć po zapasy.",
      "npc_id": "strazniczka", "requires": [],
      "objectives": [{"type": "kill", "target": "rat", "label": "Szczury na Słonecznych Łąkach", "required": 3, "x": 810, "y": 1460}],
-     "reward": {"xp": 55, "gold": 25, "potions": {"health_potion": 2, "mana_potion": 1}}},
+     "reward": {"xp": 55, "gold": 25, "potions": {"health_potion": 2}}},
     {"id": "q_mill", "title": "Droga do Starego Młyna", "description": "Oren zaznaczył młyn na południowym zachodzie. Odkryj go, wróć do kartografa i odbierz lepszą broń dla swojej klasy.",
      "npc_id": "kartograf", "requires": ["q_rats"],
      "objectives": [{"type": "discover", "target": "old_mill", "label": "Odkryj Stary Młyn", "required": 1, "x": 340, "y": 1640}],
@@ -211,9 +213,8 @@ loot_content.configure(ITEMS, ENEMY_TYPES, content.TIER_LEVELS)
 hunt_content.place(content, OBSTACLES, LANDMARKS)
 content.VERSION = "0.8.18"
 WIDTH, HEIGHT = content.WIDTH, content.HEIGHT
-for prefix, label in (("health", "zdrowia"), ("mana", "many")):
-    for tier, level, amount, cost in ((2, 20, 220, 45), (3, 50, 520, 95), (4, 80, 950, 165)):
-        POTIONS[f"{prefix}_potion_{tier}"] = {"name": f"Mikstura {label} {tier}", "price": cost, "restore": amount, "min_level": level}
+for tier, level, amount, cost in ((2, 20, 220, 45), (3, 50, 520, 95), (4, 80, 950, 165)):
+    POTIONS[f"health_potion_{tier}"] = {"name": f"Mikstura zdrowia {tier}", "price": cost, "restore": amount, "min_level": level}
 
 dnd_content.configure(content, CLASSES, POTIONS)
 inventory_rules.configure(ITEMS, POTIONS)
@@ -276,6 +277,7 @@ class Player:
     legacy_medium_grace: bool = False
     casting_channel: dict = field(default_factory=dict)
     rest_state: dict = field(default_factory=dict)  # Session only; never persisted.
+    rest_cooldown_until: float = 0  # Persisted wall-clock deadline, shared by all rest entry points.
     familiar_state: dict = field(default_factory=dict)
     caster_messages: list = field(default_factory=list)
     form_attack_index: int = 0
@@ -309,9 +311,9 @@ class Player:
     inventory: list = field(default_factory=list)
     equipment: dict = field(default_factory=lambda: {"weapon": "", "armor": "", "ring": "", "shield": ""})
     inventory_rules_version: int = 0
-    potion_slots: dict = field(default_factory=lambda: {"q":"health_potion", "r":"mana_potion"})
+    potion_slots: dict = field(default_factory=lambda: {"q":"health_potion"})
     loot_discoveries: dict = field(default_factory=dict)
-    potions: dict = field(default_factory=lambda: {"health_potion": 3, "mana_potion": 3})
+    potions: dict = field(default_factory=lambda: {"health_potion": 3})
     facing: list = field(default_factory=lambda: [0, 1])
     attack_facing: list = field(default_factory=lambda: [0, 1])
     speech_text: str = ""
@@ -464,6 +466,7 @@ class Player:
             result.update({"rest": {"kind": self.rest_state["kind"], "total": self.rest_state["total"],
                                      "remaining": round(max(0, self.rest_state["until"]-now), 3)} if self.rest_state else {},
                            "rest_block_reason": rest_reason, "rest_block_remaining": round(rest_wait, 3),
+                           "rest_cooldown_remaining": round(max(0, self.rest_cooldown_until-now), 3),
                            "rest_safe": any(near(self, zone) for zone in content.CITIES)})
             result.update({"action_remaining": round(max(0, self.attack_cooldown_until-now), 3),
                            "action_duration": combat_rules.ROUND_SECONDS,
@@ -516,7 +519,7 @@ class Player:
         return {key: getattr(self, key) for key in (
             "primal_order", "training_feats", "caster_rules_version", "legacy_medium_grace",
             "fighting_style", "weapon_grip", "fighter_rules_version",
-            "level_up_batches", "rules_version", "mana_rules_version", "mana_recovery_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
+            "level_up_batches", "rules_version", "mana_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
             "site_cooldowns", "wind_until", "ward_until", "premium_demo_until", "floor", "skill_tries", "promoted", "soul", "runes", "bank_gold", "depot", "home_city", "blessed", "mastery", "spell_cooldowns", "spell_ready", "rune_ready", "haste_until", "transition_ready",
             "x", "y", "hp", "mana", "level", "xp", "gold", "class_id", "class_chosen", "weapon", "kills", "boss_kills",
             "inventory_rules_version", "potion_slots", "loot_discoveries",
@@ -1001,6 +1004,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                         "disconnected": "Odpoczynek wymaga połączenia z grą.",
                         "moving": "Zatrzymaj się, aby rozpocząć odpoczynek.",
                         "channel": "Najpierw zakończ rzucanie rytuału.",
+                        "cooldown": f"Następny odpoczynek za {math.ceil(remaining)} s.",
                         "combat_pvp": f"Odpoczynek po walce PvP za {math.ceil(remaining)} s.",
                         "combat_pve": f"Odpoczynek po walce za {math.ceil(remaining)} s."}
             return await self.notice(p, messages[reason])
@@ -1010,7 +1014,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         self.stop_auto(p)
         p.rest_state = {"kind": kind, "total": seconds, "until": now+seconds,
                         "x": p.x, "y": p.y, "floor": p.floor}
-        await self.notice(p, f'{"Krótki" if kind == "short" else "Długi"} odpoczynek · {seconds} s. Ruch lub akcja przerywa odpoczynek.')
+        await self.notice(p, f'Pełny odpoczynek · {seconds} s. Ruch lub akcja przerywa odpoczynek.')
 
     def tick_rest(self, p):
         rest = p.rest_state
@@ -1030,11 +1034,13 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         else:
             p.hp = min(p.max_hp, p.hp+p.max_hp*REST_RULES["short_hp_fraction"])
             p.mana = min(p.max_mana, p.mana+p.max_mana*REST_RULES["short_mana_fraction"])
+        # Start the shared lock only when resources were actually awarded. Save
+        # the absolute deadline alongside those resources in the same transaction.
+        p.rest_cooldown_until = now+REST_RULES["cooldown_seconds"]
         with self.db:
             self.save_player(p)
         self.combat_effect(p, "heal", radius=65, duration=.9)
-        self.caster_message(p, "Odpoczynek zakończony: pełne zdrowie i mana." if rest["kind"] == "long"
-                            else "Odpoczynek zakończony: +25% maksymalnego zdrowia i many.")
+        self.caster_message(p, "Odpoczynek zakończony: pełne zdrowie i mana.")
 
     def begin_action(self, p, bonus=False):
         self.cancel_rest(p)
@@ -1204,7 +1210,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         if kind == "potion_bind":
             slot = data.get("slot")
             template = data.get("item", "")
-            if slot not in ("q", "r") or not isinstance(template, str):
+            if slot != "q" or not isinstance(template, str):
                 return await self.notice(p, "Nieznany skrót mikstury.")
             if template and (template not in POTIONS or not inventory_rules.count(p, template) or p.level < POTIONS[template].get("min_level", 1)):
                 return await self.notice(p, "Wybierz posiadaną miksturę odpowiednią dla swojego poziomu.")
@@ -1260,11 +1266,13 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                 p.inventory.append(make_item(kind_id))
             p.gold -= spec["price"]
         elif kind == "potion":
-            kind_id = p.potion_slots.get(data.get("slot"), "") if "slot" in data and isinstance(data.get("slot"), str) else data.get("item")
+            if "slot" in data and data["slot"] != "q":
+                return
+            kind_id = p.potion_slots.get("q", "") if "slot" in data else data.get("item")
             spec = POTIONS.get(kind_id) if isinstance(kind_id, str) else None
             if spec is None or p.level < spec.get("min_level", 1) or not p.potions.get(kind_id) or self.now() < p.potion_cooldown_until:
                 return
-            attr, maximum = ("hp", p.max_hp) if kind_id.startswith("health_potion") else ("mana", p.max_mana)
+            attr, maximum = "hp", p.max_hp
             if getattr(p, attr) >= maximum:
                 return
             self.cancel_rest(p)

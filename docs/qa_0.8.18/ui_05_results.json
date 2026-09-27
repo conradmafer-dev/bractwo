@@ -1,0 +1,38 @@
+{
+  "revision": "UI_05",
+  "date": "2026-09-27",
+  "scope": "Targeted rest, cooldown and health-only potion checks. No full regression rerun.",
+  "settings": {"rest_seconds": 15, "hp_restored": "full", "mana_restored": "full", "cooldown_seconds_after_completion": 60},
+  "targeted_tests": [
+    {
+      "file": "tests/test_rest_0818.py",
+      "selected_cases_passed": 6,
+      "coverage": "Full recovery after 15 seconds, other cooldowns unchanged, PvE/PvP gates, cancellation without reward or cooldown, shared 60-second cooldown and exact boundary, old saves/reconnect/restart/owner_delta, published rest fields.",
+      "run_note": "Initial run passed five cases; the persistence case encountered a Windows SQLite fixture cleanup error. The test now closes its backup connection explicitly; rerunning that case passed."
+    },
+    {
+      "file": "tests/test_health_potions_0818.py",
+      "selected_cases_passed": 6,
+      "coverage": "Health-only catalog, merchant/quest/loot sources, preserved health drop probability, retired mana stacks removed from inventory and depot, legacy counts imported once, Q preserved or repaired, mana and R potion commands rejected."
+    },
+    {
+      "file": "tests/test_inventory_windows_0810.py",
+      "selected_cases_passed": 6,
+      "coverage": "Selected existing health potion purchase, sale, Q binding/use, cooldown and legacy migration checks."
+    },
+    {
+      "file": "tests/test_rest_ui_0818.cjs",
+      "selected_cases_passed": 6,
+      "coverage": "Published rest rules, combat/active/dead gates, full recovery defaults and the final fractional second of cooldown."
+    }
+  ],
+  "syntax_passed": ["web/game.js", "web/rest_ui.js", "web/windows.js", "web/inventory_ui.js"],
+  "source_review": [
+    "HUD has one potion button Q; R invokes restUI.open with existing typing and repeat guards.",
+    "Rest has no choice dialog, keeps the animation and above-character progress, and displays the cooldown on its button.",
+    "The inventory offers Q assignment only; mana potion controls and shop rows are removed.",
+    "The remaining active-backend mana_potion identifier references detect retired items for cleanup and rejection."
+  ],
+  "not_run": ["Physical phone session", "Browser gameplay session", "Full regression suites"],
+  "deployment": "Local source and packages only. No live database edited, push or deployment performed."
+}

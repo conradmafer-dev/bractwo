@@ -69,9 +69,9 @@
   if(item.mastery_name){const more=node('details',undefined,'item-mastery-info');more.append(node('summary',item.mastery_name),node('p',item.mastery_description||''));pane.append(more);}
   const actions=node('footer',undefined,'item-actions');
   const worn=Object.entries(p.equipment||{}).find(([,uid])=>String(uid)===String(item.uid));
-  if(item.slot==='potion'){
+  if(item.slot==='potion'&&item.potion_kind==='health'){
    actions.append(button('Użyj',()=>h.send({type:'potion',item:item.template}),!p.alive||p.level<(item.min_level||1)));
-   for(const slot of ['q','r'])actions.append(button((p.potion_slots?.[slot]===item.template?'✓ ':'Przypisz ')+slot.toUpperCase(),()=>h.send({type:'potion_bind',slot,item:item.template}),!p.alive||p.level<(item.min_level||1)));
+   actions.append(button(p.potion_slots?.q===item.template?'✓ Q':'Przypisz Q',()=>h.send({type:'potion_bind',slot:'q',item:item.template}),!p.alive||p.level<(item.min_level||1)));
   }else if(worn)actions.append(button('Zdejmij',()=>h.send({type:'unequip',slot:worn[0]}),!p.alive||!!p.form));
   else if(['weapon','armor','ring','shield'].includes(item.slot))actions.append(button('Załóż',()=>h.send({type:'equip',uid:item.uid}),!p.alive||!!p.form||!!item.preview?.equip_error||p.level<(item.min_level||1)));
   if(worn?.[0]==='weapon'&&item.versatile_dice){
@@ -99,6 +99,7 @@
    for(const b of tabs.children){b.classList.toggle('active',b.dataset.tradeTab===tab);b.setAttribute('aria-selected',String(b.dataset.tradeTab===tab));}
    const scroll=body.scrollTop;body.replaceChildren();
    let items=tab==='buy'?Object.entries(w.items||{}).filter(([,spec])=>Number.isFinite(spec.price)).map(([key,spec])=>({...spec,template:key,preview:p.item_previews?.[key]})):p.inventory.filter(i=>!Object.values(p.equipment||{}).includes(i.uid));
+   items=items.filter(item=>item.slot!=='potion'||item.potion_kind==='health');
    for(const item of items){const row=node('article',undefined,'merchant-item');row.dataset.template=item.template;
     const img=node('img');img.src=item.icon||'assets/equipment/empty.svg';img.alt='';row.append(img);
     const text=node('div',undefined,'merchant-item-text');text.append(node('strong',item.name+(item.quantity>1?' ×'+item.quantity:'')),node('small',(item.effect_summary||item.armor_summary||item.damage_dice||'')+(item.min_level>1?' · Poziom '+item.min_level:'')));row.append(text);

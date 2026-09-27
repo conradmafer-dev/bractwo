@@ -2,6 +2,12 @@
 
 Baza: 0.8.17 z poprawką Mobile01. Zachowano układ telefonu, zasady różdżki i dotychczasowe postacie.
 
+**UI_05 — pełna regeneracja i cooldown:** dotychczasowy krótki odpoczynek trwa teraz 15 sekund i przywraca całe HP oraz manę. Po udanym ukończeniu zaczyna się wspólny cooldown 60 sekund, zapisany przy postaci i widoczny na przycisku. Ponowne logowanie ani starsze polecenie długiego odpoczynku nie omijają blokady. Przerwanie nie przyznaje regeneracji ani nie uruchamia cooldownu. Nadal wystarcza jedno kliknięcie, a pasek i animacja pozostają nad postacią. Wpisy UI_04–UI_02 poniżej są historią wcześniejszych poprawek.
+
+**Mikstury i skróty w UI_05:** usunięto mikstury many ze sklepu, łupów, nagród i wyposażenia. Pozostaje jeden slot mikstury zdrowia **Q**; klawisz **R** rozpoczyna lub przerywa odpoczynek. Starsze mikstury many są usuwane przy odczycie plecaka i depozytu, bez zmiany pozostałych przedmiotów. Poprawne przypisanie mikstury zdrowia do Q zostaje zachowane; jeśli Q wskazywało dawną miksturę many, wraca do mikstury zdrowia. Stare polecenia przypisania lub użycia mikstury pod R są odrzucane.
+
+**UI_04 — odpoczynek jednym kliknięciem:** przycisk Odpoczynek natychmiast wysyła polecenie krótkiego odpoczynku. Usunięto okno wyboru krótkiego i długiego odpoczynku. Dotyczy to również przycisku u kupca. Ponowne kliknięcie przerywa aktywny odpoczynek. Serwer nadal sprawdza blokadę po walce i informuje o pozostałym czasie. Animacja i pasek nad postacią są bez zmian. Poniższe wpisy UI_03 i UI_02 opisują wcześniejsze poprawki.
+
 **UI_03 — joystick, czary i medytacja:** czar z paska oraz najczęściej używany czar reagują na niezależne dotknięcie drugim palcem, gdy pierwszy obsługuje joystick. Przesunięcie paska lub anulowanie gestu nie rzuca czaru; dodatkowe zdarzenie kliknięcia nie powtarza akcji. Po wyborze rodzaju odpoczynku okno zamyka się od razu. Postęp jest nad własną postacią, z animacją medytacji, niebieskim kręgiem i unoszącymi się kroplami many. Efekt kończy się zgodnie ze stanem serwera. Zachowano układ UI_02 i dotychczasowe czasy oraz zasady regeneracji. Sprawdzenie tej poprawki ograniczono do celowanych testów Node i składni; raport: `docs/qa_0.8.18/ui_03_results.json`.
 
 **UI_02 — korekta rozmieszczenia przycisków:** odpoczynek przeniesiono nad Rozmawiaj na telefonie, na wysokość Czary i ulubionego czaru, oraz nad K Czary na komputerze. Na wąskim ekranie pionowym przycisk przechodzi wyżej, gdy ten sam rząd jest zajęty; nie zasłania istniejących przycisków. Ikona ekwipunku z górnego menu jest ukryta, a skrót I działa jak wcześniej. Reszta gry jest bez zmian. Zgodnie z prośbą użytkownika tę korektę sprawdzono tylko pod kątem składni JavaScript i zachowania powiązań przycisków; poniższe rozbudowane wyniki testów dotyczą poprzedniego wydania 0.8.18.
@@ -12,14 +18,15 @@ Przycisk z księżycem **Odpoczynek** znajduje się nad K Czary na komputerze i 
 
 | Rodzaj | Czas | Efekt po ukończeniu | Miejsce |
 | --- | --- | --- | --- |
-| Krótki | 6 sekund | +25% maksymalnego zdrowia i +25% maksymalnej many, do ich limitów | Także w terenie |
-| Długi | 15 sekund | Pełne zdrowie i mana | Bezpieczna osada |
+| Pełny | 15 sekund | Całe HP i mana; następnie 60 sekund cooldownu | Także w terenie |
 
-- Po starciu z potworem można zacząć po **3 sekundach**. Panel pokazuje pozostały czas blokady.
+- Jedno kliknięcie **Odpoczynek** lub naciśnięcie **R** rozpoczyna pełny odpoczynek bez wyboru rodzaju i bez dodatkowego panelu.
+- Cooldown trwa **60 sekund od ukończenia**. Licznik jest widoczny na przycisku, który w tym czasie nie rozpoczyna kolejnego odpoczynku. Serwer zapisuje blokadę przy postaci, więc obowiązuje ona także po ponownym zalogowaniu i restarcie serwera; upływa również poza grą.
+- Po starciu z potworem można zacząć po **3 sekundach**. Przy wcześniejszym kliknięciu komunikat pokazuje pozostały czas blokady.
 - Walka z graczem nadal wymaga odczekania pełnej dotychczasowej blokady **20 sekund**.
-- Odpoczynek jest bezpłatny. Ruch, walka i rozpoczęcie innej wykonywanej czynności przerywają go. Można też ponownie nacisnąć przycisk **Odpoczynek**, aby przerwać regenerację.
-- Po wyborze krótkiego lub długiego odpoczynku panel natychmiast się zamyka. Pasek i pozostały czas widać nad własną postacią. Niebieski krąg i krople many towarzyszą medytacji; przemieniony druid zachowuje formę zwierzęcia i otrzymuje ten sam efekt regeneracji.
-- Zdrowie i mana są przyznawane dopiero po ukończeniu. Zamknięcie panelu nie przerywa odpoczynku; ruch po powrocie do gry już tak.
+- Odpoczynek jest bezpłatny. Ruch, walka i rozpoczęcie innej wykonywanej czynności przerywają go. Można też ponownie nacisnąć przycisk **Odpoczynek** lub **R**, aby przerwać regenerację.
+- Pasek i pozostały czas widać nad własną postacią. Niebieski krąg i krople many towarzyszą medytacji; przemieniony druid zachowuje formę zwierzęcia i otrzymuje ten sam efekt regeneracji.
+- Całe zdrowie i mana są przyznawane dopiero po ukończeniu. Przerwany odpoczynek nie przyznaje nagrody i nie uruchamia cooldownu.
 - Odpoczynek nie zeruje odnowień czarów i zdolności. Pasywna regeneracja many, ochrona PvP, handel i zasady bezpiecznego wylogowania zachowują własne warunki.
 
 ## Blokada paneli i joystick
@@ -59,7 +66,7 @@ Pełna paczka źródłowa dodatkowo zawiera testy, narzędzia, historyczną doku
 
 ## Weryfikacja
 
-Wyniki znajdują się w `docs/qa_0.8.18/`. Raport `ui_03_results.json` dotyczy bieżącej poprawki. Poniższe szersze kontrole przeprowadzono dla wcześniejszego wydania 0.8.18; nie powtarzano ich dla UI_03.
+Wyniki znajdują się w `docs/qa_0.8.18/`. Raport `ui_05_results.json` dotyczy bieżącej poprawki. Poniższe szersze kontrole przeprowadzono dla wcześniejszego wydania 0.8.18; nie powtarzano ich dla UI_03–UI_05.
 
 Przeszło wtedy 296 unikalnych testów serwera, 56 testów JavaScript oraz 4 testy tras HTTP i plików aplikacji. Dwa scenariusze WebSocket przekroczyły limit czasu przy równoległym obciążeniu komputera; powtórzone osobno przeszły bez zmiany testów lub ich limitów. Raporty zachowują oba wyniki.
 

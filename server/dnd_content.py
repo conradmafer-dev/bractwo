@@ -347,8 +347,6 @@ def configure(content, classes, potions):
     for i, dice in enumerate(([2,4,2],[4,4,4],[8,4,8],[10,4,20]),1):
         key='health_potion'+('' if i==1 else '_'+str(i))
         potions[key].update(dice=dice,restore=int(dice[0]*(dice[1]+1)/2+dice[2]))
-    for i, amount in enumerate((18,35,60,100),1):
-        potions['mana_potion'+('' if i==1 else '_'+str(i))]['restore']=amount
 
 
 # Small client-independent status catalogue. Timers are sent by the server,

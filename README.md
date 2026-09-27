@@ -2,12 +2,13 @@
 
 Gra RPG online na komputer i telefon. Aktualizacja bazuje na 0.8.17 z mobilnym układem Mobile01.
 
-Poprawka **UI_03**: można trzymać joystick i dotknąć czaru drugim palcem. Po wybraniu krótkiego lub długiego odpoczynku okno natychmiast się zamyka. Postęp widać nad własną postacią, która medytuje w niebieskim kręgu z unoszącymi się kroplami many. Ponowne naciśnięcie Odpoczynek przerywa regenerację.
+Poprawka **UI_05**: kliknięcie **Odpoczynek** lub klawisz **R** rozpoczyna pełną regenerację, bez okna wyboru. Trwa ona **15 sekund** i odnawia całe HP oraz manę. Po ukończeniu obowiązuje **60 sekund cooldownu**, widocznego na przycisku. Postęp jest nad własną postacią, która medytuje w niebieskim kręgu z unoszącymi się kroplami many. Ponowne kliknięcie lub R przerywa odpoczynek bez nagrody i bez cooldownu. Zachowano obsługę joysticka i czaru dotykanego drugim palcem z UI_03.
+
+Mikstury many usunięto ze sklepu, łupów i wyposażenia. Pozostaje jeden slot mikstury zdrowia pod **Q**. Przy odczycie starszej postaci stare mikstury many są usuwane z plecaka i depozytu; pozostałe przedmioty są zachowane.
 
 Zachowano układ **UI_02**: odpoczynek nad Rozmawiaj na telefonie i nad K Czary na komputerze. Skrót I nadal otwiera ekwipunek; jego dodatkowa ikona w górnym menu jest ukryta.
 
-- **Krótki odpoczynek:** 6 sekund, odzyskuje 25% maksymalnego zdrowia i many.
-- **Długi odpoczynek:** 15 sekund, pełne zdrowie i mana w bezpiecznej osadzie.
+- **Pełny odpoczynek:** 15 sekund, całe HP i mana, także w terenie. Cooldown po ukończeniu: 60 sekund, zachowany po ponownym zalogowaniu.
 - Po walce z potworami odpoczynek jest dostępny po **3 sekundach**. Blokada po PvP nadal trwa 20 sekund.
 - **Pełny ekran:** przycisk na stronie logowania i podczas gry, także bezpośrednio na telefonie.
 - **Zainstaluj grę:** aplikacja PWA uruchamiana z ikony. Rozgrywka wymaga internetu.

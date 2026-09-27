@@ -13,11 +13,10 @@ def configure(items, potions):
     labels = ('mała', 'większa', 'potężna', 'najwyższa')
     for key, spec in potions.items():
         tier = int(key.rsplit('_', 1)[1]) if key[-1].isdigit() else 1
-        health = key.startswith('health')
-        spec.update(name=('Mikstura zdrowia' if health else 'Mikstura many')+' · '+labels[tier-1],
-                    icon=f'assets/equipment/{key}.svg', potion_kind='health' if health else 'mana')
+        spec.update(name='Mikstura zdrowia · '+labels[tier-1],
+                    icon=f'assets/equipment/{key}.svg', potion_kind='health')
         dice = spec.get('dice')
-        effect = f"{dice[0]}k{dice[1]}+{dice[2]} HP" if dice else f"{spec['restore']} many"
+        effect = f"{dice[0]}k{dice[1]}+{dice[2]} HP" if dice else f"{spec['restore']} HP"
         items[key] = dict(spec, slot='potion', class_ids=['knight','ranger','mage','druid'],
                           min_level=spec.get('min_level',1), value=max(1,spec['price']//3),
                           rarity=('common','uncommon','rare','epic')[tier-1], stack_limit=STACK_LIMIT,
@@ -42,12 +41,20 @@ def sync(p, potions):
     p.potions={key:count(p,key) for key in potions}
 
 
+def retired_potion(template):
+    return isinstance(template,str) and (template=='mana_potion' or template.startswith('mana_potion_'))
+
+
 def ensure(p, items, potions, make_item):
-    """One-time migration; a full old bag never destroys existing supplies.
+    """Migrate surviving supplies without dropping gear from a full old bag.
 
     A migrated overfull bag is temporarily allowed. New stacks cannot enter it
     until space is made. The version prevents duplication on subsequent logins.
     """
+    # Retired mana stacks disappear from both bags, including already migrated saves.
+    # Keep the original migration version so stale compatibility counts are not reimported.
+    for bag in (p.inventory,p.depot):
+        bag[:]=[item for item in bag if not retired_potion(item.get('template'))]
     if p.inventory_rules_version < VERSION:
         legacy=dict(p.potions)
         for key, amount in legacy.items():
@@ -64,12 +71,11 @@ def ensure(p, items, potions, make_item):
                     item=make_item(key);item['quantity']=min(STACK_LIMIT,left)
                     p.inventory.append(item);left-=item['quantity']
         p.inventory_rules_version=VERSION
-    if not isinstance(p.potion_slots,dict):p.potion_slots={}
-    for slot,default in (('q','health_potion'),('r','mana_potion')):
-        if p.potion_slots.get(slot,default) not in potions and p.potion_slots.get(slot,default)!='':
-            p.potion_slots[slot]=default
-        else:p.potion_slots.setdefault(slot,default)
+    q=p.potion_slots.get('q','health_potion') if isinstance(p.potion_slots,dict) else 'health_potion'
+    if not isinstance(q,str) or (q not in potions and q!=''):q='health_potion'
+    p.potion_slots={'q':q}
     if not isinstance(p.loot_discoveries,dict):p.loot_discoveries={}
+    p.loot_discoveries={key:value for key,value in p.loot_discoveries.items() if not retired_potion(key)}
     sync(p,potions)
 
 
@@ -83,7 +89,7 @@ def slots_needed(p, rewards, cap=STACK_LIMIT):
 
 
 def add(p, template, quantity, make_item, capacity):
-    if type(quantity) is not int or quantity<1:return False
+    if retired_potion(template) or type(quantity) is not int or quantity<1:return False
     extra=slots_needed(p,{template:quantity})
     if extra and len(p.inventory)+extra>capacity:return False
     left=quantity
@@ -140,7 +146,7 @@ def known_loot(p, enemies):
     result={}
     for template in p.loot_discoveries:
         for src in sources(p,template,enemies):
-            result.setdefault(src['kind'],[]).append(dict(template=template,chance=src['chance'],kind='potion' if template.startswith(('health_potion','mana_potion')) else 'item'))
+            result.setdefault(src['kind'],[]).append(dict(template=template,chance=src['chance'],kind='potion' if template.startswith('health_potion') else 'item'))
     return result
 
 

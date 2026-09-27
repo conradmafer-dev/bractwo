@@ -1,0 +1,24 @@
+{
+  "revision": "UI_04",
+  "date": "2026-09-27",
+  "scope": "Minimal check of the one-click rest change only.",
+  "syntax": {"file": "web/rest_ui.js", "method": "Node vm.Script", "passed": true},
+  "action_smoke_check": {
+    "method": "Execute the actual open function in Node with mocked state and send hooks.",
+    "passed": true,
+    "cases": [
+      "One activation prepares the UI, stops movement and sends rest with kind short.",
+      "Activation during an active rest sends rest_cancel.",
+      "A combat-blocked client snapshot still sends the request for authoritative server validation and its existing notice.",
+      "No player sends no request."
+    ]
+  },
+  "review": [
+    "The rest UI no longer creates or opens a dialog.",
+    "The HUD and merchant buttons share the direct short-rest action.",
+    "The source change does not alter the server's rest timing, healing or combat gate.",
+    "Above-character progress and animation remain unchanged from UI_03."
+  ],
+  "not_run": ["Browser or physical phone session", "Full regression suites"],
+  "deployment": "Local source and packages only."
+}

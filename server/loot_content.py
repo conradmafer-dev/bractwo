@@ -187,8 +187,7 @@ def configure(items,enemies,tier_levels):
         entries.append(dict(kind='item',template=trophy,chance=1.0 if boss else .32))
         if kind not in NO_POTIONS:
             suffix='_3' if level>=70 else '_2' if level>=20 else ''
-            for typ in ('health','mana'):
-                entries.append(dict(kind='potion',template=typ+'_potion'+suffix,chance=.15 if boss else .04))
+            entries.append(dict(kind='potion',template='health_potion'+suffix,chance=.15 if boss else .04))
         # Keep compatibility fields for tools; generated equipment and family uniques are disabled.
         spec['loot_origin']='Skarbiec i zdobycze' if kind in ('boss','sand_queen','dragon_lord','ancient_dragon','lich_king','abyss_lord','ice_queen') else 'Trofea' if kind in NO_POTIONS else 'Ekwipunek przeciwnika'
         spec['loot']=dict(family=family,tier=tier,equipment_chance=0,trophy_chance=0,potion_chance=0,

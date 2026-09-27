@@ -246,9 +246,8 @@
     ui.goldText.textContent=formatNumber(me.gold); ui.goldText.title=`${formatNumber(me.gold)} złota`;
     ui.attackButton.querySelector("span").textContent=info.icon;
     ui.onlineCount.textContent=`${snapshot.players.filter(player=>!player.disconnected).length} online`;
-    ui.healthCount.textContent=me.potions?.health_potion||0; ui.manaCount.textContent=me.potions?.mana_potion||0;
+    ui.healthCount.textContent=me.potions?.health_potion||0;
     ui.healthPotion.disabled=!(me.potions?.health_potion>0) || me.hp<=0;
-    ui.manaPotion.disabled=!(me.potions?.mana_potion>0) || me.hp<=0;
     const favoriteId=me.favorite_spell||world.classes?.[me.class_id]?.default_ability;
     const abilitySpec=world.spells?.[favoriteId];
     const cooldown=Math.max(0,Number(me.spell_cooldowns?.[favoriteId])||0,Number(abilitySpec?.action==='extra'?0:abilitySpec?.action==='bonus'?me.bonus_remaining:me.action_remaining)||0);
@@ -349,7 +348,7 @@
   function rewardDescription(reward){
     const parts=[];if(reward.xp)parts.push(`${reward.xp} PD`);if(reward.gold)parts.push(`${reward.gold} złota`);
     if(reward.item){const template=reward.item.startsWith("class_weapon_")?`${me?.class_id||"knight"}_weapon_${reward.item.split("_").pop()}`:reward.item;parts.push(world.items?.[template]?.name||"wyposażenie twojej klasy");}
-    for(const [key,label]of[["health_potion","mikst. zdrowia"],["mana_potion","mikst. many"]]){const count=reward.potions?.[key]||reward[key];if(count)parts.push(`${count} × ${label}`);}
+    for(const [key,label]of[["health_potion","mikst. zdrowia"]]){const count=reward.potions?.[key]||reward[key];if(count)parts.push(`${count} × ${label}`);}
     return parts.join(" · ");
   }
   function renderJournal(){
@@ -439,9 +438,9 @@
       const sell=actionButton("Sprzedaj",()=>send({type:"sell",uid:item.uid}),!trading||equipped);sell.dataset.sell=item.uid;sell.dataset.action="sell";sell.dataset.uid=item.uid;sell.title=equipped?"Najpierw zdejmij przedmiot":near?"Sprzedaj kupcowi":"Sprzedaż przy kupcu w osadzie";actions.append(sell);row.append(actions);ui.inventoryList.append(row);
     }
     const prices=world.merchant.prices||world.potion_prices||{};
-    for(const [key,id]of[["health_potion","healthPrice"],["mana_potion","manaPrice"]]){const amount=prices[key];ui[id].textContent=typeof amount==="number"?`${amount} zł`:"Cena podana przez kupca";}
+    for(const [key,id]of[["health_potion","healthPrice"]]){const amount=prices[key];ui[id].textContent=typeof amount==="number"?`${amount} zł`:"Cena podana przez kupca";}
     ui.merchantHint.textContent=near&&!trading?"Trwa walka. Poczekaj na wygaśnięcie blokady, aby handlować.":near?"Jesteś przy kupcu. Kupuj mikstury i sprzedawaj niezałożony sprzęt.":"Podejdź do kupca w osadzie, aby handlować.";
-    ui.buyHealth.disabled=!trading||Number(me.gold)<Number(prices.health_potion??Infinity);ui.buyMana.disabled=!trading||Number(me.gold)<Number(prices.mana_potion??Infinity);ui.restButton.disabled=!me.alive;
+    ui.buyHealth.disabled=!trading||Number(me.gold)<Number(prices.health_potion??Infinity);ui.restButton.disabled=!me.alive;
   }
   function renderPlayers(){
     if(!me)return;
@@ -502,8 +501,8 @@
   ui.inventoryTab.addEventListener("click",()=>characterSheet.open("inventory"));ui.playersTab.addEventListener("click",()=>setPanel("players"));
   ui.closePanel.addEventListener("click",()=>{ui.sidePanel.hidden=true;updateHUD();});
   ui.interactButton.addEventListener("click",interact);Runtime.bindTouchTap(ui.abilityButton,ability);
-  ui.healthPotion.addEventListener("click",()=>useQuickPotion("q"));ui.manaPotion.addEventListener("click",()=>useQuickPotion("r"));
-  ui.buyHealth.addEventListener("click",()=>send({type:"buy",item:"health_potion"}));ui.buyMana.addEventListener("click",()=>send({type:"buy",item:"mana_potion"}));
+  ui.healthPotion.addEventListener("click",()=>useQuickPotion("q"));
+  ui.buyHealth.addEventListener("click",()=>send({type:"buy",item:"health_potion"}));
   ui.restButton.addEventListener("click",()=>restUI.open());
   ui.safetyButton.addEventListener("click",()=>{if(!playing||!me)return;send({type:"pvp_safety",enabled:me.pvp_safety===false});});
   ui.clearTarget.addEventListener("click",clearTarget);
@@ -552,7 +551,7 @@
       if(event.code==="KeyJ"){togglePanel("journal");return;}
     }
     if(!canControl())return;heldKeys.add(event.code);
-    if(!event.repeat){if(event.code==="Space")attemptAttack();if(event.code==="KeyE")interact();if(event.code==="KeyF")ability();if(event.code==="KeyQ")useQuickPotion("q");if(event.code==="KeyR")useQuickPotion("r");const slot=Runtime.hotbarSlotForCode(event.code);if(slot>=0)cast(Runtime.hotbarKey(me.hotbar,hotbarPage,slot));}
+    if(!event.repeat){if(event.code==="Space")attemptAttack();if(event.code==="KeyE")interact();if(event.code==="KeyF")ability();if(event.code==="KeyQ")useQuickPotion("q");if(event.code==="KeyR")restUI.open();const slot=Runtime.hotbarSlotForCode(event.code);if(slot>=0)cast(Runtime.hotbarKey(me.hotbar,hotbarPage,slot));}
   },true);
   // Capture release even when a focused window control consumes the event.
   addEventListener("keyup", (event) => { heldKeys.delete(event.code); }, true);
@@ -635,12 +634,12 @@
   function spellByLevel(level){return spellsForClass().find(([,s])=>spellGate(s)===level)?.[0];}
   function useQuickPotion(slot){if(playing&&me?.hp>0)send({type:'potion',slot});}
   function updatePotionButtons(){
-    for(const [slot,id,countId] of [['q','healthPotion','healthCount'],['r','manaPotion','manaCount']]){
-      const key=me.potion_slots?.[slot]??(slot==='q'?'health_potion':'mana_potion'),spec=world.potions?.[key],button=ui[id],count=me.potions?.[key]||0;
+    for(const [slot,id,countId] of [['q','healthPotion','healthCount']]){
+      const key=me.potion_slots?.[slot]??'health_potion',spec=world.potions?.[key],button=ui[id],count=me.potions?.[key]||0;
       ui[countId].textContent=count;
       button.disabled=me.hp<=0||!spec||!count||me.level<(spec?.min_level||1)||(me.potion_cooldown||0)>0;
       button.classList.toggle('cooldown',(me.potion_cooldown||0)>0);
-      const label=button.querySelector('small');label.textContent=(me.potion_cooldown||0)>0?Math.ceil(me.potion_cooldown)+' s':spec?(spec.potion_kind==='health'?'Zdrowie':'Mana'):'Przypisz';
+      const label=button.querySelector('small');label.textContent=(me.potion_cooldown||0)>0?Math.ceil(me.potion_cooldown)+' s':spec?'Zdrowie':'Przypisz';
       button.title=slot.toUpperCase()+' · '+(spec?.name||'Brak mikstury — przypisz w plecaku')+(spec?' · '+(world.items?.[key]?.effect_summary||spec.restore):'');
       button.setAttribute('aria-label',(spec?.name||'Brak mikstury')+' · '+count+' szt.');
       button.dataset.potion=key||'';
@@ -1144,7 +1143,7 @@
     const progress=Math.max(0,Math.min(1,1-remaining/Math.max(.001,Number(rest.total)||1)));
     block(ctx,x-33,y-82,66,8,"#092840eb");block(ctx,x-32,y-81,64,6,"#1b4f70");
     block(ctx,x-32,y-81,64*progress,6,"#57c5ff");
-    label(`${rest.kind==='long'?'Długi':'Krótki'} odpoczynek · ${Math.ceil(remaining)} s`,x,y-92,"#a8e7ff",9);
+    label(`Pełny odpoczynek · ${Math.ceil(remaining)} s`,x,y-92,"#a8e7ff",9);
     ctx.restore();
   }
   function drawPlayer(v,t){
@@ -1392,7 +1391,7 @@
   fighterPrompt=globalThis.BractwoFighterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
   casterPrompt=globalThis.BractwoCasterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
   mobileHud=globalThis.BractwoMobile.create({stop:resetControls,closeChat});
-  restUI=globalThis.BractwoRestUI.create({state:()=>({player:me,world}),send,stop:resetControls,clearTarget,
+  restUI=globalThis.BractwoRestUI.create({state:()=>({player:me,world}),send,notice,stop:resetControls,clearTarget,
     prepare:()=>{closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   appShell=globalThis.BractwoAppShell.create({stop:()=>{resetControls();closeChat();restUI.close();}});
   ui.closeEffectDetail.addEventListener('click',()=>{ui.effectDetail.hidden=true;});
