@@ -1,4 +1,4 @@
-/* Pure runtime utilities: no graphics settings, DOM or network dependencies. */
+/* Lightweight runtime utilities: no graphics settings or network dependencies. */
 (function (root) {
   'use strict';
   class SpatialIndex {
@@ -159,7 +159,49 @@
     const result=roll.check==='save'?(roll.saved?(roll.save_half?'obrona · połowa':'obrona · brak obrażeń'):'nieudana obrona'):roll.shielded?'TARCZA':roll.critical?'KRYTYK':roll.hit?'trafienie':'PUDŁO';
     return `${name} · ${who}: ${check} · ${result}${roll.hit?` · ${roll.damage_dice} → ${roll.damage} obr.`:''}`;
   }
-  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, queuedSpellLabel, combatSummary };
+  // A second finger may produce PointerEvents without a compatibility click.
+  // Keep native horizontal scrolling: do not capture or cancel pointerdown/move.
+  function bindTouchTap(button, activate, scrollParent = () => null) {
+    const touches = new Map(); let lastTouchEnd = -Infinity;
+    const scrollPosition = el => [el?.scrollLeft || 0, el?.scrollTop || 0];
+    function moved(event, touch) {
+      const [x, y] = scrollPosition(touch.scroller);
+      if (Math.hypot(event.clientX - touch.x, event.clientY - touch.y) > 12 ||
+          Math.abs(x - touch.scrollX) > 2 || Math.abs(y - touch.scrollY) > 2) touch.moved = true;
+      return touch.moved;
+    }
+    button.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'touch' || button.disabled) return;
+      const scroller = scrollParent(), [scrollX, scrollY] = scrollPosition(scroller);
+      touches.set(event.pointerId, { x: event.clientX, y: event.clientY, scroller, scrollX, scrollY, moved: false });
+    });
+    button.addEventListener('pointermove', event => {
+      const touch = touches.get(event.pointerId); if (touch) moved(event, touch);
+    });
+    button.addEventListener('pointerup', event => {
+      const touch = touches.get(event.pointerId); if (!touch) return;
+      touches.delete(event.pointerId); lastTouchEnd = Date.now();
+      const rect = button.getBoundingClientRect();
+      if (button.disabled || moved(event, touch) || event.clientX < rect.left || event.clientX > rect.right ||
+          event.clientY < rect.top || event.clientY > rect.bottom) return;
+      event.preventDefault(); activate(event);
+    });
+    const cancel = event => {
+      if (touches.delete(event.pointerId)) lastTouchEnd = Date.now();
+    };
+    button.addEventListener('pointercancel', cancel);
+    button.addEventListener('lostpointercapture', cancel);
+    button.addEventListener('contextmenu', () => {
+      if (touches.size) lastTouchEnd = Date.now(); touches.clear();
+    });
+    button.addEventListener('click', event => {
+      const fromTouch = event.pointerType === 'touch' || event.sourceCapabilities?.firesTouchEvents ||
+        (!event.pointerType && event.detail > 0 && Date.now() - lastTouchEnd < 800);
+      if (fromTouch) { event.preventDefault(); return; }
+      if (!button.disabled) activate(event);
+    });
+  }
+  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, queuedSpellLabel, combatSummary, bindTouchTap };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BractwoRuntime = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

@@ -88,16 +88,14 @@
     const longButton = button('longRestButton', 'Długi odpoczynek', () => start('long'));
     shortCard.append(shortTitle, shortDetails, shortButton); longCard.append(longTitle, longDetails, longButton);
     choices.append(shortCard, longCard);
-    const ongoing = el('section', 'restOngoing');
-    const status = el('p', 'restStatus'); status.setAttribute('role', 'status');
-    const progress = el('progress', 'restProgress'); progress.max = 1; progress.setAttribute('aria-label', 'Postęp odpoczynku');
-    const cancel = button('cancelRestButton', 'Przerwij odpoczynek', () => h.send({ type: 'rest_cancel' }));
-    ongoing.append(status, progress, cancel);
-    const note = el('p', 'restNote', 'Ruch lub walka przerywają odpoczynek. Punkty odzyskasz po jego ukończeniu.');
-    panel.append(header, restriction, choices, ongoing, note); ui.append(panel);
+    const status = el('p', 'restStatus'); status.className = 'sr-only'; status.setAttribute('role', 'status');
+    const note = el('p', 'restNote', 'Postęp zobaczysz nad postacią. Ruch, walka lub ponowne naciśnięcie Odpoczynek przerywają regenerację.');
+    panel.append(header, restriction, choices, note); ui.append(panel, status);
     let focus = null;
     function open() {
-      if (!h.state().player) return;
+      const { player, world } = h.state();
+      if (!player) return;
+      if (model(player, world.rest_rules).active) { h.send({ type: 'rest_cancel' }); return; }
       focus = document.activeElement; h.prepare?.(); h.stop?.();
       panel.hidden = false; render();
       if (!panel.open) panel.showModal();
@@ -113,24 +111,25 @@
       const { player, world } = h.state(), m = model(player, world.rest_rules);
       if (!(kind === 'short' ? m.canShort : m.canLong)) return;
       h.stop?.(); h.clearTarget?.(); h.send({ type: 'rest', kind });
+      close();
     }
     function render() {
       const { player, world } = h.state(), m = model(player, world.rest_rules);
       positionButton();
       toggle.classList.toggle('rest-active', m.active);
-      toggle.title = m.active ? `Odpoczynek — ${m.remaining} s` : 'Krótki lub długi odpoczynek';
-      toggle.dataset.mobileLabel = m.active ? `Odpoczynek · ${m.remaining} s` : 'Odpoczynek';
+      toggle.title = m.active ? `Przerwij odpoczynek — ${m.remaining} s` : 'Krótki lub długi odpoczynek';
+      toggle.setAttribute('aria-label', m.active ? 'Przerwij odpoczynek' : 'Odpoczynek');
+      toggle.dataset.mobileLabel = m.active ? 'Przerwij odpoczynek' : 'Odpoczynek';
+      const announcement = m.active ? 'Trwa odpoczynek. Postęp jest nad postacią. Ruch lub przycisk Odpoczynek przerywa regenerację.' : '';
+      if (status.textContent !== announcement) status.textContent = announcement;
+      if (m.active) { close(); return; }
       if (panel.hidden) return;
       if (!player) { close(); return; }
       shortTitle.textContent = `Krótki · ${m.shortSeconds} s`;
       longTitle.textContent = `Długi · ${m.longSeconds} s`;
       shortDetails.textContent = `Odnawia ${m.hpPercent}% maks. zdrowia i ${m.manaPercent}% maks. many. Także w terenie.`;
       shortButton.disabled = !m.canShort; longButton.disabled = !m.canLong;
-      restriction.textContent = m.active ? 'Pozostań w miejscu. Zamknięcie tego okna nie przerywa odpoczynku.' :
-        m.restriction || (m.safe ? 'Możesz rozpocząć odpoczynek. Bez opłaty.' : 'Długi odpoczynek wymaga bezpiecznej osady. Krótki jest dostępny także tutaj.');
-      choices.hidden = m.active; ongoing.hidden = !m.active; note.hidden = m.active;
-      status.textContent = (m.kind === 'long' ? 'Długi' : 'Krótki') + ` odpoczynek — jeszcze ${m.remaining} s`;
-      progress.value = m.progress;
+      restriction.textContent = m.restriction || (m.safe ? 'Możesz rozpocząć odpoczynek. Bez opłaty.' : 'Długi odpoczynek wymaga bezpiecznej osady. Krótki jest dostępny także tutaj.');
     }
     panel.addEventListener('cancel', event => { event.preventDefault(); close(); });
     return { open, close, render, blocksControls: () => panel.open };

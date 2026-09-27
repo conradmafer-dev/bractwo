@@ -2,7 +2,9 @@
 
 Gra RPG online na komputer i telefon. Aktualizacja bazuje na 0.8.17 z mobilnym układem Mobile01.
 
-Poprawka **UI_02**: odpoczynek jest nad przyciskiem Rozmawiaj na telefonie i nad K Czary na komputerze. Usunięto widoczną ikonę ekwipunku z górnego menu; skrót I nadal otwiera ekwipunek. Pozostałe zasady i elementy układu są bez zmian.
+Poprawka **UI_03**: można trzymać joystick i dotknąć czaru drugim palcem. Po wybraniu krótkiego lub długiego odpoczynku okno natychmiast się zamyka. Postęp widać nad własną postacią, która medytuje w niebieskim kręgu z unoszącymi się kroplami many. Ponowne naciśnięcie Odpoczynek przerywa regenerację.
+
+Zachowano układ **UI_02**: odpoczynek nad Rozmawiaj na telefonie i nad K Czary na komputerze. Skrót I nadal otwiera ekwipunek; jego dodatkowa ikona w górnym menu jest ukryta.
 
 - **Krótki odpoczynek:** 6 sekund, odzyskuje 25% maksymalnego zdrowia i many.
 - **Długi odpoczynek:** 15 sekund, pełne zdrowie i mana w bezpiecznej osadzie.

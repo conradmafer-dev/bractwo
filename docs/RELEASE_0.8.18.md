@@ -2,6 +2,8 @@
 
 Baza: 0.8.17 z poprawką Mobile01. Zachowano układ telefonu, zasady różdżki i dotychczasowe postacie.
 
+**UI_03 — joystick, czary i medytacja:** czar z paska oraz najczęściej używany czar reagują na niezależne dotknięcie drugim palcem, gdy pierwszy obsługuje joystick. Przesunięcie paska lub anulowanie gestu nie rzuca czaru; dodatkowe zdarzenie kliknięcia nie powtarza akcji. Po wyborze rodzaju odpoczynku okno zamyka się od razu. Postęp jest nad własną postacią, z animacją medytacji, niebieskim kręgiem i unoszącymi się kroplami many. Efekt kończy się zgodnie ze stanem serwera. Zachowano układ UI_02 i dotychczasowe czasy oraz zasady regeneracji. Sprawdzenie tej poprawki ograniczono do celowanych testów Node i składni; raport: `docs/qa_0.8.18/ui_03_results.json`.
+
 **UI_02 — korekta rozmieszczenia przycisków:** odpoczynek przeniesiono nad Rozmawiaj na telefonie, na wysokość Czary i ulubionego czaru, oraz nad K Czary na komputerze. Na wąskim ekranie pionowym przycisk przechodzi wyżej, gdy ten sam rząd jest zajęty; nie zasłania istniejących przycisków. Ikona ekwipunku z górnego menu jest ukryta, a skrót I działa jak wcześniej. Reszta gry jest bez zmian. Zgodnie z prośbą użytkownika tę korektę sprawdzono tylko pod kątem składni JavaScript i zachowania powiązań przycisków; poniższe rozbudowane wyniki testów dotyczą poprzedniego wydania 0.8.18.
 
 ## Odpoczynek
@@ -15,8 +17,9 @@ Przycisk z księżycem **Odpoczynek** znajduje się nad K Czary na komputerze i 
 
 - Po starciu z potworem można zacząć po **3 sekundach**. Panel pokazuje pozostały czas blokady.
 - Walka z graczem nadal wymaga odczekania pełnej dotychczasowej blokady **20 sekund**.
-- Odpoczynek jest bezpłatny. Ruch, walka i rozpoczęcie innej wykonywanej czynności przerywają go. Jest też przycisk **Przerwij odpoczynek**.
-- Nagroda jest przyznawana dopiero po ukończeniu. Zamknięcie panelu nie przerywa odpoczynku; ruch po powrocie do gry już tak.
+- Odpoczynek jest bezpłatny. Ruch, walka i rozpoczęcie innej wykonywanej czynności przerywają go. Można też ponownie nacisnąć przycisk **Odpoczynek**, aby przerwać regenerację.
+- Po wyborze krótkiego lub długiego odpoczynku panel natychmiast się zamyka. Pasek i pozostały czas widać nad własną postacią. Niebieski krąg i krople many towarzyszą medytacji; przemieniony druid zachowuje formę zwierzęcia i otrzymuje ten sam efekt regeneracji.
+- Zdrowie i mana są przyznawane dopiero po ukończeniu. Zamknięcie panelu nie przerywa odpoczynku; ruch po powrocie do gry już tak.
 - Odpoczynek nie zeruje odnowień czarów i zdolności. Pasywna regeneracja many, ochrona PvP, handel i zasady bezpiecznego wylogowania zachowują własne warunki.
 
 ## Blokada paneli i joystick
@@ -56,7 +59,9 @@ Pełna paczka źródłowa dodatkowo zawiera testy, narzędzia, historyczną doku
 
 ## Weryfikacja
 
-Wyniki tej aktualizacji znajdują się w `docs/qa_0.8.18/`. Przeszło 296 unikalnych testów serwera, 56 testów JavaScript oraz 4 testy tras HTTP i plików aplikacji. Dwa scenariusze WebSocket przekroczyły limit czasu przy równoległym obciążeniu komputera; powtórzone osobno przeszły bez zmiany testów lub ich limitów. Raporty zachowują oba wyniki.
+Wyniki znajdują się w `docs/qa_0.8.18/`. Raport `ui_03_results.json` dotyczy bieżącej poprawki. Poniższe szersze kontrole przeprowadzono dla wcześniejszego wydania 0.8.18; nie powtarzano ich dla UI_03.
+
+Przeszło wtedy 296 unikalnych testów serwera, 56 testów JavaScript oraz 4 testy tras HTTP i plików aplikacji. Dwa scenariusze WebSocket przekroczyły limit czasu przy równoległym obciążeniu komputera; powtórzone osobno przeszły bez zmiany testów lub ich limitów. Raporty zachowują oba wyniki.
 
 Testy obejmują logikę odpoczynku i przerwań, zachowanie many oraz PvP, interfejs odpoczynku, blokadę paneli, API pełnego ekranu, instalację PWA i zakres pamięci service workera. Raport `browser_results.json` osobno opisuje zakres kontroli w przeglądarce i jej ograniczenia. Emulacja przeglądarki nie zastępuje testu na fizycznym telefonie.
 

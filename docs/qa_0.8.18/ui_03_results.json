@@ -1,0 +1,36 @@
+{
+  "revision": "UI_03",
+  "date": "2026-09-27",
+  "scope": "Minimal verification requested by the user; no broad regression rerun.",
+  "syntax": {
+    "method": "Node vm.Script parse of the final JavaScript sources",
+    "passed": ["web/game.js", "web/runtime.js", "web/rest_ui.js"]
+  },
+  "targeted_tests": [
+    {
+      "file": "tests/test_multitouch_ui03.cjs",
+      "passed": 6,
+      "failed": 0,
+      "coverage": "Second-finger spell tap; compatibility click deduplication; swipe, scroll, cancel and release-outside handling; mouse and keyboard activation; independent pointer release preserving the joystick."
+    },
+    {
+      "file": "tests/test_rest_ui_0818.cjs",
+      "passed": 5,
+      "failed": 0,
+      "coverage": "Rest choice model: authoritative combat gate, PvP, fractional wait, safe areas, death, active-rest duplicate prevention and server-provided descriptions."
+    }
+  ],
+  "code_review": [
+    "The rest choice dialog closes immediately after sending a valid rest request; no active-rest progress panel remains.",
+    "Pressing the rest launcher while resting sends rest_cancel.",
+    "Player rendering uses the authoritative owner rest state for the above-character progress, meditation pose, blue aura and nine rising mana droplets.",
+    "Effects stop when the authoritative rest state clears. Animal forms retain their appearance.",
+    "Canvas state is saved and restored; particle storage does not grow."
+  ],
+  "not_run": [
+    "Physical phone multitouch and visual check",
+    "Browser gameplay session",
+    "Full server and JavaScript regression suites"
+  ],
+  "deployment": "Local source changes and release packages only; no push or live deployment."
+}

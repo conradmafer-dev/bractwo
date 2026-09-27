@@ -501,7 +501,7 @@
   ui.journalButton.addEventListener("click",()=>togglePanel("journal"));ui.questTracker.addEventListener("click",()=>setPanel("journal"));ui.journalTab.addEventListener("click",()=>setPanel("journal"));
   ui.inventoryTab.addEventListener("click",()=>characterSheet.open("inventory"));ui.playersTab.addEventListener("click",()=>setPanel("players"));
   ui.closePanel.addEventListener("click",()=>{ui.sidePanel.hidden=true;updateHUD();});
-  ui.interactButton.addEventListener("click",interact);ui.abilityButton.addEventListener("click",ability);
+  ui.interactButton.addEventListener("click",interact);Runtime.bindTouchTap(ui.abilityButton,ability);
   ui.healthPotion.addEventListener("click",()=>useQuickPotion("q"));ui.manaPotion.addEventListener("click",()=>useQuickPotion("r"));
   ui.buyHealth.addEventListener("click",()=>send({type:"buy",item:"health_potion"}));ui.buyMana.addEventListener("click",()=>send({type:"buy",item:"mana_potion"}));
   ui.restButton.addEventListener("click",()=>restUI.open());
@@ -1040,32 +1040,40 @@
       else{block(ctx,x+7,y+h-9,Math.min(29,w-8),7,"#6e9a55");block(ctx,x+w-25,y+3,19,6,"#82a764");}
     }
   }
-  function humanoid(x,y,kind,facing=[0,1],phase=0,dead=false,gear=null){
+  function humanoid(x,y,kind,facing=[0,1],phase=0,dead=false,gear=null,meditating=false){
     const info=classInfo[kind]||{cape:kind==="merchant"?"#c38b40":kind==="goblin"?"#aa6945":"#72836b",color:"#efcf87"};
     ctx.save();ctx.translate(Math.round(x),Math.round(y));if(facing[0]<-.3)ctx.scale(-1,1);if(dead){ctx.rotate(-Math.PI/2);ctx.globalAlpha=.65;}
     const bob=Math.round(Math.sin(phase*8)),step=Math.round(Math.sin(phase*9)*2),cape=info.cape;
-    block(ctx,-9,-1+step,7,7,"#4b3930");block(ctx,3,-1-step,7,7,"#4b3930");block(ctx,-9,4+step,9,3,"#302f2b");block(ctx,3,4-step,9,3,"#302f2b");
+    if(!meditating){block(ctx,-9,-1+step,7,7,"#4b3930");block(ctx,3,-1-step,7,7,"#4b3930");block(ctx,-9,4+step,9,3,"#302f2b");block(ctx,3,4-step,9,3,"#302f2b");}
     block(ctx,-12,-25+bob,24,26,"#364536");block(ctx,-10,-25+bob,20,27,cape);block(ctx,-10,-24+bob,4,24,"#ffffff20");block(ctx,8,-22+bob,4,23,"#00000024");
     if(kind==="knight"){
       block(ctx,-9,-25+bob,19,19,"#c1c6bb");block(ctx,-7,-23+bob,6,13,"#edf0d5");block(ctx,2,-23+bob,6,13,"#929f9d");block(ctx,-13,-25+bob,8,7,"#dce1cb");block(ctx,8,-25+bob,7,7,"#8f9e98");block(ctx,-9,-8+bob,19,4,"#ac844c");block(ctx,-2,-8+bob,5,4,"#e2c971");
-      if(gear===null||gear.shield_equipped){block(ctx,-19,-21+bob,12,22,"#596d78");block(ctx,-18,-20+bob,10,19,"#a8bdba");block(ctx,-16,-18+bob,6,15,"#314e63");block(ctx,-14,-16+bob,2,11,"#eacb7b");}
+      if(!meditating&&(gear===null||gear.shield_equipped)){block(ctx,-19,-21+bob,12,22,"#596d78");block(ctx,-18,-20+bob,10,19,"#a8bdba");block(ctx,-16,-18+bob,6,15,"#314e63");block(ctx,-14,-16+bob,2,11,"#eacb7b");}
     }else if(kind==="ranger"){
       block(ctx,-8,-23+bob,16,16,"#987045");block(ctx,-5,-23+bob,10,4,"#d3ad63");block(ctx,-8,-9+bob,17,4,"#574a2f");block(ctx,-2,-9+bob,4,4,"#dbb768");line(ctx,[[-7,-22+bob],[7,-9+bob]],"#d6b270",3);
     }else{block(ctx,-7,-24+bob,14,19,cape);block(ctx,-8,-7+bob,17,3,"#dcc079");block(ctx,-1,-24+bob,3,16,info.color);block(ctx,-8,-1+bob,18,3,info.color);}
-    block(ctx,-16,-21+bob,5,13,cape);block(ctx,11,-21+bob,5,13,cape);block(ctx,-16,-9+bob,5,5,"#e5b57e");block(ctx,12,-9+bob,5,5,"#e5b57e");
+    if(meditating){
+      // Crossed legs and hands resting in the lap; keep each class's clothes and head.
+      block(ctx,-17,-4,34,8,"#364536");block(ctx,-15,-3,30,7,cape);
+      line(ctx,[[-13,-1],[8,4]],info.color,3);line(ctx,[[13,-1],[-8,4]],cape,3);
+      block(ctx,-10,2,7,3,"#4b3930");block(ctx,4,2,7,3,"#4b3930");
+      line(ctx,[[-14,-20+bob],[-14,-11+bob],[-6,-8+bob]],cape,5);
+      line(ctx,[[14,-20+bob],[14,-11+bob],[6,-8+bob]],cape,5);
+      block(ctx,-7,-10+bob,6,4,"#e5b57e");block(ctx,1,-10+bob,6,4,"#f3c993");
+    }else{block(ctx,-16,-21+bob,5,13,cape);block(ctx,11,-21+bob,5,13,cape);block(ctx,-16,-9+bob,5,5,"#e5b57e");block(ctx,12,-9+bob,5,5,"#e5b57e");}
     block(ctx,-7,-38+bob,14,15,"#65442e");block(ctx,-6,-36+bob,12,12,"#e0ab75");block(ctx,-4,-35+bob,8,9,"#f3c993");block(ctx,-4,-35+bob,2,4,"#faddaa");
     if(facing[1]<-.3){block(ctx,-7,-37+bob,14,12,kind==="knight"?"#b5c1b5":"#73512f");}
-    else{block(ctx,-3,-30+bob,2,2,"#3b4134");block(ctx,3,-30+bob,2,2,"#3b4134");block(ctx,-1,-26+bob,4,2,"#a96d4c");}
+    else{block(ctx,meditating?-4:-3,-30+bob,meditating?3:2,meditating?1:2,"#3b4134");block(ctx,meditating?2:3,-30+bob,meditating?3:2,meditating?1:2,"#3b4134");block(ctx,-1,-26+bob,4,2,"#a96d4c");}
     if(kind==="knight"){block(ctx,-9,-40+bob,18,8,"#9facaa");block(ctx,-6,-43+bob,12,5,"#ccd2c0");block(ctx,-8,-40+bob,5,5,"#e3e5d0");block(ctx,-1,-44+bob,4,6,"#d44d3e");}
     else if(kind==="mage"){block(ctx,-10,-38+bob,21,4,"#2f438b");block(ctx,-7,-44+bob,15,8,"#587cc9");block(ctx,-3,-49+bob,7,8,"#6f91dc");block(ctx,-2,-53+bob,4,6,"#a6b8eb");block(ctx,-7,-39+bob,15,3,"#dabf72");}
     else if(kind==="druid"){block(ctx,-8,-40+bob,17,7,"#467844");block(ctx,-5,-43+bob,12,6,"#80a451");block(ctx,-9,-37+bob,3,12,"#517e44");block(ctx,6,-37+bob,3,12,"#517e44");}
     else{block(ctx,-8,-40+bob,17,6,"#9d713e");block(ctx,-6,-43+bob,12,5,"#bd9355");block(ctx,-10,-38+bob,21,3,"#735736");}
-    if(kind!=="knight"&&gear?.shield_equipped){
+    if(!meditating&&kind!=="knight"&&gear?.shield_equipped){
       block(ctx,-22,-21+bob,15,22,"#493d28");block(ctx,-21,-20+bob,13,19,"#987a45");
       block(ctx,-19,-19+bob,2,17,"#c3a666");block(ctx,-14,-19+bob,2,17,"#695132");block(ctx,-18,-13+bob,7,6,"#b7c1aa");
     }
-    const armament=gear?gear.weapon:(kind==="knight"?"sword":kind==="ranger"?"bow":kind==="merchant"?"none":"staff");
-    const wt=gear?.weapon_type||"";
+    const armament=meditating?"none":gear?gear.weapon:(kind==="knight"?"sword":kind==="ranger"?"bow":kind==="merchant"?"none":"staff");
+    const wt=meditating?"":gear?.weapon_type||"";
     if(armament==="bow"){line(ctx,[[19,-31+bob],[24,-24+bob],[27,-14+bob],[23,-4+bob],[19,2+bob]],"#d3ad66",3);line(ctx,[[19,-31+bob],[19,2+bob]],"#ede4b8",1);}
     else if(wt==="maul"||wt==="warhammer"){block(ctx,15,-37+bob,4,43,"#9c733d");block(ctx,wt==="maul"?6:9,-43+bob,wt==="maul"?24:18,13,"#bdccc8");block(ctx,10,-41+bob,16,4,"#f0f3db");}
     else if(["handaxe","battleaxe","greataxe"].includes(wt)){block(ctx,17,-36+bob,3,42,"#9c733d");block(ctx,20,-39+bob,12,15,"#becbc5");block(ctx,29,-38+bob,3,15,"#e4e7ca");if(wt==="greataxe")block(ctx,7,-39+bob,11,15,"#afbdb6");}
@@ -1111,12 +1119,43 @@
     const near=me&&distance(me,l)<190;
     if(near||!playing)label(`${found?"✓ ":"◇ "}${l.name}`,x,y-92,found?"#e3edb8":"#fff0bd",11);
   }
+  function drawRestAura(x,y,t){
+    const pulse=1+Math.sin(t*2.4)*.05;
+    glow(x,y-12,38,"#5ac5ff",.17);
+    ellipse(ctx,x,y+6,29*pulse,12*pulse,"#298eff22");
+    ctx.save();ctx.strokeStyle="#63caff";ctx.lineWidth=1.8;
+    ctx.beginPath();ctx.ellipse(x,y+6,29*pulse,12*pulse,0,0,TAU);ctx.stroke();
+    ctx.strokeStyle="#7ad7ff66";ctx.lineWidth=1;
+    ctx.beginPath();ctx.ellipse(x,y+6,35/pulse,15/pulse,0,0,TAU);ctx.stroke();ctx.restore();
+  }
+  function drawRestProgress(x,y,t,rest){
+    ctx.save();
+    // Fixed particle count: continuous rising mana droplets without a growing emitter list.
+    for(let i=0;i<9;i++){
+      const q=(t*.42+i/9)%1,dx=x+Math.sin(i*2.4+q*.8)*(18+i%3*3),dy=y+3-q*61;
+      ctx.globalAlpha=Math.sin(q*Math.PI)*.85;ctx.fillStyle=i%2?"#54baff":"#91e2ff";
+      ctx.beginPath();ctx.moveTo(dx,dy-5);ctx.quadraticCurveTo(dx-5,dy+1,dx,dy+4);
+      ctx.quadraticCurveTo(dx+5,dy+1,dx,dy-5);ctx.fill();
+      block(ctx,dx-1,dy,1,2,"#dbf5ff");
+    }
+    ctx.globalAlpha=1;
+    const elapsed=Math.min(.25,Math.max(0,t-lastSnapshotAt/1000));
+    const remaining=Math.max(0,Number(rest.remaining)-elapsed);
+    const progress=Math.max(0,Math.min(1,1-remaining/Math.max(.001,Number(rest.total)||1)));
+    block(ctx,x-33,y-82,66,8,"#092840eb");block(ctx,x-32,y-81,64,6,"#1b4f70");
+    block(ctx,x-32,y-81,64*progress,6,"#57c5ff");
+    label(`${rest.kind==='long'?'Długi':'Krótki'} odpoczynek · ${Math.ceil(remaining)} s`,x,y-92,"#a8e7ff",9);
+    ctx.restore();
+  }
   function drawPlayer(v,t){
     const p=v.entity,x=v.x,y=v.y,isMe=String(p.id)===myId;if(!inView(x,y))return;
+    const rest=isMe&&playing&&p.hp>0&&['short','long'].includes(p.rest?.kind)&&p.rest.remaining>0?p.rest:null;
+    if(rest)drawRestAura(x,y,t);
     if(String(p.id)===selectedTarget){ctx.strokeStyle="#f05942";ctx.lineWidth=2;ctx.strokeRect(x-20,y-44,40,50);}
-    if(isMe){ctx.strokeStyle="#e5eeae88";ctx.lineWidth=1.5;ctx.strokeRect(x-16,y-14,32,28);}
+    if(isMe&&!rest){ctx.strokeStyle="#e5eeae88";ctx.lineWidth=1.5;ctx.strokeRect(x-16,y-14,32,28);}
     if(p.form&&p.hp>0){drawEnemy({...v,entity:{...p,id:'form_'+p.id,kind:p.form,name:'',is_companion:true}},t);}
-    else {ellipse(ctx,x,y+6,17,7,"#2c422e70");humanoid(x,y,p.class_id,p.facing||[0,1],v.move,p.hp<=0,p);}
+    else {ellipse(ctx,x,y+6,17,7,"#2c422e70");humanoid(x,y,p.class_id,rest?[0,1]:p.facing||[0,1],rest?t*.2:v.move,p.hp<=0,p,!!rest);}
+    if(rest)drawRestProgress(x,y,t,rest);
     const color=p.skull==="red"?"#ff9b83":p.skull==="white"?"#fff6dc":isMe?"#fff2a8":me?.party_id&&p.party_id===me.party_id?"#a1eff2":"#c3f4a9";
     label(`${p.skull&&p.skull!=="none"?"☠ ":""}${p.name}${p.disconnected?" · offline":""}`,x,y-66,color,11);
     block(ctx,x-18,y-55,36,4,"#304232");block(ctx,x-17,y-54,34*Math.max(0,p.hp/p.max_hp),2,isMe?"#86df6b":"#9fd672");
@@ -1306,7 +1345,7 @@
   const hotbarButtons=Array.from({length:24},(_,slot)=>{
     const button=document.createElement('button');button.className='hotbar-slot';button.dataset.slot=slot;
     button.innerHTML=`<kbd>${Runtime.hotbarLabel(slot,false)}</kbd><span></span><small></small><b></b>`;
-    button.addEventListener('click',()=>cast(Runtime.hotbarKey(me?.hotbar,hotbarPage,slot)));
+    Runtime.bindTouchTap(button,()=>{if(canControl())cast(Runtime.hotbarKey(me?.hotbar,hotbarPage,slot));},()=>button.closest('.hotbar-viewport'));
     button.addEventListener('contextmenu',event=>{event.preventDefault();openExpansion('spells');});
     (slot<12?ui.hotbarSlots:ui.hotbarFunctionSlots).append(button);return button;
   });
