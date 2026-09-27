@@ -1,0 +1,91 @@
+Bractwo 0.8.18 — raport backendu (2026-09-27)
+
+ZMIANY OBJĘTE TESTAMI
+server/server.py; server/caster_game.py; tests/test_rest_0818.py.
+Krótki odpoczynek: 6 s, do +25% max HP/many. Długi: 15 s, pełne HP/mana, bezpieczna strefa, bez opłaty.
+Odpoczynek po PvE dostępny po 3 s. Istniejąca blokada PvP 20 s, blokada wylogowania, pasywna regeneracja many i pozostałe cooldowny bez zmian.
+
+PRZEBIEG 1: DEDYKOWANE TESTY ODPOCZYNKU
+Moduł: test_rest_0818
+Ran 18 tests in 44.804s
+OK (18/18)
+
+PRZEBIEG 2: ODPOCZYNEK + ISTNIEJĄCA REGRESJA
+Moduły: test_rest_0818, test_mana_hotbar_statuses, test_arcane_recovery_0815,
+        test_wand_casting_0817, test_pvp_magic, test_casters_0814.
+Ran 296 tests in 384.732s
+FAILED (errors=2)
+294 przeszły; 0 nieudanych asercji; 2 błędy przygotowania sesji WebSocket.
+W tym wszystkie 18 nowych testów odpoczynku przeszło ponownie.
+18 testów z pierwszego przebiegu nie jest doliczane drugi raz do liczby unikalnych przypadków.
+Nie zmieniano starych testów ani ich timeoutów.
+
+Oba błędy nastąpiły w asyncSetUp, przed wejściem w scenariusz walki.
+W logu wystąpiły opóźnienia callbacków aiohttp/asyncio 7.360, 9.531 oraz 10.672 s.
+Host był równocześnie obciążony przeglądarką i serwerem testu QA.
+Poniższe wyniki nie pozwalają zaliczyć tych dwóch testów; wymagają odrębnego ponowienia.
+
+ERROR 1: test_real_two_client_websocket_cast_and_relock
+(test_pvp_magic.PVPWebSocket.test_real_two_client_websocket_cast_and_relock)
+Traceback (most recent call last):
+  File "tests/test_pvp_magic.py", line 502, in receive
+    packet=await ws.receive_json()
+  File "aiohttp/client_ws.py", line 407, in receive_json
+    data = await self.receive_str(timeout=timeout)
+  File "aiohttp/client_ws.py", line 386, in receive_str
+    msg = await self.receive(timeout)
+  File "aiohttp/client_ws.py", line 336, in receive
+    msg = await self._reader.read()
+  File "aiohttp/_websocket/reader_c.py", line 118, in read
+  File "aiohttp/_websocket/reader_c.py", line 115, in aiohttp._websocket.reader_c.WebSocketDataQueue.read
+asyncio.exceptions.CancelledError
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+  File "tests/test_pvp_magic.py", line 490, in asyncSetUp
+    message=await self.receive(ws,'welcome')
+  File "tests/test_pvp_magic.py", line 500, in receive
+    async with asyncio.timeout(5):
+  File "asyncio/timeouts.py", line 115, in __aexit__
+    raise TimeoutError from exc_val
+TimeoutError
+
+ERROR 2: test_real_two_client_websocket_party_support
+(test_pvp_magic.PVPWebSocket.test_real_two_client_websocket_party_support)
+Traceback (most recent call last):
+  File "asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+  File "asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+  File "tests/test_pvp_magic.py", line 491, in asyncSetUp
+    await self.receive(ws,'notice')
+  File "tests/test_pvp_magic.py", line 502, in receive
+    packet=await ws.receive_json()
+  File "aiohttp/client_ws.py", line 407, in receive_json
+    data = await self.receive_str(timeout=timeout)
+  File "aiohttp/client_ws.py", line 388, in receive_str
+    raise WSMessageTypeError(
+aiohttp.client_exceptions.WSMessageTypeError: Received message 8:1000 is not WSMsgType.TEXT
+
+Po błędach asyncSetUp unittest raportował też niezamknięte sesje ClientSession/WS.
+Był to skutek pominięcia asyncTearDown po nieudanym asyncSetUp; proces regresji zakończył się kodem 1.
+
+PLAN POWTÓRZENIA
+Po zakończeniu równoległego browser QA uruchomić wyłącznie klasę
+  test_pvp_magic.PVPWebSocket
+obejmującą powyższe dwa oryginalne testy, bez edytowania limitu 5 s ani zachowania gry.
+Rozpoczętą przed informacją o obciążeniu hosta próbę retestu przerwano Ctrl+C jeszcze przed wynikami.
+Status końcowy: RETEST ZAKOŃCZONY — 2/2 OK w 15.287 s. Szczegóły: backend_ws_retest.txt.
+Oryginalne testy i limit 5 s pozostały bez zmian. Wszystkie 296 unikalnych przypadków mają PASS: 294 w szerokim przebiegu i 2 w izolowanym retescie.
+
+ŚRODOWISKO
+Bundled Python 3.12:
+C:\Users\Lenovo\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe
+sys.path: projekt/.qa-python, projekt, projekt/tests.
+PYTHONDONTWRITEBYTECODE=1.
+Dane gry testowane wyłącznie w bazie :memory:.

@@ -1,0 +1,266 @@
+{
+  "status": "partial_browser_verification",
+  "all_planned_end_to_end_checks_completed": false,
+  "passed_browser_checks": 9,
+  "javascript_errors": [],
+  "game": {
+    "report": "browser/browser_results.json",
+    "transport": "Python WebSocket bridge to isolated aiohttp server; production HTML/CSS/JS and embedded assets at routed bractwo.local origin",
+    "passed_checks": [
+      {
+        "name": "Native fullscreen enters/exits from authentication screen",
+        "ok": true
+      },
+      {
+        "name": "Registration and gameplay use the actual server through the documented WebSocket bridge",
+        "ok": true
+      },
+      {
+        "name": "Rest menu/dialog accessible at 734x260",
+        "ok": true
+      },
+      {
+        "name": "Rest menu/dialog accessible at 390x844",
+        "ok": true
+      },
+      {
+        "name": "Native fullscreen enters/exits from mobile game control",
+        "ok": true
+      }
+    ],
+    "layouts": [
+      {
+        "viewport": {
+          "width": 734,
+          "height": 260
+        },
+        "issues": [],
+        "screenshot": "game-734x260.png"
+      },
+      {
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "issues": [],
+        "screenshot": "game-390x844.png"
+      }
+    ],
+    "failure": "Page.wait_for_function: Timeout 60000ms exceeded.",
+    "max_queued_bridge_messages": 153,
+    "observed_blocker": "After server fixture changed position and HP/mana, the browser still showed the older safe-area/full-resource snapshot. Waiting for the first PvE rest restriction timed out after 60 seconds.",
+    "interpretation": "The growing bridge queue prevented validation of later authoritative state transitions; these checks are not reported as application passes."
+  },
+  "controllers": {
+    "report": "dom/browser_results.json",
+    "status": "passed",
+    "fixture": "Existing index DOM with inline production CSS; only windows.js/mobile.js execute; no gameplay, server or WebSocket.",
+    "passed_checks": [
+      {
+        "name": "Visible quest landscape: joystick is centred between left edge/spells and bottom rail/viewport",
+        "ok": true,
+        "geometry": {
+          "viewport": {
+            "width": 734,
+            "height": 390
+          },
+          "joystick": {
+            "x": 12,
+            "y": 232,
+            "width": 88,
+            "height": 88,
+            "right": 100,
+            "bottom": 320
+          },
+          "spellbar": {
+            "x": 112,
+            "y": 324,
+            "width": 466,
+            "height": 56,
+            "right": 578,
+            "bottom": 380
+          },
+          "quest": {
+            "x": 8,
+            "y": 117,
+            "width": 216,
+            "height": 44,
+            "right": 224,
+            "bottom": 161
+          },
+          "upperBoundary": 161,
+          "gaps": {
+            "left": 12,
+            "right": 12,
+            "above": 71,
+            "below": 70
+          }
+        }
+      },
+      {
+        "name": "mobile: default lock, real drag after unlock, relock prevents further drag",
+        "ok": true,
+        "pointer": "native CDP touch",
+        "initial": {
+          "x": 8,
+          "y": 8,
+          "width": 216,
+          "height": 68
+        },
+        "moved": {
+          "x": 88,
+          "y": 68,
+          "width": 216,
+          "height": 68
+        },
+        "relocked": {
+          "x": 88,
+          "y": 68,
+          "width": 216,
+          "height": 68
+        }
+      },
+      {
+        "name": "Reset while locked restores the default centred joystick",
+        "ok": true,
+        "geometry": {
+          "viewport": {
+            "width": 734,
+            "height": 390
+          },
+          "joystick": {
+            "x": 12,
+            "y": 232,
+            "width": 88,
+            "height": 88,
+            "right": 100,
+            "bottom": 320
+          },
+          "spellbar": {
+            "x": 112,
+            "y": 324,
+            "width": 466,
+            "height": 56,
+            "right": 578,
+            "bottom": 380
+          },
+          "quest": {
+            "x": 8,
+            "y": 117,
+            "width": 216,
+            "height": 44,
+            "right": 224,
+            "bottom": 161
+          },
+          "upperBoundary": 161,
+          "gaps": {
+            "left": 12,
+            "right": 12,
+            "above": 71,
+            "below": 70
+          }
+        }
+      },
+      {
+        "name": "desktop: default lock, real drag after unlock, relock prevents further drag",
+        "ok": true,
+        "pointer": "native mouse",
+        "initial": {
+          "x": 163.46875,
+          "y": 15,
+          "width": 235,
+          "height": 89
+        },
+        "moved": {
+          "x": 523,
+          "y": 195,
+          "width": 235,
+          "height": 89
+        },
+        "relocked": {
+          "x": 523,
+          "y": 195,
+          "width": 235,
+          "height": 89
+        }
+      }
+    ],
+    "geometry": [
+      {
+        "viewport": {
+          "width": 734,
+          "height": 390
+        },
+        "joystick": {
+          "x": 12,
+          "y": 232,
+          "width": 88,
+          "height": 88,
+          "right": 100,
+          "bottom": 320
+        },
+        "spellbar": {
+          "x": 112,
+          "y": 324,
+          "width": 466,
+          "height": 56,
+          "right": 578,
+          "bottom": 380
+        },
+        "quest": {
+          "x": 8,
+          "y": 117,
+          "width": 216,
+          "height": 44,
+          "right": 224,
+          "bottom": 161
+        },
+        "upperBoundary": 161,
+        "gaps": {
+          "left": 12,
+          "right": 12,
+          "above": 71,
+          "below": 70
+        }
+      }
+    ],
+    "limitations": [
+      "about:blank fixture does not verify localStorage persistence."
+    ]
+  },
+  "final_source": {
+    "bridge_snapshot_differences_from_final": [
+      "web/mobile.css"
+    ],
+    "difference_explanation": "Only the final mobile.css rule hiding window-grip inside mobileMenu was added after the game bridge snapshot. The final rule was then verified by the passing static DOM retest.",
+    "final_mobile_css_sha256": "2ca90ff0de434f9b7e6a34b07fe377e59a9b87a69ebf1ff7006cc1e4a0f3b037"
+  },
+  "history": [
+    {
+      "report": "native_attempt/browser_results.json",
+      "result": "Native localhost page.goto timed out despite --no-proxy-server"
+    },
+    {
+      "report": "bridge_attempt_1/browser_results.json",
+      "result": "Serial WebSocket delivery blocked heartbeat processing during a slow render; receiver and delivery were separated in the harness"
+    },
+    {
+      "report": "dom_before_menu_grip_fix/browser_results.json",
+      "result": "Real mobile menu-close click was intercepted by the unlocked settings grip; production mobile.css was corrected and the same DOM test then passed"
+    }
+  ],
+  "http_report": "http_results.json",
+  "unverified_in_browser": [
+    "Authoritative rest progress/reward/PvE/PvP state transitions: bridge throughput limit; backend behavior is covered by separate server unit tests",
+    "Native service worker activation/offline behavior and operating-system PWA installation: no further native browser attempts were made",
+    "LocalStorage profile persistence in the isolated about:blank DOM fixture"
+  ],
+  "key_screenshots": [
+    "browser/game-734x260.png",
+    "browser/game-390x844.png",
+    "browser/rest-734x260.png",
+    "dom/mobile-reset-locked.png",
+    "dom/desktop-relocked.png"
+  ],
+  "cleanup": "All test browser processes and isolated game servers were closed. The unused separate PWA browser harness was removed."
+}

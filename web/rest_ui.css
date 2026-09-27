@@ -1,0 +1,31 @@
+#restPanel {
+  box-sizing: border-box; width: min(580px, calc(100vw - 24px)); max-height: calc(100dvh - 24px);
+  padding: 16px; border: 1px solid #c5ad71; border-radius: 10px; color: #e6e4ce; pointer-events: auto;
+  background: #122b24; box-shadow: 0 15px 60px #0009; overflow: auto; font: 14px/1.45 system-ui, sans-serif;
+}
+#restPanel::backdrop { background: #03100bae; }
+#restPanel header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+#restPanel h2 { margin: 0; font: 24px Georgia, serif; color: #ecd69b; }
+#restPanel h3 { margin: 0; color: #ebd799; font-size: 16px; }
+#restPanel p { margin: 8px 0; }
+#restPanel button { min-height: 44px; border: 1px solid #b5aa7166; border-radius: 5px; color: #efe2b6; background: #30452d; padding: 8px 12px; }
+#restPanel #closeRestPanel { width: 44px; padding: 0; font-size: 25px; flex-shrink: 0; background: transparent; }
+#restChoices { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+#restChoices section { display: flex; flex-direction: column; padding: 12px; border: 1px solid #8f9d7044; border-radius: 7px; background: #071d1766; }
+#restChoices p { flex: 1; font-size: 13px; color: #bbcab4; }
+#restPanel #restRestriction { min-height: 20px; color: #dec891; }
+#restPanel #restNote { margin-bottom: 0; font-size: 12px; color: #a7b9a1; }
+#restProgress { display: block; width: 100%; height: 14px; margin: 12px 0; accent-color: #ddbe70; }
+#restOngoing #cancelRestButton { width: 100%; }
+#restMenuButton.rest-active { border-color: #ecd083; box-shadow: 0 0 10px #e9cd6b55; }
+@media (max-width: 480px) { #restChoices { grid-template-columns: 1fr; } }
+@media (max-height: 420px) {
+  #restPanel { padding: 8px 12px; font-size: 12px; }
+  #restPanel header { min-height: 36px; }
+  #restPanel h2 { font-size: 20px; }
+  #restPanel h3 { font-size: 14px; }
+  #restPanel p { margin: 4px 0; }
+  #restChoices { gap: 8px; }
+  #restChoices section { padding: 7px; }
+  #restChoices p { font-size: 11px; line-height: 1.3; }
+}

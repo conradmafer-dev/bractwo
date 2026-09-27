@@ -84,6 +84,17 @@
 .atlas-tools button:focus-visible{outline:2px solid #e1ca87;outline-offset:2px}
 #sidePanel .panel-head{padding-left:36px}
 #sidePanel .panel-head>.panel-grip{left:7px;right:auto;top:8px;opacity:.8}
+/* 0.8.18: prevent accidental rearrangement until explicitly unlocked. */
+#hudLayoutLock[aria-pressed="true"]{border-color:#ddc17d;background:#3b462d;color:#ffe2a1}
+#gameUI.hud-layout-locked .window-grip{display:none!important}
+#gameUI.hud-layout-locked .window-handle{cursor:default;touch-action:auto!important}
+#gameUI.hud-layout-unlocked .window-handle{cursor:grab;touch-action:none!important}
+#gameUI.hud-layout-unlocked .window-handle:active{cursor:grabbing}
+#gameUI.mobile-hud.hud-layout-unlocked .window-grip{display:block!important;opacity:.95;min-width:44px;width:44px;min-height:44px;height:44px;line-height:42px!important;font-size:22px!important;touch-action:none!important}
+#gameUI.mobile-hud.hud-layout-unlocked #actionDock>.window-grip{top:-46px;right:0}
+#gameUI.mobile-hud.hud-layout-unlocked #spellbar>.window-grip{top:0;right:0}
+#gameUI.mobile-hud.hud-layout-unlocked .quickbar>.window-grip{top:-46px;right:0}
+#gameUI.mobile-hud.hud-layout-unlocked #hudLayoutHint{display:block}
 /* A landscape phone needs a taller book: the former HUD-sized slot left only
    a thin strip of map. The left part of the world/joystick remains available. */
 @media(max-height:550px) and (min-width:560px){

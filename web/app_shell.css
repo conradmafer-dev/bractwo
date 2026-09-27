@@ -1,0 +1,26 @@
+/* Fullscreen and installation fit the existing desktop bar and phone menu. */
+.app-auth-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+.app-text-button { min-height: 44px; min-width: 44px; padding: 8px 12px; border: 1px solid #cdb67888; border-radius: 4px; background: #24392f; color: #f0dfb2; font: 13px/1.35 system-ui, sans-serif; }
+.app-auth-actions > button { flex: 1 1 130px; }
+.app-icon-button { flex-shrink: 0; }
+#mobileFullscreenButton { display: none; }
+.app-shell-status { position: fixed; z-index: 250; top: max(10px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%); width: max-content; max-width: min(480px, calc(100% - 24px)); padding: 10px 14px; border: 1px solid #cdb67888; border-radius: 5px; background: #11271ff5; color: #f0dfb2; font: 13px/1.5 system-ui, sans-serif; box-shadow: 0 8px 30px #0006; pointer-events: none; }
+.app-shell-status:empty { display: none; }
+#appHelpDialog { width: min(480px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); margin: auto; padding: 18px; overflow: auto; border: 1px solid #cdb678aa; border-radius: 7px; background: #1d3028; color: #ecdfbc; box-shadow: 0 20px 70px #0009; }
+#appHelpDialog::backdrop { background: #04110cbd; }
+#appHelpDialog > header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; position: sticky; top: -18px; padding: 6px 0; background: #1d3028; }
+#appHelpTitle { margin: 5px 0 0; font: 24px/1.25 Georgia, serif; }
+#appHelpClose { flex: 0 0 44px; padding: 0; font-size: 25px; }
+#appHelpBody { font: 14px/1.55 system-ui, sans-serif; }
+#appHelpBody p { margin: 12px 0 0; }
+@media (max-width: 700px), (max-width: 1100px) and (max-height: 600px) {
+  #gameUI.mobile-hud #mobileFullscreenButton {
+    display: flex; align-items: center; justify-content: center; position: absolute;
+    right: var(--mobile-right); top: calc(var(--mobile-top) + 104px); z-index: 30;
+    width: 44px; height: 44px; padding: 0; font: 25px/1 system-ui, sans-serif;
+  }
+  /* The always-visible phone control already supplies this menu action. */
+  #gameUI.mobile-hud #mobileMenu #fullscreenButton { display: none; }
+  #gameUI.mobile-hud.mobile-menu-open #mobileFullscreenButton,
+  #gameUI.mobile-hud.mobile-chat-open #mobileFullscreenButton { visibility: hidden; }
+}

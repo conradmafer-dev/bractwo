@@ -140,6 +140,7 @@ class CasterGame:
         if p.mana<cost:return await self.notice(p,f'Potrzebujesz {cost} many. Dostępny jest także rytuał.')
         if p.gold<s.get('gold',0):return await self.notice(p,f'Składniki kosztują {s["gold"]} złota.')
         seconds=float(s.get('ritual_seconds',10) if ritual else s.get('channel_seconds',3))
+        self.cancel_rest(p)
         self.stop_auto(p)
         # A currently held movement key still cancels, instead of silently eating it.
         p.casting_channel=dict(key=key,name=s['name'],until=now+seconds,total=seconds,x=p.x,y=p.y,floor=p.floor,

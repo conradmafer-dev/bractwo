@@ -1,0 +1,8 @@
+Retest wyłącznie oryginalnej klasy test_pvp_magic.PVPWebSocket, bez zmian testów i timeoutów.
+test_real_two_client_websocket_cast_and_relock (test_pvp_magic.PVPWebSocket.test_real_two_client_websocket_cast_and_relock) ... ok
+test_real_two_client_websocket_party_support (test_pvp_magic.PVPWebSocket.test_real_two_client_websocket_party_support) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 15.287s
+
+OK

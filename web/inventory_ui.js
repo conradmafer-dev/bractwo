@@ -90,12 +90,12 @@
   let tab='buy',signature='',focus;
   for(const [key,label] of [['buy','Kupuj'],['sell','Sprzedaj']]){const b=button(label,()=>{tab=key;signature='';render();});b.dataset.tradeTab=key;b.setAttribute('role','tab');tabs.append(b);}panel.append(tabs);
   const summary=node('p',undefined,'merchant-summary'),body=node('div',undefined,'merchant-content');panel.append(summary,body);
-  const foot=node('footer',undefined,'item-actions');foot.append(button('Odpocznij',()=>h.send({type:'interact'})),button('Zamknij',close));panel.append(foot);document.getElementById('gameUI').append(panel);
+  const foot=node('footer',undefined,'item-actions');foot.append(button('Odpoczynek',()=>h.rest?h.rest():h.send({type:'interact'})),button('Zamknij',close));panel.append(foot);document.getElementById('gameUI').append(panel);
   function close(){panel.hidden=true;hide();if(focus?.isConnected&&focus.getClientRects().length)focus.focus({preventScroll:true});}
   function open(){focus=document.activeElement;h.prepare?.();panel.hidden=false;signature='';render();tabs.firstChild.focus({preventScroll:true});}
   function render(){if(panel.hidden)return;const {player:p,world:w}=h.state();if(!p)return;const trade=h.canTrade();
    const key=JSON.stringify([tab,p.inventory,p.equipment,p.gold,p.level,p.alive,trade,p.item_previews]);if(key===signature)return;signature=key;
-   summary.textContent=`Złoto: ${p.gold} · `+(trade?'Wybierz przedmiot.':'Handel tylko przy kupcu, poza walką.');foot.firstChild.disabled=!trade;
+   summary.textContent=`Złoto: ${p.gold} · `+(trade?'Wybierz przedmiot.':'Handel tylko przy kupcu, poza walką.');foot.firstChild.disabled=!p.alive;
    for(const b of tabs.children){b.classList.toggle('active',b.dataset.tradeTab===tab);b.setAttribute('aria-selected',String(b.dataset.tradeTab===tab));}
    const scroll=body.scrollTop;body.replaceChildren();
    let items=tab==='buy'?Object.entries(w.items||{}).filter(([,spec])=>Number.isFinite(spec.price)).map(([key,spec])=>({...spec,template:key,preview:p.item_previews?.[key]})):p.inventory.filter(i=>!Object.values(p.equipment||{}).includes(i.uid));

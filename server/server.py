@@ -1,4 +1,4 @@
-"""Pogranicze: authoritative shared-world RPG prototype, version 0.8.17.
+"""Pogranicze: authoritative shared-world RPG prototype, version 0.8.18.
 
 One process owns a SQLite database; all economy, combat and crimes are server-owned.
 """
@@ -83,6 +83,31 @@ PVP_RULES = {"min_level": 8, "white_seconds": 120, "combat_seconds": 20,
              "normal_gold_loss": .05, "normal_xp_loss": .10,
              "red_gold_loss": .20, "red_xp_loss": .20,
              "red_item_loss": "one_unequipped; transferred_to_killer_if_space_else_destroyed"}
+REST_RULES = {"short_seconds": 6, "long_seconds": 15,
+              "short_hp_fraction": .25, "short_mana_fraction": .25,
+              "pve_delay_seconds": 3, "long_safe_only": True}
+
+
+def rest_block_status(p, now, simulation_time):
+    """Rest has its own PvE wait; combat/logout and mana recovery stay unchanged."""
+    if not p.alive:
+        return "dead", 0
+    if p.disconnected:
+        return "disconnected", 0
+    if p.casting_channel:
+        return "channel", 0
+    if (p.dx or p.dy) and simulation_time-p.input_time <= .35:
+        return "moving", 0
+    pvp = max(0, p.pvp_combat_until-now)
+    # Existing persisted combat deadlines also protect reconnects without a migration.
+    pve = max(0, p.combat_until-(PVP_RULES["combat_seconds"]-REST_RULES["pve_delay_seconds"])-now)
+    if pvp:
+        return "combat_pvp", max(pvp, pve)
+    if pve:
+        return "combat_pve", pve
+    return "", 0
+
+
 POTIONS = {"health_potion": {"name": "Mikstura zdrowia", "price": 15, "restore": 65},
            "mana_potion": {"name": "Mikstura many", "price": 12, "restore": 55}}
 CLASSES = dict(dnd_content.CLASS_SPECS)
@@ -184,7 +209,7 @@ combat_rules.configure(ITEMS, ENEMY_TYPES)
 hunt_content.configure(ENEMY_TYPES)
 loot_content.configure(ITEMS, ENEMY_TYPES, content.TIER_LEVELS)
 hunt_content.place(content, OBSTACLES, LANDMARKS)
-content.VERSION = "0.8.17"
+content.VERSION = "0.8.18"
 WIDTH, HEIGHT = content.WIDTH, content.HEIGHT
 for prefix, label in (("health", "zdrowia"), ("mana", "many")):
     for tier, level, amount, cost in ((2, 20, 220, 45), (3, 50, 520, 95), (4, 80, 950, 165)):
@@ -250,6 +275,7 @@ class Player:
     caster_rules_version: int = 0
     legacy_medium_grace: bool = False
     casting_channel: dict = field(default_factory=dict)
+    rest_state: dict = field(default_factory=dict)  # Session only; never persisted.
     familiar_state: dict = field(default_factory=dict)
     caster_messages: list = field(default_factory=list)
     form_attack_index: int = 0
@@ -434,6 +460,11 @@ class Player:
             result.update(level_up.pending(self))
             if self._hotbar_level != (self.class_id,self.level):dnd_content.sync_hotbar(self)
             result.update(private_state(self, now))
+            rest_reason, rest_wait = rest_block_status(self, now, simulation_time)
+            result.update({"rest": {"kind": self.rest_state["kind"], "total": self.rest_state["total"],
+                                     "remaining": round(max(0, self.rest_state["until"]-now), 3)} if self.rest_state else {},
+                           "rest_block_reason": rest_reason, "rest_block_remaining": round(rest_wait, 3),
+                           "rest_safe": any(near(self, zone) for zone in content.CITIES)})
             result.update({"action_remaining": round(max(0, self.attack_cooldown_until-now), 3),
                            "action_duration": combat_rules.ROUND_SECONDS,
                            "damage_dice": combat_rules.dice_text(combat_rules.weapon_dice(self)),
@@ -630,7 +661,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                 "enemy_types": inventory_rules.metadata_enemies(ENEMY_TYPES), "loot_hunts": content.LOOT_HUNTS, "spawn": SPAWN, "river": RIVER, "trail_gate": TRAIL_GATE, "weapons": WEAPONS,
                 "nature_sites": [{k:v for k,v in s.items() if k not in ("text","hint_x","hint_y")} for s in self.nature_sites],
                 "classes": CLASSES, "items": inventory_rules.metadata_items(ITEMS), "merchant": MERCHANT, "safe_zone": SAFE_ZONE,
-                "pvp_rules": PVP_RULES, "potions": POTIONS, "inventory_cap": INVENTORY_CAP,
+                "pvp_rules": PVP_RULES, "rest_rules": REST_RULES, "potions": POTIONS, "inventory_cap": INVENTORY_CAP,
                 "party_rules": {"max_members": PARTY_CAP, "range": PARTY_RANGE, "bonus_per_extra_member": .10,
                                 "participation_seconds": 30, "max_level_ratio": 3},
                 "abilities": {"offense": "PvE_and_unlocked_PvP", "druid_party_heal": "party_and_unlocked_PvP_support",
@@ -790,6 +821,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                 saved = json.loads(self.db.execute("SELECT data FROM accounts WHERE id=?", (pid,)).fetchone()[0])
                 p = self.load_player(pid, row[1], ws, saved)
             p.ws = ws
+        self.cancel_rest(p, "")
         p.pvp_safety, p.dx, p.dy, p.input_time = True, 0, 0, -10
         self.players[pid] = p
         self.owner_cache.pop(pid, None)
@@ -949,7 +981,67 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         kind = "sword" if equipment_rules.melee(p) else "magic_bolt" if equipment_rules.is_focus(equipment_rules.weapon(p)) else "arrow"
         return self.combat_effect(p, kind, target, duration=.22 if kind == "sword" else .32)
 
+    def cancel_rest(self, p, message="Odpoczynek przerwany."):
+        if not getattr(p, "rest_state", None):
+            return False
+        p.rest_state = {}
+        if message and not p.disconnected:
+            self.caster_message(p, message)
+        return True
+
+    async def start_rest(self, p, kind="short"):
+        if not isinstance(kind, str) or kind not in ("short", "long"):
+            return await self.notice(p, "Wybierz krótki albo długi odpoczynek.")
+        if p.rest_state:
+            return await self.notice(p, "Odpoczynek już trwa.")
+        now = self.now()
+        reason, remaining = rest_block_status(p, now, self.time)
+        if reason:
+            messages = {"dead": "Nie możesz odpoczywać po śmierci.",
+                        "disconnected": "Odpoczynek wymaga połączenia z grą.",
+                        "moving": "Zatrzymaj się, aby rozpocząć odpoczynek.",
+                        "channel": "Najpierw zakończ rzucanie rytuału.",
+                        "combat_pvp": f"Odpoczynek po walce PvP za {math.ceil(remaining)} s.",
+                        "combat_pve": f"Odpoczynek po walce za {math.ceil(remaining)} s."}
+            return await self.notice(p, messages[reason])
+        if kind == "long" and not self.in_safe(p):
+            return await self.notice(p, "Długi odpoczynek wymaga bezpiecznej strefy miasta. W terenie wybierz krótki.")
+        seconds = REST_RULES[kind+"_seconds"]
+        self.stop_auto(p)
+        p.rest_state = {"kind": kind, "total": seconds, "until": now+seconds,
+                        "x": p.x, "y": p.y, "floor": p.floor}
+        await self.notice(p, f'{"Krótki" if kind == "short" else "Długi"} odpoczynek · {seconds} s. Ruch lub akcja przerywa odpoczynek.')
+
+    def tick_rest(self, p):
+        rest = p.rest_state
+        if not rest:
+            return
+        now = self.now()
+        reason, _ = rest_block_status(p, now, self.time)
+        if (reason or (p.x, p.y, p.floor) != (rest["x"], rest["y"], rest["floor"])
+                or (rest["kind"] == "long" and not self.in_safe(p))):
+            self.cancel_rest(p)
+            return
+        if now < rest["until"]:
+            return
+        p.rest_state = {}
+        if rest["kind"] == "long":
+            p.hp, p.mana = p.max_hp, p.max_mana
+        else:
+            p.hp = min(p.max_hp, p.hp+p.max_hp*REST_RULES["short_hp_fraction"])
+            p.mana = min(p.max_mana, p.mana+p.max_mana*REST_RULES["short_mana_fraction"])
+        with self.db:
+            self.save_player(p)
+        self.combat_effect(p, "heal", radius=65, duration=.9)
+        self.caster_message(p, "Odpoczynek zakończony: pełne zdrowie i mana." if rest["kind"] == "long"
+                            else "Odpoczynek zakończony: +25% maksymalnego zdrowia i many.")
+
+    def begin_action(self, p, bonus=False):
+        self.cancel_rest(p)
+        return super().begin_action(p, bonus=bonus)
+
     def tag(self, p, pvp=False):
+        self.cancel_rest(p)
         p.combat_until = max(p.combat_until, self.now()+PVP_RULES["combat_seconds"])
         if pvp:
             p.pvp_combat_until = max(p.pvp_combat_until, p.combat_until)
@@ -1099,10 +1191,8 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
             self.combat_effect(p, "heal" if action == "spring" else "bulwark", radius=65, duration=.9)
             self.persist()
             return await self.notice(p, site["name"]+detail)
-        if p.alive and self.merchant_near(p) and p.combat_until <= self.now():
-            p.hp, p.mana = p.max_hp, p.max_mana
-            self.persist()
-            return await self.notice(p, "Kupiec: odpocząłeś. Sprzedaj niezałożony sprzęt lub kup mikstury zdrowia (15) i many (12).")
+        if self.merchant_near(p):
+            return await self.start_rest(p, "long")
         await self.notice(p, "Kupiec w Przystani sprzedaje mikstury, skupuje sprzęt i pozwala odpocząć.")
 
     async def inventory_command(self, p, kind, data):
@@ -1177,6 +1267,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
             attr, maximum = ("hp", p.max_hp) if kind_id.startswith("health_potion") else ("mana", p.max_mana)
             if getattr(p, attr) >= maximum:
                 return
+            self.cancel_rest(p)
             inventory_rules.consume(p, kind_id)
             restored = combat_rules.roll_damage(self.combat_rng,spec["dice"]) if "dice" in spec else {"damage":spec["restore"],"damage_dice":str(spec["restore"]),"damage_rolls":[]}
             amount=min(maximum-getattr(p,attr),restored["damage"])
@@ -1246,6 +1337,11 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         p = next((p for p in self.players.values() if p.ws is ws), None)
         if p is None:
             return await self.error(ws, "Najpierw zaloguj postać.")
+        if kind == "rest":
+            return await self.start_rest(p, data.get("kind", "short"))
+        if kind == "rest_cancel":
+            self.cancel_rest(p)
+            return
         if kind == "dismiss_level_up":
             if level_up.dismiss(p, data.get("id")):
                 self.persist()
@@ -1287,6 +1383,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
             norm = max(1, math.hypot(x, y))
             p.dx, p.dy, p.input_time = x/norm, y/norm, self.time
             if x or y:
+                self.cancel_rest(p)
                 self.cancel_channel(p)
                 p.facing = [x/norm, y/norm]
         elif kind == "premium_demo":
@@ -1450,6 +1547,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         for p in tuple(self.players.values()):
             p.current_wall_time = now
             if not p.alive:
+                self.cancel_rest(p, "")
                 if now >= p.respawn_until:
                     home = next((c for c in content.CITIES if c["id"] == p.home_city), content.CITIES[0])
                     p.x, p.y, p.floor, p.hp, p.mana = home["x"], home["y"], 0, p.max_hp, p.max_mana
@@ -1485,6 +1583,9 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                 if not self.in_safe(p):
                     unsafe_ids.add(p.id)
         self.step_monsters(dt, player_cells, unsafe_ids)
+        # Resolve incoming damage before awarding a rest that ends on this tick.
+        for p in tuple(self.players.values()):
+            self.tick_rest(p)
 
     async def run(self):
         loop = asyncio.get_running_loop()
@@ -1503,6 +1604,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
             await asyncio.sleep(max(0, next_tick-loop.time()))
 
     def remove_player(self, p):
+        self.cancel_rest(p, "")
         self.cancel_channel(p,'');self.familiars.pop(p.id,None);self.alarms.pop(p.id,None)
         self.stop_auto(p);self.break_concentration(p);self.companions.pop(p.id,None)
         with self.db:
@@ -1515,6 +1617,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
     async def disconnect(self, ws):
         p = next((p for p in self.players.values() if p.ws is ws), None)
         if p:
+            self.cancel_rest(p, "")
             self.stop_auto(p);self.companions.pop(p.id,None)
             p.ws, p.dx, p.dy, p.input_time = None, 0, 0, -10
             if p.alive and p.combat_until > self.now():
@@ -1618,14 +1721,20 @@ def create_app(db_path="world.sqlite3", clock=None):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css")]:
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():
                 raise web.HTTPNotFound()
-            return web.FileResponse(path,headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
+            headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"}
+            if filename == "manifest.webmanifest":
+                headers["Content-Type"] = "application/manifest+json"
+            elif filename == "sw.js":
+                headers["Content-Type"] = "application/javascript"
+            return web.FileResponse(path,headers=headers)
         app.router.add_get(route,asset)
     app.router.add_static("/assets/",web_dir/"assets",show_index=False)
+    app.router.add_static("/icons/",web_dir/"icons",show_index=False)
     app.cleanup_ctx.append(lifecycle)
     return app
 

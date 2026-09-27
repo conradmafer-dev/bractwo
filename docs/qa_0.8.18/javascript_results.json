@@ -1,0 +1,61 @@
+{
+  "status": "passed",
+  "javascript": {
+    "core_and_rest_ui": {
+      "passed": 40,
+      "failed": 0,
+      "suites": [
+        "test_rest_ui_0818.cjs",
+        "test_inventory_windows.cjs",
+        "test_client_runtime.cjs",
+        "test_wand_casting_0817.cjs"
+      ]
+    },
+    "pwa_fullscreen": {
+      "passed": 9,
+      "failed": 0,
+      "command": "& 'C:\\Users\\Lenovo\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe' '.\\tests\\test_app_shell.cjs'",
+      "duration_ms": 1767.0324,
+      "scope": "Direct Node execution; browser and service-worker APIs represented by controlled VM test doubles. Native browser integration is reported separately.",
+      "suites": [
+        "test_app_shell.cjs"
+      ],
+      "checks": [
+        "fullscreen is requested by a click and browser events synchronize every control",
+        "fullscreen denial opens dismissible help, stops movement and permits retry",
+        "iPhone without fullscreen receives honest Add to Home Screen instructions",
+        "accepted install prompt does not falsely report completed installation",
+        "dismissed install consumes the prompt and the next click offers manual help",
+        "standalone mode hides install affordances and worker only registers on secure origins",
+        "worker precaches only disconnected page and icons, and preserves unrelated caches",
+        "worker never intercepts game code, API, credential POST or cross-origin requests",
+        "navigation loads fresh HTML online and falls back to disconnected page offline"
+      ]
+    },
+    "panel_lock": {
+      "passed": 7,
+      "failed": 0,
+      "command": "& 'C:\\Users\\Lenovo\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\node\\bin\\node.exe' '.\\tests\\test_panel_lock_0818.cjs'",
+      "duration_ms": 16049.7988,
+      "scope": "Direct Node execution of production windows.js with a controlled DOM/storage/pointer fixture. Native mouse and touch integration is reported separately.",
+      "suites": [
+        "test_panel_lock_0818.cjs"
+      ],
+      "checks": [
+        "new layouts start locked; pointer and keyboard cannot move panels",
+        "legacy saved positions and visibility survive default-lock migration",
+        "explicit unlock permits drag and arrow movement, and locking preserves placement",
+        "locking mid-drag releases capture and restores the last committed position",
+        "reset preserves current lock state while clearing positions and hidden panels",
+        "mobile unlock permits moving panels and relock preserves separate saved placement",
+        "only an explicit boolean false unlocks a stored profile"
+      ]
+    }
+  },
+  "syntax": [
+    "web/game.js",
+    "web/rest_ui.js",
+    "web/inventory_ui.js"
+  ],
+  "note": "Direct Node execution in a single process; browser integration is reported separately."
+}

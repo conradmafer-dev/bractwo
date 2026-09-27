@@ -1,4 +1,4 @@
-/* Loaded last. Phone layout shares the same breakpoint with mobile.js. */
+/* Phone layout shares the same breakpoint with mobile.js. */
 .mobile-control, #mobileMenu { display: none; }
 
 @media (max-width: 700px), (max-width: 1100px) and (max-height: 600px) {
@@ -7,10 +7,15 @@
     --mobile-right: max(8px, env(safe-area-inset-right));
     --mobile-top: max(8px, env(safe-area-inset-top));
     --mobile-bottom: max(10px, env(safe-area-inset-bottom));
+    --mobile-screen-left: env(safe-area-inset-left, 0px);
+    --mobile-screen-bottom: env(safe-area-inset-bottom, 0px);
     height: 100dvh;
   }
   .mobile-hud *, .mobile-hud *::before, .mobile-hud *::after { box-sizing: border-box; }
   .mobile-hud button { touch-action: manipulation; }
+  #gameUI.mobile-hud.joystick-centered .movement-controls:not(.hud-floating) {
+    left: var(--mobile-joystick-x); top: var(--mobile-joystick-y); bottom: auto;
+  }
   .mobile-hud .window-grip, .mobile-hud #controlTip, .mobile-hud kbd,
   .mobile-hud .brand, .mobile-hud #connectionStatus { display: none !important; }
   .mobile-hud .window-handle { cursor: default; touch-action: auto !important; }
@@ -101,6 +106,8 @@
   .mobile-hud #mobileMenu .icon-button::after { content: attr(data-mobile-label); font: 11px/15px system-ui; }
   .mobile-hud #mobileMenu .safety-button { align-self: stretch; min-height: 44px; font-size: 12px; }
   .mobile-hud #mobileMenu #skullStatus { font-size: 12px; white-space: normal; }
+  /* Menu controls stay inside the drawer; their grips must not cover Close. */
+  #gameUI.mobile-hud #mobileMenu .window-grip { display: none !important; }
   .mobile-hud #mobileMenu .hud-visibility { padding: 0; position: static; }
   .mobile-hud #mobileMenu .hud-visibility > button { min-width: 44px; min-height: 44px; font-size: 12px; }
   .mobile-hud #hudVisibilityMenu { max-height: none; }

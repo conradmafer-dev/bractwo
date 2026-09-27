@@ -10,3 +10,6 @@ data
 backups
 tests
 docs
+.qa-python
+node_modules
+builds

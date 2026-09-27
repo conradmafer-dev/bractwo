@@ -1,0 +1,14 @@
+{
+  "status": "passed",
+  "syntax": [
+    "web/game.js",
+    "web/rest_ui.js",
+    "web/inventory_ui.js",
+    "web/mobile.js",
+    "web/windows.js",
+    "web/app_shell.js",
+    "web/sw.js"
+  ],
+  "checkedAt": "2026-09-27T10:29:01.142Z",
+  "note": "Includes final native keyboard guard for rest and merchant buttons."
+}
