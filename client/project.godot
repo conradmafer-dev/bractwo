@@ -1,9 +1,9 @@
-; Bractwo — Pogranicze — prototype 0.6.0, Godot 4.5.x
+; Bractwo — Pogranicze — prototype 0.8.17, Godot 4.5.x
 config_version=5
 
 [application]
 config/name="Bractwo — Pogranicze"
-config/version="0.6.0"
+config/version="0.8.17"
 run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://assets/icon.svg"

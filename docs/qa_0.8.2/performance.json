@@ -1,0 +1,14 @@
+{
+  "1": {
+    "step_ms": 0.356,
+    "snapshot_batch_ms": 0.361,
+    "mean_packet_bytes": 9544,
+    "monsters": 11235
+  },
+  "24": {
+    "step_ms": 4.111,
+    "snapshot_batch_ms": 14.842,
+    "mean_packet_bytes": 23276,
+    "monsters": 11235
+  }
+}

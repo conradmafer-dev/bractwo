@@ -1,0 +1,70 @@
+TAP version 13
+# Subtest: spatial queries preserve every visible object at boundaries and across floors
+ok 1 - spatial queries preserve every visible object at boundaries and across floors
+  ---
+  duration_ms: 22.260982
+  type: 'test'
+  ...
+# Subtest: FPS measures actual frame timestamps, including slow frames and reset
+ok 2 - FPS measures actual frame timestamps, including slow frames and reset
+  ---
+  duration_ms: 0.248553
+  type: 'test'
+  ...
+# Subtest: motion interpolates evenly and snaps on floor change or distant travel
+ok 3 - motion interpolates evenly and snaps on floor change or distant travel
+  ---
+  duration_ms: 0.262935
+  type: 'test'
+  ...
+# Subtest: picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+ok 4 - picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+  ---
+  duration_ms: 0.409335
+  type: 'test'
+  ...
+# Subtest: owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+ok 5 - owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+  ---
+  duration_ms: 0.197457
+  type: 'test'
+  ...
+# Subtest: surface index gives trails priority, curved segments, ellipse edges and floor stone
+ok 6 - surface index gives trails priority, curved segments, ellipse edges and floor stone
+  ---
+  duration_ms: 0.59186
+  type: 'test'
+  ...
+# Subtest: large monster picking follows species size and ignores other floors
+ok 7 - large monster picking follows species size and ignores other floors
+  ---
+  duration_ms: 0.208784
+  type: 'test'
+  ...
+# Subtest: combat readout explains lower d20, misses, criticals and saving throws
+ok 8 - combat readout explains lower d20, misses, criticals and saving throws
+  ---
+  duration_ms: 0.254773
+  type: 'test'
+  ...
+# Subtest: companion cannot be accidentally selected as a hostile monster
+ok 9 - companion cannot be accidentally selected as a hostile monster
+  ---
+  duration_ms: 0.314763
+  type: 'test'
+  ...
+# Subtest: combat summary exposes actual damage dice and zero save damage
+ok 10 - combat summary exposes actual damage dice and zero save damage
+  ---
+  duration_ms: 0.4721
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 79.602056

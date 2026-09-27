@@ -1,0 +1,50 @@
+Chromium ready; loading actual client and bridge
+Client loaded; creating QA account
+PASS 1: 24 fields in two 12-key rows; all nine starting mage spells included
+PASS 2: C opens standalone four-tab card; backpack 3x5 with no journal or atlas
+PASS 3: Statistics show real weapon/spell rolls, six attributes/saves and thirteen damage resistances
+PASS 4: Feats tab is an honest empty state, with no fake purchasable feats
+PASS 5: Spell tab binding assigns F1 and persists server hotbar
+PASS 6: F1 actually casts its assigned spell, F switches from successful-use history
+PASS 7: F12 dispatches slot 24, not a browser action or the adaptive F shortcut
+PASS 8: Magic Missile emits one three-projectile event and animated curved trails
+PASS 9: Ray of Frost emits blue-white beam metadata and draws impact shards
+PASS 10: Adaptive F actually casts the most-used spell through the real ability command
+PASS 11: Real burning_hands cast transmits and renders cone geometry
+PASS 12: Real fireball cast transmits and renders circle geometry
+PASS 13: Real lightning_bolt cast transmits and renders line geometry
+PASS 14: Full inventory is paged in 3 rows, worn equipment remains above backpack
+PASS 15: Inventory tile opens equip/sell detail without a one-item vertical list
+PASS 16: Character sheet at 390x844: no page overflow; fifteen cells/three rows
+PASS 17: Character sheet at 320x700: no page overflow; fifteen cells/three rows
+PASS 18: Character sheet at 844x390: no page overflow; fifteen cells/three rows
+PASS 19: Mobile two twelve-slot rows share horizontal touch scroll
+PASS 20: High-level overflow spells available in second 24-slot bank
+PASS 21: Character statistics refresh when soul/experience changes, without reopening
+{
+  "checks": [
+    "24 fields in two 12-key rows; all nine starting mage spells included",
+    "C opens standalone four-tab card; backpack 3x5 with no journal or atlas",
+    "Statistics show real weapon/spell rolls, six attributes/saves and thirteen damage resistances",
+    "Feats tab is an honest empty state, with no fake purchasable feats",
+    "Spell tab binding assigns F1 and persists server hotbar",
+    "F1 actually casts its assigned spell, F switches from successful-use history",
+    "F12 dispatches slot 24, not a browser action or the adaptive F shortcut",
+    "Magic Missile emits one three-projectile event and animated curved trails",
+    "Ray of Frost emits blue-white beam metadata and draws impact shards",
+    "Adaptive F actually casts the most-used spell through the real ability command",
+    "Real burning_hands cast transmits and renders cone geometry",
+    "Real fireball cast transmits and renders circle geometry",
+    "Real lightning_bolt cast transmits and renders line geometry",
+    "Full inventory is paged in 3 rows, worn equipment remains above backpack",
+    "Inventory tile opens equip/sell detail without a one-item vertical list",
+    "Character sheet at 390x844: no page overflow; fifteen cells/three rows",
+    "Character sheet at 320x700: no page overflow; fifteen cells/three rows",
+    "Character sheet at 844x390: no page overflow; fifteen cells/three rows",
+    "Mobile two twelve-slot rows share horizontal touch scroll",
+    "High-level overflow spells available in second 24-slot bank",
+    "Character statistics refresh when soul/experience changes, without reopening"
+  ],
+  "count": 21,
+  "errors": []
+}

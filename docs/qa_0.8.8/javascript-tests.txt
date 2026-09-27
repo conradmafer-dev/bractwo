@@ -1,0 +1,268 @@
+TAP version 13
+# Subtest: spatial queries preserve every visible object at boundaries and across floors
+ok 1 - spatial queries preserve every visible object at boundaries and across floors
+  ---
+  duration_ms: 25.168047
+  type: 'test'
+  ...
+# Subtest: FPS measures actual frame timestamps, including slow frames and reset
+ok 2 - FPS measures actual frame timestamps, including slow frames and reset
+  ---
+  duration_ms: 0.412708
+  type: 'test'
+  ...
+# Subtest: motion interpolates evenly and snaps on floor change or distant travel
+ok 3 - motion interpolates evenly and snaps on floor change or distant travel
+  ---
+  duration_ms: 0.328925
+  type: 'test'
+  ...
+# Subtest: picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+ok 4 - picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+  ---
+  duration_ms: 0.530131
+  type: 'test'
+  ...
+# Subtest: owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+ok 5 - owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+  ---
+  duration_ms: 0.298941
+  type: 'test'
+  ...
+# Subtest: surface index gives trails priority, curved segments, ellipse edges and floor stone
+ok 6 - surface index gives trails priority, curved segments, ellipse edges and floor stone
+  ---
+  duration_ms: 0.656838
+  type: 'test'
+  ...
+# Subtest: large monster picking follows species size and ignores other floors
+ok 7 - large monster picking follows species size and ignores other floors
+  ---
+  duration_ms: 0.247004
+  type: 'test'
+  ...
+# Subtest: combat readout explains lower d20, misses, criticals and saving throws
+ok 8 - combat readout explains lower d20, misses, criticals and saving throws
+  ---
+  duration_ms: 0.713932
+  type: 'test'
+  ...
+# Subtest: companion cannot be accidentally selected as a hostile monster
+ok 9 - companion cannot be accidentally selected as a hostile monster
+  ---
+  duration_ms: 0.406028
+  type: 'test'
+  ...
+# Subtest: combat summary exposes actual damage dice and zero save damage
+ok 10 - combat summary exposes actual damage dice and zero save damage
+  ---
+  duration_ms: 0.553095
+  type: 'test'
+  ...
+# Subtest: paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+ok 11 - paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+  ---
+  duration_ms: 0.317328
+  type: 'test'
+  ...
+# Subtest: hotbar pages handle empty lists and exact twenty-four-slot boundaries
+ok 12 - hotbar pages handle empty lists and exact twenty-four-slot boundaries
+  ---
+  duration_ms: 0.168538
+  type: 'test'
+  ...
+# Subtest: status timer distinguishes six hundred rounds from real-world duration
+ok 13 - status timer distinguishes six hundred rounds from real-world duration
+  ---
+  duration_ms: 0.257289
+  type: 'test'
+  ...
+# Subtest: mana budget UI names mixed slot distribution and flexible pool
+ok 14 - mana budget UI names mixed slot distribution and flexible pool
+  ---
+  duration_ms: 0.219784
+  type: 'test'
+  ...
+# Subtest: spell profile overlays owner scaling without mutating the shared catalogue
+ok 15 - spell profile overlays owner scaling without mutating the shared catalogue
+  ---
+  duration_ms: 5.933964
+  type: 'test'
+  ...
+# Subtest: hotbar mana uses selected casting rank, never static base spell cost
+ok 16 - hotbar mana uses selected casting rank, never static base spell cost
+  ---
+  duration_ms: 0.228637
+  type: 'test'
+  ...
+# Subtest: repeating active concentration is free, other spell costs remain payable
+ok 17 - repeating active concentration is free, other spell costs remain payable
+  ---
+  duration_ms: 0.138855
+  type: 'test'
+  ...
+# Subtest: missing locked spell profile falls back to a safe base and empty slots stay empty
+ok 18 - missing locked spell profile falls back to a safe base and empty slots stay empty
+  ---
+  duration_ms: 0.269907
+  type: 'test'
+  ...
+# Subtest: owner delta replaces spell profiles completely and never leaks them across accounts
+ok 19 - owner delta replaces spell profiles completely and never leaks them across accounts
+  ---
+  duration_ms: 0.155429
+  type: 'test'
+  ...
+# Subtest: single line only contains name and the gained HP
+ok 20 - single line only contains name and the gained HP
+  ---
+  duration_ms: 0.892064
+  type: 'test'
+  ...
+# Subtest: each saving throw can be shown independently
+ok 21 - each saving throw can be shown independently
+  ---
+  duration_ms: 0.105715
+  type: 'test'
+  ...
+# Subtest: movement delta retains its units and decimal comma
+ok 22 - movement delta retains its units and decimal comma
+  ---
+  duration_ms: 0.13592
+  type: 'test'
+  ...
+# Subtest: spell unlock is a gain, not before and after
+ok 23 - spell unlock is a gain, not before and after
+  ---
+  duration_ms: 0.089181
+  type: 'test'
+  ...
+# Subtest: compact owner state preserves pending receipts until changed
+ok 24 - compact owner state preserves pending receipts until changed
+  ---
+  duration_ms: 0.417165
+  type: 'test'
+  ...
+# Subtest: authoritative empty queue clears receipt history
+ok 25 - authoritative empty queue clears receipt history
+  ---
+  duration_ms: 1.987459
+  type: 'test'
+  ...
+# Subtest: Polish drop chance percentages
+ok 26 - Polish drop chance percentages
+  ---
+  duration_ms: 15.070708
+  type: 'test'
+  ...
+# Subtest: Loot preview uses canonical item and unconditional chance
+ok 27 - Loot preview uses canonical item and unconditional chance
+  ---
+  duration_ms: 0.217911
+  type: 'test'
+  ...
+# Subtest: Potion previews use potion catalog
+ok 28 - Potion previews use potion catalog
+  ---
+  duration_ms: 0.105967
+  type: 'test'
+  ...
+# Subtest: Unknown species has no invented drops
+ok 29 - Unknown species has no invented drops
+  ---
+  duration_ms: 0.536079
+  type: 'test'
+  ...
+# Subtest: Atlas frame is always bounded for normal movement
+ok 30 - Atlas frame is always bounded for normal movement
+  ---
+  duration_ms: 6.872828
+  type: 'test'
+  ...
+# Subtest: Atlas idle and invalid movement safe default
+ok 31 - Atlas idle and invalid movement safe default
+  ---
+  duration_ms: 0.306993
+  type: 'test'
+  ...
+# Subtest: Atlas four walking frames loop in order
+ok 32 - Atlas four walking frames loop in order
+  ---
+  duration_ms: 0.18344
+  type: 'test'
+  ...
+# Subtest: physical row one uses digits 1..0, Minus and Equal
+ok 33 - physical row one uses digits 1..0, Minus and Equal
+  ---
+  duration_ms: 1.38456
+  type: 'test'
+  ...
+# Subtest: F1..F12 occupy row two while adaptive F is not a slot
+ok 34 - F1..F12 occupy row two while adaptive F is not a slot
+  ---
+  duration_ms: 0.172193
+  type: 'test'
+  ...
+# Subtest: labels remain correct for second row and overflow bank
+ok 35 - labels remain correct for second row and overflow bank
+  ---
+  duration_ms: 0.368092
+  type: 'test'
+  ...
+# Subtest: all rendered shapes agree with Python geometry at sampled boundaries
+ok 36 - all rendered shapes agree with Python geometry at sampled boundaries
+  ---
+  duration_ms: 20.820861
+  type: 'test'
+  ...
+# Subtest: three missiles take distinct curved paths and converge at one target
+ok 37 - three missiles take distinct curved paths and converge at one target
+  ---
+  duration_ms: 1.386633
+  type: 'test'
+  ...
+# Subtest: missiles do not produce NaN when actor positions coincide
+ok 38 - missiles do not produce NaN when actor positions coincide
+  ---
+  duration_ms: 0.221757
+  type: 'test'
+  ...
+# Subtest: every current spell draws valid canvas commands and balances save/restore
+ok 39 - every current spell draws valid canvas commands and balances save/restore
+  ---
+  duration_ms: 22.295875
+  type: 'test'
+  ...
+# Subtest: legacy effects remain with the existing renderer
+ok 40 - legacy effects remain with the existing renderer
+  ---
+  duration_ms: 0.226143
+  type: 'test'
+  ...
+# Subtest: all upcast magic missiles have separate curves and converge on the target
+ok 41 - all upcast magic missiles have separate curves and converge on the target
+  ---
+  duration_ms: 0.993924
+  type: 'test'
+  ...
+# Subtest: eleven coincident-origin missiles remain finite at all animation phases
+ok 42 - eleven coincident-origin missiles remain finite at all animation phases
+  ---
+  duration_ms: 0.544803
+  type: 'test'
+  ...
+# Subtest: scaled missile volleys and scorching rays draw all animation phases without canvas imbalance
+ok 43 - scaled missile volleys and scorching rays draw all animation phases without canvas imbalance
+  ---
+  duration_ms: 9.828543
+  type: 'test'
+  ...
+1..43
+# tests 43
+# suites 0
+# pass 43
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1047.766983

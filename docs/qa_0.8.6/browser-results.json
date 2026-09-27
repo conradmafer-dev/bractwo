@@ -1,0 +1,104 @@
+{
+  "checks": [
+    "No retroactive receipts on login",
+    "Two levels from one award; separate deltas and bottom Zamknij",
+    "Each new receipt offset down and right in cascade",
+    "Earlier receipt can be raised by its header",
+    "Receipts survive ordinary notification timeout",
+    "Closing middle receipt keeps both surrounding receipts",
+    "Closing last receipt hides only the cascade",
+    "Separate saving throws, primary score, added dice and spell unlocks with icons",
+    "390x844: scrollable long summary, bottom Close visible, no overflow",
+    "320x700: scrollable long summary, bottom Close visible, no overflow",
+    "844x390: scrollable long summary, bottom Close visible, no overflow",
+    "Mobile Close reveals previous receipt",
+    "Action opens Statistics, allocates actual mastery, updates HP, leaves receipt",
+    "Cannot allocate while the existing combat lock is active",
+    "Reconnect restores only outstanding receipts and allocated stats",
+    "Closing summaries does not consume an unassigned point",
+    "Separate account cannot see another player receipts"
+  ],
+  "count": 17,
+  "errors": [],
+  "sent": [
+    {
+      "page": "AwansPanel",
+      "type": "ranking"
+    },
+    {
+      "page": "AwansPanel",
+      "type": "hello",
+      "name": "AwansPanel",
+      "password": "testpassword99",
+      "create": true,
+      "class_id": "mage",
+      "compact_state": true
+    },
+    {
+      "page": "AwansPanel",
+      "type": "dismiss_level_up",
+      "id": "2e86831bc5324b85b6e7bd0815bcdfc4:11"
+    },
+    {
+      "page": "AwansPanel",
+      "type": "dismiss_level_up",
+      "id": "2e86831bc5324b85b6e7bd0815bcdfc4:12"
+    },
+    {
+      "page": "AwansPanel",
+      "type": "dismiss_level_up",
+      "id": "2e86831bc5324b85b6e7bd0815bcdfc4:10"
+    },
+    {
+      "page": "AwansPanel",
+      "type": "dismiss_level_up",
+      "id": "02ef5f5911494ea2b1923bd482779d07:21"
+    },
+    {
+      "page": "AwansPanel",
+      "type": "dismiss_level_up",
+      "id": "02ef5f5911494ea2b1923bd482779d07:20"
+    },
+    {
+      "page": "AwansPanel",
+      "type": "mastery",
+      "branch": "vitality"
+    },
+    {
+      "page": "AwansPanel",
+      "type": "hello",
+      "name": "AwansPanel",
+      "password": "testpassword99",
+      "create": false,
+      "class_id": "mage",
+      "compact_state": true
+    },
+    {
+      "page": "AwansPanel",
+      "type": "dismiss_level_up",
+      "id": "176f07d909614f8595695eca3e44366a:55"
+    },
+    {
+      "page": "AwansPanel",
+      "type": "dismiss_level_up",
+      "id": "774180ea131d4b9cbc89215927c4b569:50"
+    },
+    {
+      "page": "OtherAwans",
+      "type": "ranking"
+    },
+    {
+      "page": "OtherAwans",
+      "type": "ranking"
+    },
+    {
+      "page": "OtherAwans",
+      "type": "hello",
+      "name": "OtherAwans",
+      "password": "testpassword99",
+      "create": true,
+      "class_id": "mage",
+      "compact_state": true
+    }
+  ]
+}

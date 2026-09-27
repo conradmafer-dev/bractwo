@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "Mage still starts at 40/40 mana.",
+    "Four real XP level-ups produce four cascade cards, with only individual mana/recovery gains.",
+    "At level 5 the Feats card displays real recovery +29 and enables it in combat.",
+    "Clicking Recovery at level 5 really restores29 mana and starts unchanged180-second cooldown.",
+    "Level6: max96, Mana+12, Recovery+2; level-up does not clear the active cooldown.",
+    "Mana tooltip shows current96 and next gain11, not a false tabletop-slot equivalent.",
+    "Spellbook at level6 refreshes to recovery31 and next-level +2, without waiting for a five-level threshold.",
+    "390x844: updated recovery amount and card render without horizontal page overflow.",
+    "844x390: updated recovery amount and card render without horizontal page overflow.",
+    "Level10 preserves140 total, unlocks circleII as before and adds only11 mana; spell cost remains30.",
+    "F uses actual favorite Recovery and restores the unchanged40 mana at level10.",
+    "druid: level10 pool140, mana gain11, no fabricated Arcane Recovery.",
+    "ranger: level10 pool60, mana gain2, no fabricated Arcane Recovery.",
+    "knight: level10 pool30, mana gain0, no fabricated Arcane Recovery.",
+    "No JavaScript errors; production handlers and actual UI used throughout."
+  ],
+  "errors": [],
+  "connection": "controlled Python WebSocket bridge to real aiohttp server",
+  "monster_ai": "paused; real server handlers; deterministic clock"
+}

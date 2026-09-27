@@ -1,0 +1,91 @@
+test_attack_cooldown_cannot_spam (test_dnd.GameRules.test_attack_cooldown_cannot_spam) ... ok
+test_auto_does_not_chase_or_retarget (test_dnd.GameRules.test_auto_does_not_chase_or_retarget) ... ok
+test_auto_floor_isolation (test_dnd.GameRules.test_auto_floor_isolation) ... ok
+test_auto_pause_clears_spell_queue (test_dnd.GameRules.test_auto_pause_clears_spell_queue) ... ok
+test_auto_pvp_safety_never_implicitly_disabled (test_dnd.GameRules.test_auto_pvp_safety_never_implicitly_disabled) ... ok
+test_barkskin_minimum_ac (test_dnd.GameRules.test_barkskin_minimum_ac) ... ok
+test_bear_two_attacks (test_dnd.GameRules.test_bear_two_attacks) ... ok
+test_blind_or_entangle_retries_save (test_dnd.GameRules.test_blind_or_entangle_retries_save) ... ok
+test_clear_target_stops_auto (test_dnd.GameRules.test_clear_target_stops_auto) ... ok
+test_compact_snapshot_restores_hotbar_on_change (test_dnd.GameRules.test_compact_snapshot_restores_hotbar_on_change) ... ok
+test_concentration_expires (test_dnd.GameRules.test_concentration_expires) ... ok
+test_concentration_recast_free (test_dnd.GameRules.test_concentration_recast_free) ... ok
+test_damage_breaks_concentration (test_dnd.GameRules.test_damage_breaks_concentration) ... ok
+test_death_stops_auto_and_shape (test_dnd.GameRules.test_death_stops_auto_and_shape) ... ok
+test_druid_basic_melee_range (test_dnd.GameRules.test_druid_basic_melee_range) ... ok
+test_druid_shillelagh_bonus_and_primary_attack (test_dnd.GameRules.test_druid_shillelagh_bonus_and_primary_attack) ... ok
+test_every_spell_executes (test_dnd.GameRules.test_every_spell_executes) ... ok
+test_extra_attacks_all_rolled_separately (test_dnd.GameRules.test_extra_attacks_all_rolled_separately) ... ok
+test_fireball_save_and_damage (test_dnd.GameRules.test_fireball_save_and_damage) ... ok
+test_first_circle_gate (test_dnd.GameRules.test_first_circle_gate) ... ok
+test_free_cantrip_with_zero_mana (test_dnd.GameRules.test_free_cantrip_with_zero_mana) ... ok
+test_freedom_of_movement_cancels_magical_movement_penalty (test_dnd.GameRules.test_freedom_of_movement_cancels_magical_movement_penalty) ... ok
+test_friendly_heal_rejects_pvp_combat (test_dnd.GameRules.test_friendly_heal_rejects_pvp_combat) ... ok
+test_heal_other_player_only_party (test_dnd.GameRules.test_heal_other_player_only_party) ... ok
+test_healing_full_hp_no_cost (test_dnd.GameRules.test_healing_full_hp_no_cost) ... ok
+test_healing_uses_dice_and_ability (test_dnd.GameRules.test_healing_uses_dice_and_ability) ... ok
+test_hotbar_persisted (test_dnd.GameRules.test_hotbar_persisted) ... ok
+test_hotbar_rejects_foreign_and_bad_slot (test_dnd.GameRules.test_hotbar_rejects_foreign_and_bad_slot) ... ok
+test_hunters_mark_each_attack (test_dnd.GameRules.test_hunters_mark_each_attack) ... ok
+test_magic_missile_automatic_three_dice (test_dnd.GameRules.test_magic_missile_automatic_three_dice) ... ok
+test_malformed_cast_target_rejected_without_cost (test_dnd.GameRules.test_malformed_cast_target_rejected_without_cost) ... ok
+test_meteor_hits_selected_center_once (test_dnd.GameRules.test_meteor_hits_selected_center_once) ... ok
+test_migrate_paladin_gear_uid_and_hp (test_dnd.GameRules.test_migrate_paladin_gear_uid_and_hp) ... ok
+test_migration_keeps_dead_character_dead (test_dnd.GameRules.test_migration_keeps_dead_character_dead) ... ok
+test_moonbeam_periodic_not_each_frame (test_dnd.GameRules.test_moonbeam_periodic_not_each_frame) ... ok
+test_no_casting_in_shape_and_free_return (test_dnd.GameRules.test_no_casting_in_shape_and_free_return) ... ok
+test_no_damage_minimum_one_after_zero_save (test_dnd.GameRules.test_no_damage_minimum_one_after_zero_save) ... ok
+test_one_concentration_only (test_dnd.GameRules.test_one_concentration_only) ... ok
+test_pet_death_cooldown (test_dnd.GameRules.test_pet_death_cooldown) ... ok
+test_pet_gate_and_real_actor (test_dnd.GameRules.test_pet_gate_and_real_actor) ... ok
+test_pet_only_attacks_selected_enemy (test_dnd.GameRules.test_pet_only_attacks_selected_enemy) ... ok
+test_pet_removed_on_floor_change (test_dnd.GameRules.test_pet_removed_on_floor_change) ... ok
+test_queued_spell_preempts_auto (test_dnd.GameRules.test_queued_spell_preempts_auto) ... ok
+test_ranger_delayed_magic (test_dnd.GameRules.test_ranger_delayed_magic) ... ok
+test_ranking_empty_accounts (test_dnd.GameRules.test_ranking_empty_accounts) ... ok
+test_ranking_public_and_no_private_data (test_dnd.GameRules.test_ranking_public_and_no_private_data) ... ok
+test_real_weapon_damage (test_dnd.GameRules.test_real_weapon_damage) ... ok
+test_removed_runes_refund_once (test_dnd.GameRules.test_removed_runes_refund_once) ... ok
+test_repeated_concentration_spell_free_with_empty_mana (test_dnd.GameRules.test_repeated_concentration_spell_free_with_empty_mana) ... ok
+test_scorching_ray_three_attack_rolls (test_dnd.GameRules.test_scorching_ray_three_attack_rolls) ... ok
+test_select_starts_auto_and_round_cooldown (test_dnd.GameRules.test_select_starts_auto_and_round_cooldown) ... ok
+test_shape_has_temporary_health (test_dnd.GameRules.test_shape_has_temporary_health) ... ok
+test_shield_can_turn_hit_into_miss (test_dnd.GameRules.test_shield_can_turn_hit_into_miss) ... ok
+test_shield_does_not_cancel_critical (test_dnd.GameRules.test_shield_does_not_cancel_critical) ... ok
+test_snapshot_private_vs_public (test_dnd.GameRules.test_snapshot_private_vs_public) ... ok
+test_spike_growth_damage_only_on_movement (test_dnd.GameRules.test_spike_growth_damage_only_on_movement) ... ok
+test_stoneskin_halves_physical_damage (test_dnd.GameRules.test_stoneskin_halves_physical_damage) ... ok
+test_world_terrain_preserved (test_dnd.GameRules.test_world_terrain_preserved) ... ok
+test_wrong_class_spells_denied (test_dnd.GameRules.test_wrong_class_spells_denied) ... ok
+test_health_version (test_dnd.NetworkRules.test_health_version) ... /mnt/data/work/Bractwo_0.8.0/server/server.py:1444: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["game"]=Game(db_path, clock=clock)
+ok
+test_public_ranking_http_no_auth (test_dnd.NetworkRules.test_public_ranking_http_no_auth) ... ok
+test_registration_and_ws_ranking (test_dnd.NetworkRules.test_registration_and_ws_ranking) ... Executing <Task pending name='Task-320' coro=<NetworkRules.asyncSetUp() running at /mnt/data/work/Bractwo_0.8.0/tests/test_dnd.py:287> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.158 seconds
+ok
+test_unauthed_hotbar_is_rejected (test_dnd.NetworkRules.test_unauthed_hotbar_is_rejected) ... ok
+test_web_assets_delivered (test_dnd.NetworkRules.test_web_assets_delivered) ... ok
+test_advantage_disadvantage_cancel (test_dnd.PureRules.test_advantage_disadvantage_cancel) ... ok
+test_bounded_proficiency (test_dnd.PureRules.test_bounded_proficiency) ... ok
+test_cantrips_scale_without_multiple_casts (test_dnd.PureRules.test_cantrips_scale_without_multiple_casts) ... ok
+test_circles_full (test_dnd.PureRules.test_circles_full) ... ok
+test_circles_ranger (test_dnd.PureRules.test_circles_ranger) ... ok
+test_critical_doubles_dice_not_modifier (test_dnd.PureRules.test_critical_doubles_dice_not_modifier) ... ok
+test_damage_not_linear_in_game_level (test_dnd.PureRules.test_damage_not_linear_in_game_level) ... ok
+test_early_monsters_low_hp (test_dnd.PureRules.test_early_monsters_low_hp) ... ok
+test_every_monster_has_explicit_damage_dice (test_dnd.PureRules.test_every_monster_has_explicit_damage_dice) ... ok
+test_half_damage_round_down (test_dnd.PureRules.test_half_damage_round_down) ... ok
+test_knight_no_spells (test_dnd.PureRules.test_knight_no_spells) ... ok
+test_natural_one_misses (test_dnd.PureRules.test_natural_one_misses) ... ok
+test_negative_modifier (test_dnd.PureRules.test_negative_modifier) ... ok
+test_potion_dice (test_dnd.PureRules.test_potion_dice) ... ok
+test_spell_catalogue (test_dnd.PureRules.test_spell_catalogue) ... ok
+test_starting_hp (test_dnd.PureRules.test_starting_hp) ... ok
+test_weapon_extra_attacks (test_dnd.PureRules.test_weapon_extra_attacks) ... ok
+test_zero_damage_on_successful_save (test_dnd.PureRules.test_zero_damage_on_successful_save) ... ok
+
+----------------------------------------------------------------------
+Ran 82 tests in 4.576s
+
+OK

@@ -1,4 +1,6 @@
 extends Node2D
+const CASTER_VFX = preload("res://scripts/caster_vfx.gd")
+const SPELL_VFX = preload("res://scripts/spell_vfx.gd")
 ## 0.4: continent size comes from server metadata; draw only the camera vicinity.
 ## Collision and interactions remain server-authoritative; art never sends positions.
 
@@ -26,6 +28,8 @@ var _font: Font
 var _last_flags: Dictionary = {}
 var _server_time: float = 0.0
 var _effects: Dictionary = {}
+var _monster_textures: Dictionary = {}
+var _monster_walk: Dictionary = {}
 
 const INK: Color = Color("172c32")
 const GOLD: Color = Color("e8c87e")
@@ -48,6 +52,7 @@ class GroundLayer:
 			renderer._draw_ground(self)
 
 func _ready() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	_font = ThemeDB.fallback_font
 	_ground = GroundLayer.new()
 	_ground.renderer = self
@@ -67,6 +72,7 @@ func _ready() -> void:
 func set_world(data: Dictionary) -> void:
 	world_data = data
 	_static_index.build(data)
+	_monster_walk.clear()
 	_surface_map.build(data)
 	_mills = data.get("obstacles", []).filter(func(o: Dictionary) -> bool: return o.get("type", "") == "mill")
 	_region_rects.clear()
@@ -108,8 +114,15 @@ func set_state(data: Dictionary) -> void:
 	if data.is_empty():
 		_effects.clear()
 		_samples.clear()
+	if data.has("active_field_effects"):
+		for id: String in _effects.keys():
+			if _effects[id].get("persistent", false) and not data["active_field_effects"].has(id):
+				_effects.erase(id)
 	for effect: Dictionary in data.get("effects", []):
 		var id: String = str(effect.get("id", ""))
+		if effect.get("ended", false):
+			_effects.erase(id)
+			continue
 		if not _effects.has(id) and _server_time < float(effect.get("time", 0)) + float(effect.get("duration", 0.32)):
 			_effects[id] = effect.duplicate(true)
 	var flags: Dictionary = snapshot.get("world", {})
@@ -118,7 +131,7 @@ func set_state(data: Dictionary) -> void:
 		if is_instance_valid(_ground):
 			_ground.queue_redraw()
 	var active: Dictionary = {}
-	for group: String in ["players", "enemies"]:
+	for group: String in ["players", "enemies", "companions"]:
 		for entry: Dictionary in snapshot.get(group, []):
 			var key: String = group + ":" + str(entry.get("id", ""))
 			active[key] = true
@@ -495,11 +508,12 @@ func _draw() -> void:
 		_draw_merchant()
 	_draw_npcs()
 	_draw_mill_blades()
+	CASTER_VFX.world(self, world_data, snapshot, _local_player())
 	var actors: Array[Dictionary] = []
-	for enemy: Dictionary in snapshot.get("enemies", []):
+	for enemy: Dictionary in snapshot.get("enemies", []) + snapshot.get("companions", []):
 		if not bool(enemy.get("alive", true)) or float(enemy.get("hp", 1)) <= 0:
 			continue
-		var key: String = "enemies:" + str(enemy.get("id", ""))
+		var key: String = ("companions:" if enemy.get("is_companion", false) else "enemies:") + str(enemy.get("id", ""))
 		var p: Vector2 = _positions.get(key, Vector2(float(enemy.get("x", 0)), float(enemy.get("y", 0))))
 		actors.append({"type": "enemy", "data": enemy, "p": p})
 	for player: Dictionary in snapshot.get("players", []):
@@ -516,6 +530,9 @@ func _draw() -> void:
 			_draw_player(actor["data"], p)
 		else:
 			_draw_enemy(actor["data"], p)
+		if float(actor["data"].get("hp", 0)) > 0:
+			CASTER_VFX.statuses(self, actor["data"], p, _server_time)
+			SPELL_VFX.draw_statuses(self, actor["data"].get("status_effects", []), p, _server_time, float(actor["data"].get("size", 1)))
 	_draw_effects()
 	for actor: Dictionary in actors:
 		if actor["type"] == "player" and int(actor["data"].get("floor", 0)) == int(_local_player().get("floor", 0)):
@@ -548,6 +565,13 @@ func _draw_merchant() -> void:
 		_text_center(p + Vector2(0, 32), "E · Handel i leczenie", WARM, 12)
 
 func _draw_player(player: Dictionary, p: Vector2) -> void:
+	if not str(player.get("form", "")).is_empty() and float(player.get("hp", 0)) > 0:
+		var shape: Dictionary = player.duplicate()
+		shape["kind"] = player["form"]
+		shape["size"] = 1
+		_draw_enemy(shape, p)
+		_text_center(p + Vector2(0, -78), str(player.get("name", "")) + " · " + str(player.get("temp_hp", 0)) + " tymcz. HP", GOLD, 13)
+		return
 	var mine: bool = str(player.get("id", "")) == local_id
 	var facing_data: Array = player.get("facing", [0, 1])
 	var facing: Vector2 = Vector2(float(facing_data[0]), float(facing_data[1])) if facing_data.size() >= 2 else Vector2.DOWN
@@ -593,6 +617,10 @@ func _draw_player(player: Dictionary, p: Vector2) -> void:
 		draw_arc(o + Vector2(16, -25), 19, -PI * 0.5, PI * 0.5, 20, Color("c49e62"), 3, true)
 		draw_line(o + Vector2(16, -44), o + Vector2(16, -6), Color("e4d6ad"), 1.5, true)
 		draw_line(o + Vector2(10, -25), o + Vector2(40, -25), Color("e1d1a8"), 2, true)
+	elif str(player.get("weapon_type", "")) == "maul":
+		draw_line(o + Vector2(9, -7), o + Vector2(26, -44), Color("987749"), 5, true)
+		draw_rect(Rect2(o + Vector2(13, -49), Vector2(26, 14)), Color("bcc9bd"))
+		draw_rect(Rect2(o + Vector2(13, -49), Vector2(26, 14)), GOLD, false, 2)
 	else:
 		draw_line(o + Vector2(17, -12), o + Vector2(30, -38), Color("273d42"), 7, true)
 		draw_line(o + Vector2(18, -13), o + Vector2(30, -38), Color("d5e5dc"), 4, true)
@@ -602,6 +630,11 @@ func _draw_player(player: Dictionary, p: Vector2) -> void:
 			var angle: float = Vector2(float(aim_data[0]), float(aim_data[1])).angle()
 			draw_arc(p + Vector2(0, -13), 48, angle - 0.8, angle + 0.8, 18, Color(0.87, 0.93, 0.77, 0.9), 5, true)
 			draw_arc(p + Vector2(0, -13), 54, angle - 0.5, angle + 0.6, 16, Color(0.87, 0.93, 0.77, 0.3), 2, true)
+	if player.get("shield_equipped", false):
+		draw_colored_polygon(PackedVector2Array([o + Vector2(-23, -31), o + Vector2(-7, -31), o + Vector2(-6, -17), o + Vector2(-15, -7), o + Vector2(-24, -17)]), Color("76928b"))
+		draw_line(o + Vector2(-15, -29), o + Vector2(-15, -12), GOLD, 2)
+	if player.get("two_handed", false) and str(player.get("weapon_type", "")) != "maul":
+		draw_line(o + Vector2(13, -9), o + Vector2(33, -51), Color("e4eadc"), 6, true)
 	var name_text: String = str(player.get("name", "Wędrowiec")) + " · " + str(int(player.get("level", 1)))
 	if bool(player.get("disconnected", false)):
 		name_text += " [offline]"
@@ -617,10 +650,15 @@ func _draw_player(player: Dictionary, p: Vector2) -> void:
 	_health_bar(p + Vector2(0, -56), 44, float(player.get("hp", 1)), float(player.get("max_hp", 1)), Color("7bbc9a"))
 
 func _draw_enemy(enemy: Dictionary, p: Vector2) -> void:
+	if CASTER_VFX.actor(self, enemy, p, _server_time):
+		_text_center(p + Vector2(0, -54), str(enemy.get("name", "")), GOLD, 11)
+		return
 	var size: float = float(enemy.get("size", 1))
 	if str(enemy.get("id", "")) == selected_enemy:
 		draw_rect(Rect2(p + Vector2(-30, -62) * size, Vector2(60, 70) * size), Color("f05942"), false, 2)
 	var spec: Dictionary = world_data.get("enemy_types", {}).get(str(enemy.get("kind", "wolf")), {})
+	if spec.has("sprite") and _draw_loot_monster(enemy, p, spec):
+		return
 	var kind: String = str(spec.get("appearance", enemy.get("kind", "wolf")))
 	if kind in ["bear", "harpy", "cyclops", "ghoul", "scorpion"]:
 		_draw_wild_enemy(enemy, p, spec)
@@ -754,7 +792,7 @@ func _text_center(p: Vector2, value: String, color: Color, font_size: int) -> vo
 func _class_color(class_id: String) -> Color:
 	match class_id:
 		"knight": return Color("739ecc")
-		"paladin": return Color("d3ac48")
+		"ranger": return Color("d3ac48")
 		"mage": return Color("a078d6")
 		"druid": return Color("52ae63")
 	return Color("438d92")
@@ -835,7 +873,17 @@ func _draw_effects() -> void:
 		var target: Vector2 = Vector2(float(effect.get("target_x",origin.x)),float(effect.get("target_y",origin.y)))
 		var kind: String = str(effect.get("kind","magic_bolt"))
 		var radius: float = float(effect.get("radius",0))
-		if kind == "danger_zone":
+		if kind.begins_with("fighter_"):
+			SPELL_VFX.draw_fighter(self, effect, t)
+			continue
+		if kind == "spell":
+			SPELL_VFX.draw(self, effect, t, _server_time)
+			continue
+		if kind == "combat_roll":
+			var result_text: String = ("DRAŚNIĘCIE · " + str(effect.get("damage", 0))) if effect.get("graze", false) else "KRYTYK" if effect.get("critical", false) else "PUDŁO" if not effect.get("hit", true) else "OBRONA ½" if effect.get("saved", false) else ""
+			if not result_text.is_empty():
+				_text_center(target + Vector2(0, -82 - t * 16), result_text, Color(GOLD if effect.get("critical", false) else Color("d6dccc"), 1 - t), 13)
+		elif kind == "danger_zone":
 			var tint: Color = _enemy_element_color(str(effect.get("element", "stone")))
 			draw_circle(target, radius, Color(tint, 0.12))
 			draw_arc(target, radius, 0, TAU, 56, Color(tint, 0.9), 3)
@@ -1156,3 +1204,30 @@ func _draw_site(c: Node2D, site: Dictionary, p: Vector2) -> void:
 		_map_label(c, p + Vector2(0, -26), "≈" if action == "wind" else "◇", tint)
 	_map_label(c, p + Vector2(0, -64), str(site["name"]), tint)
 	_map_label(c, p + Vector2(0, 32), "E · użyj poza walką", tint)
+
+func _draw_loot_monster(enemy: Dictionary, p: Vector2, spec: Dictionary) -> bool:
+	var path: String = "res://" + str(spec["sprite"])
+	if not _monster_textures.has(path):
+		_monster_textures[path] = load(path) if ResourceLoader.exists(path) else null
+	var atlas: Texture2D = _monster_textures[path] as Texture2D
+	if atlas == null:
+		return false
+	var id: String = str(enemy.get("id", ""))
+	var walk: Dictionary = _monster_walk.get(id, {"last":p, "distance":0.0})
+	walk["distance"] = float(walk["distance"]) + p.distance_to(walk["last"])
+	walk["last"] = p
+	_monster_walk[id] = walk
+	var frame: int = int(float(walk["distance"]) * 0.069) % int(spec.get("sprite_frames", 4))
+	var facing: Array = enemy.get("facing", [1, 0])
+	var flip: float = -1.0 if float(facing[0]) < 0 else 1.0
+	var z: float = float(spec.get("size", 1))
+	_shadow(p, Vector2(21, 7) * z)
+	draw_set_transform(p, 0, Vector2(z * flip, z))
+	draw_texture_rect_region(atlas, Rect2(-40, -68, 80, 80), Rect2(frame * 80, 0, 80, 80))
+	if float(enemy.get("attack_until", 0)) > _server_time:
+		draw_arc(Vector2(18, -24), 22, -1.1, 0.6, 12, GOLD, 2)
+	draw_set_transform(Vector2.ZERO)
+	var height: float = -78 * z
+	_text_center(p + Vector2(0, height), str(enemy.get("name", "")), GOLD if spec.get("boss", false) else WARM, 12)
+	_health_bar(p + Vector2(0, height + 7), 50 * z, float(enemy.get("hp", 1)), float(enemy.get("max_hp", 1)), Color("c77868"))
+	return true

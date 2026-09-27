@@ -1,0 +1,105 @@
+Chromium ready; loading actual client and bridge
+Client loaded; creating QA account
+LAYOUT 1440 900 {".chat-wrap": {"x": 24, "y": 818, "w": 201.59375, "h": 62, "right": 225.59375, "bottom": 880}, ".quickbar": {"x": 233.59375, "y": 756, "w": 54, "h": 124, "right": 287.59375, "bottom": 880}, "#spellbar": {"x": 295.59375, "y": 756, "w": 939.40625, "h": 124, "right": 1235, "bottom": 880}, "#bookSpell": {"x": 1123, "y": 820, "w": 42, "h": 60, "right": 1165, "bottom": 880}, "#abilityButton": {"x": 1169, "y": 820, "w": 66, "h": 60, "right": 1235, "bottom": 880}, "#effectsPanel": {"x": 350, "y": 118, "w": 840, "h": 66, "right": 1190, "bottom": 184}, ".topbar": {"x": 22, "y": 15, "w": 1396, "h": 91, "right": 1418, "bottom": 106}, ".combat-controls": {"x": 1242, "y": 801, "w": 170, "h": 68, "right": 1412, "bottom": 869}, ".movement-controls": {"x": 385, "y": 876, "w": 0, "h": 0, "right": 385, "bottom": 876}}
+PASS 1: 1440x900: potion order, F right of K, controls clickable, top statuses, no page overflow
+PASS 2: Status strip has no shared background/border/shadow; blank area does not intercept the world
+PASS 3: Own status retains timer and opens description below strip; close works
+PASS 4: Target status is distinguished on button and in description
+PASS 5: K still opens the spell tab in the standalone character sheet
+PASS 6: Relocated HP/mana buttons consume actual server potions and restore health/mana
+PASS 7: F button reflects real favorite and casts at selected enemy
+PASS 8: Favorite changes with usage and keyboard F still casts
+LAYOUT 1280 720 {".chat-wrap": {"x": 24, "y": 623, "w": 179.1875, "h": 77, "right": 203.1875, "bottom": 700}, ".quickbar": {"x": 211.1875, "y": 576, "w": 54, "h": 124, "right": 265.1875, "bottom": 700}, "#spellbar": {"x": 273.1875, "y": 576, "w": 801.8125, "h": 124, "right": 1075, "bottom": 700}, "#bookSpell": {"x": 963, "y": 640, "w": 42, "h": 60, "right": 1005, "bottom": 700}, "#abilityButton": {"x": 1009, "y": 640, "w": 66, "h": 60, "right": 1075, "bottom": 700}, "#effectsPanel": {"x": 350, "y": 118, "w": 680, "h": 66, "right": 1030, "bottom": 184}, ".topbar": {"x": 22, "y": 15, "w": 1236, "h": 91, "right": 1258, "bottom": 106}, ".combat-controls": {"x": 1082, "y": 621, "w": 170, "h": 68, "right": 1252, "bottom": 689}, ".movement-controls": {"x": 385, "y": 696, "w": 0, "h": 0, "right": 385, "bottom": 696}}
+PASS 9: 1280x720: potion order, F right of K, controls clickable, top statuses, no page overflow
+LAYOUT 1024 768 {".chat-wrap": {"x": 12, "y": 671, "w": 145, "h": 77, "right": 157, "bottom": 748}, ".quickbar": {"x": 163, "y": 636, "w": 50, "h": 112, "right": 213, "bottom": 748}, "#spellbar": {"x": 219, "y": 636, "w": 600, "h": 112, "right": 819, "bottom": 748}, "#bookSpell": {"x": 707, "y": 694, "w": 42, "h": 54, "right": 749, "bottom": 748}, "#abilityButton": {"x": 753, "y": 694, "w": 66, "h": 54, "right": 819, "bottom": 748}, "#effectsPanel": {"x": 292, "y": 112, "w": 527, "h": 66, "right": 819, "bottom": 178}, ".topbar": {"x": 22, "y": 15, "w": 980, "h": 91, "right": 1002, "bottom": 106}, ".combat-controls": {"x": 826, "y": 669, "w": 170, "h": 68, "right": 996, "bottom": 737}, ".movement-controls": {"x": 385, "y": 744, "w": 0, "h": 0, "right": 385, "bottom": 744}}
+PASS 10: 1024x768: potion order, F right of K, controls clickable, top statuses, no page overflow
+LAYOUT 390 844 {".chat-wrap": {"x": 12, "y": 525, "w": 366, "h": 25, "right": 378, "bottom": 550}, ".quickbar": {"x": 12, "y": 556, "w": 366, "h": 44, "right": 378, "bottom": 600}, "#spellbar": {"x": 12, "y": 606, "w": 366, "h": 110, "right": 378, "bottom": 716}, "#bookSpell": {"x": 275, "y": 556, "w": 39, "h": 44, "right": 314, "bottom": 600}, "#abilityButton": {"x": 318, "y": 556, "w": 60, "h": 44, "right": 378, "bottom": 600}, "#effectsPanel": {"x": 12, "y": 140, "w": 366, "h": 28, "right": 378, "bottom": 168}, ".topbar": {"x": 12, "y": 15, "w": 366, "h": 89, "right": 378, "bottom": 104}, ".combat-controls": {"x": 238, "y": 738, "w": 137, "h": 78, "right": 375, "bottom": 816}, ".movement-controls": {"x": 16, "y": 720, "w": 100, "h": 100, "right": 116, "bottom": 820}}
+PASS 11: 390x844: potion order, F right of K, controls clickable, top statuses, no page overflow
+LAYOUT 360 640 {".chat-wrap": {"x": 12, "y": 321, "w": 336, "h": 25, "right": 348, "bottom": 346}, ".quickbar": {"x": 12, "y": 352, "w": 336, "h": 44, "right": 348, "bottom": 396}, "#spellbar": {"x": 12, "y": 402, "w": 336, "h": 110, "right": 348, "bottom": 512}, "#bookSpell": {"x": 245, "y": 352, "w": 39, "h": 44, "right": 284, "bottom": 396}, "#abilityButton": {"x": 288, "y": 352, "w": 60, "h": 44, "right": 348, "bottom": 396}, "#effectsPanel": {"x": 12, "y": 140, "w": 336, "h": 28, "right": 348, "bottom": 168}, ".topbar": {"x": 12, "y": 10, "w": 336, "h": 89, "right": 348, "bottom": 99}, ".combat-controls": {"x": 208, "y": 534, "w": 137, "h": 78, "right": 345, "bottom": 612}, ".movement-controls": {"x": 16, "y": 516, "w": 100, "h": 100, "right": 116, "bottom": 616}}
+PASS 12: 360x640: potion order, F right of K, controls clickable, top statuses, no page overflow
+LAYOUT 844 390 {".chat-wrap": {"x": 112, "y": 260, "w": 170, "h": 23, "right": 282, "bottom": 283}, ".quickbar": {"x": 112, "y": 288, "w": 44, "h": 92, "right": 156, "bottom": 380}, "#spellbar": {"x": 161, "y": 288, "w": 532, "h": 92, "right": 693, "bottom": 380}, "#bookSpell": {"x": 597, "y": 251, "w": 34, "h": 32, "right": 631, "bottom": 283}, "#abilityButton": {"x": 635, "y": 251, "w": 58, "h": 32, "right": 693, "bottom": 283}, "#effectsPanel": {"x": 242, "y": 90, "w": 447, "h": 58, "right": 689, "bottom": 148}, ".topbar": {"x": 22, "y": 8, "w": 800, "h": 78, "right": 822, "bottom": 86}, ".combat-controls": {"x": 697, "y": 300, "w": 129, "h": 69, "right": 826, "bottom": 369}, ".movement-controls": {"x": 18, "y": 293, "w": 83, "h": 83, "right": 101, "bottom": 376}}
+PASS 13: 844x390: potion order, F right of K, controls clickable, top statuses, no page overflow
+PASS 14: Hotbar bank buttons are clickable on narrow landscape
+PASS 15: Both 12-slot rows scroll together on phone; K/F remain fixed
+PASS 16: Phone status buttons open descriptions and chat sends a real message
+PASS 17: Removed statuses leave no empty strip
+{
+  "checks": [
+    "1440x900: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "Status strip has no shared background/border/shadow; blank area does not intercept the world",
+    "Own status retains timer and opens description below strip; close works",
+    "Target status is distinguished on button and in description",
+    "K still opens the spell tab in the standalone character sheet",
+    "Relocated HP/mana buttons consume actual server potions and restore health/mana",
+    "F button reflects real favorite and casts at selected enemy",
+    "Favorite changes with usage and keyboard F still casts",
+    "1280x720: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "1024x768: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "390x844: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "360x640: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "844x390: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "Hotbar bank buttons are clickable on narrow landscape",
+    "Both 12-slot rows scroll together on phone; K/F remain fixed",
+    "Phone status buttons open descriptions and chat sends a real message",
+    "Removed statuses leave no empty strip"
+  ],
+  "count": 17,
+  "errors": [],
+  "transport": "controlled Python WebSocket bridge",
+  "sent": [
+    {
+      "page": "UkladCzarodziej",
+      "type": "ranking"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "ranking"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "hello",
+      "name": "UkladCzarodziej",
+      "password": "testpassword99",
+      "create": true,
+      "class_id": "mage",
+      "compact_state": true
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "select_target",
+      "enemy_id": "qa_hud_ogre"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "select_target",
+      "enemy_id": "qa_hud_ogre"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "potion",
+      "item": "health_potion"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "potion",
+      "item": "mana_potion"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "cast",
+      "spell_id": "ray_of_frost",
+      "enemy_id": "qa_hud_ogre"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "cast",
+      "spell_id": "fire_bolt",
+      "enemy_id": "qa_hud_ogre"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "chat",
+      "text": "Test układu HUD"
+    }
+  ]
+}

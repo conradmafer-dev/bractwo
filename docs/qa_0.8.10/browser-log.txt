@@ -1,0 +1,21 @@
+Chromium ready; loading actual client and bridge
+Client loaded; creating QA account
+PASS 1: Default left HUD is stacked and bottom chat/potions align.
+PASS 2: Three actual level-up receipts do not cover the left rail.
+PASS 3: Level-up header drags; Close removes only its own saved receipt.
+PASS 4: Visibility switches hide panels without discarding level-up data.
+PASS 5: HUD grip moves quest without opening it; reset restores default flow.
+PASS 6: Worn weapon has real damage tooltip on hover.
+PASS 7: Click worn gear previews it; separate actions; no invented sources.
+PASS 8: Character window remembers dragged position when reopened.
+PASS 9: Inventory potion binds to Q and restores precisely 35 mana, not an auto-selected variant.
+PASS 10: Merchant Rest button uses the real guarded server interaction.
+PASS 11: Merchant Buy/Sell tabs trade canonical stacks and exclude worn gear.
+PASS 12: Merchant is draggable and Escape closes it.
+PASS 13: Only an actually delivered mummy drop reveals that source, updating owned items.
+PASS 14: Live target, PvP and status effects do not move over the region or quest.
+PASS 15: Bounded HUD, character and merchant at 390x844; no horizontal page overflow.
+PASS 16: Bounded HUD, character and merchant at 844x390; no horizontal page overflow.
+PASS 17: Bounded HUD, character and merchant at 360x640; no horizontal page overflow.
+PASS 18: Layout and visibility are serialized per character and orientation.
+PASS 19: No JavaScript page errors during end-to-end actions.

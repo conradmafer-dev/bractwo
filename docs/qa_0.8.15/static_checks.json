@@ -1,0 +1,12 @@
+{
+  "python_syntax_files": 24,
+  "javascript_syntax_files": 13,
+  "only_changed_caster_definition": [
+    "arcane_recovery"
+  ],
+  "recovery_scaling_unchanged_ast": true,
+  "class_descriptions_and_other_statuses_unchanged": true,
+  "godot_parsed_in_engine": false,
+  "docker_built": false,
+  "node": "v22.16.0"
+}

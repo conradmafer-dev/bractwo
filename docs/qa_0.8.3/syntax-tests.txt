@@ -1,0 +1,3 @@
+Python compileall (server tests tools): PASS
+web/game.js syntax: PASS
+web/runtime.js syntax: PASS

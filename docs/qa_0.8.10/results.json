@@ -1,0 +1,26 @@
+{
+  "checks": [
+    "Default left HUD is stacked and bottom chat/potions align.",
+    "Three actual level-up receipts do not cover the left rail.",
+    "Level-up header drags; Close removes only its own saved receipt.",
+    "Visibility switches hide panels without discarding level-up data.",
+    "HUD grip moves quest without opening it; reset restores default flow.",
+    "Worn weapon has real damage tooltip on hover.",
+    "Click worn gear previews it; separate actions; no invented sources.",
+    "Character window remembers dragged position when reopened.",
+    "Inventory potion binds to Q and restores precisely 35 mana, not an auto-selected variant.",
+    "Merchant Rest button uses the real guarded server interaction.",
+    "Merchant Buy/Sell tabs trade canonical stacks and exclude worn gear.",
+    "Merchant is draggable and Escape closes it.",
+    "Only an actually delivered mummy drop reveals that source, updating owned items.",
+    "Live target, PvP and status effects do not move over the region or quest.",
+    "Bounded HUD, character and merchant at 390x844; no horizontal page overflow.",
+    "Bounded HUD, character and merchant at 844x390; no horizontal page overflow.",
+    "Bounded HUD, character and merchant at 360x640; no horizontal page overflow.",
+    "Layout and visibility are serialized per character and orientation.",
+    "No JavaScript page errors during end-to-end actions."
+  ],
+  "errors": [],
+  "connection": "controlled Python WebSocket bridge to real aiohttp server",
+  "ui_monster_ai": "paused; AI tested separately"
+}

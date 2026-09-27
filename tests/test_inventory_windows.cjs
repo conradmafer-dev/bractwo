@@ -1,0 +1,11 @@
+const test=require('node:test');const assert=require('node:assert/strict');
+const {facts}=require('../web/inventory_ui.js');const {clampPosition}=require('../web/windows.js');
+test('compact potion includes strength and quantity, no zero weapon stats',()=>{let x=facts({slot:'potion',effect_summary:'35 many',quantity:4,stack_limit:99,value:15});assert(x.includes('Odnawia 35 many'));assert(x.includes('Liczba: 4'));assert(!x.some(y=>y.includes('Atak')));});
+test('weapon shows actual personalized rolls without repeating enchantment',()=>{let x=facts({slot:'weapon',weapon_name:'Miecz długi',weapon_category:'martial',attack:1,attack_bonus:1,preview:{attack:5,dice:'1k8+3',damage_type:'slashing'}});assert(x.includes('Obrażenia  1k8+3 cięte'));assert(x.includes('Atak  1k20+5'));assert(!x.some(y=>y==='Trafienie +1'));});
+test('armor and resistance use compact concrete descriptions',()=>{let x=facts({slot:'armor',armor_summary:'KP 13 + Zręczność',resistances:['fire']});assert(x.includes('KP 13 + Zręczność'));assert(x.includes('Odporność: ogień'));});
+test('requirements display meaningful level but no class wall of text',()=>{let x=facts({slot:'weapon',class_ids:['druid'],min_level:5},{classes:{druid:{name:'Druid'}}});assert(!x.some(s=>s.startsWith('Dla:')));assert(x.includes('Poziom 5'));});
+test('all-class supplies need no class wall of text',()=>{let x=facts({slot:'potion',class_ids:['druid','mage','knight','ranger'],restore:18});assert(!x.some(y=>y.startsWith('Dla:')));});
+test('no source row until server provides owner-discovered sources',()=>{let x=facts({slot:'weapon',sources:[]});assert(!x.some(s=>s.startsWith('Zdobyto')));let y=facts({slot:'weapon',sources:[{name:'Bandyta',chance:.03}]});assert(y.includes('Zdobyto: Bandyta'));assert(!y.some(s=>s.includes('%')));});
+test('negative window position remains on screen',()=>assert.deepEqual(clampPosition(-60,-300,300,200,1440,900),{x:6,y:6}));
+test('offscreen close header is clamped to viewport',()=>assert.deepEqual(clampPosition(2000,3000,300,200,1440,900),{x:1134,y:694}));
+test('oversized saved window remains reachable on mobile',()=>assert.deepEqual(clampPosition(1000,1000,900,1000,390,844),{x:6,y:6}));

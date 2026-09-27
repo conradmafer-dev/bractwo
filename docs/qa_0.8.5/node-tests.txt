@@ -1,0 +1,142 @@
+TAP version 13
+# Subtest: spatial queries preserve every visible object at boundaries and across floors
+ok 1 - spatial queries preserve every visible object at boundaries and across floors
+  ---
+  duration_ms: 18.267317
+  type: 'test'
+  ...
+# Subtest: FPS measures actual frame timestamps, including slow frames and reset
+ok 2 - FPS measures actual frame timestamps, including slow frames and reset
+  ---
+  duration_ms: 0.266561
+  type: 'test'
+  ...
+# Subtest: motion interpolates evenly and snaps on floor change or distant travel
+ok 3 - motion interpolates evenly and snaps on floor change or distant travel
+  ---
+  duration_ms: 0.22635
+  type: 'test'
+  ...
+# Subtest: picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+ok 4 - picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+  ---
+  duration_ms: 0.505401
+  type: 'test'
+  ...
+# Subtest: owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+ok 5 - owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+  ---
+  duration_ms: 0.205098
+  type: 'test'
+  ...
+# Subtest: surface index gives trails priority, curved segments, ellipse edges and floor stone
+ok 6 - surface index gives trails priority, curved segments, ellipse edges and floor stone
+  ---
+  duration_ms: 0.428555
+  type: 'test'
+  ...
+# Subtest: large monster picking follows species size and ignores other floors
+ok 7 - large monster picking follows species size and ignores other floors
+  ---
+  duration_ms: 0.224117
+  type: 'test'
+  ...
+# Subtest: combat readout explains lower d20, misses, criticals and saving throws
+ok 8 - combat readout explains lower d20, misses, criticals and saving throws
+  ---
+  duration_ms: 0.237297
+  type: 'test'
+  ...
+# Subtest: companion cannot be accidentally selected as a hostile monster
+ok 9 - companion cannot be accidentally selected as a hostile monster
+  ---
+  duration_ms: 0.267162
+  type: 'test'
+  ...
+# Subtest: combat summary exposes actual damage dice and zero save damage
+ok 10 - combat summary exposes actual damage dice and zero save damage
+  ---
+  duration_ms: 0.389125
+  type: 'test'
+  ...
+# Subtest: paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+ok 11 - paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+  ---
+  duration_ms: 0.216145
+  type: 'test'
+  ...
+# Subtest: hotbar pages handle empty lists and exact twenty-four-slot boundaries
+ok 12 - hotbar pages handle empty lists and exact twenty-four-slot boundaries
+  ---
+  duration_ms: 0.107762
+  type: 'test'
+  ...
+# Subtest: status timer distinguishes six hundred rounds from real-world duration
+ok 13 - status timer distinguishes six hundred rounds from real-world duration
+  ---
+  duration_ms: 0.136795
+  type: 'test'
+  ...
+# Subtest: mana budget UI names mixed slot distribution and flexible pool
+ok 14 - mana budget UI names mixed slot distribution and flexible pool
+  ---
+  duration_ms: 0.411779
+  type: 'test'
+  ...
+# Subtest: physical row one uses digits 1..0, Minus and Equal
+ok 15 - physical row one uses digits 1..0, Minus and Equal
+  ---
+  duration_ms: 0.825402
+  type: 'test'
+  ...
+# Subtest: F1..F12 occupy row two while adaptive F is not a slot
+ok 16 - F1..F12 occupy row two while adaptive F is not a slot
+  ---
+  duration_ms: 0.111949
+  type: 'test'
+  ...
+# Subtest: labels remain correct for second row and overflow bank
+ok 17 - labels remain correct for second row and overflow bank
+  ---
+  duration_ms: 0.164077
+  type: 'test'
+  ...
+# Subtest: all rendered shapes agree with Python geometry at sampled boundaries
+ok 18 - all rendered shapes agree with Python geometry at sampled boundaries
+  ---
+  duration_ms: 12.428775
+  type: 'test'
+  ...
+# Subtest: three missiles take distinct curved paths and converge at one target
+ok 19 - three missiles take distinct curved paths and converge at one target
+  ---
+  duration_ms: 0.972192
+  type: 'test'
+  ...
+# Subtest: missiles do not produce NaN when actor positions coincide
+ok 20 - missiles do not produce NaN when actor positions coincide
+  ---
+  duration_ms: 0.203907
+  type: 'test'
+  ...
+# Subtest: every current spell draws valid canvas commands and balances save/restore
+ok 21 - every current spell draws valid canvas commands and balances save/restore
+  ---
+  duration_ms: 16.061429
+  type: 'test'
+  ...
+# Subtest: legacy effects remain with the existing renderer
+ok 22 - legacy effects remain with the existing renderer
+  ---
+  duration_ms: 0.163075
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 757.134798

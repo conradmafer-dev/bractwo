@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="windows.css">
   <link rel="stylesheet" href="fighter.css">
   <link rel="stylesheet" href="caster.css">
+  <link rel="stylesheet" href="mobile.css">
 </head>
 <body>
   <canvas id="world" aria-label="Otwarty świat Bractwa — Pogranicze"></canvas>
@@ -106,7 +107,7 @@
       <div class="quickbar" role="group" aria-label="Mikstury zdrowia i many"><button id="healthPotion" class="potion-button health-potion" title="Mikstura zdrowia [Q]"><kbd>Q</kbd><span>♥</span><small>Zdrowie</small><b id="healthCount">0</b></button><button id="manaPotion" class="potion-button mana-potion" title="Mikstura many [R]"><kbd>R</kbd><span>✦</span><small>Mana</small><b id="manaCount">0</b></button></div>
       <div id="spellbar" class="spellbar" aria-label="Dwa paski czarów: 1–0, minus, równa się oraz F1–F12">
       <div class="hotbar-viewport"><div id="hotbarSlots" class="hotbar-slots" aria-label="Czary 1–0, −, ="></div><div id="hotbarFunctionSlots" class="hotbar-slots" aria-label="Czary F1–F12"></div></div>
-      <div class="hotbar-toolbar"><div id="hotbarPages" class="hotbar-pages" hidden><button id="hotbarPrev" aria-label="Poprzedni zestaw czarów" title="Poprzedni zestaw [Page Up]">‹</button><output id="hotbarPageLabel">1/1</output><button id="hotbarNext" aria-label="Następny zestaw czarów" title="Następny zestaw [Page Down]">›</button></div><div class="book-favorite-controls"><button id="bookSpell" title="Karta postaci · czary [K]">K<br>Czary</button><button id="abilityButton" class="ability-button" title="Najczęściej używany czar [F]"><kbd>F</kbd><span id="abilityIcon">⚔</span><small id="abilityName">Umiejętność</small><b id="abilityCooldown"></b></button></div></div>
+      <div class="hotbar-toolbar"><div id="hotbarPages" class="hotbar-pages" hidden><button id="hotbarPrev" aria-label="Poprzedni zestaw czarów" title="Poprzedni zestaw [Page Up]">‹</button><output id="hotbarPageLabel">1/1</output><button id="hotbarNext" aria-label="Następny zestaw czarów" title="Następny zestaw [Page Down]">›</button></div><div class="book-favorite-controls"><button id="bookSpell" title="Karta postaci · czary [K]"><kbd>K</kbd><br>Czary</button><button id="abilityButton" class="ability-button" title="Najczęściej używany czar [F]"><kbd>F</kbd><span id="abilityIcon">⚔</span><small id="abilityName">Umiejętność</small><b id="abilityCooldown"></b></button></div></div>
     </div>
     </div>
     <div class="combat-controls"><button id="interactButton" class="action-button interact-button"><span>◆</span><small>Rozmawiaj</small><kbd>E</kbd></button><button id="attackButton" class="action-button attack-button"><span>⚔</span><small id="attackLabel">Atakuj</small><i id="actionProgress" aria-hidden="true"></i><kbd>SPACJA</kbd></button></div>
@@ -126,6 +127,7 @@
   <script src="character_sheet.js"></script>
   <script src="level_up.js"></script>
   <script src="loot_ui.js"></script>
+  <script src="mobile.js"></script>
   <script src="windows.js"></script>
   <script src="game.js"></script>
 </body>

@@ -1,0 +1,21 @@
+{
+  "missing_original_files": [],
+  "changed_original_files": [
+    "README.md",
+    "client/export_presets.cfg",
+    "client/project.godot",
+    "client/scripts/main.gd",
+    "docs/RAILWAY.md",
+    "docs/TEST_REPORT.md",
+    "run.py",
+    "server/server.py",
+    "server/world_content.py",
+    "tests/smoke_railway.py",
+    "tests/test_dnd.py",
+    "tests/test_loot_088.py",
+    "tests/test_railway.py",
+    "web/game.js",
+    "web/index.html"
+  ],
+  "art_assets_unchanged": true
+}

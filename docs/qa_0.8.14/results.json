@@ -1,0 +1,26 @@
+{
+  "checks": [
+    "New druid starts in light armor with shield training, no medium armor or automatic path.",
+    "Clicking a path previews it; explicit confirmation is required.",
+    "Warden grants two proficiencies, hides redundant feats and does NOT add armor or any item.",
+    "Druid can view equipped staff, switch to two hands and safely stow shield; no sell outside trade.",
+    "Movement remains live while the updated character card is open.",
+    "390x844: class paths and owned training fit the screen without horizontal page overflow.",
+    "844x390: class paths and owned training fit the screen without horizontal page overflow.",
+    "Level5 unlocks wolf and cat, not stronger bears; actual cat shape gives2 temporary HP.",
+    "Leaving a form does not clear the shared Wild Shape/Wild Companion cooldown.",
+    "Changing to Magician at a master removes Warden-only grants and restores missing training choices.",
+    "A missing medium-armor feat can be selected at15, adds its single ability point and cannot be selected again.",
+    "Animal Speech ritual enables a real E interaction with the fox and a map hint, without loot spoilers.",
+    "Arcane Recovery visibly channels, movement cancels it without spending mana or starting cooldown.",
+    "Completed recovery restores20 mana and starts the180-second cooldown.",
+    "Alarm ritual completes without mana; its authoritative persistent square is visible to its owner.",
+    "Ritual familiar costs10 gold, no mana; nonattacking owl and commands reflect actual server state.",
+    "Ordinary combat spells cannot be cast as free rituals.",
+    "Wizard spellbook and familiar commands fit a narrow portrait viewport.",
+    "No JavaScript exceptions in new class choices, channels, inventory, forms, rituals or responsive views."
+  ],
+  "errors": [],
+  "connection": "controlled Python WebSocket bridge to real aiohttp server",
+  "monster_ai": "paused; real server handlers; deterministic clock and dice"
+}

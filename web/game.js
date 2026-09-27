@@ -26,7 +26,7 @@
   let groundChunks=new Map(), expansionTab='growth', expansionSignature='', selectedRune='fire', atlasMode='nearby', navigationGoal=null;
   let hotbarPage=0;
   let atlasView=null, atlasController=null;
-  let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null;
+  let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null, mobileHud=null;
   let effects = new Map(), seenEffects = new Map(), floatingTexts = [];
   const touches = matchMedia("(pointer: coarse)").matches;
   const TAU = Math.PI * 2;
@@ -470,7 +470,7 @@
   }
   function clearTarget(){send({type:"select_target"});selectedTarget=null;selectedEnemy=null;playersSignature="";if(me)updateHUD();}
   function typing() { const active=document.activeElement; return ["INPUT", "TEXTAREA", "SELECT"].includes(active?.tagName) && !["button", "checkbox", "radio"].includes(active?.type) || !!active?.isContentEditable; }
-  function canControl() { return playing && me && me.hp > 0 && !document.hidden && !blurPaused && ui.disconnectPanel.hidden && ui.legacyClassPanel.hidden && !typing(); }
+  function canControl() { return playing && me && me.hp > 0 && !document.hidden && !blurPaused && ui.disconnectPanel.hidden && ui.legacyClassPanel.hidden && !mobileHud?.blocksControls() && !typing(); }
   function resetControls() {
     heldKeys.clear(); joystick.x = 0; joystick.y = 0; joystick.pointer = null; attackPointer = null; attackHeld = false;
     ui.joystickKnob.style.transform = ""; ui.attackButton.classList.remove("held");
@@ -525,7 +525,7 @@
   });
   // Capture Enter before a focused HUD button can consume it or submit another form.
   addEventListener("keydown",event=>{
-    if(!playing)return;
+    if(!playing||mobileHud?.blocksControls())return;
     if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
     if(merchantPanel?.visible&&event.code==='Escape'){event.preventDefault();merchantPanel.close();return;}
     if(lootPanel?.visible&&event.code==='Escape'){event.preventDefault();lootPanel.close();return;}
@@ -641,6 +641,7 @@
       button.classList.toggle('cooldown',(me.potion_cooldown||0)>0);
       const label=button.querySelector('small');label.textContent=(me.potion_cooldown||0)>0?Math.ceil(me.potion_cooldown)+' s':spec?(spec.potion_kind==='health'?'Zdrowie':'Mana'):'Przypisz';
       button.title=slot.toUpperCase()+' · '+(spec?.name||'Brak mikstury — przypisz w plecaku')+(spec?' · '+(world.items?.[key]?.effect_summary||spec.restore):'');
+      button.setAttribute('aria-label',(spec?.name||'Brak mikstury')+' · '+count+' szt.');
       button.dataset.potion=key||'';
       const span=button.querySelector('span');if(span.dataset.potion!==key){span.dataset.potion=key;span.replaceChildren();if(spec?.icon){const img=document.createElement('img');img.src=spec.icon;img.alt='';span.append(img);}else span.textContent='+';}
     }
@@ -1347,9 +1348,10 @@
   merchantPanel=globalThis.BractwoInventoryUI.createMerchant({state:()=>({player:me,world}),send,
     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
     prepare:()=>{characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
-  hudWindows=globalThis.BractwoWindows.create({levelLayout:()=>levelUpPanels?.layout()});
+  hudWindows=globalThis.BractwoWindows.create({stop:resetControls,levelLayout:()=>levelUpPanels?.layout()});
   fighterPrompt=globalThis.BractwoFighterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
   casterPrompt=globalThis.BractwoCasterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
+  mobileHud=globalThis.BractwoMobile.create({stop:resetControls,closeChat});
   ui.closeEffectDetail.addEventListener('click',()=>{ui.effectDetail.hidden=true;});
   ui.escapeRestraint.addEventListener('click',()=>{const packet={type:'escape_restraint'};if(ui.escapeRestraint.dataset.target)packet.target_id=ui.escapeRestraint.dataset.target;send(packet);});
   let selectedEffectId='';

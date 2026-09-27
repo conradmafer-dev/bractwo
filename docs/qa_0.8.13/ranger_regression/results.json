@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "New level-one ranger has 40 mana and exactly three usable hotbar spells.",
+    "Spellbook matches authoritative unlocks; Mark is free, Longstrider unlocks at five.",
+    "Mark hotkey applies a visible target status and cooldown without spending mana.",
+    "Arming is free, marked ready and warns which concentration the next hit replaces.",
+    "Real autoattack triggers the one-shot snare, spends 20 mana and replaces Mark with vines.",
+    "Monster status details show per-round damage; players cannot help enemy monsters escape.",
+    "Periodic damage occurs once per three-second round rather than per animation frame.",
+    "Healing uses the shared mana pool without breaking ensnaring concentration; level five adds Longstrider.",
+    "390x844: readable spellbook, four unlocked spells and no page overflow.",
+    "844x390: readable spellbook, four unlocked spells and no page overflow.",
+    "Higher Mark duration ranks are still free in the actual power selector.",
+    "Second browser client can escape PvP vines using the status button; its main action is consumed.",
+    "No JavaScript errors during combat, status effects, spellbook and responsive layout."
+  ],
+  "errors": [],
+  "connection": "controlled Python WebSocket bridge to real aiohttp server",
+  "monster_ai": "paused; real server spell/attack/tick handlers; deterministic clock and dice"
+}

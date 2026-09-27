@@ -1,0 +1,11 @@
+hotbar 8 ['1♧Shillelagh · magiczna laska0 MP', '2⌁Ciernisty bicz0 MP', '3♨Wytworzenie płomienia0 MP', '4♥Leczenie ranpoz. 10', '5♜Oplątaniepoz. 10', '6☾Promień księżycapoz. 20', '7♞Dziki kształt · wilkpoz. 20', '8♟Dziki kształt · niedźwiedźpoz. 40']
+bound ['healing_word', 'thorn_whip', 'produce_flame', 'cure_wounds', 'entangle', 'moonbeam', 'wild_shape_wolf', 'wild_shape_bear']
+form wolf
+auto True dummy {'id': 'fx5', 'kind': 'combat_roll', 'source_id': '1', 'target_id': 'dummy', 'floor': 0, 'x': 1100.0, 'y': 1180.0, 'target_x': 1154.1408, 'target_y': 1180.0, 'time': 6.349999999999985, 'duration': 1.4, 'radius': 0, 'check': 'attack', 'rolls': [19], 'roll': 19, 'bonus': 6, 'total': 25, 'defense': 11, 'hit': True, 'critical': False, 'disadvantage': False, 'advantage': False, 'damage': 4, 'damage_dice': '1k6+2', 'damage_rolls': [2], 'damage_modifier': 2, 'damage_type': 'bludgeoning', 'action': 'Atak 1/1', 'target_name': 'Ogr maczugowy', 'expires_at': 1790196666.9726565}
+ranking 1
+DruidTest
+Druid
+40
+mobile ranking visible True
+errors []
+DONE

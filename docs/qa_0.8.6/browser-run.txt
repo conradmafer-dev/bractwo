@@ -1,0 +1,43 @@
+Chromium ready; loading actual client and bridge
+Client loaded; creating QA account
+PASS 1: No retroactive receipts on login
+PASS 2: Two levels from one award; separate deltas and bottom Zamknij
+PASS 3: Each new receipt offset down and right in cascade
+PASS 4: Earlier receipt can be raised by its header
+PASS 5: Receipts survive ordinary notification timeout
+PASS 6: Closing middle receipt keeps both surrounding receipts
+PASS 7: Closing last receipt hides only the cascade
+PASS 8: Separate saving throws, primary score, added dice and spell unlocks with icons
+PASS 9: 390x844: scrollable long summary, bottom Close visible, no overflow
+PASS 10: 320x700: scrollable long summary, bottom Close visible, no overflow
+PASS 11: 844x390: scrollable long summary, bottom Close visible, no overflow
+PASS 12: Mobile Close reveals previous receipt
+PASS 13: Action opens Statistics, allocates actual mastery, updates HP, leaves receipt
+PASS 14: Cannot allocate while the existing combat lock is active
+PASS 15: Reconnect restores only outstanding receipts and allocated stats
+PASS 16: Closing summaries does not consume an unassigned point
+Client loaded; creating QA account
+PASS 17: Separate account cannot see another player receipts
+{
+  "checks": [
+    "No retroactive receipts on login",
+    "Two levels from one award; separate deltas and bottom Zamknij",
+    "Each new receipt offset down and right in cascade",
+    "Earlier receipt can be raised by its header",
+    "Receipts survive ordinary notification timeout",
+    "Closing middle receipt keeps both surrounding receipts",
+    "Closing last receipt hides only the cascade",
+    "Separate saving throws, primary score, added dice and spell unlocks with icons",
+    "390x844: scrollable long summary, bottom Close visible, no overflow",
+    "320x700: scrollable long summary, bottom Close visible, no overflow",
+    "844x390: scrollable long summary, bottom Close visible, no overflow",
+    "Mobile Close reveals previous receipt",
+    "Action opens Statistics, allocates actual mastery, updates HP, leaves receipt",
+    "Cannot allocate while the existing combat lock is active",
+    "Reconnect restores only outstanding receipts and allocated stats",
+    "Closing summaries does not consume an unassigned point",
+    "Separate account cannot see another player receipts"
+  ],
+  "count": 17,
+  "errors": []
+}

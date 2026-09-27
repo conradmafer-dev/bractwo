@@ -1,0 +1,99 @@
+{
+  "checks": [
+    "Level-one wizard: 40 MP, nine unlocked spells, two pages, no locked placeholders",
+    "Page-two key 1 casts Shocking Grasp, not page-one Fire Bolt",
+    "Both arrow buttons and Page Up/Down change pages",
+    "Longstrider: 20 MP, visible 600-round/30-minute timer, clickable rule description",
+    "Armed Shield shows a separate persistent status and does not consume mana until triggered",
+    "Two paid casts exhaust mana; third is blocked, free cantrip still casts and keeps Longstrider",
+    "Selected monster has its own visible status row",
+    "Level 10: circle II, 140-MP mixed budget, new spells on hotbar, circle III still gated at 20",
+    "Book changes order by swapping slots across pages without removing unlocked spells",
+    "Level 20: circle III, 270 MP and automatically inserted third-circle spells",
+    "Visible/clickable pages, effects and close control, no horizontal overflow at 390x844",
+    "Visible/clickable pages, effects and close control, no horizontal overflow at 320x700",
+    "Visible/clickable pages, effects and close control, no horizontal overflow at 844x390",
+    "Open spell book hides effect overlay so it cannot cover spell controls",
+    "Mobile spell book exposes costs, circle gates and the complete slot picker",
+    "Level-one druid: all eight available spells on one page, including Healing Word and Longstrider",
+    "Druid shows Longstrider plus named concentration while the target shows root",
+    "Breaking concentration removes its status, not Longstrider",
+    "PvP debuff appears on affected player and disappears when its round expires",
+    "No JavaScript page errors in two connected clients and desktop/mobile layouts"
+  ],
+  "errors": [],
+  "commands": [
+    {
+      "page": "ManaMage",
+      "type": "cast",
+      "spell_id": "shocking_grasp"
+    },
+    {
+      "page": "ManaMage",
+      "type": "cast",
+      "spell_id": "longstrider"
+    },
+    {
+      "page": "ManaMage",
+      "type": "cast",
+      "spell_id": "shield"
+    },
+    {
+      "page": "ManaMage",
+      "type": "cast",
+      "spell_id": "magic_missile"
+    },
+    {
+      "page": "ManaMage",
+      "type": "cast",
+      "spell_id": "magic_missile"
+    },
+    {
+      "page": "ManaMage",
+      "type": "cast",
+      "spell_id": "fire_bolt"
+    },
+    {
+      "page": "ManaMage",
+      "type": "select_target",
+      "enemy_id": "world_browser084"
+    },
+    {
+      "page": "ManaMage",
+      "type": "select_target",
+      "enemy_id": "world_browser084"
+    },
+    {
+      "page": "ManaMage",
+      "type": "hotbar",
+      "slot": 0,
+      "spell_id": "shocking_grasp"
+    },
+    {
+      "page": "ManaMage",
+      "type": "select_target"
+    },
+    {
+      "page": "ManaDruid",
+      "type": "cast",
+      "spell_id": "longstrider"
+    },
+    {
+      "page": "ManaDruid",
+      "type": "select_target",
+      "enemy_id": "world_browser084"
+    },
+    {
+      "page": "ManaDruid",
+      "type": "select_target",
+      "enemy_id": "world_browser084"
+    },
+    {
+      "page": "ManaDruid",
+      "type": "cast",
+      "spell_id": "entangle",
+      "enemy_id": "world_browser084"
+    }
+  ],
+  "method": "Chromium DOM/canvas; actual production JS/CSS; real server over Python WebSocket bridge; synthetic localStorage. Native browser networking, persistent localStorage and physical phones are not tested by this harness."
+}

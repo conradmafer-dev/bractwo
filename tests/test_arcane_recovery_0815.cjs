@@ -1,0 +1,13 @@
+const test=require('node:test'),assert=require('node:assert/strict');
+const {canRecover}=require('../web/caster_ui.js');
+const mage=(extra={})=>({class_id:'mage',alive:true,form:'',mana:0,max_mana:40,combat_remaining:20,pvp_combat_remaining:90,bonus_remaining:0,action_remaining:2.5,spell_cooldowns:{},character_sheet:{caster:{channel:{}}},...extra});
+test('Recovery is ready in combat and during main action cooldown',()=>assert(canRecover(mage())));
+test('Recovery remains ready while moving',()=>assert(canRecover(mage({dx:1,dy:-1}))));
+test('Recovery is also ready outside combat',()=>assert(canRecover(mage({combat_remaining:0,pvp_combat_remaining:0}))));
+test('Full mana disables Recovery',()=>assert(!canRecover(mage({mana:40}))));
+test('Fractional missing mana enables Recovery',()=>assert(canRecover(mage({mana:39.5}))));
+test('Cooldown and bonus action disable Recovery',()=>{assert(!canRecover(mage({bonus_remaining:.01})));assert(!canRecover(mage({spell_cooldowns:{arcane_recovery:.01}})));});
+test('Only living mage in normal form can use Recovery',()=>{for(const patch of [{alive:false},{class_id:'druid'},{class_id:'knight'},{class_id:'ranger'},{form:'cat'}])assert(!canRecover(mage(patch)));assert(!canRecover(null));});
+test('A ritual in progress must be cancelled first',()=>assert(!canRecover(mage({character_sheet:{caster:{channel:{key:'alarm'}}}}))));
+test('Concentration and armor do not block Recovery',()=>assert(canRecover(mage({concentration:'wall_of_fire',character_sheet:{training:{armor_penalty:true},caster:{channel:{}}}}))));
+test('Readiness does not mutate client state',()=>{const p=mage();const before=JSON.stringify(p);assert(canRecover(p));assert.equal(JSON.stringify(p),before);});

@@ -1,0 +1,26 @@
+{
+  "checks": [
+    "Level-one warrior has actual AC18, sword, shield and a nonblocking style reminder.",
+    "Three style tiles; clicking previews without spending any point or changing the character.",
+    "Explicit confirmation enables Dueling, hides reminder and shows three weapon masteries.",
+    "Restyling outside a master is disabled; existing style remains selected.",
+    "Character statistics display the actual style, mastery and 1d8+5 weapon damage.",
+    "Four independent equipment slots; worn shield is clickable and has a real preview.",
+    "Movement remains possible while the new equipment and feat sheet are open.",
+    "At a town master, style changes for free and Defense updates actual AC to19.",
+    "Two-hand versatile grip stows the shield, uses d10 and enables Great Weapon Fighting.",
+    "390x844: style cards and confirmation accessible without horizontal page overflow.",
+    "844x390: style cards and confirmation accessible without horizontal page overflow.",
+    "Second Wind works at zero mana and the hotbar displays its60-second cooldown.",
+    "Repeated Second Wind input cannot bypass its cooldown.",
+    "At level5 Action Surge is unlocked automatically and the book discloses its90-second cooldown.",
+    "Action Surge hits during main-action cooldown without resetting it; Sap appears on the target.",
+    "Weapon mastery status is clickable and explains its effect.",
+    "Changing weapon changes active mastery but does not automatically change the fighting style.",
+    "Druid receives no warrior choice, items or mastery interface.",
+    "No JavaScript exceptions during choices, combat, movement, effects and responsive rendering."
+  ],
+  "errors": [],
+  "connection": "controlled Python WebSocket bridge to real aiohttp server",
+  "monster_ai": "paused; real server handlers; deterministic clock and dice"
+}

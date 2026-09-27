@@ -1,0 +1,130 @@
+{
+  "checks": [
+    "Level 10: projectile, damage die, ally and cost deltas; no before/after",
+    "Cascaded receipts remain until their individual bottom Close",
+    "Spell book displays four missiles, selected cost and next level gain",
+    "Power picker sends actual base-circle preference and refreshes dice/cost",
+    "Browser cast at chosen circle really spends 20 mana and resolves three hits",
+    "Auto restores the highest unlocked rank and four authoritative projectiles",
+    "390x844: power controls usable, current values visible, no page overflow",
+    "320x700: power controls usable, current values visible, no page overflow",
+    "844x390: power controls usable, current values visible, no page overflow",
+    "Maximum rank emits and renders eleven missiles using the real effect payload/renderer",
+    "Druid level 20 separates upcast dice and ability modifier gains; field dice included",
+    "Mobile spell growth panel scrolls, with Close remaining accessible",
+    "Persistent area retains its original paid dice after a later circle unlock",
+    "Repeated concentration shows locked rank; stopping exposes the new paid rank, disabled at zero mana"
+  ],
+  "count": 14,
+  "errors": [],
+  "transport": "controlled Python WebSocket bridge",
+  "sent": [
+    {
+      "page": "SkalowanieMag",
+      "type": "ranking"
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "hello",
+      "name": "SkalowanieMag",
+      "password": "testpassword99",
+      "create": true,
+      "class_id": "mage",
+      "compact_state": true
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "dismiss_level_up",
+      "id": "37286793b0a7485cafadd70d75f9d48c:10"
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "dismiss_level_up",
+      "id": "37286793b0a7485cafadd70d75f9d48c:11"
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "spell_power",
+      "spell_id": "magic_missile",
+      "circle": 1
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "cast",
+      "spell_id": "magic_missile"
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "spell_power",
+      "spell_id": "magic_missile",
+      "circle": 0
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "cast",
+      "spell_id": "magic_missile"
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "spell_power",
+      "spell_id": "magic_missile",
+      "circle": 1
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "spell_power",
+      "spell_id": "magic_missile",
+      "circle": 0
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "spell_power",
+      "spell_id": "magic_missile",
+      "circle": 1
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "spell_power",
+      "spell_id": "magic_missile",
+      "circle": 0
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "spell_power",
+      "spell_id": "magic_missile",
+      "circle": 1
+    },
+    {
+      "page": "SkalowanieMag",
+      "type": "spell_power",
+      "spell_id": "magic_missile",
+      "circle": 0
+    },
+    {
+      "page": "SkalowanieDruid",
+      "type": "ranking"
+    },
+    {
+      "page": "SkalowanieDruid",
+      "type": "ranking"
+    },
+    {
+      "page": "SkalowanieDruid",
+      "type": "hello",
+      "name": "SkalowanieDruid",
+      "password": "testpassword99",
+      "create": true,
+      "class_id": "druid",
+      "compact_state": true
+    },
+    {
+      "page": "SkalowanieDruid",
+      "type": "dismiss_level_up",
+      "id": "fb7883728a5f4caaa9a4cb3edb977473:20"
+    },
+    {
+      "page": "SkalowanieDruid",
+      "type": "stop_concentration"
+    }
+  ]
+}

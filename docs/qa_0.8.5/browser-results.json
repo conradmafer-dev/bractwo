@@ -1,0 +1,114 @@
+{
+  "checks": [
+    "24 fields in two 12-key rows; all nine starting mage spells included",
+    "C opens standalone four-tab card; backpack 3x5 with no journal or atlas",
+    "Statistics show real weapon/spell rolls, six attributes/saves and thirteen damage resistances",
+    "Feats tab is an honest empty state, with no fake purchasable feats",
+    "Spell tab binding assigns F1 and persists server hotbar",
+    "F1 actually casts its assigned spell, F switches from successful-use history",
+    "F12 dispatches slot 24, not a browser action or the adaptive F shortcut",
+    "Magic Missile emits one three-projectile event and animated curved trails",
+    "Ray of Frost emits blue-white beam metadata and draws impact shards",
+    "Adaptive F actually casts the most-used spell through the real ability command",
+    "Real burning_hands cast transmits and renders cone geometry",
+    "Real fireball cast transmits and renders circle geometry",
+    "Real lightning_bolt cast transmits and renders line geometry",
+    "Full inventory is paged in 3 rows, worn equipment remains above backpack",
+    "Inventory tile opens equip/sell detail without a one-item vertical list",
+    "Character sheet at 390x844: no page overflow; fifteen cells/three rows",
+    "Character sheet at 320x700: no page overflow; fifteen cells/three rows",
+    "Character sheet at 844x390: no page overflow; fifteen cells/three rows",
+    "Mobile two twelve-slot rows share horizontal touch scroll",
+    "High-level overflow spells available in second 24-slot bank",
+    "Character statistics refresh when soul/experience changes, without reopening"
+  ],
+  "count": 21,
+  "errors": [],
+  "sent": [
+    {
+      "page": "KartaMage",
+      "type": "ranking"
+    },
+    {
+      "page": "KartaMage",
+      "type": "ranking"
+    },
+    {
+      "page": "KartaMage",
+      "type": "hello",
+      "name": "KartaMage",
+      "password": "testpassword99",
+      "create": true,
+      "class_id": "mage",
+      "compact_state": true
+    },
+    {
+      "page": "KartaMage",
+      "type": "hotbar",
+      "slot": 12,
+      "spell_id": "longstrider"
+    },
+    {
+      "page": "KartaMage",
+      "type": "cast",
+      "spell_id": "longstrider"
+    },
+    {
+      "page": "KartaMage",
+      "type": "hotbar",
+      "slot": 23,
+      "spell_id": "mage_armor"
+    },
+    {
+      "page": "KartaMage",
+      "type": "cast",
+      "spell_id": "mage_armor"
+    },
+    {
+      "page": "KartaMage",
+      "type": "select_target",
+      "enemy_id": "visual_dummy"
+    },
+    {
+      "page": "KartaMage",
+      "type": "select_target",
+      "enemy_id": "visual_dummy"
+    },
+    {
+      "page": "KartaMage",
+      "type": "cast",
+      "spell_id": "magic_missile",
+      "enemy_id": "visual_dummy"
+    },
+    {
+      "page": "KartaMage",
+      "type": "cast",
+      "spell_id": "ray_of_frost",
+      "enemy_id": "visual_dummy"
+    },
+    {
+      "page": "KartaMage",
+      "type": "cast",
+      "spell_id": "ray_of_frost",
+      "enemy_id": "visual_dummy"
+    },
+    {
+      "page": "KartaMage",
+      "type": "cast",
+      "spell_id": "burning_hands",
+      "enemy_id": "visual_dummy"
+    },
+    {
+      "page": "KartaMage",
+      "type": "cast",
+      "spell_id": "fireball",
+      "enemy_id": "visual_dummy"
+    },
+    {
+      "page": "KartaMage",
+      "type": "cast",
+      "spell_id": "lightning_bolt",
+      "enemy_id": "visual_dummy"
+    }
+  ]
+}

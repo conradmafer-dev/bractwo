@@ -1,0 +1,20 @@
+{
+  "checks": [
+    "Atuty: Recovery is enabled in PvE/PvP combat with no mana and a busy main action; wording is updated.",
+    "Real click restores20 mana immediately while moving, consumes bonus action only, keeps combat timers and starts180-second cooldown.",
+    "Feat button, spellbook and hotbar all lock after use; hotbar shows180s.",
+    "Unowned feats and future spells remain unchanged; no scrolls or unrelated visibility changes.",
+    "Spellbook casts instant Recovery during combat after cooldown expires, without delaying main action.",
+    "Actual most-used ability under F invokes Recovery in combat and cannot bypass cooldown.",
+    "Hotbar click invokes the same authoritative instant Recovery.",
+    "Full mana disables Recovery on card, hotbar and F instead of wasting the cooldown.",
+    "Card readiness refreshes when only the three-second bonus-action lock expires.",
+    "390x844: Recovery remains readable and usable in combat, without horizontal page overflow.",
+    "844x390: Recovery remains readable and usable in combat, without horizontal page overflow.",
+    "Alarm still uses its ten-second out-of-combat ritual; Recovery cannot silently cancel or skip it.",
+    "No JavaScript exceptions during all tested controls and responsive layouts."
+  ],
+  "errors": [],
+  "connection": "controlled Python WebSocket bridge to real aiohttp server",
+  "monster_ai": "paused; real server handlers; deterministic clock"
+}

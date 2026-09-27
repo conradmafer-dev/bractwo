@@ -10,3 +10,5 @@ builds/*
 export_credentials.cfg
 *.keystore
 node_modules/
+
+.qa-python/

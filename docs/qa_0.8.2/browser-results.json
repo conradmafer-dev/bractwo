@@ -1,0 +1,106 @@
+{
+  "checks": [
+    "Locked PvP blocks Magic Missile selected through player list and hotbar",
+    "Unlocking enables autoattack against the already selected player",
+    "Hotbar slot 4 sends Magic Missile to the selected player: three actual damage rolls",
+    "Class ability button applies Ray of Frost slow to player",
+    "Relocking clears hostile status and stops player-targeted spells without erasing combat timer",
+    "Healing Word heals self while an opponent remains selected; no need to clear target",
+    "Support hotbar correctly targets selected party member and tracks caster concentration",
+    "Healing selected party member during PvP succeeds and tags the healer for combat",
+    "Mobile viewport preserves all eight hotbar controls",
+    "No JavaScript page errors across the two clients",
+    "Selecting monster performs actual 1d4 spark and attack tooltip explains weaker wand",
+    "Queued hotbar Fire Bolt takes priority over auto-spark: 20 damage, not 24, at level 20",
+    "Spellbook visibly distinguishes wand from free scaling cantrips",
+    "New explanation and eight spell slots render in mobile viewport",
+    "Live simulation holds displaced monster at loss position, without return or immediate healing",
+    "Live snapshot and spatial index retain monster at current position"
+  ],
+  "errors": [],
+  "commands": [
+    {
+      "page": "PvpMage",
+      "type": "select_target",
+      "target_id": "2"
+    },
+    {
+      "page": "PvpMage",
+      "type": "cast",
+      "spell_id": "magic_missile",
+      "target_id": "2"
+    },
+    {
+      "page": "PvpMage",
+      "type": "pvp_safety",
+      "enabled": false
+    },
+    {
+      "page": "PvpMage",
+      "type": "cast",
+      "spell_id": "magic_missile",
+      "target_id": "2"
+    },
+    {
+      "page": "PvpMage",
+      "type": "cast",
+      "spell_id": "ray_of_frost",
+      "target_id": "2"
+    },
+    {
+      "page": "PvpMage",
+      "type": "pvp_safety",
+      "enabled": true
+    },
+    {
+      "page": "PvpMage",
+      "type": "cast",
+      "spell_id": "magic_missile",
+      "target_id": "2"
+    },
+    {
+      "page": "PvpDruid",
+      "type": "select_target",
+      "target_id": "1"
+    },
+    {
+      "page": "PvpDruid",
+      "type": "pvp_safety",
+      "enabled": false
+    },
+    {
+      "page": "PvpDruid",
+      "type": "cast",
+      "spell_id": "healing_word"
+    },
+    {
+      "page": "PvpDruid",
+      "type": "cast",
+      "spell_id": "stoneskin",
+      "target_id": "1"
+    },
+    {
+      "page": "PvpDruid",
+      "type": "cast",
+      "spell_id": "healing_word",
+      "target_id": "1"
+    },
+    {
+      "page": "PvpMage",
+      "type": "select_target",
+      "enemy_id": "world_browser082"
+    },
+    {
+      "page": "PvpMage",
+      "type": "select_target",
+      "enemy_id": "world_browser082"
+    },
+    {
+      "page": "PvpMage",
+      "type": "cast",
+      "spell_id": "fire_bolt",
+      "enemy_id": "world_browser082"
+    }
+  ],
+  "method": "Chromium DOM/canvas; unmodified game JS/CSS; real server over Python WebSocket bridge; synthetic localStorage. Native browser networking and persistent localStorage are not tested by this harness."
+}

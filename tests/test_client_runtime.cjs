@@ -59,3 +59,90 @@ test('large monster picking follows species size and ignores other floors', () =
   assert.equal(hitActor([dragon],500,355,'me',0),dragon);
   assert.equal(hitActor([dragon],500,355,'me',-1),null);
 });
+
+
+test('combat readout explains lower d20, misses, criticals and saving throws', () => {
+  const {combatSummary}=require('../web/runtime.js');
+  const attack={id:'fx1',target_name:'Goblin',rolls:[20,1],roll:1,bonus:4,total:5,defense:12,check:'attack',hit:false,critical:false,disadvantage:true,damage:0};
+  const miss=combatSummary(attack);
+  assert(miss.includes('k20 [20, 1] → 1 + 4 = 5 / KP 12'));
+  assert(miss.includes('PUDŁO'));assert(!miss.includes('obr.'));
+  const critical=combatSummary({...attack,disadvantage:false,roll:20,total:24,hit:true,critical:true,damage:31});
+  assert(critical.includes('KRYTYK') && critical.includes('31 obr.'));
+  const save=combatSummary({...attack,check:'save',saved:true,disadvantage:false,roll:15,total:19,hit:true,damage:12});
+  assert(save.includes('/ ST 12') && save.includes('12 obr.'));
+  assert.equal(combatSummary({}), '');
+});
+
+test('companion cannot be accidentally selected as a hostile monster',()=>{
+ const c={kind:'c',x:80,y:100,entity:{id:'pet-1',kind:'wolf',hp:20,floor:0,is_companion:true}};
+ assert.equal(hitActor([c],80,78,'self',0),null);
+});
+test('combat summary exposes actual damage dice and zero save damage',()=>{
+ const {combatSummary}=require('../web/runtime.js');
+ const text=combatSummary({id:'roll1',target_name:'Goblin',action:'Ognisty pocisk',check:'attack',rolls:[15],roll:15,bonus:5,total:20,defense:13,hit:true,damage:6,damage_dice:'1k10'});
+ assert(text.includes('1k10')&&text.includes('6 obr.'));
+ const save=combatSummary({id:'roll2',check:'save',rolls:[15],roll:15,bonus:0,total:15,defense:13,saved:true,hit:true,damage:0,save_half:false,damage_dice:'1k6'});
+ assert(save.includes('0 obr.'));assert(!save.includes('połowa'));
+});
+
+test('paginated hotbar keeps twenty-four keys and exposes every unlocked spell',()=>{
+ const {hotbarPageCount,hotbarKey}=require('../web/runtime.js');
+ const bar=Array.from({length:48},(_,i)=>'s'+i);
+ assert.equal(hotbarPageCount(bar),2);
+ assert.equal(hotbarKey(bar,0,11),'s11');assert.equal(hotbarKey(bar,0,23),'s23');
+ assert.equal(hotbarKey(bar,1,0),'s24');assert.equal(hotbarKey(bar,1,23),'s47');
+ assert.equal(hotbarKey(bar,4,0),'');assert.equal(hotbarKey(bar,0,24),'');
+});
+test('hotbar pages handle empty lists and exact twenty-four-slot boundaries',()=>{
+ const {hotbarPageCount}=require('../web/runtime.js');
+ assert.equal(hotbarPageCount([]),1);assert.equal(hotbarPageCount(null),1);
+ assert.equal(hotbarPageCount(Array(24)),1);assert.equal(hotbarPageCount(Array(48)),2);
+ assert.equal(hotbarPageCount(Array(25)),2);
+});
+test('status timer distinguishes six hundred rounds from real-world duration',()=>{
+ const {formatEffectTime}=require('../web/runtime.js');
+ assert.equal(formatEffectTime({remaining:1800,rounds:600}),'30:00 · 600 r.');
+ assert.equal(formatEffectTime({remaining:2.1,rounds:1}),'3 s · 1 r.');
+ assert.equal(formatEffectTime({remaining:null,rounds:null}),'aktywne');
+});
+test('mana budget UI names mixed slot distribution and flexible pool',()=>{
+ const {manaBudgetText}=require('../web/runtime.js');
+ const text=manaBudgetText({base:140,bonus:0,slots:[4,2],shared:true});
+ assert(text.includes('140'));assert(text.includes('4× krąg 1'));assert(text.includes('2× krąg 2'));
+ assert(text.toLowerCase().includes('wspólna'));
+});
+
+test('spell profile overlays owner scaling without mutating the shared catalogue',()=>{
+ const {spellProfile}=require('../web/runtime.js');
+ const spec={id:'magic_missile',name:'Magiczny pocisk',mana:20,shots:3,dice:[1,4,1]};
+ const p={spell_profiles:{magic_missile:{mana:50,shots:5,cast_circle:3,power_summary:'5 × 1k4+1'}}};
+ const value=spellProfile(spec,p);
+ assert.equal(value.mana,50);assert.equal(value.shots,5);assert.equal(value.name,spec.name);
+ assert.equal(spec.mana,20);assert.equal(spec.shots,3);assert.notEqual(value,spec);
+});
+test('hotbar mana uses selected casting rank, never static base spell cost',()=>{
+ const {spellMana}=require('../web/runtime.js');
+ const s={id:'magic_missile',mana:20};
+ assert.equal(spellMana(s,{spell_profiles:{magic_missile:{mana:130}}}),130);
+ assert.equal(spellMana(s,{spell_profiles:{magic_missile:{mana:20}}}),20);
+ assert.equal(spellMana({id:'fire_bolt',mana:0},{spell_profiles:{fire_bolt:{mana:0}}}),0);
+});
+test('repeating active concentration is free, other spell costs remain payable',()=>{
+ const {spellMana}=require('../web/runtime.js');
+ const p={concentration:'call_lightning',spell_profiles:{call_lightning:{mana:90},magic_missile:{mana:90}}};
+ assert.equal(spellMana({id:'call_lightning',mana:50,recast:true},p),0);
+ assert.equal(spellMana({id:'magic_missile',mana:20},p),90);
+ p.concentration='';assert.equal(spellMana({id:'call_lightning',mana:50,recast:true},p),90);
+});
+test('missing locked spell profile falls back to a safe base and empty slots stay empty',()=>{
+ const {spellProfile,spellMana}=require('../web/runtime.js');
+ assert.equal(spellProfile(null,{}),null);assert.equal(spellMana(undefined,{}),0);
+ assert.deepEqual(spellProfile({id:'fireball',mana:50},{}),{id:'fireball',mana:50});
+});
+test('owner delta replaces spell profiles completely and never leaks them across accounts',()=>{
+ const p={id:'1',spell_profiles:{magic_missile:{shots:4,mana:30}}};
+ const next=mergeOwner(p,{id:'1',hp:10},true);assert.equal(next.spell_profiles.magic_missile.shots,4);
+ assert.deepEqual(mergeOwner(next,{id:'1',spell_profiles:{}},true).spell_profiles,{});
+ assert.equal(mergeOwner(next,{id:'2'},true).spell_profiles,undefined);
+});

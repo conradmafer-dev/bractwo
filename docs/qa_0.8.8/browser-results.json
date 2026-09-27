@@ -1,0 +1,65 @@
+{
+  "checks": [
+    "Inventory: 3x5 items, distinct icons, canonical 2d6, +1 and source with 18%",
+    "Browser equip action changes the server weapon to 2d6+1 plus ability",
+    "Heavy +2 armor equipped from browser: real server AC 20",
+    "Foreign-class loot remains in bag, with equip disabled for knight",
+    "Trophy cannot be worn",
+    "Character sheet refreshes actual new weapon damage",
+    "Canvas renders 11 actual new atlases: 9 species + mummy + skeleton archer",
+    "Selected monster opens actual species table: mummy wand exactly 5%, six independent entries",
+    "All rendered drop icons loaded successfully",
+    "Escape closes loot preview and restores gameplay controls",
+    "New boss preview shows separate named items with 18/10/12/4%",
+    "390x844 loot preview fits horizontally and bottom Close stays visible",
+    "844x390 loot list scrolls without hiding Close",
+    "Mobile inventory retains 3 rows of icons, correctly loaded and no horizontal overflow"
+  ],
+  "count": 14,
+  "errors": [],
+  "transport": "controlled Python WebSocket bridge",
+  "sent": [
+    {
+      "page": "LupyRycerz",
+      "type": "ranking"
+    },
+    {
+      "page": "LupyRycerz",
+      "type": "ranking"
+    },
+    {
+      "page": "LupyRycerz",
+      "type": "hello",
+      "name": "LupyRycerz",
+      "password": "[synthetic QA credential omitted]",
+      "create": true,
+      "class_id": "knight",
+      "compact_state": true
+    },
+    {
+      "page": "LupyRycerz",
+      "type": "equip",
+      "uid": "99e36f6096ae99fd"
+    },
+    {
+      "page": "LupyRycerz",
+      "type": "equip",
+      "uid": "376f215c9dc859b1"
+    },
+    {
+      "page": "LupyRycerz",
+      "type": "select_target",
+      "enemy_id": "qa_loot_0"
+    },
+    {
+      "page": "LupyRycerz",
+      "type": "select_target",
+      "enemy_id": "qa_loot_0"
+    },
+    {
+      "page": "LupyRycerz",
+      "type": "select_target",
+      "enemy_id": "qa_loot_9"
+    }
+  ]
+}

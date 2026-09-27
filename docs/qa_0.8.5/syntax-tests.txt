@@ -1,0 +1,3 @@
+Python compileall (server/tests/tools): PASS
+JavaScript syntax (game/runtime/spell_vfx/character_sheet): PASS
+GDScript import/compile/run: NOT PERFORMED

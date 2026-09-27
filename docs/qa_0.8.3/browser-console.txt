@@ -1,0 +1,18 @@
+{
+  "checks": [
+    "New wizard starts at level 1 with circle I",
+    "Wizard book enables all five circle-I spells, keeps circle II locked at 20",
+    "Wizard default slots 4 and 5 unlock with level-1 tooltips and unchanged mana cost",
+    "Level-1 Magic Missile casts through default hotbar, three dice, mana and queue",
+    "Level-1 Shield can be armed from hotbar without upfront mana charge",
+    "Wizard circle I and eight spell slots render at 390x844",
+    "New level-1 druid has all four circle-I spells; circle II and wild shape remain locked",
+    "Level-1 Cure Wounds heals through default slot 4 and consumes mana",
+    "Level-1 Entangle from slot 5 applies concentration and root after failed save",
+    "Druid first-circle labels and controls render at 390x844",
+    "Level-1 ranger still sees shared first-circle spells locked at level 20",
+    "In-game help explains new first gate and unchanged later progression",
+    "No JavaScript page errors across three clients and desktop/mobile layouts"
+  ],
+  "errors": []
+}

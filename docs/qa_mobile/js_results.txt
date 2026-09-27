@@ -1,0 +1,44 @@
+JavaScript syntax OK
+✔ compact potion includes strength and quantity, no zero weapon stats (7.6341ms)
+✔ weapon shows actual personalized rolls without repeating enchantment (0.7277ms)
+✔ armor and resistance use compact concrete descriptions (0.5554ms)
+✔ requirements display meaningful level but no class wall of text (0.6156ms)
+✔ all-class supplies need no class wall of text (5.2321ms)
+✔ no source row until server provides owner-discovered sources (0.9095ms)
+✔ negative window position remains on screen (219.9911ms)
+✔ offscreen close header is clamped to viewport (0.3166ms)
+✔ oversized saved window remains reachable on mobile (0.3051ms)
+✔ spatial queries preserve every visible object at boundaries and across floors (73.1186ms)
+✔ FPS measures actual frame timestamps, including slow frames and reset (1.3819ms)
+✔ motion interpolates evenly and snaps on floor change or distant travel (160.8076ms)
+✔ picking uses drawn positions, ignores corpses/other floors, selects monsters and players (1.6356ms)
+✔ owner deltas retain unchanged bags but replace empty lists and never merge other accounts (0.7977ms)
+✔ surface index gives trails priority, curved segments, ellipse edges and floor stone (3.1029ms)
+✔ large monster picking follows species size and ignores other floors (0.7285ms)
+✔ combat readout explains lower d20, misses, criticals and saving throws (53.3186ms)
+✔ companion cannot be accidentally selected as a hostile monster (0.4171ms)
+✔ combat summary exposes actual damage dice and zero save damage (0.4318ms)
+✔ paginated hotbar keeps twenty-four keys and exposes every unlocked spell (0.626ms)
+✔ hotbar pages handle empty lists and exact twenty-four-slot boundaries (0.3357ms)
+✔ status timer distinguishes six hundred rounds from real-world duration (0.75ms)
+✔ mana budget UI names mixed slot distribution and flexible pool (114.3098ms)
+✔ spell profile overlays owner scaling without mutating the shared catalogue (0.4312ms)
+✔ hotbar mana uses selected casting rank, never static base spell cost (0.3087ms)
+✔ repeating active concentration is free, other spell costs remain payable (0.2039ms)
+✔ missing locked spell profile falls back to a safe base and empty slots stay empty (0.2162ms)
+✔ owner delta replaces spell profiles completely and never leaks them across accounts (0.2194ms)
+✔ only the server-acknowledged pending spell gets a queue caption (0.2091ms)
+✔ ready pending command remains visible until the server executes it (0.1622ms)
+✔ no empty slot or absent player can show a phantom pending spell (0.133ms)
+✔ queue label disappears after completion or cancellation (0.1794ms)
+✔ hotbar, F and book share the same queue formatter (1.6824ms)
+✔ wand instruction is determined by actual weapon and mentions manual Space (1.285ms)
+✔ native client mirrors the queue and actual weapon instruction (274.002ms)
+ℹ tests 35
+ℹ suites 0
+ℹ pass 35
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1565.7838

@@ -1,0 +1,8 @@
+{
+  "python_compileall": "passed",
+  "javascript_syntax_files": 13,
+  "svg_xml_files": 345,
+  "godot_literal_resource_paths_checked": 16,
+  "godot_engine_compiled_or_run": false,
+  "identical_shared_asset_files": 183
+}

@@ -1,3 +1,9 @@
+# Mobile01 — mobilny HUD na bazie 0.8.17
+
+Kompaktowy status i mapa, stałe sterowanie, przewijany pasek zajętych czarów oraz menu i czat na żądanie. Reguły różdżki i many bez zmian. [Opis zmian, instalacja i testy Mobile01](docs/MOBILE_01.md).
+
+---
+
 # Bractwo 0.8.17 — różdżka nie przeszkadza czarom
 
 Aktualizacja na bazie **0.8.16**. Poprawia wyłącznie współpracę wyboru celu,

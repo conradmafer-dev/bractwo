@@ -3,15 +3,15 @@ extends Node
 const WORLD_SCRIPT = preload("res://scripts/world_view.gd")
 const PAD_SCRIPT = preload("res://scripts/input_pad.gd")
 const MINIMAP_SCRIPT = preload("res://scripts/minimap.gd")
-const CLASS_IDS: Array[String] = ["knight", "paladin", "mage", "druid"]
-const CLASS_NAMES: Dictionary = {"knight":"Rycerz", "paladin":"Paladyn", "mage":"Mag", "druid":"Druid"}
+const CLASS_IDS: Array[String] = ["knight", "ranger", "mage", "druid"]
+const CLASS_NAMES: Dictionary = {"knight":"Rycerz", "ranger":"Łowca", "mage":"Czarodziej", "druid":"Druid"}
 const CLASS_DESCRIPTIONS: Dictionary = {
-	"knight":"Miecz i wysoka wytrzymałość. Umiejętność osłania i przyciąga potwory.",
-	"paladin":"Łuk i walka dystansowa. Umiejętność wykonuje mocniejszy strzał.",
-	"mage":"Kostur i obrażenia magiczne. Umiejętność trafia pobliskie potwory.",
-	"druid":"Kostur i wsparcie. Umiejętność leczy ciebie oraz pobliską drużynę."
+	"knight":"Wybór stylu, mistrzostwo broni, kolczuga i tarcza. Drugi oddech bez many.",
+	"ranger":"Łuk, I krąg i bezpłatny Znak łowcy od początku; wilk od poziomu 10.",
+	"mage":"Różdżka: 1k4. Darmowe sztuczki; I krąg od poziomu 1, II od 10, dalsze co 10.",
+	"druid":"Wybór Strażnika lub Mistyka natury; I krąg od 1., wilk i kot od 5. poziomu."
 }
-const SLOT_NAMES: Dictionary = {"weapon":"Broń", "armor":"Pancerz", "ring":"Pierścień", "trophy":"Trofeum"}
+const SLOT_NAMES: Dictionary = {"weapon":"Broń", "armor":"Pancerz", "shield":"Tarcza", "ring":"Pierścień", "trophy":"Trofeum"}
 const PAPER: Color = Color("eee6ce")
 const GOLD: Color = Color("dabb79")
 const GREEN: Color = Color("8ed6b5")
@@ -23,6 +23,10 @@ var local_id: String = ""
 var state: Dictionary = {}
 var world_data: Dictionary = {}
 var progression = preload("res://scripts/expansion_panel.gd").new()
+var level_up_panels = preload("res://scripts/level_up.gd").new()
+var fighter_choice = preload("res://scripts/fighter_choice.gd").new()
+var caster_choice = preload("res://scripts/caster_choice.gd").new()
+var character_sheet = preload("res://scripts/character_sheet.gd").new()
 var navigation_goal: Dictionary = {}
 var player: Dictionary = {}
 var login_panel: Control
@@ -44,6 +48,8 @@ var event_label: Label
 var status_label: Label
 var hint_label: Label
 var target_label: Label
+var loot_button: Button
+var loot_dialog: AcceptDialog
 var feed: Label
 var chat_field: LineEdit
 var pad: Control
@@ -51,6 +57,7 @@ var ability_button: Button
 var health_button: Button
 var mana_button: Button
 var attack_button: Button
+var combat_roll_label: Label
 var safety_button: Button
 var safety_confirm: ConfirmationDialog
 var inventory_panel: PanelContainer
@@ -84,6 +91,8 @@ var fps_elapsed: float = 0.0
 var battle_panel: PanelContainer
 var battle_list: VBoxContainer
 var battle_buttons: Dictionary = {}
+var merchant_tab: String = "buy"
+var window_layout = preload("res://scripts/window_layout.gd").new()
 var last_inventory_key: String = ""
 var last_players_key: String = ""
 var register_requested: bool = false
@@ -95,6 +104,19 @@ var attack_elapsed: float = 0.0
 var attack_held: bool = false
 var app_focused: bool = true
 var notices: Array[String] = []
+var hotbar_buttons: Array[Button] = []
+var hotbar_page: int = 0
+var hotbar_pages: HBoxContainer
+var hotbar_page_label: Label
+var own_effects_row: HBoxContainer
+var target_effects_row: HBoxContainer
+var status_strip: VBoxContainer
+var effect_dialog: AcceptDialog
+var escape_restraint_button: Button
+var control_tip: PanelContainer
+var tip_dismissed: bool = false
+var ranking_label: Label
+var ranking_http: HTTPRequest
 
 func _ready() -> void:
 	_bind_keys()
@@ -112,15 +134,22 @@ func _ready() -> void:
 	_build_inventory()
 	_build_party()
 	_build_journal()
+	level_up_panels.setup(self)
 	progression.setup(self)
+	character_sheet.setup(self)
+	fighter_choice.setup(self)
+	caster_choice.setup(self)
 	safety_confirm = ConfirmationDialog.new()
 	safety_confirm.title = "Odblokować atakowanie graczy?"
-	safety_confirm.dialog_text = "Atak wymaga wybrania konkretnej postaci.\nNieuzasadniona agresja i zabójstwa powodują kary.\nOsada i początkujący pozostają chronieni."
+	safety_confirm.dialog_text = "PvP: broń, czary, obszary i wilk. Uważaj na osoby w obszarze.\nNieuzasadniona agresja i zabójstwa powodują kary.\nOsada i początkujący pozostają chronieni."
 	safety_confirm.ok_button_text = "Odblokuj PvP"
 	safety_confirm.cancel_button_text = "Zostaw blokadę"
 	safety_confirm.confirmed.connect(func() -> void: _send({"type":"pvp_safety", "enabled":false}))
 	root.add_child(safety_confirm)
 	_load_preferences()
+	control_tip.visible = not tip_dismissed
+	_setup_ranking()
+	window_layout.setup(self)
 	if OS.has_feature("web"):
 		var browser_url = JavaScriptBridge.eval("(location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws'")
 		if browser_url is String:
@@ -210,12 +239,29 @@ func _build_login(root: Control) -> void:
 	login_panel.add_child(center)
 	var panel: PanelContainer = PanelContainer.new()
 	panel.custom_minimum_size = Vector2(580, 0)
-	center.add_child(panel)
+	var login_row: HBoxContainer = HBoxContainer.new()
+	login_row.add_theme_constant_override("separation", 20)
+	center.add_child(login_row)
+	login_row.add_child(panel)
+	var ranks: PanelContainer = PanelContainer.new()
+	ranks.custom_minimum_size.x = 270
+	login_row.add_child(ranks)
+	var rank_box: VBoxContainer = VBoxContainer.new()
+	ranks.add_child(rank_box)
+	rank_box.add_child(_label("RANKING GRACZY", 18, GOLD))
+	rank_box.add_child(_label("Poziom / PD · TOP 20", 12, GREEN))
+	var rank_scroll: ScrollContainer = ScrollContainer.new()
+	rank_scroll.custom_minimum_size = Vector2(244, 390)
+	rank_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	rank_box.add_child(rank_scroll)
+	ranking_label = _wrap_label("Łączenie z rankingiem…", 14)
+	ranking_label.custom_minimum_size.x = 240
+	rank_scroll.add_child(ranking_label)
 	var box: VBoxContainer = VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
 	box.add_child(_label("BRACTWO · POGRANICZE", 30, GOLD))
-	box.add_child(_label("WIELKI KONTYNENT 0.4  /  WSPÓLNY OTWARTY ŚWIAT", 14, GREEN))
+	box.add_child(_label("KOŚCI I KRĘGI 0.8.4  /  WSPÓLNY OTWARTY ŚWIAT", 14, GREEN))
 	box.add_child(_label("Cztery klasy · rozwój bez limitu poziomu · loot · drużyny · PvP", 15))
 	box.add_child(_label("Adres serwera", 13, GREEN))
 	endpoint = LineEdit.new()
@@ -257,7 +303,7 @@ func _build_login(root: Control) -> void:
 	login_status = _wrap_label("Uruchom serwer z paczki, potem utwórz postać.", 14, GREEN)
 	login_status.custom_minimum_size = Vector2(540, 38)
 	box.add_child(login_status)
-	box.add_child(_label("WASD: ruch · Spacja: atak · F: magia · E: rozmowa · J: zadania", 13))
+
 	box.add_child(_label("Postęp zapisuje serwer. Przez internet używaj wss:// z TLS.", 13, Color("a7b8a6")))
 
 func _bar(color: Color, height: float) -> ProgressBar:
@@ -316,17 +362,52 @@ func _build_hud(root: Control) -> void:
 	status_label = _label("Ochrona osady", 14)
 	status.add_child(status_label)
 	target_label = _label("Cel: potwory w zasięgu", 13, GREEN)
-	status.add_child(target_label)
+	var target_row: HBoxContainer = HBoxContainer.new()
+	status.add_child(target_row)
+	target_row.add_child(target_label)
+	loot_button = _button("Łup", _show_target_loot)
+	loot_button.hide()
+	target_row.add_child(loot_button)
+	loot_dialog = AcceptDialog.new()
+	loot_dialog.ok_button_text = "Zamknij"
+	add_child(loot_dialog)
+	# Independent transparent status strip below the top HUD. Only buttons have a background.
+	status_strip = VBoxContainer.new()
+	status_strip.name = "StatusButtons"
+	status_strip.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	status_strip.offset_left = 412
+	status_strip.offset_right = -246
+	status_strip.offset_top = 128
+	status_strip.offset_bottom = 208
+	status_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud.add_child(status_strip)
+	own_effects_row = _make_effect_row(status_strip)
+	target_effects_row = _make_effect_row(status_strip)
+	status_strip.hide()
+	effect_dialog = AcceptDialog.new()
+	effect_dialog.ok_button_text = "Zamknij"
+	escape_restraint_button = effect_dialog.add_button("Wyrwij się · akcja", true, "escape_restraint")
+	escape_restraint_button.hide()
+	effect_dialog.custom_action.connect(func(action: StringName) -> void:
+		if action == "escape_restraint":
+			var packet: Dictionary = {"type":"escape_restraint"}
+			var ally_id: String = str(escape_restraint_button.get_meta("target_id", ""))
+			if not ally_id.is_empty():
+				packet["target_id"] = ally_id
+			_send(packet)
+			effect_dialog.hide())
+	hud.add_child(effect_dialog)
 	fps_label = _label("— FPS", 12, PAPER)
 	fps_label.custom_minimum_size.x = 64
 	fps_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	top_row.add_child(fps_label)
 	top_row.add_child(_button("Wyjdź", _disconnect))
 	hint_label = _label("", 14, GREEN)
-	hint_label.position = Vector2(22, 128)
+	hint_label.position = Vector2(22, 164)
 	hud.add_child(hint_label)
 	var tracker_panel: PanelContainer = PanelContainer.new()
-	tracker_panel.position = Vector2(14, 156)
+	tracker_panel.name = "QuestTracker"
+	tracker_panel.position = Vector2(14, 202)
 	tracker_panel.custom_minimum_size = Vector2(380, 88)
 	tracker_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(tracker_panel)
@@ -354,15 +435,15 @@ func _build_hud(root: Control) -> void:
 	battle_panel.hide()
 	var notice_panel: PanelContainer = PanelContainer.new()
 	notice_panel.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
-	notice_panel.offset_left = 188
-	notice_panel.offset_right = 664
-	notice_panel.offset_top = -176
-	notice_panel.offset_bottom = -12
+	notice_panel.offset_left = 12
+	notice_panel.offset_right = 294
+	notice_panel.offset_top = -266
+	notice_panel.offset_bottom = -152
 	hud.add_child(notice_panel)
 	var notice_box: VBoxContainer = VBoxContainer.new()
 	notice_panel.add_child(notice_box)
 	feed = _wrap_label("Witaj na Pograniczu.", 14)
-	feed.custom_minimum_size = Vector2(430, 94)
+	feed.custom_minimum_size = Vector2(254, 46)
 	feed.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	feed.clip_text = true
 	notice_box.add_child(feed)
@@ -379,52 +460,118 @@ func _build_hud(root: Control) -> void:
 	pad.offset_top = -172
 	pad.offset_bottom = -12
 	hud.add_child(pad)
+	var character_button: Button = _button("C · Karta postaci", func() -> void: character_sheet.toggle())
+	character_button.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+	character_button.offset_left = -198
+	character_button.offset_right = -12
+	character_button.offset_top = 14
+	character_button.offset_bottom = 54
+	hud.add_child(character_button)
 	var actions: VBoxContainer = VBoxContainer.new()
+	actions.name = "ActionDock"
 	actions.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
-	actions.offset_left = -588
+	actions.offset_left = -880
 	actions.offset_right = -12
-	actions.offset_top = -221
+	actions.offset_top = -316
 	actions.offset_bottom = -12
 	actions.add_theme_constant_override("separation", 6)
 	hud.add_child(actions)
 	var menus: HBoxContainer = HBoxContainer.new()
 	actions.add_child(menus)
-	menus.add_child(_button("I · Plecak", _toggle_inventory))
+	menus.add_child(_button("C · Postać", func() -> void: character_sheet.toggle()))
 	menus.add_child(_button("P · Gracze", _toggle_party))
 	menus.add_child(_button("J · Zadania", _toggle_journal))
-	menus.add_child(_button("K · Księga", func() -> void: progression.toggle()))
+	menus.add_child(_button("K · Czary", func() -> void: character_sheet.toggle("spells")))
+	# F keeps its original usage-based action; only its parent and placement change.
+	ability_button = _button("F · Umiejętność", func() -> void: _send({"type":"ability"}))
+	ability_button.name = "ClassAbility"
+	ability_button.custom_minimum_size.x = 164
+	ability_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	ability_button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	ability_button.expand_icon = true
+	ability_button.add_theme_constant_override("icon_max_width", 22)
+	menus.add_child(ability_button)
+	menus.add_child(_button("Świat", func() -> void: progression.toggle()))
 	safety_button = _button("PvP zablokowane", _toggle_safety)
 	safety_button.name = "PvpSafety"
 	safety_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	safety_button.custom_minimum_size.x = 128
+	safety_button.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	menus.add_child(safety_button)
-	var spellbar: HBoxContainer = HBoxContainer.new()
+	for menu: Button in menus.get_children():
+		menu.add_theme_font_size_override("font_size", 11)
+	var spellbar: GridContainer = GridContainer.new()
+	spellbar.columns = 12
 	actions.add_child(spellbar)
-	spellbar.add_child(_button("3 · Leczenie", func() -> void: _send({"type":"cast", "spell_id":"mend"})))
-	spellbar.add_child(_button("4 · Pośpiech", func() -> void: _send({"type":"cast", "spell_id":"haste"})))
-	spellbar.add_child(_button("5 · Czar", func() -> void: _cast_level(30)))
-	spellbar.add_child(_button("6 · Mistrz", func() -> void: _cast_level(80)))
-	spellbar.add_child(_button("7 · Runa", func() -> void: _send({"type":"rune_use", "rune_id":"fire"})))
+	for slot: int in range(24):
+		var b: Button = _button(_hotbar_key_label(slot), _cast_slot.bind(slot))
+		b.custom_minimum_size = Vector2(60, 55)
+		b.expand_icon = true
+		b.add_theme_constant_override("icon_max_width", 24)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", 12)
+		b.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		spellbar.add_child(b)
+		hotbar_buttons.append(b)
+	hotbar_pages = HBoxContainer.new()
+	hotbar_pages.alignment = BoxContainer.ALIGNMENT_CENTER
+	actions.add_child(hotbar_pages)
+	hotbar_pages.add_child(_button("‹ Page Up", _change_hotbar_page.bind(-1)))
+	hotbar_page_label = _label("1/1", 13)
+	hotbar_pages.add_child(hotbar_page_label)
+	hotbar_pages.add_child(_button("Page Down ›", _change_hotbar_page.bind(1)))
 	var utilities: HBoxContainer = HBoxContainer.new()
 	actions.add_child(utilities)
-	health_button = _button("1 · Życie", func() -> void: _best_potion("health_potion"))
-	health_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	utilities.add_child(health_button)
-	mana_button = _button("2 · Mana", func() -> void: _best_potion("mana_potion"))
-	mana_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	utilities.add_child(mana_button)
+	# Potions sit between the left chat panel and both spell rows.
+	var potion_strip: VBoxContainer = VBoxContainer.new()
+	potion_strip.name = "PotionStrip"
+	potion_strip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT)
+	potion_strip.offset_left = -974
+	potion_strip.offset_right = -892
+	potion_strip.offset_top = -266
+	potion_strip.offset_bottom = -152
+	potion_strip.add_theme_constant_override("separation", 4)
+	potion_strip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud.add_child(potion_strip)
+	health_button = _button("Q · HP", func() -> void: _best_potion("health_potion"))
+	mana_button = _button("R · Mana", func() -> void: _best_potion("mana_potion"))
+	for potion_button: Button in [health_button, mana_button]:
+		potion_button.custom_minimum_size = Vector2(82, 55)
+		potion_button.add_theme_font_size_override("font_size", 12)
+		potion_strip.add_child(potion_button)
 	utilities.add_child(_button("E · Rozmowa", _interact_nearby))
+	combat_roll_label = _wrap_label("", 12, GOLD)
+	combat_roll_label.custom_minimum_size.y = 32
+	combat_roll_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	actions.add_child(combat_roll_label)
 	var combat: HBoxContainer = HBoxContainer.new()
 	actions.add_child(combat)
-	ability_button = _button("F · Umiejętność", func() -> void: _send({"type":"ability"}))
-	ability_button.name = "ClassAbility"
-	ability_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	combat.add_child(ability_button)
-	attack_button = _button("SPACJA · ATAK", _attack)
+	attack_button = _button("SPACJA · ATAK", func() -> void: pass)
 	attack_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	attack_button.button_down.connect(func() -> void: attack_held = true)
+	attack_button.button_down.connect(func() -> void:
+		attack_held = true
+		_attack()
+	)
 	attack_button.button_up.connect(func() -> void: attack_held = false)
 	combat.add_child(attack_button)
-	_add_notice("Strażniczka w osadzie szuka pomocy. E: rozmowa · J: dziennik · Enter: czat.")
+	control_tip = PanelContainer.new()
+	control_tip.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT)
+	control_tip.offset_left = 190
+	control_tip.offset_top = -77
+	control_tip.offset_right = 675
+	control_tip.offset_bottom = -16
+	hud.add_child(control_tip)
+	var tip_row: HBoxContainer = HBoxContainer.new()
+	control_tip.add_child(tip_row)
+	var tip: Label = _wrap_label("W S A D · ruch     SPACJA · atak\nKliknij cel: autoatak · 1–0, −, = / F1–F12: czary · C: karta", 12, PAPER)
+	tip.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tip.custom_minimum_size.x = 400
+	tip_row.add_child(tip)
+	tip_row.add_child(_button("×", func() -> void:
+		tip_dismissed = true
+		control_tip.hide()
+		_save_preferences()))
+	_add_notice("Strażniczka w osadzie szuka pomocy.")
 
 func _window(title: String) -> PanelContainer:
 	var panel: PanelContainer = PanelContainer.new()
@@ -442,11 +589,12 @@ func _window(title: String) -> PanelContainer:
 	label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	heading.add_child(label)
 	heading.add_child(_button("Zamknij", func() -> void: panel.hide()))
+	window_layout.attach(panel, label)
 	panel.hide()
 	return panel
 
 func _build_inventory() -> void:
-	inventory_panel = _window("PLECAK I WYPOSAŻENIE")
+	inventory_panel = _window("KUPIEC")
 	inventory_panel.name = "InventoryPanel"
 	inventory_panel.offset_bottom = 704
 	var box: VBoxContainer = inventory_panel.get_child(0)
@@ -466,10 +614,10 @@ func _build_inventory() -> void:
 	box.add_child(shop_label)
 	var shop: HBoxContainer = HBoxContainer.new()
 	box.add_child(shop)
-	buy_health = _button("Kup miksturę życia", func() -> void: _send({"type":"buy", "item":"health_potion"}))
+	buy_health = _button("Kupuj", func() -> void: merchant_tab = "buy"; last_inventory_key = ""; _refresh_inventory())
 	buy_health.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	shop.add_child(buy_health)
-	buy_mana = _button("Kup miksturę many", func() -> void: _send({"type":"buy", "item":"mana_potion"}))
+	buy_mana = _button("Sprzedaj", func() -> void: merchant_tab = "sell"; last_inventory_key = ""; _refresh_inventory())
 	buy_mana.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	shop.add_child(buy_mana)
 	var scroll: ScrollContainer = ScrollContainer.new()
@@ -499,7 +647,7 @@ func _build_party() -> void:
 	leave_party = _button("Opuść drużynę", func() -> void: _send({"type":"party_leave"}))
 	party_actions.add_child(leave_party)
 	party_actions.add_child(_button("Wyczyść cel PvP", func() -> void: _select_target("")))
-	box.add_child(_wrap_label("Cel PvP wskazujesz ręcznie. Blokada ataków nie chroni przed cudzą agresją. F: potwory / leczenie; druid nie leczy sojusznika walczącego z graczem.", 13, Color("b6c5b3")))
+	box.add_child(_wrap_label("Po odblokowaniu PvP działają broń, czary, obszary i wilk. Wsparcie drużyny w PvP również włącza cię do walki. Blokada ataków nie chroni przed cudzą agresją.", 13, Color("b6c5b3")))
 	pvp_rules_label = _wrap_label("", 13, RED)
 	box.add_child(pvp_rules_label)
 	var scroll: ScrollContainer = ScrollContainer.new()
@@ -547,16 +695,16 @@ func _process(delta: float) -> void:
 		return
 	input_elapsed += delta
 	attack_elapsed += delta
-	var typing: bool = get_viewport().gui_get_focus_owner() is LineEdit
+	var typing: bool = get_viewport().gui_get_focus_owner() is LineEdit or get_viewport().gui_get_focus_owner() is TextEdit
 	if input_elapsed >= 0.05:
 		input_elapsed = 0.0
 		var movement: Vector2 = Vector2.ZERO
-		if app_focused and not typing and not _menu_open():
+		if app_focused and not typing and not _controls_blocked():
 			movement = Input.get_vector("walk_left", "walk_right", "walk_up", "walk_down")
 			if pad.vector.length() > movement.length():
 				movement = pad.vector
 		_send({"type":"input", "x":movement.x, "y":movement.y})
-	if attack_elapsed >= 0.22 and app_focused and not typing and not _menu_open() and (attack_held or Input.is_action_pressed("strike")):
+	if attack_elapsed >= 0.22 and app_focused and not typing and not _controls_blocked() and (attack_held or Input.is_action_pressed("strike")):
 		attack_elapsed = 0.0
 		_attack()
 
@@ -582,6 +730,7 @@ func _poll_socket() -> void:
 func _handle_message(data: Dictionary) -> void:
 	match str(data.get("type", "")):
 		"welcome":
+			level_up_panels.reset()
 			local_id = str(data.get("id", ""))
 			player = {}
 			selected_enemy = ""
@@ -616,6 +765,8 @@ func _handle_message(data: Dictionary) -> void:
 			_add_notice(pending_invite_name + " zaprasza do drużyny. P → Dołącz.")
 			last_players_key = ""
 			_refresh_party()
+		"nature_hint":
+			navigation_goal = {"x":data.get("x", 0), "y":data.get("y", 0), "floor":data.get("floor", 0), "label":data.get("name", "Wskazówka")}
 		"notice":
 			_add_notice(str(data.get("text", "")))
 		"chat":
@@ -627,7 +778,21 @@ func _handle_message(data: Dictionary) -> void:
 				_add_notice(str(data.get("text", "Nie można wykonać tej czynności.")))
 
 func _send(data: Dictionary) -> void:
-	if not selected_enemy.is_empty() and str(data.get("type", "")) in ["ability", "rune_use"]:
+	var command: String = str(data.get("type", ""))
+	if command in ["cast", "ability"]:
+		data = data.duplicate()
+		var key: String = str(data.get("spell_id", player.get("favorite_spell", "")))
+		var spec: Dictionary = _spell_profile(key)
+		var friend: Dictionary = _find_player(selected_target) if not selected_target.is_empty() else {}
+		var same_party: bool = not str(player.get("party_id", "")).is_empty() and str(friend.get("party_id", "")) == str(player.get("party_id", ""))
+		if str(spec.get("targeting", "")) == "ally" and not friend.is_empty() and (str(friend.get("id", "")) == local_id or same_party):
+			data["target_id"] = selected_target
+		elif str(spec.get("kind", "")) in ["attack", "save", "missiles", "mark", "control", "field"]:
+			if not selected_enemy.is_empty():
+				data["enemy_id"] = selected_enemy
+			elif not selected_target.is_empty():
+				data["target_id"] = selected_target
+	if not selected_enemy.is_empty() and command == "rune_use":
 		data = data.duplicate()
 		data["enemy_id"] = selected_enemy
 	if socket != null and socket.get_ready_state() == WebSocketPeer.STATE_OPEN:
@@ -690,7 +855,7 @@ func _update_hud() -> void:
 	for entry: Dictionary in state.get("players", []):
 		if not bool(entry.get("disconnected", false)):
 			online += 1
-	event_label.text = "POGRANICZE · online %d · ATK %d · Pancerz %d" % [online, int(player.get("attack", 0)), int(player.get("armor", 0))]
+	event_label.text = "POGRANICZE · online %d · Trafienie +%d · KP %d · %s" % [online, int(player.get("attack_bonus", 0)), int(player.get("armor_class", 10)), str(player.get("damage_dice", ""))]
 	var skull: String = str(player.get("skull", "none"))
 	var skull_text: String = "Bez czaszki"
 	if skull == "white":
@@ -717,29 +882,48 @@ func _update_hud() -> void:
 		selected_enemy = ""
 		world_view.selected_target = ""
 		world_view.selected_enemy = ""
+	loot_button.visible = not selected_enemy.is_empty() and not target.is_empty()
 	if not selected_enemy.is_empty():
-		target_label.text = "Cel: %s · %d/%d HP" % [target.get("name", ""), int(target.get("hp", 0)), int(target.get("max_hp", 1))]
+		target_label.text = ("Auto: %s · %d/%d HP · KP %d" if bool(player.get("weapon_auto_attack", true)) else "Cel: %s · %d/%d HP · KP %d") % [target.get("name", ""), int(target.get("hp", 0)), int(target.get("max_hp", 1)), int(target.get("armor_class", 10))]
 		attack_button.text = "SPACJA · WYBRANY POTWÓR"
 	else:
 		target_label.text = "Cel: potwory w zasięgu" if selected_target.is_empty() else "Cel PvP: %s%s" % [target.get("name", "?"), " · ATAK ZABLOKOWANY" if safe else ""]
 		attack_button.text = "SPACJA · POTWORY" if selected_target.is_empty() else "SPACJA · CEL PvP"
+	var action_remaining: float = float(player.get("action_remaining", 0))
+	if action_remaining > 0:
+		attack_button.text = "SPACJA · %.1f s" % action_remaining
+	attack_button.tooltip_text = ("Iskra różdżki tylko na Spację lub przycisk ataku. Zaznaczenie wybiera cel dla czarów.\n" if not bool(player.get("weapon_auto_attack", true)) else "Zaznaczenie uruchamia autoatak bronią co 3 s.\n") + "Esc odznacza cel. Oczekujący czar ma pierwszeństwo przed następnym atakiem. Atak i czar dzielą akcję; akcja dodatkowa ma własne odnowienie."
+	combat_roll_label.text = _combat_summary(player.get("last_roll", {}))
 	target_label.add_theme_color_override("font_color", GREEN if selected_target.is_empty() else RED)
 	_refresh_battle_list()
-	var potions: Dictionary = player.get("potions", {})
-	health_button.text = "1 · Życie ×%d" % _potion_count("health_potion")
-	mana_button.text = "2 · Mana ×%d" % _potion_count("mana_potion")
-	var potion_cooldown: float = float(player.get("potion_cooldown", 0))
-	health_button.disabled = _potion_count("health_potion") <= 0 or not bool(player.get("alive", true)) or potion_cooldown > 0
-	var potion_metadata: Dictionary = world_data.get("potions", {})
-	health_button.tooltip_text = "Odnawia %d HP · wspólny czas odnowienia mikstur: %ds" % [int(potion_metadata.get("health_potion", {}).get("restore", 0)), int(ceil(potion_cooldown))]
-	mana_button.tooltip_text = "Odnawia %d many · wspólny czas odnowienia mikstur: %ds" % [int(potion_metadata.get("mana_potion", {}).get("restore", 0)), int(ceil(potion_cooldown))]
-	mana_button.disabled = _potion_count("mana_potion") <= 0 or not bool(player.get("alive", true)) or potion_cooldown > 0
-	var cooldown: float = float(player.get("ability_cooldown", 0))
-	ability_button.text = "F · " + str(player.get("ability_name", "Umiejętność")) + (" (%ds)" % int(ceil(cooldown)) if cooldown > 0 else "")
-	var class_spec: Dictionary = world_data.get("classes", {}).get(class_id, {})
-	var ability_cost: int = int(class_spec.get("ability_cost", 0))
-	ability_button.disabled = cooldown > 0 or not bool(player.get("alive", true)) or float(player.get("mana", 0)) < ability_cost
-	ability_button.tooltip_text = "Koszt: %d many. Umiejętności ofensywne trafiają wyłącznie potwory. Druid leczy drużynę poza walką PvP." % ability_cost
+	for key: String in ["q", "r"]:
+		var template: String = str(player.get("potion_slots", {}).get(key, "health_potion" if key == "q" else "mana_potion"))
+		var spec: Dictionary = world_data.get("items", {}).get(template, {})
+		var count: int = int(player.get("potions", {}).get(template, 0))
+		var b: Button = health_button if key == "q" else mana_button
+		b.text = key.to_upper() + " · ×%d" % count
+		b.tooltip_text = str(spec.get("name", "Nie przypisano mikstury")) + "\n" + _item_details(spec) + "\nPrzypisanie: C → Ekwipunek."
+		var path: String = "res://" + str(spec.get("icon", ""))
+		b.icon = load(path) as Texture2D if ResourceLoader.exists(path) else null
+		b.expand_icon = true
+		b.add_theme_constant_override("icon_max_width", 27)
+		b.disabled = count <= 0 or not player.get("alive", true) or float(player.get("potion_cooldown", 0)) > 0 or int(player.get("level", 1)) < int(spec.get("min_level", 1))
+	var favorite: String = str(player.get("favorite_spell", ""))
+	var ability_spec: Dictionary = _spell_profile(favorite)
+	var cooldown: float = float(player.get("spell_cooldowns", {}).get(favorite, 0))
+	var ability_cost: int = _spell_mana(favorite, ability_spec)
+	var revert: bool = ability_spec.get("kind", "") == "shape" and not str(player.get("form", "")).is_empty()
+	var reaction: bool = ability_spec.get("kind", "") == "reaction"
+	var weapon_ready: bool = ability_spec.get("kind", "") == "weapon_trigger" and bool(player.get("ensnaring_armed", false))
+	var favorite_queue: String = _queued_spell_label(favorite)
+	ability_button.text = "F · " + str(ability_spec.get("name", "Czar")) + (" · " + favorite_queue if not favorite_queue.is_empty() else " · GOTOWE" if weapon_ready else " (%ds)" % ceili(cooldown) if cooldown > 0 else "")
+	var favorite_icon: String = "res://" + str(ability_spec.get("icon", ""))
+	ability_button.icon = load(favorite_icon) as Texture2D if ResourceLoader.exists(favorite_icon) else null
+	ability_button.disabled = ability_spec.is_empty() or not bool(player.get("alive", true)) or (not revert and not reaction and not weapon_ready and (cooldown > 0 or float(player.get("mana", 0)) < ability_cost or not str(player.get("form", "")).is_empty()))
+	if ability_spec.get("kind", "") == "recovery":
+		ability_button.disabled = not preload("res://scripts/caster_sheet.gd").can_recover(player)
+	ability_button.tooltip_text = str(ability_spec.get("name", "Czar")) + "\nNajczęściej używany czar w ostatnich 100 udanych użyciach. Koszt: %d many." % ability_cost
+
 	if not bool(player.get("alive", true)):
 		hint_label.text = "Pokonano cię. Za chwilę wrócisz do osady z karą za śmierć."
 	elif not bool(player.get("class_chosen", true)):
@@ -749,7 +933,7 @@ func _update_hud() -> void:
 	elif _near_merchant():
 		hint_label.text = "E · Kupiec: kup mikstury, sprzedaj łupy · I: załóż sprzęt · P: zaproś graczy"
 	else:
-		hint_label.text = "J: dziennik i kierunek wyprawy · Enter: czat · F: umiejętność · 1/2: mikstury"
+		hint_label.text = ""
 	if str(player.get("party_id", "")) == pending_invite_id and not pending_invite_id.is_empty():
 		pending_invite_id = ""
 		pending_invite_name = ""
@@ -757,8 +941,15 @@ func _update_hud() -> void:
 		_refresh_inventory()
 	if party_panel.visible:
 		_refresh_party()
+	_update_hotbar()
+	_update_statuses(target)
 	progression.refresh()
+	character_sheet.refresh()
+	fighter_choice.refresh()
+	caster_choice.refresh()
+	level_up_panels.refresh()
 	_refresh_tracker()
+	window_layout.refresh()
 	minimap.set_data(world_data, state, local_id)
 	if journal_panel.visible:
 		_refresh_journal()
@@ -788,21 +979,14 @@ func _merchant_data() -> Dictionary:
 	return nearby if not nearby.is_empty() else world_data.get("merchant", {})
 
 func _toggle_inventory() -> void:
-	progression.panel.hide()
-	inventory_panel.visible = not inventory_panel.visible
-	party_panel.hide()
-	journal_panel.hide()
-	_stop_controls()
-	attack_held = false
-	if inventory_panel.visible:
-		_refresh_inventory()
+	character_sheet.toggle("inventory")
 
 func _toggle_party() -> void:
+	character_sheet.panel.hide()
 	progression.panel.hide()
 	party_panel.visible = not party_panel.visible
 	inventory_panel.hide()
 	journal_panel.hide()
-	_stop_controls()
 	attack_held = false
 	if party_panel.visible:
 		_refresh_party()
@@ -812,7 +996,6 @@ func _merchant() -> void:
 	inventory_panel.show()
 	party_panel.hide()
 	journal_panel.hide()
-	_stop_controls()
 	_refresh_inventory()
 
 func _clear_children(parent: Node) -> void:
@@ -834,74 +1017,122 @@ func _item_usable(item: Dictionary) -> bool:
 	if str(item.get("slot", "")) == "trophy":
 		return false
 	var classes: Array = item.get("class_ids", [])
-	return int(player.get("level", 1)) >= int(item.get("min_level", 1)) and (classes.is_empty() or classes.has(str(player.get("class_id", "knight"))))
+	return str(player.get("form", "")).is_empty() and str(item.get("preview", {}).get("equip_error", "")).is_empty() and int(player.get("level", 1)) >= int(item.get("min_level", 1)) and (classes.is_empty() or classes.has(str(player.get("class_id", "knight"))))
 
 func _item_details(item: Dictionary) -> String:
-	var classes: Array[String] = []
-	for class_id in item.get("class_ids", []):
-		classes.append(str(CLASS_NAMES.get(str(class_id), class_id)))
-	var details: String = "%s · ATK +%d · Pancerz +%d · poz. %d" % [SLOT_NAMES.get(str(item.get("slot", "")), "Sprzęt"), int(item.get("attack", 0)), int(item.get("armor", 0)), int(item.get("min_level", 1))]
-	if not classes.is_empty():
-		details += " · " + "/".join(classes)
-	details += " · " + str(world_data.get("rarities", {}).get(item.get("rarity", "common"), "Pospolity"))
-	if str(item.get("slot", "")) == "trophy":
-		return "Trofeum · " + str(item.get("description", "Na sprzedaż"))
-	return details
+	var lines: PackedStringArray = PackedStringArray()
+	if item.is_empty():
+		return ""
+	var details: Dictionary = item.get("preview", player.get("item_previews", {}).get(item.get("template", ""), {}))
+	var slot: String = str(item.get("slot", ""))
+	var damage_names: Dictionary = {"piercing":"kłute", "slashing":"sieczne", "bludgeoning":"obuchowe", "fire":"ogień", "cold":"zimno", "force":"moc", "necrotic":"nekrotyczne", "poison":"trucizna"}
+	if slot == "weapon":
+		lines.append(str(item.get("weapon_name", "Broń")) + (" · Prosta" if item.get("weapon_category", "") == "simple" else " · Żołnierska" if item.get("weapon_category", "") == "martial" else ""))
+		if details.has("attack"):
+			var attack_value: int = int(details["attack"])
+			lines.append("Atak  1k20" + ("+" if attack_value >= 0 else "") + str(attack_value))
+		lines.append("Obrażenia  " + str(details.get("dice", item.get("damage_dice", ""))) + " " + str(damage_names.get(details.get("damage_type", item.get("damage_type", "")), "")))
+		if details.has("two_hand_dice"):
+			lines.append("Oburącz  " + str(details["two_hand_dice"]))
+		elif item.get("two_handed", false):
+			lines.append("Dwuręczna")
+		if int(details.get("spell_bonus", item.get("spell_bonus", 0))) > 0:
+			lines.append("Czary: atak i ST +%d" % int(details.get("spell_bonus", item.get("spell_bonus", 0))))
+		if not details.get("proficient", true):
+			lines.append("Brak biegłości: −%d do trafienia" % int(details.get("proficiency", 2)))
+		if details.get("heavy_penalty", false):
+			lines.append("Za mała cecha — utrudnienie")
+		if item.has("mastery_name"):
+			lines.append("Mistrzostwo  " + str(item["mastery_name"]) + ("" if details.get("mastery_active", false) else " 🔒"))
+	elif slot == "potion":
+		lines.append("Odnawia " + str(item.get("effect_summary", "")))
+		lines.append("Liczba: %d" % int(item.get("quantity", 1)))
+	elif slot == "armor":
+		lines.append(str({"none":"Szata", "light":"Lekki pancerz", "medium":"Średni pancerz", "heavy":"Ciężki pancerz"}.get(item.get("armor_kind", "none"), "Pancerz")))
+		lines.append("Twoja KP  %d" % int(details["ac"]) if details.has("ac") else str(item.get("armor_summary", "")))
+		if details.get("armor_penalty", false):
+			lines.append("Brak wyszkolenia — bez czarów, utrudnienie Siły/Zręczności")
+		if details.get("speed_penalty", false):
+			lines.append("Za mała Siła — ruch −10 stóp")
+	elif slot == "shield":
+		lines.append("Tarcza · +%d KP" % int(item.get("shield_ac", 2)))
+		if details.has("ac"):
+			lines.append("Twoja KP  %d" % int(details["ac"]))
+		if details.get("untrained_shield", false):
+			lines.append("Brak wyszkolenia — bez premii KP")
+	elif slot == "ring":
+		lines.append("Pierścień")
+		if int(item.get("ac_bonus", 0)) > 0:
+			lines.append("KP +%d" % int(item["ac_bonus"]))
+		if int(item.get("attack_bonus", 0)) > 0:
+			lines.append("Atak bronią +%d" % int(item["attack_bonus"]))
+	var resistance_names: PackedStringArray = PackedStringArray()
+	for dtype: String in item.get("resistances", []):
+		resistance_names.append(str(damage_names.get(dtype, dtype)))
+	if not resistance_names.is_empty():
+		lines.append("Odporność: " + ", ".join(resistance_names))
+	if int(item.get("min_level", 1)) > 1:
+		lines.append("Poziom %d" % int(item["min_level"]))
+	var sources: PackedStringArray = PackedStringArray()
+	for source: Dictionary in item.get("sources", []):
+		sources.append(str(source.get("name", "")))
+	if not sources.is_empty():
+		lines.append("Zdobyto: " + ", ".join(sources))
+	return "\n".join(lines)
 
 func _refresh_inventory() -> void:
 	var inventory: Array = player.get("inventory", [])
-	var equipment: Dictionary = player.get("equipment", {})
-	var near: bool = _near_merchant()
-	var trading: bool = near and float(player.get("combat_remaining", 0)) <= 0 and bool(player.get("alive", true))
-	var key: String = JSON.stringify([inventory, equipment, player.get("gold", 0), player.get("level", 1), player.get("attack", 0), player.get("armor", 0), player.get("class_id", "knight"), player.get("class_chosen", true), _in_town(), near, trading])
+	var trading: bool = _near_merchant() and float(player.get("combat_remaining", 0)) <= 0 and player.get("alive", true)
+	var key: String = JSON.stringify([merchant_tab, inventory, player.get("equipment"), player.get("gold"), player.get("level"), trading])
 	if key == last_inventory_key:
 		return
 	last_inventory_key = key
-	inventory_stats.text = "ATK %d · Pancerz %d · Złoto %d · Przedmioty %d/%d" % [int(player.get("attack", 0)), int(player.get("armor", 0)), int(player.get("gold", 0)), inventory.size(), int(world_data.get("inventory_cap", 40))]
+	inventory_stats.text = "Złoto: %d · Plecak: %d / 40" % [int(player.get("gold", 0)), inventory.size()]
 	legacy_row.visible = not bool(player.get("class_chosen", true))
-	legacy_button.disabled = not _in_town()
-	legacy_button.tooltip_text = "Jednorazowy wybór klasy — tylko w osadzie."
-	_clear_children(equipment_list)
-	for slot: String in ["weapon", "armor", "ring"]:
-		var uid: String = str(equipment.get(slot, ""))
-		var item: Dictionary = _item_by_uid(uid)
-		var row: HBoxContainer = HBoxContainer.new()
-		equipment_list.add_child(row)
-		var label: Label = _wrap_label(str(SLOT_NAMES[slot]) + ": " + str(item.get("name", "puste")), 14, GOLD)
-		row.add_child(label)
-		var remove: Button = _button("Zdejmij", func() -> void: _send({"type":"unequip", "slot":slot}))
-		remove.custom_minimum_size.y = 32
-		remove.disabled = uid.is_empty()
-		row.add_child(remove)
-	shop_label.text = "Kupiec w zasięgu · kup mikstury lub sprzedaj niezałożony sprzęt." if trading else ("Zakończ walkę, aby odpocząć i handlować." if near else "Handel dostępny przy kupcu w osadzie.")
-	buy_health.disabled = not trading
-	buy_mana.disabled = not trading
-	var merchant: Dictionary = _merchant_data()
-	var prices: Dictionary = merchant.get("prices", {})
-	buy_health.text = "Kup życie" + (" · %d zł" % int(prices["health_potion"]) if prices.has("health_potion") else "")
-	buy_mana.text = "Kup manę" + (" · %d zł" % int(prices["mana_potion"]) if prices.has("mana_potion") else "")
+	equipment_list.hide()
+	shop_label.text = "Wybierz przedmiot." if trading else "Handel przy kupcu, poza walką."
+	buy_health.text = "✓ Kupuj" if merchant_tab == "buy" else "Kupuj"
+	buy_mana.text = "✓ Sprzedaj" if merchant_tab == "sell" else "Sprzedaj"
 	_clear_children(inventory_list)
-	if inventory.is_empty():
-		inventory_list.add_child(_label("Brak sprzętu. Potwory mogą upuścić nowe przedmioty.", 14))
-	for item: Dictionary in inventory:
-		var uid: String = str(item.get("uid", ""))
-		var equipped: bool = _item_equipped(uid)
-		var row: HBoxContainer = HBoxContainer.new()
-		inventory_list.add_child(row)
-		var info: VBoxContainer = VBoxContainer.new()
-		info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(info)
-		info.add_child(_wrap_label(str(item.get("name", "Przedmiot")) + (" · założone" if equipped else ""), 15, GOLD if equipped else PAPER))
-		info.add_child(_wrap_label(_item_details(item), 12, GREEN if _item_usable(item) else RED))
-		var equip: Button = _button("Załóż", func() -> void: _send({"type":"equip", "uid":uid}))
-		equip.disabled = equipped or not _item_usable(item)
-		row.add_child(equip)
-		equip.visible = str(item.get("slot", "")) != "trophy"
-		var sell: Button = _button("Sprzedaj\n%d zł" % int(item.get("value", 0)), func() -> void: _send({"type":"sell", "uid":uid}))
-		sell.disabled = equipped or not trading
-		sell.add_theme_font_size_override("font_size", 13)
-		sell.tooltip_text = "Sprzedaje ten przedmiot kupcowi. Założony sprzęt trzeba najpierw zdjąć."
-		row.add_child(sell)
+	var entries: Array = []
+	if merchant_tab == "buy":
+		for template: String in world_data.get("items", {}):
+			if not world_data["items"][template].has("price"):
+				continue
+			var entry: Dictionary = world_data.get("items", {}).get(template, {}).duplicate()
+			entry["template"] = template
+			entry["preview"] = player.get("item_previews", {}).get(template, {})
+			entries.append(entry)
+	else:
+		for entry: Dictionary in inventory:
+			if not _item_equipped(str(entry.get("uid", ""))):
+				entries.append(entry)
+	for item: Dictionary in entries:
+		var box: VBoxContainer = VBoxContainer.new()
+		inventory_list.add_child(box)
+		var label: Label = _wrap_label(str(item.get("name", "")) + (" ×%d" % int(item["quantity"]) if item.has("quantity") else ""), 15, GOLD)
+		label.mouse_filter = Control.MOUSE_FILTER_STOP
+		label.tooltip_text = _item_details(item)
+		box.add_child(label)
+		box.add_child(_wrap_label(str(item.get("effect_summary", item.get("damage_dice", ""))), 12, GREEN))
+		var actions: HFlowContainer = HFlowContainer.new()
+		box.add_child(actions)
+		if merchant_tab == "buy":
+			var price: int = int(item.get("price", 0))
+			var buy: Button = _button("Kup · %d zł" % price, func() -> void: _send({"type":"buy", "item":item["template"]}))
+			buy.disabled = not trading or int(player.get("gold", 0)) < price or int(player.get("level", 1)) < int(item.get("min_level", 1))
+			actions.add_child(buy)
+		else:
+			var sell: Button = _button("Sprzedaj 1 · %d zł" % int(item.get("value", 0)), func() -> void: _send({"type":"sell", "uid":item["uid"]}))
+			sell.disabled = not trading
+			actions.add_child(sell)
+			if int(item.get("quantity", 1)) > 1:
+				var stack: Button = _button("Sprzedaj stos", func() -> void: _send({"type":"sell", "uid":item["uid"], "quantity":item["quantity"]}))
+				stack.disabled = not trading
+				actions.add_child(stack)
+		inventory_list.add_child(HSeparator.new())
+	if entries.is_empty():
+		inventory_list.add_child(_wrap_label("Brak przedmiotów do sprzedaży.", 14))
 
 func _refresh_party() -> void:
 	var entries: Array = []
@@ -951,13 +1182,14 @@ func _toggle_safety() -> void:
 	attack_held = false
 	if bool(player.get("pvp_safety", true)):
 		var rules: Dictionary = world_data.get("pvp_rules", {})
-		safety_confirm.dialog_text = "Atak wymaga wybrania konkretnej postaci.\nNieuzasadniona agresja: biała czaszka.\n%d nieuzasadnione zabójstwa / 24 h: czerwona czaszka i surowsza kara śmierci.\nPvP od poziomu %d, poza chronioną osadą." % [int(rules.get("red_kills", 3)), int(rules.get("min_level", 8))]
+		safety_confirm.dialog_text = "PvP: broń, czary, obszary i wilk. Uważaj na osoby w obszarze.\nNieuzasadniona agresja: biała czaszka.\n%d nieuzasadnione zabójstwa / 24 h: czerwona czaszka i surowsza kara śmierci.\nPvP od poziomu %d, poza chronioną osadą." % [int(rules.get("red_kills", 3)), int(rules.get("min_level", 8))]
 		safety_confirm.popup_centered(Vector2i(620, 240))
 	else:
 		_send({"type":"pvp_safety", "enabled":true})
 		_select_target("")
 
 func _select_target(id: String) -> void:
+	_send({"type":"select_target", "target_id":id})
 	selected_enemy = ""
 	world_view.selected_enemy = ""
 	selected_target = id
@@ -965,11 +1197,32 @@ func _select_target(id: String) -> void:
 	attack_held = false
 	last_players_key = ""
 	if not id.is_empty():
-		_add_notice("Wybrano cel PvP: " + str(_find_player(id).get("name", "?")) + ". Spacja zaatakuje go po odblokowaniu PvP.")
+		_add_notice("Wybrano cel PvP: " + str(_find_player(id).get("name", "?")) + ". Po odblokowaniu PvP działają autoatak, czary i towarzysz.")
 	_update_hud()
 
+func _combat_summary(roll: Dictionary) -> String:
+	if roll.get("graze", false):
+		return "%s · pudło · Draśnięcie → %s obr." % [roll.get("action", "Atak"), str(roll.get("damage", 0))]
+	if str(roll.get("check", "")) == "healing":
+		return "%s · %s → +%d" % [roll.get("action", "Leczenie"), roll.get("damage_dice", ""), int(roll.get("healing", 0))]
+	if str(roll.get("check", "")) == "automatic":
+		return "%s · %s → %d obrażeń" % [roll.get("action", "Czar"), roll.get("damage_dice", ""), int(roll.get("damage", 0))]
+	if str(roll.get("check", "")) == "concentration":
+		return "Koncentracja: k20 %d + %d / ST %d · %s" % [int(roll.get("roll", 0)), int(roll.get("bonus", 0)), int(roll.get("defense", 10)), "utrzymana" if roll.get("saved", false) else "przerwana"]
+	if roll.is_empty():
+		return ""
+	var die: String = "k20 %d" % int(roll.get("roll", 0))
+	if bool(roll.get("disadvantage", false)) or bool(roll.get("advantage", false)):
+		die = "k20 %s → %d" % [str(roll.get("rolls", [])), int(roll.get("roll", 0))]
+	var save: bool = str(roll.get("check", "")) == "save"
+	var result: String = "KRYTYK" if roll.get("critical", false) else "trafienie" if roll.get("hit", false) else "PUDŁO"
+	if save:
+		result = ("obrona · połowa" if roll.get("save_half", false) else "obrona · brak obrażeń") if roll.get("saved", false) else "nieudana obrona"
+	var damage: String = " · %s → %s obr." % [str(roll.get("damage_dice", "")), str(roll.get("damage", 0))] if roll.get("hit", false) else ""
+	return "%s: %s + %d = %d / %s %d · %s%s" % [str(roll.get("target_name", "Cel")), die, int(roll.get("bonus", 0)), int(roll.get("total", 0)), "ST" if save else "KP", int(roll.get("defense", 0)), result, damage]
+
 func _attack() -> void:
-	if local_id.is_empty() or not bool(player.get("alive", true)):
+	if local_id.is_empty() or not app_focused or _controls_blocked() or get_viewport().gui_get_focus_owner() is LineEdit or not bool(player.get("alive", true)) or float(player.get("action_remaining", 0)) > 0:
 		return
 	if not selected_enemy.is_empty():
 		_send({"type":"attack", "enemy_id":selected_enemy})
@@ -1005,6 +1258,7 @@ func _select_enemy(id: String) -> void:
 	if enemy.is_empty() or float(enemy.get("hp", 0)) <= 0 or int(enemy.get("floor", 0)) != int(player.get("floor", 0)):
 		return
 	selected_enemy = id
+	_send({"type":"select_target", "enemy_id":id})
 	selected_target = ""
 	world_view.selected_enemy = id
 	world_view.selected_target = ""
@@ -1067,6 +1321,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _input(event: InputEvent) -> void:
+	if is_instance_valid(loot_dialog) and loot_dialog.visible:
+		return
 	# Handle Enter before GUI shortcuts, including a focused HUD button or chat field.
 	if local_id.is_empty() or not event is InputEventKey or not event.pressed or event.echo:
 		return
@@ -1086,39 +1342,117 @@ func _input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 
 func _unhandled_key_input(event: InputEvent) -> void:
+	if is_instance_valid(loot_dialog) and loot_dialog.visible and event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
+		loot_dialog.hide()
+		return
 	if local_id.is_empty() or not event is InputEventKey or not event.pressed or event.echo:
 		return
-	if get_viewport().gui_get_focus_owner() is LineEdit or safety_confirm.visible:
+	if event.ctrl_pressed or event.alt_pressed or event.meta_pressed:
+		return
+	if get_viewport().gui_get_focus_owner() is LineEdit or get_viewport().gui_get_focus_owner() is TextEdit or safety_confirm.visible:
 		return
 	match event.physical_keycode:
+		KEY_SPACE:
+			_attack()
 		KEY_E:
 			_interact_nearby()
 		KEY_F:
-			if not _menu_open():
+			if not _controls_blocked():
 				_send({"type":"ability"})
-		KEY_1:
+		KEY_Q:
 			_best_potion("health_potion")
-		KEY_2:
+		KEY_R:
 			_best_potion("mana_potion")
 		KEY_I:
 			_toggle_inventory()
 		KEY_P:
 			_toggle_party()
+		KEY_C:
+			character_sheet.toggle()
 		KEY_K:
-			progression.toggle()
+			character_sheet.toggle("spells")
+		KEY_PAGEUP:
+			_change_hotbar_page(-1)
+		KEY_PAGEDOWN:
+			_change_hotbar_page(1)
+		KEY_1:
+			if not _controls_blocked():
+				_cast_slot(0)
+		KEY_2:
+			if not _controls_blocked():
+				_cast_slot(1)
 		KEY_3:
-			_send({"type":"cast", "spell_id":"mend"})
+			if not _controls_blocked():
+				_cast_slot(2)
 		KEY_4:
-			_send({"type":"cast", "spell_id":"haste"})
+			if not _controls_blocked():
+				_cast_slot(3)
 		KEY_5:
-			_cast_level(30)
+			if not _controls_blocked():
+				_cast_slot(4)
 		KEY_6:
-			_cast_level(80)
+			if not _controls_blocked():
+				_cast_slot(5)
 		KEY_7:
-			_send({"type":"rune_use", "rune_id":"fire"})
+			if not _controls_blocked():
+				_cast_slot(6)
+		KEY_8:
+			if not _controls_blocked():
+				_cast_slot(7)
+		KEY_9:
+			if not _controls_blocked():
+				_cast_slot(8)
+		KEY_0:
+			if not _controls_blocked():
+				_cast_slot(9)
+		KEY_MINUS:
+			if not _controls_blocked():
+				_cast_slot(10)
+		KEY_EQUAL:
+			if not _controls_blocked():
+				_cast_slot(11)
+		KEY_F1:
+			if not _controls_blocked():
+				_cast_slot(12)
+		KEY_F2:
+			if not _controls_blocked():
+				_cast_slot(13)
+		KEY_F3:
+			if not _controls_blocked():
+				_cast_slot(14)
+		KEY_F4:
+			if not _controls_blocked():
+				_cast_slot(15)
+		KEY_F5:
+			if not _controls_blocked():
+				_cast_slot(16)
+		KEY_F6:
+			if not _controls_blocked():
+				_cast_slot(17)
+		KEY_F7:
+			if not _controls_blocked():
+				_cast_slot(18)
+		KEY_F8:
+			if not _controls_blocked():
+				_cast_slot(19)
+		KEY_F9:
+			if not _controls_blocked():
+				_cast_slot(20)
+		KEY_F10:
+			if not _controls_blocked():
+				_cast_slot(21)
+		KEY_F11:
+			if not _controls_blocked():
+				_cast_slot(22)
+		KEY_F12:
+			if not _controls_blocked():
+				_cast_slot(23)
 		KEY_J:
 			_toggle_journal()
 		KEY_ESCAPE:
+			if character_sheet.panel.visible:
+				character_sheet.panel.hide()
+				return
 			progression.panel.hide()
 			inventory_panel.hide()
 			party_panel.hide()
@@ -1128,12 +1462,14 @@ func _unhandled_key_input(event: InputEvent) -> void:
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
 		app_focused = false
+		_send({"type":"auto_pause", "paused":true})
 		attack_held = false
 		if is_instance_valid(pad):
 			pad.reset()
 		_send({"type":"input", "x":0, "y":0})
 	elif what == NOTIFICATION_APPLICATION_FOCUS_IN:
 		app_focused = true
+		_send({"type":"auto_pause", "paused":false})
 	elif what == NOTIFICATION_WM_CLOSE_REQUEST:
 		_send({"type":"input", "x":0, "y":0})
 		if socket != null:
@@ -1144,9 +1480,11 @@ func _load_preferences() -> void:
 	if config.load("user://preferences.cfg") == OK:
 		endpoint.text = str(config.get_value("connection", "url", endpoint.text))
 		username.text = str(config.get_value("connection", "name", ""))
+		tip_dismissed = bool(config.get_value("ui", "control_tip_dismissed", false))
 
 func _save_preferences() -> void:
 	var config: ConfigFile = ConfigFile.new()
+	config.set_value("ui", "control_tip_dismissed", tip_dismissed)
 	config.set_value("connection", "url", endpoint.text.strip_edges())
 	config.set_value("connection", "name", username.text.strip_edges())
 	config.save("user://preferences.cfg")
@@ -1157,8 +1495,13 @@ func _stop_controls() -> void:
 		pad.reset()
 	_send({"type":"input", "x":0, "y":0})
 
+func _controls_blocked() -> bool:
+	return local_id.is_empty() or safety_confirm.visible or not bool(player.get("alive", true))
+
 func _menu_open() -> bool:
-	return safety_confirm.visible or inventory_panel.visible or party_panel.visible or journal_panel.visible or progression.panel.visible
+	if is_instance_valid(loot_dialog) and loot_dialog.visible:
+		return true
+	return safety_confirm.visible or inventory_panel.visible or party_panel.visible or journal_panel.visible or progression.panel.visible or character_sheet.panel.visible
 
 func _nearest_npc() -> Dictionary:
 	var here: Vector2 = Vector2(float(player.get("x", -1000)), float(player.get("y", -1000)))
@@ -1195,6 +1538,16 @@ func _merchant_is_nearest() -> bool:
 	return merchant_distance < npc_distance
 
 func _interact_nearby() -> void:
+	if _controls_blocked():
+		return
+	for window: Control in [progression.panel, journal_panel, inventory_panel]:
+		if window.visible:
+			window.hide()
+			return
+	for nature: Dictionary in world_data.get("nature_sites", []):
+		if int(nature.get("floor", 0)) == int(player.get("floor", 0)) and Vector2(float(nature.get("x", 0)), float(nature.get("y", 0))).distance_to(Vector2(float(player.get("x", 0)), float(player.get("y", 0)))) <= 110.0:
+			_send({"type":"nature_interact", "id":nature.get("id", "")})
+			return
 	for stair: Dictionary in world_data.get("stairs", []):
 		if _near_point(stair):
 			_send({"type":"descend"})
@@ -1204,6 +1557,9 @@ func _interact_nearby() -> void:
 			_send({"type":"interact"})
 			return
 	var nearest: Dictionary = _nearest_npc()
+	if str(nearest.get("service", "")) == "merchant":
+		_merchant()
+		return
 	if not str(nearest.get("service", "")).is_empty():
 		progression.show_book("Rozwój" if nearest.get("service", "") == "master" else "Usługi")
 		return
@@ -1214,11 +1570,10 @@ func _interact_nearby() -> void:
 		journal_panel.show()
 		inventory_panel.hide()
 		party_panel.hide()
-		_stop_controls()
 		last_journal_key = ""
 		_refresh_journal()
 	else:
-		_add_notice("Podejdź do postaci w osadzie. J: dziennik pokazuje cele i ich kierunek.")
+		progression.show_book("Atlas")
 
 func _build_journal() -> void:
 	journal_panel = _window("DZIENNIK WYPRAW · ZADANIA I ODKRYCIA")
@@ -1237,11 +1592,11 @@ func _build_journal() -> void:
 	scroll.add_child(journal_list)
 
 func _toggle_journal() -> void:
+	character_sheet.panel.hide()
 	progression.panel.hide()
 	journal_panel.visible = not journal_panel.visible
 	inventory_panel.hide()
 	party_panel.hide()
-	_stop_controls()
 	if journal_panel.visible:
 		last_journal_key = ""
 		_refresh_journal()
@@ -1360,19 +1715,13 @@ func _refresh_journal() -> void:
 func _cast_level(level: int) -> void:
 	for id: String in world_data.get("spells", {}):
 		var spell: Dictionary = world_data["spells"][id]
-		if int(spell["min_level"]) == level and spell.get("class_ids", []).has(player.get("class_id", "")):
+		if _spell_gate(spell) == level and spell.get("class_ids", []).has(player.get("class_id", "")):
 			_send({"type":"cast", "spell_id":id})
 			return
 
 func _best_potion(prefix: String) -> void:
-	var best: String = prefix
-	var restore: int = 0
-	for id: String in world_data.get("potions", {}):
-		var spec: Dictionary = world_data["potions"][id]
-		if id.begins_with(prefix) and int(player.get("potions", {}).get(id, 0)) > 0 and int(player.get("level", 1)) >= int(spec.get("min_level", 1)) and int(spec["restore"]) > restore:
-			best = id
-			restore = int(spec["restore"])
-	_send({"type":"potion", "item":best})
+	# Kept as a compatibility method name: never select a stronger potion silently.
+	_send({"type":"potion", "slot":"q" if prefix == "health_potion" else "r"})
 
 func _potion_count(prefix: String) -> int:
 	var count: int = 0
@@ -1380,3 +1729,213 @@ func _potion_count(prefix: String) -> int:
 		if key.begins_with(prefix):
 			count += int(player["potions"][key])
 	return count
+
+
+func _spell_gate(spec: Dictionary) -> int:
+	var cls: String = str(player.get("class_id", ""))
+	return int(spec.get("class_levels", {}).get(cls, spec.get("min_level", 1)))
+
+func _cast_slot(slot: int) -> void:
+	var bar: Array = player.get("hotbar", [])
+	var index: int = hotbar_page * 24 + slot
+	if slot >= 0 and slot < 24 and index < bar.size() and not str(bar[index]).is_empty():
+		_send({"type":"cast", "spell_id":str(bar[index])})
+
+func _bind_hotbar(index: int, spell_id: String) -> void:
+	if index > 0:
+		_send({"type":"hotbar", "slot":index - 1, "spell_id":spell_id})
+
+func _spell_profile(key: String) -> Dictionary:
+	var spec: Dictionary = world_data.get("spells", {}).get(key, {}).duplicate(true)
+	spec.merge(player.get("spell_profiles", {}).get(key, {}), true)
+	return spec
+
+func _spell_mana(key: String, spec: Dictionary) -> int:
+	var live: Dictionary = player.get("spell_profiles", {}).get(key, spec)
+	return 0 if bool(spec.get("recast", false)) and str(player.get("concentration", "")) == key else int(live.get("mana", 0))
+
+func _change_hotbar_page(delta: int) -> void:
+	var pages: int = maxi(1, ceili(player.get("hotbar", []).size() / 24.0))
+	hotbar_page = posmod(hotbar_page + delta, pages)
+	_update_hotbar()
+
+func _queued_spell_label(key: String) -> String:
+	if key.is_empty() or str(player.get("queued_spell", "")) != key:
+		return ""
+	var remaining: float = maxf(0.0, float(player.get("action_remaining", 0)))
+	return "Za %.1f s" % remaining if remaining > 0 else "W kolejce"
+
+func _update_hotbar() -> void:
+	var bar: Array = player.get("hotbar", [])
+	var pages: int = maxi(1, ceili(bar.size() / 24.0))
+	hotbar_page = clampi(hotbar_page, 0, pages - 1)
+	hotbar_pages.visible = pages > 1
+	hotbar_page_label.text = "%d/%d · 1–0, −, = oraz F1–F12" % [hotbar_page + 1, pages]
+	for slot: int in range(hotbar_buttons.size()):
+		var button: Button = hotbar_buttons[slot]
+		var index: int = hotbar_page * 24 + slot
+		var key: String = str(bar[index]) if index < bar.size() else ""
+		var spec: Dictionary = _spell_profile(key)
+		if spec.is_empty():
+			button.text = _hotbar_key_label(slot) + "\n—"
+			button.icon = null
+			button.disabled = true
+			continue
+		var gate: int = _spell_gate(spec)
+		var unlocked: bool = int(player.get("level", 1)) >= gate
+		var cd: int = ceili(float(player.get("spell_cooldowns", {}).get(key, 0)))
+		var revert: bool = spec.get("kind", "") == "shape" and not str(player.get("form", "")).is_empty()
+		var reaction: bool = spec.get("kind", "") == "reaction"
+		var detail: String = "poz. %d" % gate if not unlocked else "Powrót" if revert else ("ON" if player.get("shield_armed", false) else "OFF") if reaction else "GOTOWE" if spec.get("kind", "") == "weapon_trigger" and player.get("ensnaring_armed", false) else "%d s" % cd if cd > 0 else "%d MP" % _spell_mana(key, spec)
+		var queued: String = _queued_spell_label(key)
+		if not queued.is_empty():
+			detail = queued
+		button.text = "%s\n%s" % [_hotbar_key_label(slot), detail]
+		var icon_path: String = "res://" + str(spec.get("icon", ""))
+		if ResourceLoader.exists(icon_path):
+			button.icon = load(icon_path) as Texture2D
+		button.tooltip_text = "%s · poziom %d\n%s\n%s" % [spec.get("name", ""), gate, spec.get("power_summary", ""), spec.get("description", "")]
+		button.disabled = not unlocked or not bool(player.get("alive", false)) or (not revert and not reaction and not (spec.get("kind", "") == "weapon_trigger" and player.get("ensnaring_armed", false)) and (cd > 0 or float(player.get("mana", 0)) < _spell_mana(key, spec) or not str(player.get("form", "")).is_empty()))
+		if spec.get("kind", "") == "recovery":
+			button.disabled = not preload("res://scripts/caster_sheet.gd").can_recover(player)
+
+func _make_effect_row(parent: VBoxContainer) -> HBoxContainer:
+	var scroll: ScrollContainer = ScrollContainer.new()
+	scroll.custom_minimum_size.y = 36
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	parent.add_child(scroll)
+	var row: HBoxContainer = HBoxContainer.new()
+	row.add_theme_constant_override("separation", 4)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	scroll.add_child(row)
+	return row
+
+func _show_effect(button: Button) -> void:
+	var effect: Dictionary = button.get_meta("effect", {})
+	var other: bool = bool(button.get_meta("is_target", false))
+	var ally: Dictionary = _find_player(selected_target) if other else {}
+	var same_party: bool = not str(player.get("party_id", "")).is_empty() and player.get("party_id", "") == ally.get("party_id", "other")
+	escape_restraint_button.visible = bool(effect.get("escape_action", false)) and (not other or same_party)
+	escape_restraint_button.set_meta("target_id", selected_target if other and same_party else "")
+	effect_dialog.set_meta("escape_mode", escape_restraint_button.visible)
+	escape_restraint_button.text = "Uwolnij sojusznika · akcja" if other else "Wyrwij się · akcja"
+	escape_restraint_button.disabled = float(player.get("action_remaining", 0)) > 0
+	effect_dialog.title = str(effect.get("name", "Status"))
+	effect_dialog.dialog_text = button.tooltip_text
+	effect_dialog.popup_centered(Vector2i(470, 180))
+
+func _render_effect_buttons(effects: Array, row: HBoxContainer, is_target: bool) -> void:
+	var existing: Dictionary = {}
+	for child: Button in row.get_children():
+		existing[str(child.get_meta("effect_id", ""))] = child
+	var wanted: Dictionary = {}
+	for effect: Dictionary in effects:
+		var id: String = str(effect.get("id", ""))
+		wanted[id] = true
+		var button: Button = existing.get(id) as Button
+		if button == null:
+			button = Button.new()
+			button.focus_mode = Control.FOCUS_NONE
+			button.custom_minimum_size.y = 30
+			button.add_theme_font_size_override("font_size", 11)
+			button.set_meta("effect_id", id)
+			button.pressed.connect(_show_effect.bind(button))
+			row.add_child(button)
+		button.set_meta("effect", effect)
+		button.set_meta("is_target", is_target)
+		var time_text: String = "aktywne"
+		if effect.get("remaining") != null:
+			var seconds: int = ceili(float(effect.get("remaining", 0)))
+			time_text = "%d:%02d · %d r." % [int(seconds / 60.0), seconds % 60, int(effect.get("rounds", 0))]
+		var owner: String = "Cel · " if is_target else ""
+		button.text = "%s%s %s · %s" % [owner, str(effect.get("icon", "✦")), str(effect.get("name", "")), time_text]
+		button.tooltip_text = ("Cel · " if is_target else "Ty · ") + str(effect.get("name", "")) + " · " + time_text + "\n" + str(effect.get("description", ""))
+		button.add_theme_color_override("font_color", RED if effect.get("harmful", false) else GREEN)
+	for id: String in existing:
+		if not wanted.has(id):
+			var expired: Button = existing[id] as Button
+			row.remove_child(expired)
+			expired.queue_free()
+	var scroll: ScrollContainer = row.get_parent() as ScrollContainer
+	scroll.visible = not effects.is_empty()
+
+func _update_statuses(target: Dictionary) -> void:
+	var own: Array = player.get("status_effects", [])
+	var other: Array = target.get("status_effects", [])
+	_render_effect_buttons(own, own_effects_row, false)
+	_render_effect_buttons(other, target_effects_row, true)
+	status_strip.visible = not own.is_empty() or not other.is_empty()
+	if effect_dialog.visible and effect_dialog.get_meta("escape_mode", false):
+		var ally_id: String = str(escape_restraint_button.get_meta("target_id", ""))
+		var recipient: Dictionary = player if ally_id.is_empty() else _find_player(ally_id)
+		var still_restrained: bool = false
+		for state: Dictionary in recipient.get("status_effects", []):
+			if state.get("escape_action", false):
+				still_restrained = true
+		escape_restraint_button.visible = still_restrained
+		escape_restraint_button.disabled = float(player.get("action_remaining", 0)) > 0 or not player.get("alive", true)
+		if not still_restrained:
+			effect_dialog.hide()
+	var budget: Dictionary = player.get("mana_budget", {})
+	mana_bar.tooltip_text = "Pełna pula: %d many. Wspólna mana." % int(player.get("max_mana", 0))
+	var mana_gain: int = int(budget.get("next_level_gain", 0))
+	if mana_gain > 0:
+		mana_bar.tooltip_text += " Następny poziom: +%d many." % mana_gain
+	mana_bar.tooltip_text += " Brak regeneracji w walce. Poza walką: 12 s przerwy po wydaniu many, potem pełna pula w 4 min (20 s w osadzie)."
+
+func _setup_ranking() -> void:
+	ranking_http = HTTPRequest.new()
+	ranking_http.timeout = 8
+	add_child(ranking_http)
+	ranking_http.request_completed.connect(_ranking_received)
+	endpoint.text_submitted.connect(func(_text: String) -> void: _refresh_ranking())
+	endpoint.focus_exited.connect(_refresh_ranking)
+	var timer: Timer = Timer.new()
+	timer.wait_time = 20
+	timer.timeout.connect(_refresh_ranking)
+	add_child(timer)
+	timer.start()
+	_refresh_ranking()
+
+func _refresh_ranking() -> void:
+	if not login_panel.visible or not is_instance_valid(ranking_http):return
+	var url: String = endpoint.text.strip_edges().replace("wss://", "https://").replace("ws://", "http://")
+	url = url.trim_suffix("/ws")
+	ranking_http.cancel_request()
+	var error: Error = ranking_http.request(url.trim_suffix("/") + "/ranking")
+	if error != OK:ranking_label.text = "Ranking niedostępny — sprawdź adres."
+
+func _ranking_received(result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray) -> void:
+	if result != HTTPRequest.RESULT_SUCCESS or response_code != 200:
+		ranking_label.text = "Ranking niedostępny.\nUruchom serwer i sprawdź adres."
+		return
+	var decoded: Variant = JSON.parse_string(body.get_string_from_utf8())
+	if not decoded is Dictionary:return
+	var rows: PackedStringArray = PackedStringArray()
+	for entry: Dictionary in decoded.get("ranking", []):
+		rows.append("%d. %s · %d\n    %s%s" % [int(entry.get("rank", 0)), str(entry.get("name", "")), int(entry.get("level", 1)), str(CLASS_NAMES.get(entry.get("class_id", ""), "")), " · online" if entry.get("online", false) else ""])
+	ranking_label.text = "\n\n".join(rows) if not rows.is_empty() else "Świat czeka na pierwszego bohatera."
+
+func _hotbar_key_label(index: int) -> String:
+	var slot: int = posmod(index, 24)
+	var names: Array[String] = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0", "−", "="]
+	var label: String = names[slot] if slot < 12 else "F%d" % (slot - 11)
+	return ("%d · " % (int(index / 24.0) + 1) if index >= 24 else "") + label
+
+func _show_target_loot() -> void:
+	var target: Dictionary = _find_enemy(selected_enemy)
+	if target.is_empty():
+		return
+	var spec: Dictionary = world_data.get("enemy_types", {}).get(str(target.get("kind", "")), {})
+	loot_dialog.title = str(spec.get("name", "Łupy"))
+	var rows: PackedStringArray = PackedStringArray()
+	for entry: Dictionary in player.get("known_loot", {}).get(str(target.get("kind", "")), []):
+		var source: Dictionary = world_data.get("potions", {}) if str(entry.get("kind", "")) == "potion" else world_data.get("items", {})
+		var item: Dictionary = source.get(str(entry.get("template", "")), {})
+		rows.append(str(item.get("name", "")) + " · " + str(snappedf(float(entry.get("chance", 0)) * 100, 0.01)) + "%")
+	rows.append("")
+	rows.append("Tylko przedmioty zdobyte przez tę postać z tego gatunku." if rows.size() > 1 else "Nie odkryto jeszcze łupów z tego gatunku.")
+	loot_dialog.dialog_text = "\n".join(rows)
+	loot_dialog.popup_centered(Vector2i(mini(540, int(get_viewport_rect().size.x) - 24), 360))

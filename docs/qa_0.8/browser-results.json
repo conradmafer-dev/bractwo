@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "Eight spell hotbar slots visible",
+    "Control tip closes and writes dismissal preference",
+    "Spellbook binding reaches authoritative server and hotbar",
+    "Druid wolf form button changes real server state and render",
+    "Battle list target triggers automatic rolled attack",
+    "Escape stops automatic attacks",
+    "Unauthenticated login screen shows real ranked account",
+    "New page using stored preference keeps tip hidden",
+    "No browser JavaScript errors"
+  ],
+  "errors": [],
+  "method": "Chromium set_content; unmodified JS/CSS; actual server with Python WS bridge; localStorage test double, not browser network/navigation"
+}

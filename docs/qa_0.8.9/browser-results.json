@@ -1,0 +1,80 @@
+{
+  "checks": [
+    "1440x900: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "Status strip has no shared background/border/shadow; blank area does not intercept the world",
+    "Own status retains timer and opens description below strip; close works",
+    "Target status is distinguished on button and in description",
+    "K still opens the spell tab in the standalone character sheet",
+    "Relocated HP/mana buttons consume actual server potions and restore health/mana",
+    "F button reflects real favorite and casts at selected enemy",
+    "Favorite changes with usage and keyboard F still casts",
+    "1280x720: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "1024x768: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "390x844: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "360x640: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "844x390: potion order, F right of K, controls clickable, top statuses, no page overflow",
+    "Hotbar bank buttons are clickable on narrow landscape",
+    "Both 12-slot rows scroll together on phone; K/F remain fixed",
+    "Phone status buttons open descriptions and chat sends a real message",
+    "Removed statuses leave no empty strip"
+  ],
+  "count": 17,
+  "errors": [],
+  "transport": "controlled Python WebSocket bridge",
+  "sent": [
+    {
+      "page": "UkladCzarodziej",
+      "type": "ranking"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "ranking"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "hello",
+      "name": "UkladCzarodziej",
+      "password": "testpassword99",
+      "create": true,
+      "class_id": "mage",
+      "compact_state": true
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "select_target",
+      "enemy_id": "qa_hud_ogre"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "select_target",
+      "enemy_id": "qa_hud_ogre"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "potion",
+      "item": "health_potion"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "potion",
+      "item": "mana_potion"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "cast",
+      "spell_id": "ray_of_frost",
+      "enemy_id": "qa_hud_ogre"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "cast",
+      "spell_id": "fire_bolt",
+      "enemy_id": "qa_hud_ogre"
+    },
+    {
+      "page": "UkladCzarodziej",
+      "type": "chat",
+      "text": "Test układu HUD"
+    }
+  ]
+}
