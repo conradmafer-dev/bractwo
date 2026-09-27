@@ -1,3 +1,12 @@
+#gameUI #restMenuButton {
+  position: fixed; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-sizing: border-box; min-width: 0; min-height: 0; padding: 2px; gap: 1px; margin: 0;
+  border: 1px solid #bbae7655; border-radius: 5px; background: #152c24ed; color: #efda99;
+  pointer-events: auto; touch-action: manipulation; z-index: 9;
+}
+#restMenuButton > span { font: 22px/24px Georgia, serif; }
+#restMenuButton > small { font: 7px/10px system-ui, sans-serif; white-space: nowrap; }
+#gameUI.mobile-hud #restMenuButton > small { font-size: 8px; }
 #restPanel {
   box-sizing: border-box; width: min(580px, calc(100vw - 24px)); max-height: calc(100dvh - 24px);
   padding: 16px; border: 1px solid #c5ad71; border-radius: 10px; color: #e6e4ce; pointer-events: auto;

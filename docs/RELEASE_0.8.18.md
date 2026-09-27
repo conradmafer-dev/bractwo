@@ -2,9 +2,11 @@
 
 Baza: 0.8.17 z poprawką Mobile01. Zachowano układ telefonu, zasady różdżki i dotychczasowe postacie.
 
+**UI_02 — korekta rozmieszczenia przycisków:** odpoczynek przeniesiono nad Rozmawiaj na telefonie, na wysokość Czary i ulubionego czaru, oraz nad K Czary na komputerze. Na wąskim ekranie pionowym przycisk przechodzi wyżej, gdy ten sam rząd jest zajęty; nie zasłania istniejących przycisków. Ikona ekwipunku z górnego menu jest ukryta, a skrót I działa jak wcześniej. Reszta gry jest bez zmian. Zgodnie z prośbą użytkownika tę korektę sprawdzono tylko pod kątem składni JavaScript i zachowania powiązań przycisków; poniższe rozbudowane wyniki testów dotyczą poprzedniego wydania 0.8.18.
+
 ## Odpoczynek
 
-Przycisk z księżycem **Odpoczynek** znajduje się w górnym menu gry. Na telefonie otwórz najpierw menu ☰. Ta sama opcja jest dostępna w oknie kupca. Samo rozpoczęcie rozmowy z kupcem nie uruchamia już leczenia.
+Przycisk z księżycem **Odpoczynek** znajduje się nad K Czary na komputerze i nad Rozmawiaj na telefonie. Ta sama opcja jest dostępna w oknie kupca. Samo rozpoczęcie rozmowy z kupcem nie uruchamia już leczenia.
 
 | Rodzaj | Czas | Efekt po ukończeniu | Miejsce |
 | --- | --- | --- | --- |

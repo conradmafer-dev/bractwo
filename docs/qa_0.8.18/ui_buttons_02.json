@@ -1,0 +1,15 @@
+{
+  "revision": "UI_02",
+  "status": "passed",
+  "checks": [
+    "rest_ui.js syntax",
+    "inventory toolbar icon hidden",
+    "existing KeyI handler still opens inventory"
+  ],
+  "not_run": [
+    "server",
+    "browser",
+    "gameplay test suites"
+  ],
+  "checkedAt": "2026-09-27T11:31:33.174Z"
+}

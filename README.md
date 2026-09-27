@@ -2,6 +2,8 @@
 
 Gra RPG online na komputer i telefon. Aktualizacja bazuje na 0.8.17 z mobilnym układem Mobile01.
 
+Poprawka **UI_02**: odpoczynek jest nad przyciskiem Rozmawiaj na telefonie i nad K Czary na komputerze. Usunięto widoczną ikonę ekwipunku z górnego menu; skrót I nadal otwiera ekwipunek. Pozostałe zasady i elementy układu są bez zmian.
+
 - **Krótki odpoczynek:** 6 sekund, odzyskuje 25% maksymalnego zdrowia i many.
 - **Długi odpoczynek:** 15 sekund, pełne zdrowie i mana w bezpiecznej osadzie.
 - Po walce z potworami odpoczynek jest dostępny po **3 sekundach**. Blokada po PvP nadal trwa 20 sekund.

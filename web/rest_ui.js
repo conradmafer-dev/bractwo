@@ -41,11 +41,39 @@
     const button = (id, text, callback) => {
       const node = el('button', id, text); node.type = 'button'; node.addEventListener('click', callback); return node;
     };
-    const toggle = button('restMenuButton', '☾', open);
-    toggle.className = 'icon-button'; toggle.title = 'Krótki lub długi odpoczynek';
+    const toggle = button('restMenuButton', '', open);
+    toggle.append(el('span', null, '☾'), el('small', null, 'Odpoczynek'));
+    toggle.className = 'rest-launcher'; toggle.title = 'Krótki lub długi odpoczynek';
     toggle.setAttribute('aria-label', 'Odpoczynek'); toggle.dataset.mobileLabel = 'Odpoczynek';
     toggle.setAttribute('aria-controls', 'restPanel');
-    ui.querySelector('.top-actions').append(toggle);
+    const book = document.getElementById('bookSpell');
+    const toolbar = book.closest('.hotbar-toolbar');
+    const combat = ui.querySelector('.combat-controls');
+    book.parentElement.append(toggle);
+    function positionButton() {
+      const mobile = root.BractwoMobile?.active?.();
+      const parent = mobile ? combat : book.parentElement;
+      if (toggle.parentElement !== parent) parent.append(toggle);
+      if (ui.hidden) return;
+      const b = book.getBoundingClientRect();
+      if (!b.width || !b.height) return;
+      const pages = document.getElementById('hotbarPages').getBoundingClientRect();
+      let width = b.width, x = b.left, y = Math.min(b.top, pages.height ? pages.top : b.top) - b.height - 6;
+      if (mobile) {
+        const talk = document.getElementById('interactButton').getBoundingClientRect();
+        width = document.getElementById('abilityButton').getBoundingClientRect().width;
+        x = talk.left + (talk.width - width) / 2; y = b.top;
+        const t = toolbar.getBoundingClientRect();
+        // Narrow portrait screens need a separate row to keep the existing controls clear.
+        if (x < t.right && x + width > t.left) y = t.top - b.height - 8;
+      }
+      const values = { left: x, top: y, width, height: b.height };
+      for (const [key, value] of Object.entries(values)) {
+        const pixels = Math.round(value) + 'px';
+        if (toggle.style[key] !== pixels) toggle.style[key] = pixels;
+      }
+    }
+    root.addEventListener('resize', () => requestAnimationFrame(positionButton));
     const panel = el('dialog', 'restPanel'); panel.hidden = true;
     panel.setAttribute('aria-labelledby', 'restTitle');
     const header = el('header'); header.append(el('h2', 'restTitle', 'Odpoczynek'));
@@ -88,6 +116,7 @@
     }
     function render() {
       const { player, world } = h.state(), m = model(player, world.rest_rules);
+      positionButton();
       toggle.classList.toggle('rest-active', m.active);
       toggle.title = m.active ? `Odpoczynek — ${m.remaining} s` : 'Krótki lub długi odpoczynek';
       toggle.dataset.mobileLabel = m.active ? `Odpoczynek · ${m.remaining} s` : 'Odpoczynek';
