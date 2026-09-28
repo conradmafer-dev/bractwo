@@ -129,3 +129,11 @@
 /* Menus take focus; effect badges must not cover the spell-book buttons. */
 .game-ui:has(#sidePanel:not([hidden])) .effects-panel,
 .game-ui:has(#helpPanel:not([hidden])) .effects-panel{visibility:hidden}
+
+/* Quest tracking is available beside the quest title in the journal. */
+#minimapButton{display:block;width:100%;padding:0;border:0;background:transparent;color:inherit;cursor:pointer;touch-action:manipulation}
+#minimapButton:focus-visible{outline:2px solid #eed58d;outline-offset:2px}
+.quest-entry.tracked{border-color:#d5bb77}
+.quest-entry>.quest-track-button{min-height:38px;margin:4px 0 8px}
+.quest-track-button[aria-pressed="true"]{border-color:#d5bb77;background:#405439;color:#fff0bd}
+@media(pointer:coarse){.quest-entry>.quest-track-button{min-height:44px}}

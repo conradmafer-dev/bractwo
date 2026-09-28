@@ -1,0 +1,31 @@
+{
+  "revision": "UI_07",
+  "date": "2026-09-28",
+  "scope": "Quest tracking from the journal; minimal focused checks as requested.",
+  "syntax": {
+    "method": "node --check",
+    "passed": ["web/game.js"]
+  },
+  "targeted_tests": {
+    "file": "tests/test_quest_tracking_ui07.cjs",
+    "method": "Production quest-tracking functions executed in Node VM with lightweight DOM and storage hooks",
+    "passed": 5,
+    "failed": 0,
+    "coverage": [
+      "Manual selection replaces Atlas navigation, closes the journal and persists separately for each character.",
+      "Another quest becoming ready does not replace the selected quest.",
+      "The goal advances through unfinished objectives and then to the reward NPC, preserving coordinate and floor fallbacks.",
+      "Claiming the selected quest reward ends its tracking.",
+      "Explicitly disabled tracking remains off; locked and claimed quests cannot be selected."
+    ]
+  },
+  "source_review": [
+    "Tracking controls appear below quest titles and before descriptions for available, active and ready quests.",
+    "Journal refresh signatures include selection, Atlas navigation and player floor.",
+    "The tracker opens the journal and scrolls the selected quest into view.",
+    "Enter and Space on tracking buttons bypass global chat and attack shortcuts.",
+    "Existing cross-floor directions remain unchanged; no new staircase pathfinding is added."
+  ],
+  "not_run": ["Browser or physical phone session", "Full regression suites"],
+  "deployment": "Local source and packages only; no push or live deployment."
+}

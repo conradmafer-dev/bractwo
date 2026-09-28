@@ -1,0 +1,46 @@
+{
+  "revision": "UI_11",
+  "date": "2026-09-28",
+  "scope": "Five feats, four druid circles, their supporting spells and environment mechanics, and separate 10/30-second rests with persistent class resources.",
+  "backend_and_http": {
+    "command": "PYTHONPATH=.qa-python;.;tests python -m unittest test_general_feats_0818 test_druid_circles_0818 test_druid_circle_spells_0818 test_environment_0818 test_rest_resources_0818 test_app_shell_http_0818 -q",
+    "tests": 58,
+    "passed": 58,
+    "failed": 0,
+    "duration_seconds": 16.082,
+    "modules": {
+      "test_general_feats_0818": 9,
+      "test_druid_circles_0818": 9,
+      "test_druid_circle_spells_0818": 17,
+      "test_environment_0818": 12,
+      "test_rest_resources_0818": 7,
+      "test_app_shell_http_0818": 4
+    },
+    "notes": "Uses an in-memory database and local HTTP test server. Includes real damage, resources, spell fields, stone-wall persistence, AI escapes, polymorph, free spells at zero mana, rest interruption and reconnect. aiohttp printed its existing non-failing AppKey warning."
+  },
+  "updated_existing_rest_checks": {
+    "command": "PYTHONPATH=.qa-python;.;tests python -m unittest test_rest_0818 -q",
+    "tests": 20,
+    "passed": 20,
+    "failed": 0,
+    "duration_seconds": 14.1,
+    "notes": "Updated existing expectations after an earlier broad pattern also selected obsolete single-rest expectations. Preserved interruption, PvP, exact completion/cooldown boundary, save and reconnect scenarios. No backend edits in this pass."
+  },
+  "javascript": {
+    "test_status_actions_0818.cjs": {"tests": 1, "passed": 1, "failed": 0},
+    "test_rest_ui_0818.cjs": {"tests": 6, "passed": 6, "failed": 0},
+    "syntax": {"passed": 7, "files": ["web/game.js", "web/runtime.js", "web/caster_ui.js", "web/character_sheet.js", "web/rest_ui.js", "web/circle_spell_ui.js", "web/circle_vfx.js"]},
+    "additional_review": "14 earlier ad hoc UI/integration assertions and 10 SVG XML checks were reported passing by the UI implementer; they are not counted as a retained regression suite."
+  },
+  "source_integrity": {
+    "text_files_checked_for_nul": 785,
+    "nul_files": 0,
+    "python_files_compiled": 100,
+    "local_html_references_resolved": 31,
+    "notes": "Counts reflect the pre-package scan. The package tool independently reads back every archived file and compares its SHA-256 against the archive's own manifest."
+  },
+  "verification_limits": [
+    "No full historical regression suite, live deployment, browser gameplay session, or physical phone test for UI_11.",
+    "The 2D world has no boats and does not support vertical stone ramps/bridges; those particular D&D interactions are absent. Horizontal walls, damage, collision, water movement and supported spell variants are implemented."
+  ]
+}

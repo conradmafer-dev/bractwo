@@ -37,10 +37,6 @@
     }
     document.getElementById('mapButton').dataset.mobileLabel = 'Pokaż / ukryj minimapę';
 
-    const map = button('mobileAtlasButton', '', 'Otwórz atlas świata');
-    map.title = 'Otwórz atlas świata';
-    map.addEventListener('click', () => document.getElementById('atlasButton').click());
-    document.getElementById('minimapCard').append(map);
     const chatClose = button('mobileChatClose', '×', 'Zamknij czat');
     chat.append(chatClose);
     chatClose.addEventListener('click', () => { closeChat(); chatButton.focus({ preventScroll: true }); });

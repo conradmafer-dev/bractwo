@@ -1,0 +1,17 @@
+{
+  "revision": "UI_06",
+  "date": "2026-09-28",
+  "scope": "Small presentation change; syntax and focused code review only, as requested.",
+  "syntax": {
+    "method": "Node vm.Script parse",
+    "passed": ["web/inventory_ui.js", "web/character_sheet.js"]
+  },
+  "source_review": [
+    "Item actions are inserted immediately after the item heading and before facts and mastery details.",
+    "Backpack and worn-item selection share selectItem(uid), which renders the details and scrolls the action bar into view with block nearest.",
+    "Automatic state refreshes retain the existing scroll position and do not run the selection scroll helper.",
+    "Existing equipment callbacks and eligibility checks are unchanged; the shared layout is used on mobile and desktop."
+  ],
+  "not_run": ["Browser or physical phone session", "Automated gameplay tests", "Full regression suites"],
+  "deployment": "Local source and packages only; no push or live deployment."
+}

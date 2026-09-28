@@ -1,6 +1,30 @@
-# Bractwo 0.8.18 — odpoczynek, pełny ekran i aplikacja
+# Bractwo 0.8.18 UI_11 — atuty, kręgi druida i zasoby odpoczynku
 
 Baza: 0.8.17 z poprawką Mobile01. Zachowano układ telefonu, zasady różdżki i dotychczasowe postacie.
+
+**UI_11 — pięć atutów i cztery kręgi druida:** Twardy, Zacięty atak, Rozwój cech, Mistrz ciężkiego pancerza i Mistrz średniego pancerza. Kręgi Ziemi, Księżyca, Morza i Gwiazd odblokowują się na 10. poziomie gry. Bonusy obejmują działające czary, stany, zasoby, przemiany, pływanie, lot i efekty obszarowe; opis mechanik i przeliczeń znajduje się w `docs/DRUID_CIRCLES_0.8.18.md`.
+
+Krótki odpoczynek trwa **10 sekund**, długi **30 sekund**. Odpoczynki odnawiają przypisane im zasoby klasowe zamiast dawnych liczników czasu. Liczby użyć są zapisywane z postacią. Wyłączono pasywną regenerację HP i many; krótki odpoczynek leczy z ograniczonej puli kości zdrowia, a długi przywraca pełne zasoby. Poniższe wpisy UI_10–UI_02 stanowią historię wcześniejszych zmian; bieżące zasady odpoczynku opisano osobno poniżej. Raport bieżącego zakresu: `docs/qa_0.8.18/ui_11_results.json`.
+
+**UI_10 — szerszy widok na telefonie:** skala świata w mobilnym układzie wynosi 85% dotychczasowej skali, czyli obiekty są o 15% mniejsze, a widoczny odcinek mapy w każdej osi jest około 18% większy. Kamera korzysta z tego samego warunku mobilnego co HUD, również po obróceniu telefonu. Rozmiary przycisków, paneli i joysticka pozostają bez zmian; dotychczasowe przeliczanie dotyku oraz prostokąta minimapy uwzględnia skalę kamery. Widok desktopowy zachowuje swoją skalę. To drobna zmiana prezentacji: sprawdzenie ograniczono do składni JavaScript i przeglądu zależności, bez nowych testów ani pełnej regresji. Raport: `docs/qa_0.8.18/ui_10_results.json`.
+
+**UI_09 — ruch i przewijanie paska jednocześnie:** mobilny pasek umiejętności przewija się przez osobny wskaźnik dotyku, niezależnie od palca na joysticku. Przejęcie gestu następuje dopiero po przekroczeniu 12 pikseli poziomego ruchu, więc dotknięcie nadal rzuca czar. Przesuwanie, anulowanie gestu i dodatkowy klik przeglądarki po przesunięciu nie rzucają czaru. Można zacząć przesunięcie również na nieaktywnym slocie lub przerwie między slotami. Zachowano kliknięcia myszy i klawiatury oraz układ desktopowy. Usunięto natywne przewijanie dotykiem i przyciąganie do slotów w mobilnym pasku, ponieważ kolidowały z niezależną obsługą drugiego palca. Weryfikacja jest ograniczona do celowanych testów gestów oraz składni; raport: `docs/qa_0.8.18/ui_09_results.json`.
+
+**UI_08 — odkrycia, Atlas i wybór atutu:**
+
+- Nazwane łowiska oraz wejścia i przejścia są powiązane z tym samym katalogiem odkryć co młyn. Zachowano historyczne identyfikatory, a pobliskie schody współdzielą odkrycie tylko wtedy, gdy leżą w jego promieniu na tym samym piętrze. Anonimowe dekoracje pozostają dekoracjami.
+- Wszystkie wpisy katalogu dają dodatnie PD przy pierwszym odkryciu. Nagroda uwzględnia poziom biomu/miejsca, najsilniejszego pobliskiego przeciwnika na tym samym piętrze (z premią za bossa) i odległość od najbliższego miasta. Uwzględniono też pierwotne potwory wokół Przystani; dla starszych przeciwników bez poziomu próg trudności wynika z HP. Nagrody za złoto i wcześniej zapisane odkrycia są zachowane; nie ma ponownego wypłacania ani wyrównań za już odkryte miejsca.
+- Znaczki ◇/✓ działają także na nazwanych łowiskach, miejscach interakcji i schodach. Dziennik i listy Atlasu pokazują stan odkrycia, a dla nieodkrytego miejsca również PD. Nowe odkrycie wyświetla komunikat z nagrodą.
+- Kliknięcie minimapy, górny przycisk ⌖ oraz N otwierają bezpośrednio Atlas. M nadal przełącza widoczność minimapy. Skrót N nie działa podczas pisania w polach formularzy i czacie.
+- Krokodyl bagienny korzysta z osobnego czteroklatkowego sprite'a z płaskim pyskiem, krótkimi nogami, łuskami i długim ogonem. Nie zmienia to jego statystyk.
+- Usunięto dolną instrukcję sugerującą, że zaznaczanie zawsze uruchamia autoatak, i doprecyzowano pomoc.
+- Naprawiono wybór atutu na telefonie: fokus na liście cech nie zatrzymuje już odświeżania dostępności przycisku po zakończeniu walki. Wybór i fokus pozostają zachowane; wysyłanie korzysta z aktualnego stanu gracza. Blokady walki, śmierci, przemiany i braku punktu nadal obowiązują.
+
+Weryfikacja UI_08 jest celowana: testy odkryć i formularza atutów, jednorazowa kontrola katalogu świata, składnia oraz render samej grafiki krokodyla. Bez sesji przeglądarki, telefonu ani pełnej regresji. Raport: `docs/qa_0.8.18/ui_08_results.json`.
+
+**UI_07 — śledzenie z dziennika:** pod tytułem dostępnego, aktywnego lub gotowego do oddania zadania znajduje się przycisk Śledź zadanie. Wybór zastępuje ręczny cel atlasu i zamyka dziennik, aby od razu było widać kierunek. Śledzone zadanie pozostaje wybrane przy zmianach pozostałych zadań; cel jest wyliczany z bieżącego postępu. Po wykonaniu wszystkich etapów prowadzi do zleceniodawcy, a po odebraniu nagrody śledzenie wybranego zadania kończy się. Można je również wyłączyć tym samym przyciskiem. Kliknięcie panelu śledzonego zadania otwiera dziennik przy tym zadaniu. Wybór i wyłączenie są zapamiętywane na urządzeniu dla danej postaci. Bez zapisanego wyboru zachowano dotychczasową automatyczną podpowiedź. Dla celu na innym piętrze pozostaje wskazówka o szukaniu schodów; gra nie wyznacza nowej trasy przez podziemia. Wpisy UI_06–UI_02 poniżej opisują wcześniejsze poprawki.
+
+**UI_06 — wygodniejsze zakładanie przedmiotów:** przyciski Załóż, Zdejmij oraz pozostałe akcje przeniesiono pod nazwę przedmiotu, przed jego statystyki i opis. Wybór przedmiotu w plecaku lub założonym wyposażeniu przewija panel do jego przycisków akcji; zwykłe odświeżenie danych nie zmienia pozycji przewijania. Dotyczy to wspólnego widoku szczegółów na telefonie i komputerze. Zasady zakładania oraz ograniczenia przedmiotów pozostają bez zmian. Wpisy UI_05–UI_02 poniżej opisują wcześniejsze poprawki.
 
 **UI_05 — pełna regeneracja i cooldown:** dotychczasowy krótki odpoczynek trwa teraz 15 sekund i przywraca całe HP oraz manę. Po udanym ukończeniu zaczyna się wspólny cooldown 60 sekund, zapisany przy postaci i widoczny na przycisku. Ponowne logowanie ani starsze polecenie długiego odpoczynku nie omijają blokady. Przerwanie nie przyznaje regeneracji ani nie uruchamia cooldownu. Nadal wystarcza jedno kliknięcie, a pasek i animacja pozostają nad postacią. Wpisy UI_04–UI_02 poniżej są historią wcześniejszych poprawek.
 
@@ -18,16 +42,17 @@ Przycisk z księżycem **Odpoczynek** znajduje się nad K Czary na komputerze i 
 
 | Rodzaj | Czas | Efekt po ukończeniu | Miejsce |
 | --- | --- | --- | --- |
-| Pełny | 15 sekund | Całe HP i mana; następnie 60 sekund cooldownu | Także w terenie |
+| Krótki | 10 sekund | Leczenie z kości zdrowia i zasoby odnawiane krótkim odpoczynkiem | Także w terenie |
+| Długi | 30 sekund | Całe HP, mana, kości zdrowia i zasoby odnawiane długim odpoczynkiem | Także w terenie |
 
-- Jedno kliknięcie **Odpoczynek** lub naciśnięcie **R** rozpoczyna pełny odpoczynek bez wyboru rodzaju i bez dodatkowego panelu.
-- Cooldown trwa **60 sekund od ukończenia**. Licznik jest widoczny na przycisku, który w tym czasie nie rozpoczyna kolejnego odpoczynku. Serwer zapisuje blokadę przy postaci, więc obowiązuje ona także po ponownym zalogowaniu i restarcie serwera; upływa również poza grą.
+- Przycisk **Odpoczynek** pozwala wybrać krótki albo długi odpoczynek i zamyka wybór zaraz po rozpoczęciu. **R** rozpoczyna krótki, **Shift+R** długi; podczas odpoczynku R przerywa go.
+- Oddzielne blokady po ukończeniu trwają **15 sekund dla krótkiego** i **60 sekund dla długiego**. Serwer zapisuje je przy postaci; obowiązują również po ponownym zalogowaniu i upływają poza grą.
 - Po starciu z potworem można zacząć po **3 sekundach**. Przy wcześniejszym kliknięciu komunikat pokazuje pozostały czas blokady.
 - Walka z graczem nadal wymaga odczekania pełnej dotychczasowej blokady **20 sekund**.
 - Odpoczynek jest bezpłatny. Ruch, walka i rozpoczęcie innej wykonywanej czynności przerywają go. Można też ponownie nacisnąć przycisk **Odpoczynek** lub **R**, aby przerwać regenerację.
-- Pasek i pozostały czas widać nad własną postacią. Niebieski krąg i krople many towarzyszą medytacji; przemieniony druid zachowuje formę zwierzęcia i otrzymuje ten sam efekt regeneracji.
-- Całe zdrowie i mana są przyznawane dopiero po ukończeniu. Przerwany odpoczynek nie przyznaje nagrody i nie uruchamia cooldownu.
-- Odpoczynek nie zeruje odnowień czarów i zdolności. Pasywna regeneracja many, ochrona PvP, handel i zasady bezpiecznego wylogowania zachowują własne warunki.
+- Pasek i pozostały czas widać nad własną postacią. Niebieski krąg i krople many towarzyszą medytacji. Długi odpoczynek kończy przemiany, koncentrację i aktywne efekty.
+- Regeneracja i zwrot użyć następują dopiero po ukończeniu. Przerwany odpoczynek nie zużywa kości zdrowia, nie odnawia zasobów i nie uruchamia cooldownu.
+- Odpoczynek odnawia konkretne zasoby zgodnie z ich opisem: m.in. Dziki kształt, Drugi oddech, Zryw akcji, Odzyskanie mocy, omeny i zdolności kręgów. Zwykłe tempo akcji w walce pozostaje bez zmian. Nie ma pasywnego odnawiania HP i many.
 
 ## Blokada paneli i joystick
 
@@ -66,7 +91,7 @@ Pełna paczka źródłowa dodatkowo zawiera testy, narzędzia, historyczną doku
 
 ## Weryfikacja
 
-Wyniki znajdują się w `docs/qa_0.8.18/`. Raport `ui_05_results.json` dotyczy bieżącej poprawki. Poniższe szersze kontrole przeprowadzono dla wcześniejszego wydania 0.8.18; nie powtarzano ich dla UI_03–UI_05.
+Wyniki znajdują się w `docs/qa_0.8.18/`. Raport `ui_11_results.json` dotyczy bieżącej zmiany i wyłącznie jej celowanych sprawdzeń. Poniższe szersze kontrole przeprowadzono dla wcześniejszego wydania 0.8.18; nie powtarzano ich w UI_11.
 
 Przeszło wtedy 296 unikalnych testów serwera, 56 testów JavaScript oraz 4 testy tras HTTP i plików aplikacji. Dwa scenariusze WebSocket przekroczyły limit czasu przy równoległym obciążeniu komputera; powtórzone osobno przeszły bez zmiany testów lub ich limitów. Raporty zachowują oba wyniki.
 

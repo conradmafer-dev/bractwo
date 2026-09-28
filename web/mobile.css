@@ -69,10 +69,6 @@
   #gameUI.mobile-hud #minimapCard { width: 100%; padding: 4px; min-height: 68px; }
   .mobile-hud #minimapCard canvas { display: block; width: 100%; height: auto; }
   .mobile-hud #minimapCard > div, .mobile-hud #battleList { display: none !important; }
-  #gameUI.mobile-hud #mobileAtlasButton {
-    display: block; position: absolute; inset: 0; width: 100%; height: 100%;
-    border: 0; background: transparent; border-radius: 4px;
-  }
 
   .mobile-hud .mobile-control {
     display: block; min-width: 44px; min-height: 44px; padding: 4px;
@@ -136,13 +132,14 @@
   #gameUI.mobile-hud .hotbar-viewport {
     display: flex; align-items: stretch; gap: 4px; width: 100%; height: 60px;
     overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain;
-    touch-action: pan-x; scrollbar-width: thin; scroll-snap-type: x proximity;
+    touch-action: none; scrollbar-width: thin; scroll-snap-type: none;
   }
   #gameUI.mobile-hud .hotbar-slots { display: contents; min-width: 0; margin: 0; }
   #gameUI.mobile-hud .spellbar .hotbar-slot {
     flex: 0 0 54px; width: 54px; min-width: 54px; height: 56px;
-    padding: 3px; scroll-snap-align: start; touch-action: pan-x;
+    padding: 3px; touch-action: none;
   }
+  #gameUI.mobile-hud .spellbar .hotbar-slot:disabled { pointer-events: none; }
   #gameUI.mobile-hud .hotbar-slot.empty { display: none; }
   .mobile-hud .hotbar-slot span:has(.spell-icon) { height: 26px; }
   .mobile-hud .hotbar-slot .spell-icon { width: 26px; height: 26px; }

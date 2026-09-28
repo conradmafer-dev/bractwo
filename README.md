@@ -2,6 +2,16 @@
 
 Gra RPG online na komputer i telefon. Aktualizacja bazuje na 0.8.17 z mobilnym układem Mobile01.
 
+Poprawka **UI_10**: kamera w mobilnym układzie jest nieco oddalona — postać i świat są o 15% mniejsze, dzięki czemu widać około 18% więcej mapy w każdej osi. Dotyczy pionu i poziomu. Przyciski, panele, joystick oraz widok desktopowy zachowują dotychczasową wielkość.
+
+Poprawka **UI_09**: na telefonie można przewijać pasek umiejętności drugim palcem podczas chodzenia joystickiem. Przesunięcie paska nie rzuca czaru ani nie przerywa ruchu. Zwykłe dotknięcie czaru nadal działa; pasek można przesuwać również od nieaktywnego slotu.
+
+Poprawka **UI_08**: Atlas otwiera się po kliknięciu minimapy, przyciskiem **⌖** u góry lub klawiszem **N**. Nazwane miejsca, łowiska i przejścia mają wspólne oznaczenia odkrycia oraz jednorazowe PD zależne od poziomu okolicy, przeciwników i odległości od najbliższego miasta. Krokodyl bagienny otrzymał własną animowaną grafikę. Usunięto nieaktualną podpowiedź „kliknij cel: autoatak”. Naprawiono też przycisk wyboru atutu: po zakończeniu walki odblokowuje się nawet wtedy, gdy lista statystyk na telefonie nadal ma fokus, bez ponownego logowania i utraty wyboru.
+
+Poprawka **UI_07**: w **Dzienniku (J)** przy zadaniu jest przycisk **Śledź zadanie**. Wybór zamyka dziennik i zastępuje cel z atlasu. Wskazówka prowadzi do bieżącego etapu, a po wykonaniu zadania do zleceniodawcy. Przycisk **Śledzone · wyłącz** kończy śledzenie. Wybór jest zapamiętany na tym urządzeniu osobno dla każdej postaci.
+
+Poprawka **UI_06**: przyciski **Załóż**, **Zdejmij** i pozostałe akcje przedmiotu są pod jego nazwą, przed statystykami i opisem. Wybór przedmiotu przewija panel do tych przycisków. Nie trzeba przewijać całego opisu, aby zmienić wyposażenie.
+
 Poprawka **UI_05**: kliknięcie **Odpoczynek** lub klawisz **R** rozpoczyna pełną regenerację, bez okna wyboru. Trwa ona **15 sekund** i odnawia całe HP oraz manę. Po ukończeniu obowiązuje **60 sekund cooldownu**, widocznego na przycisku. Postęp jest nad własną postacią, która medytuje w niebieskim kręgu z unoszącymi się kroplami many. Ponowne kliknięcie lub R przerywa odpoczynek bez nagrody i bez cooldownu. Zachowano obsługę joysticka i czaru dotykanego drugim palcem z UI_03.
 
 Mikstury many usunięto ze sklepu, łupów i wyposażenia. Pozostaje jeden slot mikstury zdrowia pod **Q**. Przy odczycie starszej postaci stare mikstury many są usuwane z plecaka i depozytu; pozostałe przedmioty są zachowane.

@@ -1,10 +1,16 @@
 """Wizard/druid feature catalogue. Times and Mystic's +1 are Bractwo rules.
 
-No rest counters, no duplicate training feats, no automatic medium-armor gift.
+Resources recharge on rests; subclass choice is separate from Primal Order.
 Ritual tags are explicit: e.g. Longstrider is NOT made free by this subsystem.
 """
 from math import ceil
 from functools import lru_cache
+try:
+    from . import druid_circles as circles
+    from .druid_beasts import BEASTS
+except ImportError:
+    import druid_circles as circles
+    from druid_beasts import BEASTS
 
 VERSION=1
 ARCANE_COOLDOWN=180
@@ -14,15 +20,20 @@ ORDERS={
     'magician':dict(name='Mistyk natury',description='+1 do ataku czarami druida i ST ich obrony.',icon='assets/feats/magician.svg'),
 }
 FORMS={
-    'wolf':dict(name='Wilk',level=5,ac=12,attributes={'strength':14,'dexterity':15,'constitution':12},
+    'wolf':dict(name='Wilk',level=5,ac=12,hp=11,beast_proficiency=2,darkvision=60,
+        mental_attributes={'intelligence':3,'wisdom':12,'charisma':6},attributes={'strength':14,'dexterity':15,'constitution':12},
         attacks=[[1,6,2]],damage='piercing',attack_bonus=4,speed=40,cr='1/4',trait='Taktyka watahy · przewraca mniejsze cele',size='medium'),
-    'cat':dict(name='Kot',level=5,ac=12,attributes={'strength':3,'dexterity':15,'constitution':10},
+    'cat':dict(name='Kot',level=5,ac=12,hp=2,beast_proficiency=2,darkvision=60,saves={'dexterity':4},
+        mental_attributes={'intelligence':3,'wisdom':12,'charisma':7},attributes={'strength':3,'dexterity':15,'constitution':10},
         attacks=[[0,1,1]],damage='slashing',attack_bonus=4,speed=40,cr='0',trait='Szybka, niewielka postać zwiadowcza',size='tiny'),
-    'black_bear':dict(name='Niedźwiedź czarny',level=15,ac=11,attributes={'strength':15,'dexterity':12,'constitution':14},
+    'black_bear':dict(name='Niedźwiedź czarny',level=15,ac=11,hp=19,beast_proficiency=2,darkvision=60,swim=30,
+        mental_attributes={'intelligence':2,'wisdom':12,'charisma':7},attributes={'strength':15,'dexterity':12,'constitution':14},
         attacks=[[1,6,2],[1,6,2]],attack_types=['slashing','slashing'],damage='slashing',attack_bonus=4,speed=30,cr='1/2',trait='Dwa uderzenia pazurami',size='medium'),
-    'bear':dict(name='Niedźwiedź brunatny',level=35,ac=11,attributes={'strength':17,'dexterity':12,'constitution':15},
+    'bear':dict(name='Niedźwiedź brunatny',level=35,ac=11,hp=22,beast_proficiency=2,darkvision=60,
+        mental_attributes={'intelligence':2,'wisdom':13,'charisma':7},attributes={'strength':17,'dexterity':12,'constitution':15},
         attacks=[[1,8,3],[1,4,3]],attack_types=['piercing','slashing'],damage='piercing',attack_bonus=5,speed=40,cr='1',trait='Ugryzienie i pazury · 2 ataki',size='large'),
 }
+FORMS.update(BEASTS)
 
 def effective_level(p):return min(20,max(1,1+int(p.level)//5))
 @lru_cache(maxsize=20)
@@ -67,8 +78,8 @@ def configure(spells,classes,statuses):
         s.update(extra);spells[key]=s
     classes['mage']['description']='Sztuczki, I krąg, rytuały i Odzyskanie mocy od początku.'
     classes['druid']['description']='Strażnik lub Mistyk natury. Lekki pancerz, tarcze i przemiany od poziomu 5.'
-    add('arcane_recovery','Odzyskanie mocy','recovery',['mage'],action='bonus',cooldown=ARCANE_COOLDOWN,
-        description='Natychmiast odzyskujesz część many, także w walce i w ruchu. Akcja dodatkowa. Odnowienie 180 s.',
+    add('arcane_recovery','Odzyskanie mocy','recovery',['mage'],action='action',cooldown=0,
+        description='Po krótkim odpoczynku odzyskujesz część many. Jedno użycie między długimi odpoczynkami.',
         visual=dict(style='recovery',theme='force',colors=['#546bb2','#aacfff','#eef7ff'],shots=1))
     add('alarm','Alarm','ritual_alarm',['mage'],circle=1,mana=20,feature=False,ritual=True,ritual_seconds=10,
         channel_seconds=3,duration=14400,description='Zabezpiecza obszar wokół miejsca rzucenia. Ostrzega o wejściu potwora lub obcego gracza. Rytuał: 10 s, bez many.',radius=64,shape='square')
@@ -78,12 +89,15 @@ def configure(spells,classes,statuses):
     add('speak_with_animals','Rozmowa ze zwierzętami','animal_speech',['druid'],circle=1,mana=20,feature=False,
         ritual=True,ritual_seconds=10,channel_seconds=3,duration=300,
         description='Przez 100 rund rozumiesz spokojne zwierzęta. Podejdź do zwierzęcia i użyj E. Nie uspokaja atakujących potworów. Rytuał: 10 s bez many.')
-    add('wild_companion','Dziki towarzysz','wild_familiar',['druid'],5,cooldown=SHAPE_COOLDOWN,
-        description='Przywołuje leśną sowę bez many i składników. Nie atakuje. Wspólne odnowienie z przemianami: 60 s.')
+    add('wild_companion','Dziki towarzysz','wild_familiar',['druid'],5,cooldown=0,
+        description='Przywołuje leśną sowę, zużywając użycie Dzikiego kształtu albo komórkę I kręgu. Nie atakuje. Znika po długim odpoczynku.')
     for form,f in FORMS.items():
         key='wild_shape_'+form
         add(key,'Dziki kształt · '+f['name'].lower(),'shape',['druid'],f['level'],action='bonus',form=form,
-            cooldown=SHAPE_COOLDOWN,description=f['trait']+'. Nie rzucasz czarów; zachowujesz koncentrację. Wspólne odnowienie przemian: 60 s.',duration=1800)
+            cooldown=0,description=f['trait']+'. Zużywa użycie Dzikiego kształtu; krótki odpoczynek odnawia jedno, długi wszystkie. Zachowujesz koncentrację.',duration=1800,
+            icon=f'assets/spells/wild_shape_{form if form not in BEASTS else "bear"}.svg')
+    add('beast_trample','Tratowanie','beast_action',['druid'],55,action='bonus',icon='assets/spells/wild_shape_bear.svg',description='Słoń lub mamut: tratowanie powalonego celu w zasięgu 5 stóp. Obrona Zręczności daje połowę obrażeń.')
+    add('escape_grapple','Wyrwij się z chwytu','beast_action',['druid'],1,action='action',icon='assets/spells/entangle.svg',description='Akcja: próba Siły albo Zręczności przeciw ST chwytu.')
     statuses.update(
         ritual_channel=dict(name='Rytuał',icon='◈',description='Nie ruszaj się do końca rzucania.',harmful=False),
         speak_with_animals=dict(name='Rozmowa ze zwierzętami',icon='♧',description='Podejdź do spokojnego zwierzęcia i użyj E.',harmful=False),
@@ -97,17 +111,20 @@ def feature_rows(p):
     def feature(key,name,description,level=1):
         if p.level>=level:result.append(dict(id=key,name=name,description=description,icon=f'assets/spells/{key}.svg',level=level,automatic=True))
     if p.class_id=='mage':
-        feature('arcane_recovery','Odzyskanie mocy',f'+{recovery_amount(p)} many · natychmiast · akcja dodatkowa · odnowienie 180 s')
+        feature('arcane_recovery','Odzyskanie mocy',f'Do +{recovery_amount(p)} many po krótkim odpoczynku · raz na długi odpoczynek')
         feature('alarm','Rytuały','Alarm i Przywołanie chowańca. Rytuały nie zużywają many.')
     if p.class_id=='druid':
         feature('speak_with_animals','Druidyczny','Odczytujesz znaki druidów; znasz Rozmowę ze zwierzętami.')
-        feature('wild_shape_wolf','Dziki kształt','Przemiany · wspólne odnowienie 60 s',5)
+        feature('wild_shape_wolf','Dziki kształt','Użycia Dzikiego kształtu · krótki odpoczynek: +1 · długi: wszystkie',5)
         feature('wild_companion','Dziki towarzysz','Leśny chowaniec; nie wykonuje ataków.',5)
     return result
 
 
 def sheet(p):
+    try: from . import rest_rules
+    except ImportError: import rest_rules
     return dict(order=getattr(p,'primal_order',''),order_pending=p.class_id=='druid' and not getattr(p,'primal_order',''),
         orders=[dict(id=k,**v) for k,v in ORDERS.items()] if p.class_id=='druid' else [],
-        features=feature_rows(p),forms=[dict(id=k,**v,unlocked=p.level>=v['level'],temp_hp=effective_level(p)) for k,v in FORMS.items()] if p.class_id=='druid' else [],
+        features=feature_rows(p),forms=[dict(id=k,**v,unlocked=circles.form_allowed(p,k),temp_hp=circles.form_temp_hp(p)) for k,v in FORMS.items()] if p.class_id=='druid' else [],
+        circle=circles.sheet(p),arcane_recovery_remaining=rest_rules.remaining(p,'arcane_recovery'),
         familiar=getattr(p,'familiar_state',{}),channel=({k:v for k,v in getattr(p,'casting_channel',{}).items() if k in ('key','name','total','ritual')}|dict(remaining=round(max(0,getattr(p,'casting_channel',{}).get('until',0)-p.current_wall_time),1))) if getattr(p,'casting_channel',{}) else {},legacy_medium_grace=bool(getattr(p,'legacy_medium_grace',False)),recovery_amount=recovery_amount(p) if p.class_id=='mage' else 0)

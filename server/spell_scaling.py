@@ -83,6 +83,11 @@ def resolve(p, key, *, automatic=False, active=True):
     options = circle_options(p, key)
     selected = getattr(p, 'spell_circle_choices', {}).get(key, 0)
     rank = (selected if not automatic and selected in options else options[-1]) if options else s['circle']
+    try:from . import druid_circles as dc
+    except ImportError:import druid_circles as dc
+    free_base=(key=='guiding_bolt' and dc.circle(p)=='stars' and dc.feature_remaining(p,'guiding_bolt') and dc.state(p).get('map_equipped',True)
+        or dc.circle(p)=='land' and p.level>=25 and dc.state(p).get('natural_free_armed') and not dc.spent(p,'natural_free') and key in dc.bonus_spells(p) and s.get('circle',0)>0)
+    if free_base and not selected:rank=s['circle']
     s.update(cast_circle=rank, power_choice=0 if automatic or selected not in options else selected,
              power_options=options, resolved=True)
     if options:
@@ -115,7 +120,7 @@ def resolve(p, key, *, automatic=False, active=True):
     if key=='arcane_recovery':s['restore_mana']=rules.caster.recovery_amount(p)
     if s.get('kind')=='shape':
         f=rules.caster.FORMS[s['form']]
-        s.update(duration=rules.caster.form_duration(p),temporary_hp=rules.effective_level(p),form_ac=f['ac'],form_attacks=f['attacks'])
+        s.update(duration=rules.caster.form_duration(p),temporary_hp=dc.form_temp_hp(p),form_ac=max(f['ac'],13+dc.wisdom(p) if dc.circle(p)=='moon' else 0),form_attacks=f['attacks'])
     if s.get('duration'):
         s['duration_rounds'] = ceil(s['duration']/dnd.GAME_ROUND_SECONDS)
     # Repeated actions use the original paid profile; changing a preference or
@@ -235,6 +240,11 @@ def client_profiles(p):
     signature=(p.class_id,p.level,getattr(p,'mana_rules_version',dnd.MANA_RULES_VERSION),p.primal_order,p.weapon_grip,tuple(sorted(p.training_feats.items())),rules.gear.weapon(p).get('weapon_type',''),tuple(sorted(getattr(p,'spell_circle_choices',{}).items())),
         rules.ability_modifier(p,rules.spell_ability(p)),p.gear_bonus('attack'),p.mastery.get('power',0),
         p.concentration if active else '',locked.get('cast_circle',0) if active else 0)
+    try:
+        from . import druid_circles as dc, rest_rules
+    except ImportError:
+        import druid_circles as dc, rest_rules
+    signature+=(p.form,dc.circle(p),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),repr(getattr(p,'druid_circle_state',{})),repr(getattr(p,'rest_resources',{})))
     cache=getattr(p,'_spell_profiles_cache',None)
     if cache and cache[0]==signature:
         return cache[1]
@@ -243,9 +253,30 @@ def client_profiles(p):
             'shots','max_targets','ally_targets','duration','duration_rounds','power_summary','recast_active','restore_mana','temporary_hp','form_ac','form_attacks')
     for key in dnd.SPELLS:
         if not dnd.spell_allowed(p,key):
+            result[key]={'available':False}
             continue
         spec=resolve(p,key)
         result[key]={f:spec[f] for f in fields if f in spec}
         result[key]['next_upgrade']=next_upgrade(p,key)
+        result[key]['available']=True
+        gate=dnd.spell_level(spec,p.class_id)
+        if key in dc.bonus_spells(p):
+            gate=min(gate,dc.bonus_spells(p)[key]) if p.class_id in spec['class_ids'] else dc.bonus_spells(p)[key]
+        if spec.get('kind')=='shape' and dc.circle(p)=='moon':
+            from fractions import Fraction
+            form=rules.caster.FORMS[spec['form']]
+            gate=min(gate,max(10,5*(3*int(Fraction(str(form.get('cr','0'))))-1)))
+            if form.get('fly'):gate=max(35,gate)
+        result[key]['required_level']=gate
+        if spec.get('cast_circle',spec.get('circle'))==spec.get('circle'):
+            if key=='guiding_bolt' and dc.circle(p)=='stars' and dc.feature_remaining(p,'guiding_bolt') and dc.state(p).get('map_equipped',True):result[key]['mana']=0
+            if dc.circle(p)=='land' and p.level>=25 and dc.state(p).get('natural_free_armed') and not dc.spent(p,'natural_free') and key in dc.bonus_spells(p) and spec.get('circle',0)>0:result[key]['mana']=0
+        result[key]['cast_in_form']=dc.circle(p)=='moon' and key in dc.bonus_spells(p)
+        if key in rest_rules.NAMES:
+            result[key]['uses_remaining']=rest_rules.remaining(p,key)
+            result[key]['uses_maximum']=rest_rules.maximum(p,key)
+        if key.startswith('wild_shape_') or key=='wild_companion':
+            result[key]['uses_remaining']=dc.shape_remaining(p)
+            result[key]['uses_maximum']=dc.shape_max(p)
     p._spell_profiles_cache=(signature,result)
     return result

@@ -3,10 +3,10 @@ import math
 import zlib
 from types import SimpleNamespace
 try:
-    from . import world_content as content
+    from . import world_content as content, environment_rules as environment
     from .living_world import SURFACES
 except ImportError:
-    import world_content as content
+    import world_content as content, environment_rules as environment
     from living_world import SURFACES
 
 
@@ -59,14 +59,17 @@ class MonsterAI:
             e.home_trail = e.home_trail[::2]
 
     def enemy_move_towards(self, e, x, y, dt, factor=1):
-        if self.enemy_condition(e,'restrained') or self.enemy_condition(e,'prone'):return
+        if environment.immobile(e,self.now()) or self.enemy_condition(e,'prone'):return
         dx,dy=x-e.x,y-e.y
         length=math.hypot(dx,dy)
         if length<4:return
-        s=content.ENEMIES[e.kind]
-        speed=s['speed']*SURFACES[content.SURFACE_MAP.at(e.x,e.y,e.floor)]['speed']*factor
+        s=environment.enemy_spec(e)
+        speed=s['speed']*factor
         if e.slow_until>self.time or self.enemy_condition(e,'slow'):speed*=.5
         if self.enemy_condition(e,'growth'):speed*=.25
+        e.dx,e.dy=dx/length,dy/length
+        self.environment_bind(e)
+        speed=environment.movement_speed(e,speed,SURFACES[content.SURFACE_MAP.at(e.x,e.y,e.floor)]['speed'])
         amount=min(length,speed*dt)
         e.facing=[dx/length,dy/length]
         old=(e.x,e.y)
@@ -82,7 +85,7 @@ class MonsterAI:
         if e.chase_id or e.id in self.chasing_enemies:self.record_home_trail(e)
 
     def roam_enemy(self, e, dt):
-        s=content.ENEMIES[e.kind]
+        s=environment.enemy_spec(e)
         if e.has_engaged:
             if not e.return_at:
                 # Compatibility with an already-disengaged runtime actor.
@@ -120,7 +123,8 @@ class MonsterAI:
             self.enemy_move_towards(e,e.wander_x,e.wander_y,dt,.32)
 
     def queue_enemy_attack(self,e,target,projectile=None,special=False):
-        s=content.ENEMIES[e.kind]
+        if environment.actions_blocked(e,self.now()):return
+        s=environment.enemy_spec(e)
         element=projectile or s.get('projectile','stone')
         radius=(145 if special else 70 if element in ('stone','fire') else 48)
         delay=(1.15 if special else s.get('windup',.45))
@@ -151,6 +155,25 @@ class MonsterAI:
         e.mobile_cast = s.get("combat_role") == "hybrid" and not special
         e.cast_until=self.time+delay
         e.attack_until=self.time+delay
+
+    def enemy_escape_control(self,e,chosen=None):
+        """Spend the next action escaping Web/a whirlpool when no foe is in reach."""
+        now=self.now()
+        if environment.actions_blocked(e,now) or self.time<max(e.ready,e.ranged_ready,e.cast_until):return False
+        if chosen and chosen[2] and chosen[1]<=environment.enemy_spec(e)['melee_range']:return False
+        values=environment.conditions(e)
+        for key in ('web_restrained','whirlpool'):
+            value=values.get(key,{})
+            if value.get('until',0)<=now:continue
+            escaped=values.get('whirlpool_escape',{})
+            if key=='whirlpool' and escaped.get('until',0)>now and escaped.get('field_id')==value.get('field_id'):continue
+            result=self.environment_ability_check(e,'strength',value['dc'],'athletics')
+            e.ready=e.ranged_ready=e.cast_until=self.time+3
+            if result['saved']:
+                if key=='web_restrained':values.pop(key,None)
+                else:values['whirlpool_escape']=dict(until=now+3,field_id=value.get('field_id'))
+            return True
+        return False
 
     def resolve_hazards(self):
         waiting=[]
@@ -216,7 +239,9 @@ class MonsterAI:
             if (e.id not in self.chasing_enemies and e.id not in self.recovering_enemies and not e.chase_id
                     and not any(math.hypot(p.x-e.x, p.y-e.y) < ACTIVE_RADIUS for p in nearby)):
                 continue
-            spec = content.ENEMIES[e.kind]
+            e.current_wall_time=self.now()
+            if environment.actions_blocked(e,self.now()):continue
+            spec = environment.enemy_spec(e)
             candidates = []
             for player in nearby:
                 if player.id not in unsafe_ids or not player.alive or player.floor != e.floor:
@@ -231,7 +256,7 @@ class MonsterAI:
                 pursuing = player.id == e.chase_id
                 if not (provoked or pursuing or distance < spec['aggro']):
                     continue
-                visible = self.line_clear(e, player)
+                visible = self.environment_can_see(e, player)
                 if not visible:
                     # Pursue the last SEEN position, not live coordinates through
                     # a wall. The timer does not refresh itself while occluded.
@@ -247,6 +272,7 @@ class MonsterAI:
                 chosen = next((c for c in candidates if c[0].id == e.chase_id), None)
             if chosen is None and candidates:
                 chosen = min(candidates, key=lambda c: c[1])
+            if self.enemy_escape_control(e,chosen):continue
             if chosen is None:
                 self.stop_enemy_chase(e)
                 self.roam_enemy(e, dt)

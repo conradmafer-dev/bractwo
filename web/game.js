@@ -20,9 +20,9 @@
   const heldKeys = new Set();
   const joystick = { x: 0, y: 0, pointer: null };
   let attackPointer = null, attackHeld = false, blurPaused = false;
-  let nearby = null, selectedClass = "knight", selectedTarget = null, pendingInvite = null;
+  let nearby = null, selectedClass = "knight", selectedTarget = null, selectedWorldPoint = null, pendingInvite = null;
   let inventorySignature = "", playersSignature = "", legacyPrompted = false, lastTargetWarning = 0;
-  let panelMode = "inventory", questSignature = "", activeGoal = null;
+  let panelMode = "inventory", questSignature = "", activeGoal = null, trackedQuestId = null;
   let groundChunks=new Map(), expansionTab='growth', expansionSignature='', selectedRune='fire', atlasMode='nearby', navigationGoal=null;
   let hotbarPage=0;
   let atlasView=null, atlasController=null;
@@ -123,7 +123,8 @@
         clearTimeout(loginTimer); busy(false); playing = true; blurPaused = false; myId = String(packet.id);
         world = { ...world, ...(packet.world || {}) };
         world.obstacles = world.obstacles || []; world.zones = world.zones || [];
-        selectedTarget = null; selectedEnemy = null; battleRows.clear(); ui.battleEnemies.replaceChildren(); pendingInvite = null; legacyPrompted = false; expansionSignature = ""; navigationGoal = null;
+        selectedTarget = null; selectedEnemy = null; selectedWorldPoint = null; battleRows.clear(); ui.battleEnemies.replaceChildren(); pendingInvite = null; legacyPrompted = false; expansionSignature = ""; navigationGoal = null;
+        trackedQuestId = readTrackedQuest();
         levelUpPanels?.reset(); atlasView=null; atlasController=null;
         inventorySignature = ""; playersSignature = ""; ui.sidePanel.hidden = true; characterSheet?.close(); lootPanel?.close(); merchantPanel?.close(); restUI?.close(); ui.helpPanel.hidden = true;
         ui.legacyClassPanel.hidden = true; ui.partyInvite.hidden = true; ui.chatForm.hidden = true; ui.chatInput.blur(); ui.chatInput.value = ""; questSignature = "";
@@ -185,6 +186,13 @@
     const ownIndex = snapshot.players.findIndex(player => String(player.id) === myId);
     if (ownIndex >= 0) snapshot.players[ownIndex] = Runtime.mergeOwner(previousMe, snapshot.players[ownIndex], packet.owner_delta === true);
     me = ownIndex >= 0 ? snapshot.players[ownIndex] : null;
+    if(me&&previousMe&&Array.isArray(previousMe.discoveries)){
+      const oldDiscoveries=new Set(previousMe.discoveries);
+      for(const id of me.discoveries||[])if(!oldDiscoveries.has(id)){
+        const place=(world.landmarks||[]).find(l=>l.id===id);
+        if(place)notice(`Odkryto: ${place.name} · +${place.reward?.xp||0} PD`,"reward");
+      }
+    }
     levelUpPanels?.sync(me);
     const present = new Set();
     for (const [kind, entities] of [["p", snapshot.players], ["e", snapshot.enemies], ["c", packet.companions || []]]) {
@@ -201,6 +209,7 @@
     }
     for (const key of visuals.keys()) if (!present.has(key)) visuals.delete(key);
     if (me && (!previousMe || !sameFloor(me,previousMe) || distance(me,previousMe)>450 || (previousMe.hp <= 0 && me.hp > 0))) { camera.x = me.x; camera.y = me.y; }
+    if(selectedWorldPoint&&(!me?.alive||!sameFloor(me,selectedWorldPoint)||distance(me,selectedWorldPoint)>3500))selectedWorldPoint=null;
     if (selectedTarget && !snapshot.players.some(player => String(player.id) === selectedTarget && player.hp > 0 && sameFloor(me,player))) clearTarget();
     if (selectedEnemy && (!me?.alive || !snapshot.enemies.some(enemy => String(enemy.id) === selectedEnemy && enemy.hp > 0 && sameFloor(me,enemy)))) clearTarget();
     const activeFields=new Set(packet.active_field_effects||[]);
@@ -238,7 +247,7 @@
     ui.healthText.textContent=`${Math.ceil(me.hp)} / ${formatNumber(me.max_hp)}`;
     ui.healthFill.style.width=`${Math.max(0,Math.min(100,me.hp/me.max_hp*100))}%`;
     ui.manaText.textContent=`${Math.floor(me.mana||0)} / ${formatNumber(me.max_mana)}`;
-    ui.manaText.parentElement.title=Runtime.manaBudgetText(me.mana_budget)+' Bez pasywnej regeneracji w walce; po 12 s od wydania many: około 4 min do pełna w terenie lub 20 s w osadzie.';
+    ui.manaText.parentElement.title=Runtime.manaBudgetText(me.mana_budget)+' Mana wraca podczas długiego odpoczynku oraz dzięki dostępnym zdolnościom odzyskiwania przy krótkim odpoczynku.';
     ui.manaFill.style.width=`${Math.max(0,Math.min(100,(me.mana||0)/(me.max_mana||1)*100))}%`;
     ui.xpFill.style.width=`${Math.max(0,Math.min(100,(me.xp||0)/(me.xp_next||1)*100))}%`;
     ui.xpText.textContent=`${formatNumber(me.xp)} / ${formatNumber(me.xp_next)} PD`;
@@ -249,15 +258,15 @@
     ui.healthCount.textContent=me.potions?.health_potion||0;
     ui.healthPotion.disabled=!(me.potions?.health_potion>0) || me.hp<=0;
     const favoriteId=me.favorite_spell||world.classes?.[me.class_id]?.default_ability;
-    const abilitySpec=world.spells?.[favoriteId];
+    const abilitySpec=Runtime.spellProfile(world.spells?.[favoriteId],me);
     const cooldown=Math.max(0,Number(me.spell_cooldowns?.[favoriteId])||0,Number(abilitySpec?.action==='extra'?0:abilitySpec?.action==='bonus'?me.bonus_remaining:me.action_remaining)||0);
     ui.abilityName.textContent=abilitySpec?.name||'Brak czaru';
     ui.abilityButton.title=`F · ${abilitySpec?.name||'Brak czaru'} — najczęściej używany z ostatnich 100 użyć`;
     ui.abilityButton.dataset.spell=favoriteId||'';
     if(ui.abilityIcon.dataset.spell!==favoriteId){ui.abilityIcon.dataset.spell=favoriteId||'';ui.abilityIcon.replaceChildren();if(abilitySpec){const img=document.createElement('img');img.src=abilitySpec.icon;img.alt='';ui.abilityIcon.append(img);}else ui.abilityIcon.textContent=info.icon;}
-    ui.abilityCooldown.textContent=Runtime.queuedSpellLabel(abilitySpec,me)|| (abilitySpec?.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cooldown>0?`${Math.ceil(cooldown)}s`:"");
+    ui.abilityCooldown.textContent=Runtime.queuedSpellLabel(abilitySpec,me)|| (abilitySpec?.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cooldown>0?`${Math.ceil(cooldown)}s`:abilitySpec?.uses_remaining!==undefined?`${abilitySpec.uses_remaining}/${abilitySpec.uses_maximum}`:"");
     ui.abilityButton.classList.toggle('queued',!!favoriteId&&me.queued_spell===favoriteId);
-    ui.abilityButton.classList.toggle("cooldown",cooldown>0); ui.abilityButton.disabled=me.hp<=0||!abilitySpec||!spellAvailable(abilitySpec)||(abilitySpec.kind!=='reaction'&&abilitySpec.kind!=='shape'&&(!!me.form||(me.mana<spellMana(abilitySpec)&&!(abilitySpec.kind==='weapon_trigger'&&me.ensnaring_armed))||(me.spell_cooldowns?.[favoriteId]||0)>0));
+    ui.abilityButton.classList.toggle("cooldown",cooldown>0); ui.abilityButton.disabled=!abilitySpec||!spellAvailable(abilitySpec)||!Runtime.spellUsable(abilitySpec,me);
     if(abilitySpec?.kind==='recovery')ui.abilityButton.disabled=!globalThis.BractwoCasterUI.canRecover(me);
     const zone=[...world.zones,...(world.regions||[])].find(item=>sameFloor(me,item)&&me.x>=item.x&&me.x<=item.x+item.w&&me.y>=item.y&&me.y<=item.y+item.h);
     ui.movementStatus.textContent=`${world.surfaces?.[me.surface]?.name||'Trawa'} · ${Number(me.speed||100).toFixed(0)}${me.premium_demo?' · Premium test':''}${me.wind_remaining>0?' · Wiatr +15%':''}${me.ward_remaining>0?' · Osłona PvE':''}`;
@@ -314,6 +323,32 @@
     const arrow=["→","↘","↓","↙","←","↖","↑","↗"][(Math.round(angle/(Math.PI/4))+8)%8];
     return d<65?"Tuż obok":`${arrow} ${Math.max(1,Math.round(d/32))} pól`;
   }
+  function readTrackedQuest(){
+    try{return localStorage.getItem(`bractwo.trackedQuest.${myId}`);}catch{return null;}
+  }
+  function saveTrackedQuest(id){
+    trackedQuestId=id;questSignature="";
+    try{localStorage.setItem(`bractwo.trackedQuest.${myId}`,id);}catch{}
+  }
+  function canTrackQuest(quest){return !!quest&&["available","active","ready"].includes(quest.status);}
+  function selectedQuest(){
+    const quests=me?.quests||[];
+    // No saved preference retains the original automatic choice; an empty ID means off.
+    if(trackedQuestId!==null){
+      const quest=quests.find(q=>q.id===trackedQuestId&&canTrackQuest(q));
+      if(trackedQuestId&&!quest&&Array.isArray(me?.quests))saveTrackedQuest("");
+      return quest||null;
+    }
+    return quests.find(q=>q.status==="ready")||quests.find(q=>q.status==="active")||quests.find(q=>q.status==="available")||null;
+  }
+  function toggleQuestTracking(id){
+    const quest=(me?.quests||[]).find(q=>q.id===id);
+    if(!canTrackQuest(quest))return;
+    const stop=!navigationGoal&&selectedQuest()?.id===id;
+    saveTrackedQuest(stop?"":id);navigationGoal=null;
+    if(!stop)ui.sidePanel.hidden=true;
+    updateHUD();notice(stop?"Śledzenie zadania wyłączone.":`Śledzisz: ${quest.title}`);
+  }
   function questGoal(quest){
     if(!quest)return null;
     const npc=(world.npcs||[]).find(n=>n.id===quest.npc_id);
@@ -321,16 +356,22 @@
     const objective=(quest.objectives||[]).find(o=>o.count<o.required);
     if(!objective)return npc?{...npc,label:npc.name}:null;
     if(objective.type==="discover"){
-      const site=(world.landmarks||[]).find(n=>n.id===objective.target);return site?{...site,label:site.name}:null;
+      const site=(world.landmarks||[]).find(n=>n.id===objective.target);
+      return site?{...site,label:site.name}:(Number.isFinite(objective.x)&&Number.isFinite(objective.y)?{...objective,label:objective.label}:null);
     }
     const enemies=snapshot.enemies.filter(e=>e.kind===objective.target).sort((a,b)=>Number(a.hp<=0)-Number(b.hp<=0)||distance(a,me)-distance(b,me));
     return enemies[0]?{...enemies[0],label:`${objective.label}${enemies[0].hp<=0?" · odradza się":""}`}:(objective.x!==undefined?{...objective,label:objective.label}:npc?{...npc,label:npc.name}:null);
   }
   function updateQuestTracker(){
     if(!me)return;
-    if(navigationGoal){activeGoal=navigationGoal;ui.questTrackerTitle.textContent=navigationGoal.label;ui.questTrackerProgress.textContent='Cel nawigacji · usuń w Atlasie';ui.questTrackerDirection.textContent=directionTo(navigationGoal);return;}
-    const quests=me.quests||[];
-    const quest=quests.find(q=>q.status==="ready")||quests.find(q=>q.status==="active")||quests.find(q=>q.status==="available");
+    ui.questTracker.classList.remove("ready");
+    if(navigationGoal){activeGoal=navigationGoal;ui.questTrackerTitle.textContent=navigationGoal.label;ui.questTrackerProgress.textContent='Cel nawigacji · zadanie wybierzesz w Dzienniku';ui.questTrackerDirection.textContent=directionTo(navigationGoal);return;}
+    const quest=selectedQuest();
+    if(trackedQuestId===""){
+      activeGoal=null;ui.questTrackerTitle.textContent="Wybierz zadanie";
+      ui.questTrackerProgress.textContent="W Dzienniku naciśnij Śledź zadanie.";
+      ui.questTrackerDirection.textContent="Kliknij tutaj, aby otworzyć Dziennik.";return;
+    }
     activeGoal=questGoal(quest);
     ui.questTracker.classList.toggle("ready",quest?.status==="ready");
     if(quest){
@@ -353,8 +394,8 @@
   }
   function renderJournal(){
     if(!me)return;
-    const quests=me.quests||[];
-    const signature=JSON.stringify([quests,me.discoveries,me.hp>0,(world.npcs||[]).map(n=>[n.id,Math.round(distance(me,n)/32),distance(me,n)<=(n.radius||150)])]);
+    const quests=me.quests||[],tracked=navigationGoal?null:selectedQuest();
+    const signature=JSON.stringify([quests,trackedQuestId,!!navigationGoal,me.floor,me.discoveries,me.hp>0,(world.npcs||[]).map(n=>[n.id,Math.round(distance(me,n)/32),distance(me,n)<=(n.radius||150)])]);
     if(signature===questSignature)return;questSignature=signature;
     ui.questList.replaceChildren();
     if(!quests.length)ui.questList.append(element("p","empty-message","Mieszkańcy Przystani czekają na twoją pomoc. Podejdź do strażniczki i naciśnij E."));
@@ -362,7 +403,16 @@
     for(const quest of quests){
       const row=element("article",`quest-entry ${quest.status}`);row.dataset.questId=quest.id;row.dataset.npcId=quest.npc_id;
       const head=element("div","quest-title");head.append(element("strong","",quest.title),element("span","quest-status",statuses[quest.status]||quest.status));
-      row.append(head,element("p","quest-description",quest.description));
+      row.append(head);
+      if(canTrackQuest(quest)){
+        const tracking=tracked?.id===quest.id;
+        const button=actionButton(tracking?"✓ Śledzone · wyłącz":"Śledź zadanie",()=>toggleQuestTracking(quest.id));
+        button.classList.add("quest-track-button");button.dataset.questTrack=quest.id;
+        button.setAttribute("aria-pressed",String(tracking));
+        button.setAttribute("aria-label",`${tracking?"Przestań śledzić":"Śledź zadanie"}: ${quest.title}`);
+        row.classList.toggle("tracked",tracking);row.append(button);
+      }
+      row.append(element("p","quest-description",quest.description));
       for(const objective of quest.objectives||[]){const progress=element("div",`quest-objective${objective.count>=objective.required?" complete":""}`);progress.append(element("span","",`${objective.count>=objective.required?"✓ ":""}${objective.label}`),element("b","",`${objective.count}/${objective.required}`));row.append(progress);}
       row.append(element("div","quest-reward",`Nagroda: ${rewardDescription(quest.reward||{})}`));
       const npc=(world.npcs||[]).find(n=>n.id===quest.npc_id),close=npc&&sameFloor(me,npc)&&distance(me,npc)<=(npc.radius||150)&&me.hp>0;
@@ -381,7 +431,7 @@
     ui.discoveryList.replaceChildren();ui.discoveryCount.textContent=`${(me.discoveries||[]).length}/${(world.landmarks||[]).length}`;
     for(const landmark of world.landmarks||[]){
       const found=(me.discoveries||[]).includes(landmark.id),row=element("div",`discovery-entry${found?"":" unknown"}`);row.dataset.landmarkId=landmark.id;
-      row.append(element("strong","",`${found?"✓":"◇"} ${landmark.name}`),element("p","",found?landmark.description:"Nieodkryte miejsce. Dotrzyj tutaj, aby poznać historię i otrzymać nagrodę."),element("small","",directionTo(landmark)));ui.discoveryList.append(row);
+      row.append(element("strong","",`${found?"✓":"◇"} ${landmark.name}`),element("p","",found?landmark.description:"Nieodkryte miejsce. Dotrzyj tutaj, aby poznać historię i otrzymać nagrodę."),element("small","",`${directionTo(landmark)} · ${found?'Odkryte':'Pierwsze odkrycie: +'+(landmark.reward?.xp||0)+' PD'}`));ui.discoveryList.append(row);
     }
   }
   function updateBattleList(){
@@ -462,12 +512,20 @@
   }
   function setPanel(mode){merchantPanel?.close();characterSheet?.close();panelMode=mode;ui.sidePanel.hidden=false;ui.inventoryView.hidden=mode!=="inventory";ui.playersView.hidden=mode!=="players";ui.journalView.hidden=mode!=="journal";ui.progressionView.hidden=mode!=="progression";ui.progressionTab.classList.toggle("active",mode==="progression");ui.journalTab.classList.toggle("active",mode==="journal");ui.inventoryTab.classList.toggle("active",mode==="inventory");ui.playersTab.classList.toggle("active",mode==="players");ui.minimapCard.hidden=true;updateHUD();}
   function togglePanel(mode){if(!ui.sidePanel.hidden&&panelMode===mode){ui.sidePanel.hidden=true;updateHUD();}else setPanel(mode);}
-  function selectTarget(id){selectedEnemy=null;selectedTarget=id;send({type:"select_target",target_id:id});playersSignature="";ui.sidePanel.hidden=true;updateHUD();notice("Cel: gracz. Po odblokowaniu PvP działają ataki, czary i wilk. Czary wsparcia działają na drużynę.");}
+  function selectTarget(id){selectedWorldPoint=null;selectedEnemy=null;selectedTarget=id;send({type:"select_target",target_id:id});playersSignature="";ui.sidePanel.hidden=true;updateHUD();notice("Cel: gracz. Po odblokowaniu PvP działają ataki, czary i wilk. Czary wsparcia działają na drużynę.");}
   function selectEnemy(id){
     const enemy=snapshot.enemies.find(e=>String(e.id)===id&&e.hp>0&&sameFloor(me,e));if(!enemy)return;
-    selectedEnemy=id;selectedTarget=null;send({type:"select_target",enemy_id:id});playersSignature="";ui.sidePanel.hidden=true;updateHUD();
+    selectedWorldPoint=null;selectedEnemy=id;selectedTarget=null;send({type:"select_target",enemy_id:id});playersSignature="";ui.sidePanel.hidden=true;updateHUD();
   }
-  function clearTarget(){send({type:"select_target"});selectedTarget=null;selectedEnemy=null;playersSignature="";if(me)updateHUD();}
+  function clearTarget(){send({type:"select_target"});selectedTarget=null;selectedEnemy=null;selectedWorldPoint=null;playersSignature="";if(me)updateHUD();}
+  function targetPoint(){
+    if(!me)return null;
+    if(selectedWorldPoint&&sameFloor(me,selectedWorldPoint))return {...selectedWorldPoint};
+    const target=selectedEnemy?snapshot.enemies.find(e=>String(e.id)===selectedEnemy):snapshot.players.find(p=>String(p.id)===selectedTarget);
+    if(target&&target.hp>0&&sameFloor(me,target))return {x:target.x,y:target.y,floor:me.floor||0};
+    const [dx,dy]=me.facing||[0,1],length=Math.hypot(dx,dy)||1;
+    return {x:me.x+dx/length*192,y:me.y+dy/length*192,floor:me.floor||0};
+  }
   function typing() { const active=document.activeElement; return ["INPUT", "TEXTAREA", "SELECT"].includes(active?.tagName) && !["button", "checkbox", "radio"].includes(active?.type) || !!active?.isContentEditable; }
   function canControl() { return playing && me && me.hp > 0 && !document.hidden && !blurPaused && ui.disconnectPanel.hidden && ui.legacyClassPanel.hidden && !mobileHud?.blocksControls() && !restUI?.blocksControls() && !appShell?.blocksControls() && !typing(); }
   function resetControls() {
@@ -492,12 +550,14 @@
     while(ui.chatLog.children.length>60)ui.chatLog.firstChild.remove();ui.chatLog.scrollTop=ui.chatLog.scrollHeight;
   }
   ui.progressionButton.addEventListener('click',()=>characterSheet.toggle());ui.progressionTab.addEventListener('click',()=>setPanel('progression'));
-  ui.atlasButton.addEventListener('click',()=>openExpansion('atlas'));ui.bookSpell.addEventListener('click',()=>openExpansion('spells'));
+  function openAtlas(){resetControls();openExpansion('atlas');}
+  for(const id of ['atlasButton','topAtlasButton','minimapButton'])$(id).addEventListener('click',openAtlas);
+  ui.bookSpell.addEventListener('click',()=>openExpansion('spells'));
   ui.progressionNav.addEventListener('click',event=>{if(event.target.dataset.view){expansionTab=event.target.dataset.view;expansionSignature='';renderExpansion();}});
   ui.helpButton.addEventListener("click",toggleHelp);ui.closeHelp.addEventListener("click",toggleHelp);
   ui.mapButton.addEventListener("click",()=>{characterSheet.close();ui.minimapCard.hidden=!ui.minimapCard.hidden;ui.sidePanel.hidden=true;});
   ui.inventoryButton.addEventListener("click",()=>characterSheet.toggle("inventory"));ui.partyButton.addEventListener("click",()=>togglePanel("players"));
-  ui.journalButton.addEventListener("click",()=>togglePanel("journal"));ui.questTracker.addEventListener("click",()=>setPanel("journal"));ui.journalTab.addEventListener("click",()=>setPanel("journal"));
+  ui.journalButton.addEventListener("click",()=>togglePanel("journal"));ui.questTracker.addEventListener("click",()=>{setPanel("journal");const quest=navigationGoal?null:selectedQuest();if(quest)Array.from(ui.questList.children).find(row=>row.dataset.questId===quest.id)?.scrollIntoView({block:"nearest"});});ui.journalTab.addEventListener("click",()=>setPanel("journal"));
   ui.inventoryTab.addEventListener("click",()=>characterSheet.open("inventory"));ui.playersTab.addEventListener("click",()=>setPanel("players"));
   ui.closePanel.addEventListener("click",()=>{ui.sidePanel.hidden=true;updateHUD();});
   ui.interactButton.addEventListener("click",interact);Runtime.bindTouchTap(ui.abilityButton,ability);
@@ -520,12 +580,13 @@
     else {
       const npc=(world.npcs||[]).find(n=>sameFloor(me,n)&&Math.hypot(n.x-x,n.y-20-y)<36);
       if(npc?.service==="merchant"){merchantPanel.open();}else if(npc?.service){openExpansion(npc.service==="master"?"growth":"services");}else if(npc){setPanel("journal");const row=Array.from(ui.questList.children).find(q=>q.dataset.npcId===npc.id);row?.scrollIntoView({block:"nearest"});}
+      else{const grove=(world.obstacles||[]).find(o=>o.type==='grove'&&sameFloor(me,o)&&x>=o.x&&x<=o.x+o.w&&y>=o.y-35&&y<=o.y+o.h);clearTarget();selectedWorldPoint={x:grove?grove.x+grove.w/2:x,y:grove?grove.y+grove.h:y,floor:me.floor||0};}
     }
   });
   // Enter opens chat, while layout/app controls retain native keyboard activation.
   addEventListener("keydown",event=>{
     if(!playing||mobileHud?.blocksControls()||restUI?.blocksControls()||appShell?.blocksControls())return;
-    if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenuButton, #restButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton'))return;
+    if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton'))return;
     if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
     if(merchantPanel?.visible&&event.code==='Escape'){event.preventDefault();merchantPanel.close();return;}
     if(lootPanel?.visible&&event.code==='Escape'){event.preventDefault();lootPanel.close();return;}
@@ -544,6 +605,7 @@
       if(event.code==="PageUp"||event.code==="PageDown"){event.preventDefault();changeHotbarPage(event.code==="PageDown"?1:-1);return;}
       if(event.code==="KeyH"){toggleHelp();return;}
       if(event.code==="KeyM"){ui.mapButton.click();return;}
+      if(event.code==="KeyN"){event.preventDefault();openAtlas();return;}
       if(event.code==="KeyI"){characterSheet.toggle("inventory");return;}
       if(event.code==="KeyC"){characterSheet.toggle();return;}
       if(event.code==="KeyP"){togglePanel("players");return;}
@@ -551,7 +613,7 @@
       if(event.code==="KeyJ"){togglePanel("journal");return;}
     }
     if(!canControl())return;heldKeys.add(event.code);
-    if(!event.repeat){if(event.code==="Space")attemptAttack();if(event.code==="KeyE")interact();if(event.code==="KeyF")ability();if(event.code==="KeyQ")useQuickPotion("q");if(event.code==="KeyR")restUI.open();const slot=Runtime.hotbarSlotForCode(event.code);if(slot>=0)cast(Runtime.hotbarKey(me.hotbar,hotbarPage,slot));}
+    if(!event.repeat){if(event.code==="Space")attemptAttack();if(event.code==="KeyE")interact();if(event.code==="KeyF")ability();if(event.code==="KeyQ")useQuickPotion("q");if(event.code==="KeyR")restUI.open(event.shiftKey?"long":"short");const slot=Runtime.hotbarSlotForCode(event.code);if(slot>=0)cast(Runtime.hotbarKey(me.hotbar,hotbarPage,slot));}
   },true);
   // Capture release even when a focused window control consumes the event.
   addEventListener("keyup", (event) => { heldKeys.delete(event.code); }, true);
@@ -615,16 +677,17 @@
   function nearestMerchant(){return [world.merchant,...(world.npcs||[]).filter(n=>n.service==='merchant')].filter(Boolean).filter(n=>sameFloor(me,n)).sort((a,b)=>distance(me,a)-distance(me,b))[0]||world.merchant;}
   function nearestSite(){return (world.pois||[]).filter(s=>sameFloor(me,s)&&distance(me,s)<=s.radius).sort((a,b)=>distance(me,a)-distance(me,b))[0];}
   function nearestStair(){return (world.stairs||[]).filter(s=>sameFloor(me,s)&&distance(me,s)<=s.radius).sort((a,b)=>distance(me,a)-distance(me,b))[0];}
-  function spellsForClass(){return Object.entries(world.spells||{}).filter(([,s])=>!s.class_ids||s.class_ids.includes(me?.class_id));}
+  function spellsForClass(){return Object.entries(world.spells||{}).filter(([,s])=>me?.spell_profiles?.[s.id]?.available||!s.class_ids||s.class_ids.includes(me?.class_id));}
   function spellGate(s){return Runtime.spellGate(s,me);}
-  function spellAvailable(s){return me&&(!s.class_ids||s.class_ids.includes(me.class_id))&&me.level>=spellGate(s);}
+  function spellAvailable(s){const p=me?.spell_profiles?.[s?.id];return !!me&&(p?.available!==undefined?p.available:(!s.class_ids||s.class_ids.includes(me.class_id))&&me.level>=spellGate(s));}
   function cast(id){
     if(!id||!playing||!me?.alive)return;
     const spec=world.spells?.[id];if(!spec)return;
-    const packet={type:'cast',spell_id:id};
+    const packet=spec.circle_options||['circle_control','circle_field'].includes(spec.kind)?{type:'cast_circle_spell',spell:id,options:globalThis.BractwoCircleSpellUI?.options(id,me,spec)||{}}:{type:'cast',spell_id:id};
+    if(packet.options&&selectedWorldPoint&&sameFloor(me,selectedWorldPoint))packet.options.point={...selectedWorldPoint};
     const friend=selectedTarget&&snapshot.players.find(q=>q.id===selectedTarget);
     if(spec.targeting==='ally'&&friend&&(friend.id===me.id||me.party_id&&friend.party_id===me.party_id))packet.target_id=selectedTarget;
-    else if(['attack','save','missiles','mark','control','field'].includes(spec.kind)){
+    else if(['attack','save','missiles','mark','control','field','circle_control','circle_field','druid_circle','beast_action'].includes(spec.kind)||spec.targeting==='hostile'){
       if(selectedEnemy)packet.enemy_id=selectedEnemy;
       else if(selectedTarget)packet.target_id=selectedTarget;
     }
@@ -674,7 +737,7 @@
       root.append(element('div','section-label','KOLEJNE MOŻLIWOŚCI'));
       for(const m of world.class_progression?.[me.class_id]||[])guideRow(root,`${me.level>=m.level?'✓':'◇'} Poziom ${m.level} · ${m.name}`,m.description);
       const can=!!nearbyService('master')&&!me.combat_remaining;
-      guideRow(root,'Promocja profesji',me.promoted?'Masz wyższą rangę. Szybsza regeneracja poza walką; mistrzostwo od poziomu 50.':'Poziom 20 · 2000 złota · porozmawiaj z mistrzem w mieście.',[actionButton(me.promoted?'✓ Promowany':'Kup promocję',()=>send({type:'promote'}),!can||me.promoted||me.level<20||me.gold<2000)]);
+      guideRow(root,'Promocja profesji',me.promoted?'Masz wyższą rangę. Mistrzostwo od poziomu 50.':'Poziom 20 · 2000 złota · porozmawiaj z mistrzem w mieście.',[actionButton(me.promoted?'✓ Promowany':'Kup promocję',()=>send({type:'promote'}),!can||me.promoted||me.level<20||me.gold<2000)]);
       root.append(element('p','muted',`Punkty specjalizacji: ${me.mastery_points||0}. Pierwszy na poziomie 50, kolejne co 5 poziomów. Wymagana promocja. Punkt przydzielisz poza walką w C → Statystyki.`));
       for(const[key,name,detail]of[['power','Potęga',me.class_id==='mage'?'Nie wzmacnia Iskry ani czarów.':'Ataki bronią +1 obrażeń co 10 punktów, maksymalnie +2. Bez premii do przemian i czarów.'],['vitality','Witalność','+2 maksymalnego zdrowia za punkt'],['focus','Skupienie','+4 maksymalnej many za punkt']])guideRow(root,`${name} · ${me.mastery?.[key]||0}/20`,detail,[actionButton('Dodaj punkt',()=>send({type:'mastery',branch:key}),me.combat_remaining>0||!me.promoted||me.level<50||!me.mastery_points||(me.mastery?.[key]||0)>=20)]);
       root.append(actionButton('Wyzeruj specjalizację · 200 zł',()=>send({type:'mastery_reset'}),!can||me.gold<200||!Object.values(me.mastery||{}).some(n=>n>0)));
@@ -690,7 +753,10 @@
         const goal=atlasMode==='regions'?{x:item.x+item.w/2,y:item.y+item.h/2,floor:0}:item;
         const danger=item.recommended_level?`Zalecany poz. ${item.recommended_level} · `:item.min_level?`Zalecany poz. ${item.min_level}–${item.max_level||item.min_level} · `:'';
         const time=Math.ceil(distance(me,goal)/(me.speed||100)/60);
-        guideRow(root,item.name,`${danger}${item.description||''} ${directionTo(goal)} · ≥${time} min marszu${!sameFloor(me,goal)?' · inne piętro':''}`,[actionButton('Wyznacz kierunek',()=>navigateTo(goal,item.name))]);
+        const place=atlasMode==='regions'?null:(world.landmarks||[]).find(l=>l.id===(item.discovery_id||item.id));
+        const found=place&&me.discoveries?.includes(place.id),marker=place?(found?'✓ ':'◇ '):'';
+        const reward=place&&!found?` · odkrycie +${place.reward?.xp||0} PD`:'';
+        guideRow(root,marker+item.name,`${danger}${item.description||''} ${directionTo(goal)} · ≥${time} min marszu${!sameFloor(me,goal)?' · inne piętro':''}${reward}`,[actionButton('Wyznacz kierunek',()=>navigateTo(goal,item.name))]);
       }
       root.append(actionButton('Usuń cel nawigacji',()=>{navigationGoal=null;updateHUD();}));
     }else if(expansionTab==='premium'){
@@ -811,7 +877,8 @@
     if(!sameFloor(me,s)||!inView(s.x,s.y))return;
     const x=s.x,y=s.y,down=s.to_floor<s.floor;
     ellipse(ctx,x,y,32,23,'#25232b');for(let i=0;i<5;i++){block(ctx,x-22+i*3,y-14+i*6,44-i*6,5,down?'#a79777':'#d1be95');block(ctx,x-22+i*3,y-14+i*6,44-i*6,1,'#ead39c');}
-    label(`${down?'▼':'▲'} ${s.to_floor>0?'+':''}${s.to_floor} · ${s.name}`,x,y-34,'#ead3ff',10);if(me&&distance(me,s)<100)label(`[E] ${s.min_level>me.level?'Wymagany poziom '+s.min_level:'Przejdź'}`,x,y+29,'#ffe099',11);
+    const found=(me?.discoveries||[]).includes(s.discovery_id);
+    label(`${found?'✓':'◇'} ${down?'▼':'▲'} ${s.to_floor>0?'+':''}${s.to_floor} · ${s.name}`,x,y-34,found?'#e3edb8':'#ead3ff',10);if(me&&distance(me,s)<100)label(`[E] ${s.min_level>me.level?'Wymagany poziom '+s.min_level:'Przejdź'}`,x,y+29,'#ffe099',11);
   }
   function drawCamp(c,t){
     if(!sameFloor(me,c)||!inView(c.x,c.y,350))return;
@@ -835,7 +902,7 @@
       for(const[dx,dy]of[[-57,0],[45,-23],[15,37]]){ellipse(ctx,x+dx,y+dy,25,16,'#797c73');block(ctx,x+dx-17,y+dy-14,28,6,'#c0bc9f');}
       if(deco==='bones'){for(let i=0;i<6;i++)line(ctx,[[x-35+i*11,y-10],[x-32+i*11,y+16]],'#e1d2a7',4);ellipse(ctx,x+41,y+4,17,11,'#d1c3a3');block(ctx,x+44,y-1,5,5,'#57544d');}
     }
-    if(c.name)label(c.name,x,y-108,'#ead8a9',10);
+    if(c.name){const found=(me?.discoveries||[]).includes(c.discovery_id||c.id);label(`${found?'✓':'◇'} ${c.name}`,x,y-108,found?'#e3edb8':'#ead8a9',10);}
   }
 
   function drawNewCreature(v,t,spec){
@@ -907,7 +974,14 @@
     // Small cropped plots and fountain paving remain fully traversable.
     for(let y=1250;y<1285;y+=9)for(let x=345;x<420;x+=12){block(g,x,y,8,6,"#8b773f");block(g,x+2,y,4,5,"#92b848");block(g,x+3,y-1,3,3,"#db9046");}
   }
-  function resize(){viewport={w:innerWidth,h:innerHeight,dpr:Math.min(devicePixelRatio||1,2)};canvas.width=Math.round(viewport.w*viewport.dpr);canvas.height=Math.round(viewport.h*viewport.dpr);camera.scale=viewport.w<560?1:viewport.h<620?.95:1.2;ctx.imageSmoothingEnabled=false;}
+  function resize(){
+    viewport={w:innerWidth,h:innerHeight,dpr:Math.min(devicePixelRatio||1,2)};
+    canvas.width=Math.round(viewport.w*viewport.dpr);canvas.height=Math.round(viewport.h*viewport.dpr);
+    const baseScale=viewport.w<560?1:viewport.h<620?.95:1.2;
+    // Share the HUD's mobile breakpoints; zoom only the world, keeping controls readable.
+    camera.scale=baseScale*(globalThis.BractwoMobile.active() ? 0.85 : 1);
+    ctx.imageSmoothingEnabled=false;
+  }
   addEventListener("resize",resize);resize();buildGround();
   function inView(x,y,margin=100){return Math.abs(x-camera.x)<viewport.w/camera.scale/2+margin&&Math.abs(y-camera.y)<viewport.h/camera.scale/2+margin;}
   function glow(x,y,radius,color,strength=.2){ctx.save();ctx.globalAlpha=strength;const gradient=ctx.createRadialGradient(x,y,0,x,y,radius);gradient.addColorStop(0,color);gradient.addColorStop(1,"transparent");ctx.fillStyle=gradient;ctx.fillRect(x-radius,y-radius,radius*2,radius*2);ctx.restore();}
@@ -944,7 +1018,8 @@
       ellipse(ctx,x,y,36,23,'#c4c5a2');ellipse(ctx,x,y-2,27,16,'#5aa9b4');ellipse(ctx,x,y-3,18,9,'#9ddacc');line(ctx,[[x-10,y-4],[x+5,y-4]],'#d2f0dd',2);
     }else{block(ctx,x-19,y-10,38,19,'#7e8278');block(ctx,x-12,y-49,24,44,'#a7aa97');block(ctx,x-9,y-46,4,31,'#d4ceb3');label(l.action==='wind'?'≈':'◇',x,y-24,color,22);}
     if(!remaining)glow(x,y-15,34,color,.12+Math.sin(t*2)*.03);
-    label(l.name,x,y-66,color,10);
+    const found=(me?.discoveries||[]).includes(l.id);
+    label(`${found?'✓':'◇'} ${l.name}`,x,y-66,found?'#e3edb8':color,10);
     if(me&&distance(me,l)<105)label(remaining?`Odnowienie ${Math.ceil(remaining)} s`:'[E] '+({cache:'Otwórz skrytkę',spring:'Napij się',wind:'Wezwij wiatr',ward:'Przyjmij osłonę'}[l.action]),x,y+30,color,11);
   }
   function drawRiver(t){
@@ -1091,7 +1166,7 @@
     label(npc.name,npc.x,npc.y-55,"#f9e396",10);
   }
   function drawLandmark(l,t){
-    if(l.id.startsWith('habitat_'))return;
+    if(l.id.startsWith('habitat_')||l.source_kind==='stair')return;
     const{x,y}=l;if(!inView(x,y,130))return;const found=(me?.discoveries||[]).includes(l.id);
     if(l.action){drawSite(l,t);return;}
     if(l.decoration==='sign'){
@@ -1143,31 +1218,35 @@
     const progress=Math.max(0,Math.min(1,1-remaining/Math.max(.001,Number(rest.total)||1)));
     block(ctx,x-33,y-82,66,8,"#092840eb");block(ctx,x-32,y-81,64,6,"#1b4f70");
     block(ctx,x-32,y-81,64*progress,6,"#57c5ff");
-    label(`Pełny odpoczynek · ${Math.ceil(remaining)} s`,x,y-92,"#a8e7ff",9);
+    label(`${rest.kind==='short'?'Krótki':'Długi'} odpoczynek · ${Math.ceil(remaining)} s`,x,y-92,"#a8e7ff",9);
     ctx.restore();
   }
   function drawPlayer(v,t){
     const p=v.entity,x=v.x,y=v.y,isMe=String(p.id)===myId;if(!inView(x,y))return;
     const rest=isMe&&playing&&p.hp>0&&['short','long'].includes(p.rest?.kind)&&p.rest.remaining>0?p.rest:null;
+    globalThis.BractwoCircleVFX?.ground(ctx,x,y,p,t);
     if(rest)drawRestAura(x,y,t);
     if(String(p.id)===selectedTarget){ctx.strokeStyle="#f05942";ctx.lineWidth=2;ctx.strokeRect(x-20,y-44,40,50);}
     if(isMe&&!rest){ctx.strokeStyle="#e5eeae88";ctx.lineWidth=1.5;ctx.strokeRect(x-16,y-14,32,28);}
     if(p.form&&p.hp>0){drawEnemy({...v,entity:{...p,id:'form_'+p.id,kind:p.form,name:'',is_companion:true}},t);}
     else {ellipse(ctx,x,y+6,17,7,"#2c422e70");humanoid(x,y,p.class_id,rest?[0,1]:p.facing||[0,1],rest?t*.2:v.move,p.hp<=0,p,!!rest);}
+    globalThis.BractwoCircleVFX?.overlay(ctx,x,y,p,t);
     if(rest)drawRestProgress(x,y,t,rest);
     const color=p.skull==="red"?"#ff9b83":p.skull==="white"?"#fff6dc":isMe?"#fff2a8":me?.party_id&&p.party_id===me.party_id?"#a1eff2":"#c3f4a9";
     label(`${p.skull&&p.skull!=="none"?"☠ ":""}${p.name}${p.disconnected?" · offline":""}`,x,y-66,color,11);
     block(ctx,x-18,y-55,36,4,"#304232");block(ctx,x-17,y-54,34*Math.max(0,p.hp/p.max_hp),2,isMe?"#86df6b":"#9fd672");
   }
   function drawEnemy(v,t){
-    if(globalThis.BractwoCasterVFX.actor(ctx,v,t))return;
-    if(String(v.entity.id)===selectedEnemy){const z=v.entity.size||1;ctx.strokeStyle='#f05942';ctx.lineWidth=2;ctx.strokeRect(v.x-30*z,v.y-62*z,60*z,70*z);}
-    const e=v.entity,x=v.x,y=v.y,spec=world.enemy_types?.[e.kind]||{},kind=spec.appearance||e.kind;
+    if(v.entity.form&&v.entity.form!==v.entity.kind)v={...v,entity:{...v.entity,kind:v.entity.form}};
+    const e=v.entity,x=v.x,y=v.y,spec=e.kind==='giant_crocodile'?{...world.enemy_types?.crocodile,size:1.6}:world.enemy_types?.[e.kind]||{},kind=spec.appearance||e.kind;
     if(!inView(x,y)||e.alive===false||e.hp<=0)return;
+    if(String(e.id)===selectedEnemy){const z=Number(e.size)||spec.size||1;ctx.strokeStyle='#f05942';ctx.lineWidth=2;ctx.strokeRect(x-30*z,y-62*z,60*z,70*z);}
+    const custom=globalThis.BractwoCircleVFX?.form(ctx,x,y,e,t)||globalThis.BractwoCasterVFX.actor(ctx,v,t);
+    if(custom){if(!e.is_companion&&!e.is_familiar){label(e.name||e.kind,x,y-72,'#e5dbc1',9);block(ctx,x-20,y-65,40,4,'#3a453d');block(ctx,x-19,y-64,38*Math.max(0,e.hp/e.max_hp),2,'#e87955');}return;}
     if(spec.sprite&&globalThis.BractwoLootUI.drawMonster(ctx,v,spec,snapshot.time)){
       const z=spec.size||1,yy=y-78*z,w=spec.boss?64:42;
-      label(e.name||kind,x,yy,spec.boss?'#f7d692':'#e5dbc1',spec.boss?11:9);
-      block(ctx,x-w/2,yy+9,w,4,'#3a453d');block(ctx,x-w/2+1,yy+10,(w-2)*Math.max(0,e.hp/e.max_hp),2,'#e87955');return;
+      if(!e.is_companion){label(e.name||kind,x,yy,spec.boss?'#f7d692':'#e5dbc1',spec.boss?11:9);
+      block(ctx,x-w/2,yy+9,w,4,'#3a453d');block(ctx,x-w/2+1,yy+10,(w-2)*Math.max(0,e.hp/e.max_hp),2,'#e87955');}return;
     }
     if(["bear","harpy","cyclops","ghoul","scorpion"].includes(kind)){drawWildCreature(v,t,spec);return;}if(["dragon","demon"].includes(kind)){drawNewCreature(v,t,spec);return;}if(!inView(x,y)||e.alive===false||e.hp<=0)return;
     const phase=Math.round(Math.sin(v.move*8)*2),flip=(e.facing?.[0]||1)<0?-1:1;
@@ -1305,6 +1384,16 @@
     for(const p of snapshot.players)if(sameFloor(me,p))ellipse(mctx,(p.x-left)*sx,(p.y-top)*sy,p.id===myId?3:2,p.id===myId?3:2,p.id===myId?'#fff':'#93d5e3');
     mctx.strokeStyle='#f9e4b8';mctx.strokeRect(w/2-viewport.w/camera.scale*sx/2,h/2-viewport.h/camera.scale*sy/2,viewport.w/camera.scale*sx,viewport.h/camera.scale*sy);
   }
+  function drawWorldPoint(t){
+    if(!selectedWorldPoint||!me||!sameFloor(me,selectedWorldPoint)||!inView(selectedWorldPoint.x,selectedWorldPoint.y))return;
+    const{x,y}=selectedWorldPoint,radius=10+Math.sin(t*3)*1.5;
+    ctx.save();ctx.strokeStyle='#bdeafa';ctx.lineWidth=1.5/camera.scale;ctx.beginPath();ctx.arc(x,y,radius,0,TAU);ctx.moveTo(x-15,y);ctx.lineTo(x-6,y);ctx.moveTo(x+6,y);ctx.lineTo(x+15,y);ctx.moveTo(x,y-15);ctx.lineTo(x,y-6);ctx.moveTo(x,y+6);ctx.lineTo(x,y+15);ctx.stroke();ctx.restore();
+  }
+  function drawTreeTargets(t){
+    if(!me||me.concentration!=='tree_stride'&&!me.status_effects?.some(e=>e.id==='tree_stride'))return;
+    const trees=world.environment_trees||(world.obstacles||[]).filter(o=>o.type==='grove').map(o=>({x:o.x+o.w/2,y:o.y+o.h,floor:o.floor||0}));
+    ctx.save();ctx.strokeStyle='#bcecbcb0';ctx.lineWidth=1.3;for(const tree of trees){if(!sameFloor(me,tree)||!inView(tree.x,tree.y))continue;ctx.beginPath();ctx.arc(tree.x,tree.y,8+Math.sin(t*2)*1.5,0,TAU);ctx.stroke();}ctx.restore();
+  }
   function frame(now){
     const dt=Math.min(.05,(now-lastFrame)/1000),t=now/1000;lastFrame=now;const smoothing=1-Math.exp(-dt*13);
     const renderTime=Number(snapshot.time||0)+Math.max(0,(now-lastSnapshotAt)/1000)-.1;
@@ -1317,6 +1406,7 @@
     ctx.setTransform(viewport.dpr,0,0,viewport.dpr,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle="#668b48";ctx.fillRect(0,0,viewport.w,viewport.h);
     ctx.save();ctx.translate(Math.round(viewport.w/2),Math.round(viewport.h/2));ctx.scale(camera.scale,camera.scale);ctx.translate(-Math.round(camera.x),-Math.round(camera.y));
     drawGround();globalThis.BractwoCasterVFX.world(ctx,world,me,snapshot,t);if(!(me?.floor)){drawWaterways(t);drawRiver(t);drawSafeZone();drawVillage(t);}
+    globalThis.BractwoCircleVFX?.fields(ctx,(snapshot.circle_fields||[]).filter(f=>sameFloor(me,f)&&inView(f.x,f.y,Math.max(150,f.radius||0,f.length||0))),t);
     const objects=[];
     for(const entry of nearbyDrawables()){
       const o=entry.data;
@@ -1333,7 +1423,7 @@
     }
     objects.sort((a,b)=>a.y-b.y);for(const o of objects)o.draw();
     for(const v of visuals.values())if(v.entity.hp>0&&sameFloor(me,v.entity)&&inView(v.x,v.y)){globalThis.BractwoSpellVFX.drawStatuses(ctx,v.entity.status_effects||[],v.x,v.y,t,v.entity.size||1);globalThis.BractwoFighterVFX.statuses(ctx,v.entity,v.x,v.y,t);globalThis.BractwoCasterVFX.statuses(ctx,v.entity,v.x,v.y,t);}
-    drawGoal();drawEffects(now);drawParticles(dt);for(const v of visuals.values())if(v.kind==="p"&&sameFloor(me,v.entity))drawSpeech(v,now);
+    drawGoal();drawTreeTargets(t);drawWorldPoint(t);drawEffects(now);drawParticles(dt);for(const v of visuals.values())if(v.kind==="p"&&sameFloor(me,v.entity))drawSpeech(v,now);
     ctx.restore();drawMinimap();
     if(playing&&lastSnapshotAt&&now-lastSnapshotAt>5000)ui.connectionStatus.textContent="BRAK ODPOWIEDZI";else if(playing&&ui.connectionStatus.textContent!==" ONLINE")ui.connectionStatus.innerHTML="<i></i> ONLINE";
     requestAnimationFrame(frame);
@@ -1341,6 +1431,7 @@
   document.addEventListener("visibilitychange",()=>fpsMeter.reset());
 
   const spellIcons={longstrider:'»',mage_armor:'◇',burning_hands:'♨',healing_word:'♥',starry_wisp:'✧',shocking_grasp:'ϟ',fire_bolt:'✹',ray_of_frost:'❄',acid_splash:'◉',magic_missile:'✦',shield:'⬡',scorching_ray:'☄',fireball:'☀',misty_step:'»',shillelagh:'♧',thorn_whip:'⌁',produce_flame:'♨',cure_wounds:'♥',entangle:'♜',moonbeam:'☾',wild_shape_wolf:'♞',wild_shape_bear:'♟',animal_companion:'♞',hunters_mark:'⌖',ensnaring_strike:'⌁',second_wind:'♥'};
+  Runtime.bindTouchScroll(ui.hotbarSlots.closest('.hotbar-viewport'),()=>ui.gameUI.classList.contains('mobile-hud'));
   const hotbarButtons=Array.from({length:24},(_,slot)=>{
     const button=document.createElement('button');button.className='hotbar-slot';button.dataset.slot=slot;
     button.innerHTML=`<kbd>${Runtime.hotbarLabel(slot,false)}</kbd><span></span><small></small><b></b>`;
@@ -1360,8 +1451,8 @@
       b.dataset.spell=id||'';b.classList.toggle('empty',!s);
       if(b.querySelector('span').dataset.spell!==id){const span=b.querySelector('span');span.dataset.spell=id;span.replaceChildren();if(s){const img=document.createElement('img');img.src=s.icon;img.className='spell-icon';img.alt='';span.append(img);}else span.textContent='·';}
       b.querySelector('small').textContent=s?.name||'Pusty';
-      b.querySelector('b').textContent=!s?'':!available?'poz. '+spellGate(s):Runtime.queuedSpellLabel(s,me)|| (revert?'Powrót':s.kind==='reaction'?(me.shield_armed?'ON':'OFF'):s.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cd>0?Math.ceil(cd)+' s':spellMana(s)?spellMana(s)+' MP':'0 MP');
-      b.disabled=!s||!available||me.hp<=0||(!revert&&s.kind!=='reaction'&&!(s.kind==='weapon_trigger'&&me.ensnaring_armed)&&(cd>0||me.mana<spellMana(s)||!!me.form));
+      b.querySelector('b').textContent=!s?'':!available?'poz. '+spellGate(s):Runtime.queuedSpellLabel(s,me)|| (revert?'Powrót':s.kind==='reaction'?(me.shield_armed?'ON':'OFF'):s.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cd>0?Math.ceil(cd)+' s':s.uses_remaining!==undefined?s.uses_remaining+'/'+s.uses_maximum:spellMana(s)?spellMana(s)+' MP':'0 MP');
+      b.disabled=!s||!available||!Runtime.spellUsable(s,me);
       if(s?.kind==='recovery')b.disabled=!globalThis.BractwoCasterUI.canRecover(me);
       b.classList.toggle('locked',!!s&&!available);b.classList.toggle('queued',!!id&&me.queued_spell===id);b.classList.toggle('active-spell',!!s&&(s.kind==='reaction'&&me.shield_armed||revert||!!(s.buff&&me.statuses?.[s.buff]>0)||me.concentration===id||s.kind==='weapon_trigger'&&me.ensnaring_armed));
       b.title=s?`Zestaw ${hotbarPage+1} / ${Runtime.hotbarLabel(i,false)} · ${s.name} (${s.english}) · ${s.feature?'zdolność':s.circle?'krąg '+s.circle:'sztuczka'} · poz. ${spellGate(s)} · ${spellMana(s)} many\n${s.power_summary||''}\n${s.description}\n${Runtime.concentrationWarning(s,me,world.spells)}`:'Pusty slot — przypisz czar w księdze K';
@@ -1380,6 +1471,9 @@
   let fighterPrompt=null,casterPrompt=null;
   characterSheet=globalThis.BractwoCharacterSheet.create({
     state:()=>({player:me,world}),send,cast,gate:spellGate,mana:spellMana,nearMaster:()=>!!nearbyService("master"),
+    selectedAlly:()=>snapshot.players.find(q=>String(q.id)===String(selectedTarget)&&q.hp>0&&me?.party_id&&q.party_id===me.party_id)||null,
+    targetPoint,
+    studyTarget:()=>selectedEnemy?{enemy_id:selectedEnemy}:selectedTarget?{target_id:selectedTarget}:null,
     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
     prepare:()=>{merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
     changed:()=>{if(me)updateHUD();}
@@ -1395,8 +1489,8 @@
     prepare:()=>{closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   appShell=globalThis.BractwoAppShell.create({stop:()=>{resetControls();closeChat();restUI.close();}});
   ui.closeEffectDetail.addEventListener('click',()=>{ui.effectDetail.hidden=true;});
-  ui.escapeRestraint.addEventListener('click',()=>{const packet={type:'escape_restraint'};if(ui.escapeRestraint.dataset.target)packet.target_id=ui.escapeRestraint.dataset.target;send(packet);});
-  let selectedEffectId='';
+  let selectedEffectId='',effectActionPacket=null;
+  ui.escapeRestraint.addEventListener('click',()=>{if(effectActionPacket&&!ui.escapeRestraint.disabled&&!ui.escapeRestraint.hidden)send({...effectActionPacket});});
   function renderEffects(container,entries){
     const wanted=new Set();
     for(const effect of entries){
@@ -1415,12 +1509,14 @@
       if(selectedEffectId===container.id+':'+effect.id&&!ui.effectDetail.hidden){
         ui.effectDetailName.textContent=owner+effect.name+' · '+Runtime.formatEffectTime(effect);
         ui.effectDetailText.textContent=effect.description+(effect.concentration?' Wymaga koncentracji.':'');
-        const ally=selectedTarget&&snapshot.players.find(q=>q.id===selectedTarget&&q.party_id&&q.party_id===me.party_id);
         const other=container.id==='targetEffects';
-        ui.escapeRestraint.hidden=!effect.escape_action||(other&&!ally);
-        ui.escapeRestraint.dataset.target=other&&ally?ally.id:'';
-        ui.escapeRestraint.textContent=other?'Uwolnij sojusznika · akcja':'Wyrwij się · akcja';
-        ui.escapeRestraint.disabled=me.action_remaining>0||!me.alive;
+        const target=other&&selectedTarget?snapshot.players.find(q=>String(q.id)===String(selectedTarget)):null;
+        const action=other&&!target?null:Runtime.statusAction(effect,me,target);
+        effectActionPacket=action?.packet||null;
+        ui.escapeRestraint.hidden=!action;
+        ui.escapeRestraint.textContent=action?.label||'';
+        ui.escapeRestraint.title=action?.hint||'';
+        ui.escapeRestraint.disabled=!action||action.disabled;
       }
     }
     for(const chip of [...container.children])if(!wanted.has(chip.dataset.effect)){

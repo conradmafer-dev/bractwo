@@ -1,4 +1,4 @@
-/* One-click full recovery; progress and cooldown follow authoritative server state. */
+/* Small rest chooser; progress stays above the character in the world. */
 (function (root) {
   'use strict';
   const seconds = value => Math.max(0, Math.ceil(Number(value) || 0));
@@ -15,21 +15,23 @@
     const p = player || {};
     const rest = p.rest || {};
     const active = ['short', 'long'].includes(rest.kind) && Number(rest.remaining) > 0;
-    const cooldown = seconds(p.rest_cooldown_remaining);
-    const wait = Math.max(seconds(p.rest_block_remaining), cooldown);
+    const shortCooldown = seconds(p.rest_short_remaining), longCooldown = seconds(p.rest_long_remaining);
+    const wait = seconds(p.rest_block_remaining);
     const alive = !!player && p.hp > 0 && p.alive !== false;
-    const reason = p.rest_block_reason || (cooldown ? 'cooldown' : '');
+    const reason = p.rest_block_reason || '';
+    const longNeedsCity=!!rules.long_safe_only,longPlaceAllowed=!longNeedsCity||p.rest_safe===true;
     const blocked = !alive || wait > 0 || !!reason;
     let restriction = !alive ? reasons.dead : reason ? (reasons[reason] || reason) : '';
     if (wait) restriction = (restriction || 'Przerwa po walce') + ` — jeszcze ${wait} s.`;
     return {
-      active, kind: rest.kind, remaining: seconds(rest.remaining), cooldown,
+      active, kind: rest.kind, remaining: seconds(rest.remaining), shortCooldown, longCooldown,
       progress: active ? Math.max(0, Math.min(1, 1 - Number(rest.remaining) / Math.max(1, Number(rest.total) || 1))) : 0,
-      shortSeconds: seconds(rules.short_seconds || 15), longSeconds: seconds(rules.long_seconds || 15),
-      hpPercent: Math.round(100 * (rules.short_hp_fraction ?? 1)),
-      manaPercent: Math.round(100 * (rules.short_mana_fraction ?? 1)),
-      canShort: !blocked && !active, canLong: !blocked && !active && p.rest_safe === true,
-      safe: p.rest_safe === true, restriction
+      shortSeconds: seconds(rules.short_seconds || 10), longSeconds: seconds(rules.long_seconds || 30),
+      canShort: !blocked && !active && !shortCooldown, canLong: !blocked && !active && !longCooldown && longPlaceAllowed,
+      safe: p.rest_safe === true, longNeedsCity, longPlaceAllowed, restriction,
+      shortRestriction: restriction || (shortCooldown?`Krótki odpoczynek dostępny za ${shortCooldown} s.`:''),
+      longRestriction: restriction || (!longPlaceAllowed?'Długi odpoczynek jest dostępny tylko w mieście.':longCooldown?`Długi odpoczynek dostępny za ${longCooldown} s.`:''),
+      hitDice:p.rest_resources?.find(r=>r.id==='hit_dice')
     };
   }
   function create(h) {
@@ -43,11 +45,17 @@
     const button = (id, text, callback) => {
       const node = el('button', id, text); node.type = 'button'; node.addEventListener('click', callback); return node;
     };
-    const toggle = button('restMenuButton', '', open);
+    const toggle = button('restMenuButton', '', () => open());
     const icon = el('span', null, '☾');
     toggle.append(el('kbd', null, 'R'), icon, el('small', null, 'Odpoczynek'));
-    toggle.className = 'rest-launcher'; toggle.title = 'Rozpocznij pełny odpoczynek';
+    toggle.className = 'rest-launcher'; toggle.title = 'Wybierz odpoczynek';
     toggle.setAttribute('aria-label', 'Odpoczynek'); toggle.dataset.mobileLabel = 'Odpoczynek';
+    toggle.setAttribute('aria-controls','restMenu');toggle.setAttribute('aria-expanded','false');
+    const menu=el('section','restMenu');menu.hidden=true;menu.setAttribute('role','dialog');menu.setAttribute('aria-label','Wybierz odpoczynek');
+    const head=el('header');head.append(el('strong',null,'Odpoczynek'),button('restMenuClose','×',close));
+    const shortButton=button('restShortButton','',()=>open('short')),longButton=button('restLongButton','',()=>open('long'));
+    const shortInfo=el('small','restShortInfo'),longInfo=el('small','restLongInfo'),restriction=el('p','restRestriction');
+    menu.append(head,shortButton,shortInfo,longButton,longInfo,restriction);ui.append(menu);
     const book = document.getElementById('bookSpell');
     const toolbar = book.closest('.hotbar-toolbar');
     const combat = ui.querySelector('.combat-controls');
@@ -74,36 +82,47 @@
         const pixels = Math.round(value) + 'px';
         if (toggle.style[key] !== pixels) toggle.style[key] = pixels;
       }
+      if(!menu.hidden)positionMenu();
     }
+    function positionMenu(){const r=toggle.getBoundingClientRect(),width=menu.getBoundingClientRect().width,height=menu.getBoundingClientRect().height;menu.style.left=Math.max(8,Math.min(innerWidth-width-8,r.right-width))+'px';menu.style.top=Math.max(8,r.top-height-8)+'px';}
     root.addEventListener('resize', () => requestAnimationFrame(positionButton));
     const status = el('p', 'restStatus'); status.className = 'sr-only'; status.setAttribute('role', 'status');
     ui.append(status);
-    function open() {
+    function close(){menu.hidden=true;toggle.setAttribute('aria-expanded','false');}
+    document.addEventListener('pointerdown',event=>{if(!menu.hidden&&!menu.contains(event.target)&&!toggle.contains(event.target))close();},true);
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!menu.hidden){close();event.preventDefault();event.stopPropagation();}},true);
+    function open(kind) {
       const { player, world } = h.state();
       if (!player) return;
       const m = model(player, world.rest_rules);
-      if (m.active) { h.send({ type: 'rest_cancel' }); return; }
-      if (m.cooldown > 0) { h.notice?.(`Odpoczynek dostępny za ${m.cooldown} s.`); return; }
-      h.prepare?.(); h.stop?.();
-      // The server validates the current combat gate and reports any remaining wait.
-      h.send({ type: 'rest', kind: 'short' });
+      if (m.active) { close();h.send({ type: 'rest_cancel' }); return; }
+      if(kind!=='short'&&kind!=='long'){const show=menu.hidden;h.prepare?.();h.stop?.();menu.hidden=!show;toggle.setAttribute('aria-expanded',String(show));render();return;}
+      const allowed=kind==='short'?m.canShort:m.canLong;
+      if(!allowed){h.notice?.(kind==='short'?m.shortRestriction:m.longRestriction);return;}
+      close();h.prepare?.();h.stop?.();
+      h.send({ type: 'rest', kind });
     }
     function render() {
       const { player, world } = h.state(), m = model(player, world.rest_rules);
       positionButton();
       toggle.classList.toggle('rest-active', m.active);
-      const coolingDown = !m.active && m.cooldown > 0;
+      const cooldown=m.longPlaceAllowed?Math.min(m.shortCooldown,m.longCooldown):m.shortCooldown,coolingDown=!m.active&&cooldown>0;
       toggle.classList.toggle('rest-cooldown', coolingDown);
-      toggle.disabled = coolingDown;
-      icon.textContent = coolingDown ? `${m.cooldown}s` : '☾';
-      toggle.title = m.active ? `R · Przerwij odpoczynek — ${m.remaining} s` : coolingDown ? `R · Odpoczynek dostępny za ${m.cooldown} s` : `R · Pełny odpoczynek · ${m.shortSeconds} s · całe HP i mana`;
-      toggle.setAttribute('aria-label', m.active ? 'Przerwij odpoczynek' : coolingDown ? toggle.title : 'Pełny odpoczynek');
+      toggle.disabled = !player;
+      icon.textContent = coolingDown ? `${cooldown}s` : '☾';
+      toggle.title = m.active ? `R · Przerwij odpoczynek — ${m.remaining} s` : `R · krótki (${m.shortSeconds} s); Shift+R · długi (${m.longSeconds} s${m.longNeedsCity?', w mieście':''})`;
+      toggle.setAttribute('aria-label', m.active ? 'Przerwij odpoczynek' : 'Wybierz krótki lub długi odpoczynek');
       toggle.dataset.mobileLabel = m.active ? 'Przerwij odpoczynek' : 'Odpoczynek';
+      shortButton.textContent=`Krótki · ${m.shortSeconds} s · R${m.shortCooldown?' · za '+m.shortCooldown+' s':''}`;shortButton.disabled=!m.canShort;shortButton.title=m.shortRestriction;
+      shortInfo.textContent='Leczenie z kości zdrowia'+(m.hitDice?` (${m.hitDice.remaining}/${m.hitDice.maximum})`:'')+', część użyć zdolności i dostępne odzyskanie many.';
+      longButton.textContent=`Długi · ${m.longSeconds} s · Shift+R${m.longCooldown?' · za '+m.longCooldown+' s':''}`;longButton.disabled=!m.canLong;longButton.title=m.longRestriction;
+      longInfo.textContent=(m.longNeedsCity?'Tylko w mieście: ':'')+'Całe HP i mana oraz wszystkie zasoby odpoczynku.';
+      restriction.textContent=m.restriction||(!m.longPlaceAllowed?'Wróć do miasta, aby rozpocząć długi odpoczynek.':'');restriction.hidden=!restriction.textContent;
+      if(m.active)close();else if(!menu.hidden)positionMenu();
       const announcement = m.active ? 'Trwa odpoczynek. Postęp jest nad postacią. Ruch lub przycisk Odpoczynek przerywa regenerację.' : coolingDown ? 'Odpoczynek się odnawia. Pozostały czas jest na przycisku.' : '';
       if (status.textContent !== announcement) status.textContent = announcement;
     }
-    // Keep the shared window lifecycle API without creating a modal.
-    return { open, close: () => {}, render, blocksControls: () => false };
+    return { open, close, render, blocksControls: () => false };
   }
   const api = { model, create }; root.BractwoRestUI = api;
   if (typeof module !== 'undefined') module.exports = api;

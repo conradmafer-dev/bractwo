@@ -44,6 +44,11 @@ GENERAL_FEATS = {
     'moderately_armored': dict(name='Średnio opancerzony', grants=['medium_armor'], requires=['light_armor'], abilities=['strength','dexterity'], description='Średnie pancerze. +1 Siła lub Zręczność.'),
     'heavily_armored': dict(name='Ciężko opancerzony', grants=['heavy_armor'], requires=['medium_armor'], abilities=['strength','constitution'], description='Ciężkie pancerze. +1 Siła lub Kondycja.'),
     'martial_weapon_training': dict(name='Szkolenie w broni żołnierskiej', grants=['martial_weapons'], requires=[], abilities=['strength','dexterity'], description='Biegłość w broni żołnierskiej. +1 Siła lub Zręczność.'),
+    'tough': dict(name='Twardy', grants=[], requires=[], abilities=[], category='origin', description='Maksymalne HP zwiększone o 2 za każdy poziom D&D (poziomy Bractwa przeliczone ×5).', icon='assets/feats/tough.svg'),
+    'savage_attacker': dict(name='Zacięty atak', grants=[], requires=[], abilities=[], category='origin', description='Raz na turę, po trafieniu bronią, rzucasz jej kośćmi obrażeń dwa razy i wybierasz lepszy zestaw.', icon='assets/feats/savage_attacker.svg'),
+    'ability_score_improvement': dict(name='Rozwój cech', grants=[], requires=[], abilities=['strength','dexterity','constitution','intelligence','wisdom','charisma'], repeatable=True, ability_points=2, description='+2 do jednej cechy albo +1 do dwóch cech, maksymalnie 20.', icon='assets/feats/ability_score_improvement.svg'),
+    'heavy_armor_master': dict(name='Mistrz ciężkiego pancerza', grants=[], requires=['heavy_armor'], abilities=['strength','constitution'], description='+1 Siła lub Kondycja, maksymalnie 20. W ciężkim pancerzu obrażenia obuchowe, kłute i cięte od trafiających ataków są zmniejszone o premię z biegłości.', icon='assets/feats/heavy_armor_master.svg'),
+    'medium_armor_master': dict(name='Mistrz średniego pancerza', grants=[], requires=['medium_armor'], abilities=['strength','dexterity'], description='+1 Siła lub Zręczność, maksymalnie 20. Przy Zręczności co najmniej 16 średni pancerz uwzględnia do +3 do KP ze Zręczności zamiast +2.', icon='assets/feats/medium_armor_master.svg'),
 }
 FEAT_LEVELS = (15,35,55,75)  # tabletop class 4/8/12/16; existing growth retained
 
@@ -66,16 +71,59 @@ def _training(p):
         for key in ('martial_weapons','medium_armor'):result.setdefault(key,[]).append('Strażnik')
     pending=set(getattr(p,'training_feats',{}));active=set()
     for _ in range(len(GENERAL_FEATS)):
-        ready=[k for k in pending if k in GENERAL_FEATS and all(r in result for r in GENERAL_FEATS[k]['requires'])]
+        ready=[k for k in pending if feat_key(k) in GENERAL_FEATS and all(r in result for r in GENERAL_FEATS[feat_key(k)]['requires'])]
         if not ready:break
         for k in ready:
             active.add(k);pending.remove(k)
-            for grant in GENERAL_FEATS[k]['grants']:result.setdefault(grant,[]).append(GENERAL_FEATS[k]['name'])
+            for grant in GENERAL_FEATS[feat_key(k)]['grants']:result.setdefault(grant,[]).append(GENERAL_FEATS[feat_key(k)]['name'])
     return result,active
 
 
 def training_sources(p):return _training(p)[0]
 def active_feats(p):return _training(p)[1]
+
+
+def feat_key(instance):
+    """Repeatable choices retain string keys and values in existing save files."""
+    if not isinstance(instance,str):return ''
+    if instance in GENERAL_FEATS:return instance
+    prefix='ability_score_improvement_'
+    suffix=instance[len(prefix):] if instance.startswith(prefix) else ''
+    return 'ability_score_improvement' if suffix in {str(n) for n in range(2,len(FEAT_LEVELS)+1)} else ''
+
+
+def feat_allocations(key,value):
+    spec=GENERAL_FEATS.get(feat_key(key))
+    if not spec or not isinstance(value,str):return None
+    if not spec['abilities']:return {} if value=='' else None
+    choices=value.split('+')
+    if len(choices)!=spec.get('ability_points',1) or any(a not in spec['abilities'] for a in choices):return None
+    return {a:choices.count(a) for a in choices}
+
+
+def sanitize_feats(p):
+    raw=getattr(p,'training_feats',{})
+    p.training_feats={k:v for k,v in raw.items() if feat_allocations(k,v) is not None} if isinstance(raw,dict) else {}
+    return p.training_feats
+
+
+def feat_ability_bonuses(p):
+    bonuses={}
+    active=active_feats(p)
+    for key,value in getattr(p,'training_feats',{}).items():
+        if key not in active:continue
+        for ability,amount in (feat_allocations(key,value) or {}).items():bonuses[ability]=bonuses.get(ability,0)+amount
+    return bonuses
+
+
+def has_feat(p,key):return any(feat_key(k)==key for k in active_feats(p))
+
+
+def heavy_armor_reduction(p,kind,is_attack=False):
+    if (not is_attack or kind not in ('bludgeoning','piercing','slashing') or getattr(p,'form','')
+            or not has_feat(p,'heavy_armor_master') or _rules().equipped_item(p,'armor').get('armor_kind')!='heavy'):
+        return 0
+    return _rules().proficiency(p)
 
 
 def has(p,key): return key in training_sources(p)
@@ -139,9 +187,34 @@ def feat_points(p):return max(0,sum(p.level>=n for n in FEAT_LEVELS)-len(getattr
 
 def feat_eligible(p,key):
     s=GENERAL_FEATS.get(key)
-    if not s or key in getattr(p,'training_feats',{}):return False
+    if not s or not s.get('repeatable') and key in getattr(p,'training_feats',{}):return False
     known=training_sources(p)
-    return any(g not in known for g in s['grants']) and all(r in known for r in s['requires'])
+    return (not s['grants'] or any(g not in known for g in s['grants'])) and all(r in known for r in s['requires'])
+
+
+def select_feat(p,key,ability='',abilities=None):
+    """Validate the whole allocation before spending a point; return error or ''."""
+    if not isinstance(key,str) or key not in GENERAL_FEATS:return 'Nieznany atut.'
+    if feat_points(p)<1 or not feat_eligible(p,key):return 'Ten atut jest już posiadany, zbędny albo niedostępny.'
+    if getattr(p,'form',''):return 'Zakończ przemianę przed wyborem atutu.'
+    spec=GENERAL_FEATS[key]
+    if abilities is not None:
+        if not isinstance(abilities,(list,tuple)) or not all(isinstance(a,str) for a in abilities):return 'Wybierz właściwe cechy.'
+        ability='+'.join(abilities)
+    # A single ASI ability is a convenient request for +2 to that ability.
+    if spec.get('ability_points')==2 and isinstance(ability,str) and ability in spec['abilities']:ability=ability+'+'+ability
+    allocation=feat_allocations(key,ability)
+    if allocation is None:return 'Wybierz właściwe cechy dla tego atutu.'
+    scores=_rules().attributes(p)
+    if any(scores[a]+n>20 for a,n in allocation.items()):return 'Atut nie może zwiększyć cechy powyżej 20.'
+    instance=key
+    if spec.get('repeatable'):
+        for n in range(1,len(FEAT_LEVELS)+1):
+            instance=key if n==1 else key+'_'+str(n)
+            if instance not in p.training_feats:break
+        else:return 'Nie masz wolnego wyboru tego atutu.'
+    p.training_feats[instance]=ability
+    return ''
 
 
 def granted_rows(p):
@@ -150,9 +223,15 @@ def granted_rows(p):
 
 def training_sheet(p):
     scores=_rules().attributes(p)
+    def row(key,value=None):
+        base=feat_key(key);spec=GENERAL_FEATS[base]
+        data=dict(spec,id=key,feat_id=base,icon=spec.get('icon') or f"assets/feats/{spec['grants'][0]}.svg",min_level=15)
+        data['abilities']=[a for a in spec['abilities'] if scores[a]<20]
+        if value is not None:data.update(ability=value,allocation=feat_allocations(key,value) or {},active=key in active_feats(p))
+        return data
     return dict(granted=granted_rows(p),points=feat_points(p),levels=list(FEAT_LEVELS),
-        chosen=[dict(id=k,**GENERAL_FEATS[k],ability=v,active=k in active_feats(p),icon=f'assets/feats/{GENERAL_FEATS[k]["grants"][0]}.svg') for k,v in getattr(p,'training_feats',{}).items() if k in GENERAL_FEATS],
-        options=[(dict(id=k,**s,icon=f'assets/feats/{s["grants"][0]}.svg',min_level=15)|dict(abilities=[a for a in s['abilities'] if scores[a]<20])) for k,s in GENERAL_FEATS.items() if feat_eligible(p,k)],
+        chosen=[row(k,v) for k,v in getattr(p,'training_feats',{}).items() if feat_key(k)],
+        options=[row(k) for k in GENERAL_FEATS if feat_eligible(p,k)],
         armor_penalty=armor_penalty(p),weapon_proficient=proficient(p),
         grip=getattr(p,'weapon_grip','one'),can_change_grip=bool(weapon(p).get('versatile_dice')))
 

@@ -1,0 +1,59 @@
+{
+  "revision": "UI_08",
+  "date": "2026-09-28",
+  "scope": "Focused discovery, Atlas, crocodile artwork and mobile feat-selection fixes; no broad regression.",
+  "targeted_tests": {
+    "passed": 8,
+    "failed": 0,
+    "discovery": {
+      "file": "tests/test_discovery_ui08.py",
+      "passed": 4,
+      "final_run_seconds": 31.035,
+      "coverage": [
+        "Unique, stable discovery IDs and preserved gold; idempotent catalogue setup.",
+        "Increasing XP for distance, biome difficulty, enemy difficulty and bosses; starter HP fallback and floor isolation.",
+        "Actual discovery/save/load methods on in-memory SQLite: reward only once, including after reload.",
+        "Production catalogue audit and original 28 starter spawns unchanged in IDs, order and coordinates compared with UI_07."
+      ],
+      "catalogue": {
+        "previous_landmarks": 168,
+        "final_landmarks": 266,
+        "named_hunting_grounds": 12,
+        "stairs": 106,
+        "cities": 5,
+        "all_discovery_references_reachable_on_same_floor": true,
+        "all_xp_positive": true,
+        "xp_range": [17, 1351],
+        "examples_xp_gold": {"old_mill": [20, 8], "fortress": [52, 15], "habitat_0": [78, 10], "delve_19_-2": [1351, 135]}
+      }
+    },
+    "training": {
+      "file": "tests/test_training_refresh_ui08.cjs",
+      "passed": 4,
+      "coverage": [
+        "Level-15 druid: heavy armor feat and Constitution selected during combat; confirmation enables when combat expires while SELECT stays focused.",
+        "Existing select element and selected ability remain intact; submission uses the latest player snapshot.",
+        "No point, removed option or unavailable ability keeps confirmation disabled.",
+        "Death, transformation and renewed combat remain blocked."
+      ]
+    }
+  },
+  "syntax_passed": [
+    "web/game.js", "web/mobile.js", "web/caster_ui.js", "web/character_sheet.js",
+    "server/discovery_rules.py", "server/server.py", "server/living_world.py", "server/world_content.py", "tools/package_0818.py"
+  ],
+  "artwork": {
+    "file": "web/assets/monsters/crocodile.svg",
+    "checks": ["XML parse", "Four frames of 80x80 pixels", "Sharp rendering and visual review", "Existing sprite loader and static asset route reviewed"]
+  },
+  "interface_review": [
+    "Minimap, top Atlas button and existing Atlas link share the same open handler.",
+    "N is handled after typing and modifier guards; Atlas controls retain native Enter/Space activation.",
+    "The old mobile minimap overlay is removed; the canvas is inside a native accessible button.",
+    "Discovery marks use the authoritative IDs for sites, named habitats and stairs.",
+    "Unique HTML IDs and removal of the outdated bottom autoattack tip verified."
+  ],
+  "recovery": "Six empty or NUL-filled working text files were restored byte-for-byte from the verified UI_07 archive before applying UI_08; changed text files were then parsed/read and flushed.",
+  "not_run": ["Browser or physical phone session", "Game server startup", "Full regression suites"],
+  "deployment": "Local source and packages only; no push, live deployment or edits to live player databases."
+}

@@ -4,10 +4,10 @@ All costs, targets, ranges and cooldowns are checked on the authoritative server
 from dataclasses import dataclass, field
 from types import SimpleNamespace
 try:
-    from . import spell_geometry, spell_scaling
+    from . import spell_geometry, spell_scaling, rest_rules, druid_circles, environment_rules
     from .ranger_magic import RangerMagic
 except ImportError:
-    import spell_geometry, spell_scaling
+    import spell_geometry, spell_scaling, rest_rules, druid_circles, environment_rules
     from ranger_magic import RangerMagic
 import math
 import json
@@ -190,7 +190,9 @@ class DNDGame(RangerMagic):
         if p.pending_spell and not surge:
             if p.pending_spell.get('until',0)>=self.now():return
             p.pending_spell={}
-        if surge and (p.class_id!='knight' or p.level<5 or p.form or self.now()<p.spell_cooldowns.get('action_surge',0)):return
+        if surge and (p.class_id!='knight' or p.level<5 or p.form):return
+        if surge and (rest_rules.remaining(p,'action_surge')<1 or p.rest_resources.get('surge_turn_until',0)>self.now()):
+            return await self.notice(p,'Zryw akcji: brak użyć albo wykorzystano go już w tej turze. Użycia odnawia odpoczynek.')
         if target_id is not None and enemy_id is not None:return
         if target_id is None and enemy_id is None:
             target_id=p.auto_target_id or None;enemy_id=p.auto_enemy_id or None
@@ -208,7 +210,8 @@ class DNDGame(RangerMagic):
             if not quiet and (enemy_id or target_id):await self.notice(p,'Cel jest poza zasięgiem albo za przeszkodą.')
             return
         if surge:
-            p.spell_cooldowns['action_surge']=self.now()+90
+            rest_rules.spend(p,'action_surge')
+            p.rest_resources['surge_turn_until']=max(self.now()+rules.ROUND_SECONDS,getattr(p,'_feat_turn_until',0))
             p.attack_until=self.time+.3
             dnd.record_spell_use(p,'action_surge')
             self.fighter_effect(p,target,'surge')
@@ -216,17 +219,22 @@ class DNDGame(RangerMagic):
         self.tag(p,bool(target_id));train(p,'melee' if rules.gear.melee(p) else 'magic' if rules.gear.is_focus(rules.gear.weapon(p)) else 'distance')
         unjust=self.begin_pvp_hostility(p,target) if target_id else False
         action_name = 'Zryw akcji' if surge else 'Iskra różdżki' if rules.gear.is_focus(rules.gear.weapon(p)) else 'Atak'
+        touched={}
         for i in range(rules.attacks_per_round(p)):
             if target.hp<=0:break
+            chosen=self.circle_beast_target(p,target,i)
+            if chosen is None or chosen.hp<=0:continue
+            touched[chosen.id]=chosen
             p.form_attack_index=i
-            self.basic_effect(p,target)
-            if target_id:result=self.hit_player(p,target,pvp=True,unjust=unjust,action=action_name)
-            else:result=self.hit_enemy(p,target,action=action_name if p.class_id=='mage' or surge else f'Atak {i+1}/{rules.attacks_per_round(p)}',melee=rules.gear.melee(p))
-            self.trigger_ensnaring_strike(p,target,result)
-            self.fighter_on_weapon_hit(p,target,result)
-            self.beast_on_hit(p,target,result)
+            self.basic_effect(p,chosen)
+            if self.is_player_target(chosen):result=self.hit_player(p,chosen,pvp=True,unjust=unjust,action=action_name)
+            else:result=self.hit_enemy(p,chosen,action=action_name if p.class_id=='mage' or surge else f'Atak {i+1}/{rules.attacks_per_round(p)}',melee=rules.gear.melee(p))
+            self.trigger_ensnaring_strike(p,chosen,result)
+            self.fighter_on_weapon_hit(p,chosen,result)
+            self.beast_on_hit(p,chosen,result)
         p.form_attack_index=0
-        if not target_id and target.hp<=0:await self.defeat(target)
+        for victim in touched.values():
+            if not self.is_player_target(victim) and victim.hp<=0:await self.defeat(victim)
         with self.db:self.save_player(p)
 
     def is_player_target(self, target):
@@ -241,13 +249,13 @@ class DNDGame(RangerMagic):
         return self.enemies.get(ref)  # live compatibility with pre-0.8.1 enemy references
 
     def target_conditions(self, target):
-        return target.buffs if self.is_player_target(target) else target.conditions
+        return environment_rules.conditions(target)
 
     def target_condition(self, target, key):
         return self.target_conditions(target).get(key, {}).get('until', 0) > self.now()
 
     def target_save_bonus(self, target, ability):
-        return rules.save_bonus(target, ability) if self.is_player_target(target) else content.ENEMIES[target.kind]['saves'][ability]
+        return rules.save_bonus(target, ability) if self.is_player_target(target) else environment_rules.enemy_spec(target).get('saves',{}).get(ability,0)
 
     def target_save(self, target, ability, dc, damage, half=False):
         return rules.roll_save(self.combat_rng, self.target_save_bonus(target, ability), dc, damage, half,
@@ -443,7 +451,7 @@ class DNDGame(RangerMagic):
                 result['damage_components'] = components
                 self.resolve_player_hit(p,target,result,s['name'],owner=p,unjust=unjust)
             else:
-                target.hp=max(0,target.hp-result['damage']);self.remember_attacker(target,p)
+                result['damage']=self.environment_damage_enemy(target,result['damage'],p,result['damage_type'],components);self.remember_attacker(target,p)
                 self.report_roll(p,target,result,s['name'],p)
         if result and target.alive and result.get('hit') and (result.get('damage',0)>0 or not result.get('saved')):
             applied = False
@@ -475,7 +483,8 @@ class DNDGame(RangerMagic):
             return await self.notice(p,'Tarcza: automatyczna reakcja włączona.' if p.shield_armed else 'Tarcza: reakcja wyłączona.')
         if s['kind']=='shape' and p.form:
             p.form='';p.form_until=0;p.temp_hp=0;return
-        if p.form:return await self.notice(p,'W zwierzęcej postaci nie rzucasz czarów. Ponownie użyj przemiany, aby wrócić.')
+        if p.form and not (druid_circles.circle(p)=='moon' and key in druid_circles.bonus_spells(p)):
+            return await self.notice(p,'W tej przemianie nie możesz rzucić tego czaru.')
         if s['kind']=='surge':return await self.dnd_attack(p,target_id,enemy_id,surge=True)
         if s['kind']=='weapon_trigger':return await self.toggle_ensnaring_strike(p,s)
         offensive=s['kind'] in ('attack','save','missiles','mark','control','field')
@@ -488,7 +497,9 @@ class DNDGame(RangerMagic):
             return
         if now<p.spell_cooldowns.get(key,0):return
         recast=s.get('recast') and p.concentration==key and p.concentration_until>now
-        mana=0 if recast else s['mana']
+        mana,free_key=self.circle_spell_cost(p,s,recast)
+        if key in ('second_wind','animal_companion') and rest_rules.remaining(p,key)<1:
+            return await self.notice(p,'Brak użyć tej zdolności. Potrzebujesz odpoczynku.')
         if p.mana<mana:return await self.notice(p,f'Potrzebujesz {mana} many. Możesz wybrać niższy krąg w karcie czarów. Sztuczki są darmowe.')
         if p.gold<s.get('gold',0):return await self.notice(p,'Potrzebujesz 100 złota na składnik Kamiennej skóry.')
         targets=[];friends=[p]
@@ -535,6 +546,8 @@ class DNDGame(RangerMagic):
         # actions (e.g. Recovery) and reactions intentionally keep the queue.
         if not bonus:p.pending_spell={}
         self.begin_action(p,bonus);self.spend_mana(p,mana);p.gold-=s.get('gold',0);p.spell_cooldowns[key]=now+s['cooldown'];train(p,'magic',max(1,mana))
+        self.circle_commit_spell(p,s,free_key)
+        if key in ('second_wind','animal_companion'):rest_rules.spend(p,key)
         if s.get('concentration') and not recast:
             self.break_concentration(p);p.concentration=key;p.concentration_until=now+s['duration']
             p.concentration_profile=s
@@ -557,6 +570,7 @@ class DNDGame(RangerMagic):
                 self.join_pvp_support(p,q);q.hp+=restored
                 self.spell_effect(p,key,q,spec=s)
                 self.report_roll(p,q,dict(heal,check='healing',hit=True,healing=restored,damage=0),s['name'],p)
+            self.circle_after_heal(p,s,friends,mana)
         elif s['kind']=='mark':
             target=targets[0];p.mark_target=target.id;p.mark_target_kind='player' if self.is_player_target(target) else 'enemy'
             if self.is_player_target(target):
@@ -685,7 +699,6 @@ class DNDGame(RangerMagic):
         for owner_id,pet in tuple(self.companions.items()):
             p=self.players.get(owner_id);pet.current_wall_time=now
             if p is None or not p.alive or p.disconnected or pet.floor!=p.floor or not pet.alive:
-                if p and not pet.alive:p.spell_cooldowns['animal_companion']=max(p.spell_cooldowns.get('animal_companion',0),now+45)
                 self.companions.pop(owner_id,None);continue
             # Only the owner's explicit target. No independent acquisition of players.
             target=(self.enemies.get(p.auto_enemy_id) if p.auto_enemy_id else self.players.get(p.auto_target_id)) if p.auto_enabled else None
@@ -706,16 +719,19 @@ class DNDGame(RangerMagic):
                 pet.ready=now+3;pet.attack_until=self.time+.3
                 player_target=self.is_player_target(target)
                 unjust=self.begin_pvp_hostility(p,target) if player_target else False
-                ac=rules.armor_class(target) if player_target else content.ENEMIES[target.kind]['armor_class']
+                ac=rules.armor_class(target) if player_target else environment_rules.enemy_spec(target)['armor_class']
+                edis,eadv=self.environment_attack_flags(pet,target)
                 result=rules.roll_attack(self.combat_rng,pet.attack_bonus,ac,pet.dice,
-                    disadvantage=player_target and self.target_condition(target,'foresight'),
-                    advantage=self.target_condition(target,'restrained') or self.target_condition(target,'blind'))
+                    disadvantage=edis or player_target and self.target_condition(target,'foresight'),
+                    advantage=eadv or self.target_condition(target,'restrained') or self.target_condition(target,'blind'))
                 result['damage_type']='piercing'
+                self.environment_adjust_damage(pet,target,result,pet.dice,True)
                 if player_target:
                     self.shield_reaction(target,result)
                     self.resolve_player_hit(pet,target,result,'Ugryzienie towarzysza',owner=p,unjust=unjust)
                 else:
-                    if result['hit']:target.hp=max(0,target.hp-result['damage']);self.remember_attacker(target,p);target.attacker_id=pet.id
+                    if result['hit']:
+                        result['damage']=self.environment_damage_enemy(target,result['damage'],pet,'piercing');self.remember_attacker(target,p);target.attacker_id=pet.id
                     self.report_roll(pet,target,result,'Ugryzienie towarzysza',p)
                 self.tag(p,player_target);self.tag(pet,player_target);self.combat_effect(pet,'sword',target)
             elif not target and pet.combat_until<=now:pet.hp=min(pet.max_hp,pet.hp+dt)

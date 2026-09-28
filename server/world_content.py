@@ -89,6 +89,8 @@ def configure(items, zones, npcs, landmarks, quests, enemies, obstacles, merchan
           'speed':min(112,60+level*.4),'xp':round(20+level*5),'gold':round(5+level*1.5),
           'respawn':35+level//2,'aggro':200,'leash':330,'level':level,'tier':max(t for t,l in TIER_LEVELS.items() if l<=level),
           'appearance':appearance,'color':color}
+    enemies['crocodile'].update(sprite='assets/monsters/crocodile.svg',sprite_frame_width=80,
+                               sprite_frame_height=80,sprite_frames=4)
     bosses=[('orc_king','Król Orków',28,'goblin','#d2b267'),('sand_queen','Królowa Piasków',50,'spider','#ecd375'),
       ('lich_king','Król Nieumarłych',75,'skeleton','#b8a2e0'),('ice_queen','Królowa Lodu',95,'wisp','#c1f5ff'),
       ('ancient_dragon','Pradawny Smok',110,'dragon','#efa066'),('abyss_lord','Władca Otchłani',150,'demon','#d094f5')]

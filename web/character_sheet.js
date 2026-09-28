@@ -28,6 +28,7 @@
     panel.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const list=[...panel.querySelectorAll('button:not(:disabled),select:not(:disabled),[tabindex="0"]')].filter(x=>x.offsetParent!==null),first=list[0],last=list.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}});
     function heading(text,parent=content){parent.append(node('h3','sheet-section-title',text));}
     function tiles(entries,parent=content){const grid=node('div','sheet-stat-grid');for(const [label,value]of entries){const e=node('div','sheet-stat');e.append(node('small','',label),node('strong','',String(value)));grid.append(e);}parent.append(grid);return grid;}
+    function selectItem(uid){selectedItem=uid;signature='';render();content.querySelector('.sheet-item-detail > .item-actions')?.scrollIntoView({block:'nearest'});}
     function equipment(p,w){
       const inv=p.inventory||[],worn=p.equipment||{},equippedIds=new Set(Object.values(worn).map(String));
       const wornGrid=node('div','sheet-equipped');heading('Założone przedmioty');
@@ -35,7 +36,7 @@
         const item=inv.find(i=>String(i.uid)===String(worn[slot])),cell=node('article','sheet-equipment-card');
         cell.append(image(equipmentIcon(item,slot)),node('small','',label),node('strong','',item?.name||'Brak'));
         if(item){cell.dataset.uid=item.uid;cell.tabIndex=0;cell.setAttribute('role','button');cell.setAttribute('aria-label','Podgląd: '+item.name);cell.classList.toggle('selected',String(item.uid)===String(selectedItem));
-          const select=()=>{selectedItem=item.uid;signature='';render();};cell.addEventListener('click',select);cell.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();select();}});
+          const select=()=>selectItem(item.uid);cell.addEventListener('click',select);cell.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();select();}});
           root.BractwoInventoryUI.bind(cell,item,w);
         }wornGrid.append(cell);
       }content.append(wornGrid);
@@ -43,7 +44,7 @@
       const title=node('div','sheet-section-row');title.append(node('h3','sheet-section-title','Plecak'),node('small','',`${inv.length} / ${w.inventory_cap||40}`));content.append(title);
       const grid=node('div','sheet-bag-grid');grid.setAttribute('aria-label','Plecak — trzy rzędy');
       for(let i=0;i<pageSize;i++){
-        const item=bag[bagPage*pageSize+i];const cell=button('',()=>{selectedItem=item.uid;signature='';render();},!item);cell.className='sheet-bag-cell'+(item?' '+(item.rarity||'common'):' empty');
+        const item=bag[bagPage*pageSize+i];const cell=button('',()=>selectItem(item.uid),!item);cell.className='sheet-bag-cell'+(item?' '+(item.rarity||'common'):' empty');
         if(item){cell.dataset.uid=item.uid;cell.title=item.name;cell.classList.toggle('selected',String(item.uid)===String(selectedItem));cell.append(image(equipmentIcon(item,item.slot)),node('span','',item.name));if(item.quantity>1)cell.append(node('b','item-stack',String(item.quantity)));if(item.slot==='potion'){const slots=Object.entries(p.potion_slots||{}).filter(([,key])=>key===item.template).map(([k])=>k.toUpperCase());if(slots.length)cell.append(node('em','item-binding',slots.join('/')));}root.BractwoInventoryUI.bind(cell,item,w);}
         else cell.append(node('span','empty-mark','·'));grid.append(cell);
       }content.append(grid);
@@ -61,6 +62,7 @@
     function stats(p,w){const s=p.character_sheet||{};allocation(p);
       tiles([['Zdrowie',`${Math.ceil(p.hp)} / ${p.max_hp}`],['Mana',`${Math.floor(p.mana)} / ${p.max_mana}`],['Klasa Pancerza',p.armor_class],['Doświadczenie',`${p.xp} / ${p.xp_next}`]]);
       if(s.caster?.order)tiles([['Ścieżka',s.caster.orders?.find(o=>o.id===s.caster.order)?.name||'']]);if(s.training?.armor_penalty)content.append(node('p','caster-status-warning','Brak wyszkolenia w pancerzu: czary zablokowane; utrudnienie Siły/Zręczności.'));
+      if(s.caster?.circle?.id)tiles([['Krąg druida',s.caster.circle.name||'']]);
       if(s.fighter?.style)tiles([['Styl walki',s.fighter.style_name+(s.fighter.style_active?'':' · nieaktywny')],['Mistrzostwo broni',s.fighter.masteries?.find(m=>m.active)?.effect_name||'—']]);
       heading('Walka');tiles([['Atak bronią',dice(p.attack_bonus)],['Obrażenia',`${p.damage_dice} · ${s.damage_name||''}`],['Ataki na rundę',p.attacks_per_round],['Atak czarem',dice(s.spell_attack_bonus||0)],['ST obrony przed czarami',p.save_dc],['Premia z biegłości',signed(p.proficiency)],['Krąg czarów',p.spell_circle||'—'],['Trafienie krytyczne','20 na k20']]);
       heading('Cechy i rzuty obronne');const grid=node('div','sheet-abilities');
@@ -75,10 +77,10 @@
       if(p.blessed)content.append(node('p','','Błogosławieństwo aktywne.'));
     }
     function spells(p,w){root.BractwoCasterUI.actions(content,p,h);const info=node('div','sheet-spell-summary');info.append(node('span','',`Krąg ${p.spell_circle||0} · mana ${Math.floor(p.mana)}/${p.max_mana}`),node('span','',`F · ${w.spells?.[p.favorite_spell]?.name||'—'}`));content.append(info);
-      const list=node('div','sheet-spell-list');const available=Object.entries(w.spells||{}).filter(([,s])=>s.class_ids.includes(p.class_id)).sort((a,b)=>(h.gate(a[1])-h.gate(b[1]))||(a[1].circle-b[1].circle));let group='';
-      for(const[id,base]of available){const s=root.BractwoRuntime.spellProfile(base,p);const gate=h.gate(s),unlocked=p.level>=gate,label=s.feature?'Zdolności klasy':s.circle?`Krąg ${s.circle}`:'Sztuczki';if(group!==label){heading(label,list);group=label;}
+      const list=node('div','sheet-spell-list');const available=Object.entries(w.spells||{}).filter(([id,s])=>s.class_ids.includes(p.class_id)||p.spell_profiles?.[id]?.available===true).sort((a,b)=>(h.gate(a[1])-h.gate(b[1]))||(a[1].circle-b[1].circle));let group='';
+      for(const[id,base]of available){const s=root.BractwoRuntime.spellProfile(base,p);const gate=h.gate(s),unlocked=s.available??p.level>=gate,label=s.feature?'Zdolności klasy':s.circle?`Krąg ${s.circle}`:'Sztuczki';if(group!==label){heading(label,list);group=label;}
         const row=node('article','sheet-spell'+(unlocked?'':' locked'));row.dataset.spell=id;row.append(image(s.icon||`assets/spells/${id}.svg`));const text=node('div','sheet-spell-text');text.append(node('strong','',s.name));
-        const parts=[s.circle||s.feature?`${h.mana(s)} many`:'Bez many',s.action==='bonus'?'Akcja dodatkowa':s.action==='reaction'?'Reakcja':s.action==='extra'?'Dodatkowa akcja':'Akcja'];if(s.gold)parts.push(s.gold+' zł');if(s.ritual)parts.push('Rytuał '+s.ritual_seconds+' s');if(!unlocked)parts.push(`Od poziomu ${gate}`);text.append(node('small','',parts.join(' · ')));
+        const parts=[s.circle||s.feature?`${h.mana(s)} many`:'Bez many',s.action==='bonus'?'Akcja dodatkowa':s.action==='reaction'?'Reakcja':s.action==='extra'?'Dodatkowa akcja':'Akcja'];if(s.gold)parts.push(s.gold+' zł');if(s.ritual)parts.push('Rytuał '+s.ritual_seconds+' s');if(!unlocked)parts.push(p.level<gate?`Od poziomu ${gate}`:'Czar obecnie niedostępny');text.append(node('small','',parts.join(' · ')));
         // Player-facing original summaries; no implementation labels.
         const desc=String(s.description||'').replace(/W tej adaptacji /g,'').replace(/w adaptacji /g,'').replace(/(\d+) jednost(?:ek|ki)/g,(_,n)=>`${Math.round(Number(n)/6.4)} stóp`);
         if(s.power_summary)text.append(node('p','spell-power-summary',s.power_summary));
@@ -87,8 +89,9 @@
         if(warning)text.append(node('p','spell-concentration-warning',warning));
         if(unlocked&&s.next_upgrade)text.append(node('small','spell-next-upgrade',s.next_upgrade));
         row.append(text);const actions=node('div','sheet-spell-actions'),revert=s.kind==='shape'&&p.form;
-        const usable=unlocked&&p.alive&&(s.kind==='recovery'?root.BractwoCasterUI.canRecover(p):(revert||s.kind==='reaction'||(s.kind==='weapon_trigger'&&p.ensnaring_armed)||(!p.form&&p.mana>=h.mana(s)&&!(p.spell_cooldowns?.[id]>0))));
-        actions.append(button(root.BractwoRuntime.queuedSpellLabel(s,p)|| (revert?'Powrót':s.kind==='reaction'?(p.shield_armed?'Wyłącz':'Włącz'):s.kind==='weapon_trigger'?(p.ensnaring_armed?'Anuluj':'Przygotuj'):'Użyj'),()=>h.cast(id),!usable));
+        const usable=unlocked&&(s.kind==='recovery'?root.BractwoCasterUI.canRecover(p):root.BractwoRuntime.spellUsable(s,p));
+        actions.append(button(root.BractwoRuntime.queuedSpellLabel(s,p)|| (revert?'Powrót':s.kind==='recovery'?'Odpocznij i odzyskaj':s.kind==='reaction'?(p.shield_armed?'Wyłącz':'Włącz'):s.kind==='weapon_trigger'?(p.ensnaring_armed?'Anuluj':'Przygotuj'):'Użyj'),()=>h.cast(id),!usable));
+        root.BractwoCircleSpellUI?.append(actions,p,s,h,unlocked);
         if(unlocked&&s.ritual)actions.append(button('Rytuał · 0 many',()=>h.send({type:'ritual',spell_id:id}),!p.alive||!!p.form||p.combat_remaining>0||!!p.character_sheet?.caster?.channel?.key||p.gold<(s.gold||0)||p.character_sheet?.training?.armor_penalty));
         if(unlocked&&s.power_options?.length>1){
           const power=node('select','spell-power-picker');power.setAttribute('aria-label',`Moc czaru: ${s.name}`);
@@ -102,8 +105,11 @@
       }content.append(list);
     }
     function render(){if(panel.hidden)return;const {player:p,world:w}=h.state();if(!p)return;
+      // Native mobile pickers keep focus after selection: refresh gates without replacing them.
+      if(tab==='feats')root.BractwoCasterUI.syncTraining(content,p,h);
+      if(tab==='spells')root.BractwoCasterUI.syncCircle(content,p,h);
       if(panel.contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
-      const next=JSON.stringify([tab,bagPage,selectedItem,p.inventory,p.equipment,p.level,Math.floor(p.mana),Math.ceil(p.hp),p.hotbar,p.attributes,p.character_sheet,p.skills,p.mastery,p.mastery_points,p.combat_remaining>0,p.bonus_remaining>0,p.xp,p.xp_next,p.max_hp,p.max_mana,p.attack_bonus,p.damage_dice,p.armor_class,p.save_dc,p.attacks_per_round,p.bank_gold,p.soul,p.kills,p.boss_kills,p.gold,p.potions,p.potion_slots,p.form,p.shield_armed,p.ensnaring_armed,p.concentration,p.queued_spell,p.queued_spell?Math.ceil((p.action_remaining||0)*10):0,p.spell_cooldowns,p.spell_profiles,p.status_effects?.map(e=>[e.id,Math.ceil(e.remaining)]),h.canTrade(),h.nearMaster?.()]);if(signature===next)return;signature=next;
+      const next=JSON.stringify([tab,bagPage,selectedItem,p.inventory,p.equipment,p.level,Math.floor(p.mana),Math.ceil(p.hp),p.hotbar,p.attributes,p.character_sheet,p.skills,p.mastery,p.mastery_points,p.combat_remaining>0,p.bonus_remaining>0,p.xp,p.xp_next,p.max_hp,p.max_mana,p.attack_bonus,p.damage_dice,p.armor_class,p.save_dc,p.attacks_per_round,p.bank_gold,p.soul,p.kills,p.boss_kills,p.gold,p.potions,p.potion_slots,p.form,p.shield_armed,p.ensnaring_armed,p.concentration,p.queued_spell,p.queued_spell?Math.ceil((p.action_remaining||0)*10):0,p.spell_cooldowns,p.spell_profiles,p.environment,p.rest_resources,p.status_effects?.map(e=>[e.id,Math.ceil(e.remaining)]),h.canTrade(),h.nearMaster?.()]);if(signature===next)return;signature=next;
       document.getElementById('characterName').textContent=p.name;document.getElementById('characterSubtitle').textContent=`${p.profession||w.classes?.[p.class_id]?.name||''} · poziom ${p.level}`;
       tabButtons.forEach(b=>{const active=b.dataset.characterTab===tab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
       const scroll=content.scrollTop;content.replaceChildren();content.dataset.tab=tab;

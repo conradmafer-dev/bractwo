@@ -286,6 +286,11 @@ DEFAULT_HOTBARS = {
 }
 
 
+def hotbar_signature(p):
+    try:from . import druid_circles as dc
+    except ImportError:import druid_circles as dc
+    return (p.class_id,p.level,getattr(p,'druid_circle',''),getattr(p,'form',''),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),dc.active(p,'grappled'))
+
 def sync_hotbar(p):
     """Preserve valid custom positions, but never hide unlocked spells off-bar."""
     raw = p.hotbar if isinstance(p.hotbar, list) else []
@@ -302,7 +307,7 @@ def sync_hotbar(p):
     while bar and not bar[-1]:bar.pop()
     size=max(HOTBAR_PAGE_SIZE,((len(bar)+HOTBAR_PAGE_SIZE-1)//HOTBAR_PAGE_SIZE)*HOTBAR_PAGE_SIZE)
     p.hotbar=bar+['']*(size-len(bar))
-    p._hotbar_level=(p.class_id,p.level)
+    p._hotbar_level=hotbar_signature(p)
     return p.hotbar
 
 
@@ -320,6 +325,19 @@ def circle_for(class_id, level):
 
 def spell_allowed(p, key):
     s=SPELLS.get(key)
+    try:
+        from . import druid_circles as dc
+    except ImportError:
+        import druid_circles as dc
+    if not s:return False
+    if key=='beast_trample':
+        try:from . import caster_rules
+        except ImportError:import caster_rules
+        return bool(caster_rules.form_spec(p).get('trample'))
+    if key=='escape_grapple':return dc.active(p,'grappled')
+    if key in dc.SPELL_FEATURES:return dc.feature_allowed(p,key)
+    if key in dc.bonus_spells(p):return True
+    if key.startswith('wild_shape_') and hasattr(dc,'form_allowed'):return dc.form_allowed(p,key)
     return bool(s and p.class_id in s['class_ids'] and p.level>=spell_level(s,p.class_id))
 
 

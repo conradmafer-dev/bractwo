@@ -8,10 +8,12 @@ import math
 from dataclasses import dataclass
 from types import SimpleNamespace
 try:
+    from . import rest_rules, druid_circles as circles
     from . import caster_rules as caster, equipment_rules as gear, combat_rules as rules, dnd_content as dnd, spell_scaling, world_content as content
     from .dnd_game import Companion
     from .progression import same_floor
 except ImportError:
+    import rest_rules, druid_circles as circles
     import caster_rules as caster, equipment_rules as gear, combat_rules as rules, dnd_content as dnd, spell_scaling, world_content as content
     from dnd_game import Companion
     from progression import same_floor
@@ -46,8 +48,7 @@ class CasterGame:
 
     def migrate_caster(self,p):
         p.primal_order=p.primal_order if p.class_id=='druid' and p.primal_order in caster.ORDERS else ''
-        raw=p.training_feats if isinstance(p.training_feats,dict) else {}
-        p.training_feats={k:a for k,a in raw.items() if k in gear.GENERAL_FEATS and a in gear.GENERAL_FEATS[k]['abilities']}
+        gear.sanitize_feats(p)
         p.casting_channel={};p.caster_messages=[];p.familiar_state={}
         # Existing medium armor is not deleted or silently turned into a free feat.
         # A legacy druid gets a grace period until the first explicit path choice.
@@ -61,8 +62,8 @@ class CasterGame:
         p.caster_messages=(getattr(p,'caster_messages',[])+[text])[-8:]
 
     def clear_caster_caches(self,p):
-        for key in ('_profile_cache','_profile_signature','_spell_profile_cache','_equipment_preview_cache'):
-            if hasattr(p,key):delattr(p,key)
+        for key in ('_profile_cache','_profile_signature','_spell_profile_cache','_spell_profiles_cache','_equipment_preview_cache'):
+            p.__dict__.pop(key,None)
         p._hotbar_level=None;dnd.sync_hotbar(p)
 
     async def select_primal_order(self,p,key):
@@ -80,14 +81,13 @@ class CasterGame:
         with self.db:self.save_player(p)
         await self.notice(p,'Ścieżka: '+caster.ORDERS[key]['name']+'.'+(' Średni pancerz kupisz lub zdobędziesz.' if key=='warden' else ''))
 
-    async def choose_training_feat(self,p,key,ability):
-        if not isinstance(key,str) or not isinstance(ability,str) or key not in gear.GENERAL_FEATS:return
+    async def choose_training_feat(self,p,key,ability='',abilities=None):
+        if not isinstance(key,str) or key not in gear.GENERAL_FEATS:return
         s=gear.GENERAL_FEATS[key]
         if not p.alive or p.form or p.combat_until>self.now():return await self.notice(p,'Wybierz atut poza walką i przemianą.')
-        if gear.feat_points(p)<1 or not gear.feat_eligible(p,key):return await self.notice(p,'Ten atut jest już posiadany, zbędny albo niedostępny.')
-        if ability not in s['abilities'] or rules.attributes(p)[ability]>=20:return await self.notice(p,'Wybierz cechę poniżej 20.')
         hp_fraction=p.hp/max(1,p.max_hp)
-        p.training_feats[key]=ability
+        reason=gear.select_feat(p,key,ability,abilities)
+        if reason:return await self.notice(p,reason)
         p.hp=min(p.max_hp,hp_fraction*p.max_hp)
         self.clear_caster_caches(p)
         with self.db:self.save_player(p)
@@ -103,27 +103,11 @@ class CasterGame:
         if reason:self.caster_message(p,reason)
 
     async def cast_arcane_recovery(self,p):
-        """Instant, self-only bonus action. Never resets movement or combat state.
-
-        Cooldown and mana are committed together, before any await. A failed use
-        consumes nothing. Recovery is not a spell/ritual: existing concentration
-        and untrained armor do not prevent this class feature.
-        """
-        key='arcane_recovery';p.current_wall_time=now=self.now()
-        if not p.alive or p.disconnected or p.form or not dnd.spell_allowed(p,key):return
-        if p.casting_channel:return await self.notice(p,'Najpierw przerwij trwające rzucanie.')
-        if now<p.spell_cooldowns.get(key,0) or now<p.bonus_cooldown_until:return
+        if p.class_id!='mage' or not p.alive:return
+        if not rest_rules.remaining(p,'arcane_recovery'):
+            return await self.notice(p,'Odzyskanie mocy odnowi długi odpoczynek.')
         if p.mana>=p.max_mana:return await self.notice(p,'Masz już pełną manę.')
-        s=spell_scaling.resolve(p,key)
-        restored=max(0,min(p.max_mana-p.mana,s['restore_mana']))
-        if restored<=0:return
-        self.begin_action(p,True)
-        p.mana=min(p.max_mana,p.mana+restored)
-        p.spell_cooldowns[key]=now+caster.ARCANE_COOLDOWN
-        dnd.record_spell_use(p,key)
-        self.spell_effect(p,key,p,duration=.9,spec=s)
-        with self.db:self.save_player(p)
-        await self.notice(p,f'Odzyskanie mocy: +{restored:g} many.')
+        return await self.start_rest(p,'short',recover=True)
 
     async def start_caster_channel(self,p,key,ritual=False):
         p.current_wall_time=now=self.now()
@@ -179,22 +163,24 @@ class CasterGame:
 
     async def cast_wild_shape(self,p,s):
         now=self.now();p.current_wall_time=now
+        if rules.active_buff(p,'polymorph'):return await self.notice(p,'Polimorfii nie można odwołać Dzikim kształtem.')
         if p.form:
             if now<p.bonus_cooldown_until:return
             self.cancel_channel(p,'');self.begin_action(p,True);p.form='';p.form_until=0;p.form_attack_index=0
             self.spell_effect(p,s['id'],p,spec=s)
             return
-        if now<p.spell_cooldowns.get('wild_shape_shared',0) or now<p.bonus_cooldown_until:return
+        if now<p.bonus_cooldown_until:return
+        if not circles.spend_shape(p):return await self.notice(p,"Brak użyć Dzikiego kształtu. Odpocznij.")
         self.cancel_channel(p,'');self.begin_action(p,True)
         p.form=s['form'];p.form_until=now+caster.form_duration(p);p.form_attack_index=0
-        p.temp_hp=max(p.temp_hp,caster.effective_level(p))
+        p.temp_hp=max(p.temp_hp,circles.form_temp_hp(p))
         self.set_shape_cooldown(p,now)
         dnd.record_spell_use(p,s['id']);self.spell_effect(p,s['id'],p,spec=s)
         with self.db:self.save_player(p)
 
     def set_shape_cooldown(self,p,now):
         for key in ('wild_shape_shared','wild_companion',*('wild_shape_'+f for f in caster.FORMS)):
-            p.spell_cooldowns[key]=now+caster.SHAPE_COOLDOWN
+            p.spell_cooldowns.pop(key,None)
 
     async def cast_spell(self,p,key,enemy_id=None,target_id=None,queue=True):
         s=dnd.SPELLS.get(key) if isinstance(key,str) else None
@@ -208,7 +194,8 @@ class CasterGame:
         if s['kind']=='shape':return await self.cast_wild_shape(p,spell_scaling.resolve(p,key))
         if s['kind']=='wild_familiar':
             if p.form:return await self.notice(p,'Przywołaj towarzysza po zakończeniu przemiany.')
-            if self.now()<p.spell_cooldowns.get('wild_shape_shared',0) or self.now()<p.attack_cooldown_until:return
+            if self.now()<p.attack_cooldown_until:return
+            if not circles.spend_shape(p):return await self.notice(p,"Brak użyć Dzikiego kształtu. Odpocznij.")
             self.cancel_channel(p,'');self.begin_action(p);self.set_shape_cooldown(p,self.now());self.summon_familiar(p)
             dnd.record_spell_use(p,key);self.spell_effect(p,key,p,spec=s)
             with self.db:self.save_player(p)

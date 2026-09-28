@@ -1,0 +1,32 @@
+{
+  "revision": "UI_09",
+  "date": "2026-09-28",
+  "scope": "Mobile hotbar scrolling with a second finger while the joystick stays held.",
+  "targeted_tests": {
+    "passed": 10,
+    "failed": 0,
+    "duration_ms": 1344.6864,
+    "files": {
+      "tests/test_hotbar_scroll_ui09.cjs": 4,
+      "tests/test_multitouch_ui03.cjs": 6
+    },
+    "method": "Real runtime functions with a capture/bubble event harness, pointer capture transfer and the production game releasePointer handler.",
+    "coverage": [
+      "A non-primary touch scrolls the hotbar while the joystick retains its pointer and movement vector.",
+      "Transfer of implicit capture from a spell button to the viewport does not terminate the swipe.",
+      "A swipe, including return to its starting position, never casts; compatibility clicks are suppressed.",
+      "A subsequent spell tap and native mouse/keyboard clicks still activate normally.",
+      "Separate pointer IDs, cancellation, disabled-slot/gap starts and scroll bounds are handled independently.",
+      "Desktop mode and a non-overflowing hotbar do not capture the scrolling gesture."
+    ]
+  },
+  "syntax_passed": ["web/runtime.js", "web/game.js", "tools/package_0818.py"],
+  "source_review": [
+    "Mobile viewport and slots use touch-action none with scroll snapping disabled.",
+    "Pointer capture begins only beyond the 12-pixel horizontal swipe threshold, preserving taps.",
+    "Disabled mobile slots allow gestures to start on the underlying viewport.",
+    "Pointerup continues to the game handler; scrolling does not reset joystick controls."
+  ],
+  "not_run": ["Browser or physical phone session", "Game server startup", "Full regression suites"],
+  "deployment": "Local source and release packages only; no live deployment or player database changes."
+}

@@ -81,7 +81,7 @@
    actions.append(button('Sprzedaj'+(item.slot==='potion'?' 1':'')+' · '+(item.value||0)+' zł',()=>h.send({type:'sell',uid:item.uid}),!p.alive));
    if((item.quantity||1)>1)actions.append(button('Stos · '+(item.value||0)*item.quantity+' zł',()=>h.send({type:'sell',uid:item.uid,quantity:item.quantity}),!p.alive));
   }
-  pane.append(actions);return pane;
+  head.after(actions);return pane;
  }
  function createMerchant(h){
   const panel=node('section',undefined,'merchant-panel');panel.hidden=true;panel.id='merchantPanel';panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Kupiec');

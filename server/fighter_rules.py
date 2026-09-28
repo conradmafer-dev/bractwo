@@ -89,9 +89,9 @@ def class_sheet(p):
 def configure(items, spells, classes):
     """Called after the older loot/rarity passes; do not clobber their bonuses."""
     classes['knight'].update(description='Styl walki, mistrzostwo broni, kolczuga i tarcza. Drugi oddech bez many.',
-        ability_cost=0, ability_cooldown=SECOND_WIND_COOLDOWN)
-    spells['second_wind'].update(mana=0, cooldown=SECOND_WIND_COOLDOWN,
-        description='Akcja dodatkowa: odzyskaj 1k10 + premię wojownika HP. Premia +1 co 5 poziomów. Bez many. Odnowienie: 60 s.')
+        ability_cost=0, ability_cooldown=0)
+    spells['second_wind'].update(mana=0, cooldown=0,
+        description='Akcja dodatkowa: odzyskaj 1k10 + poziom D&D HP. Krótki odpoczynek odnawia jedno użycie, długi wszystkie.')
     # The three implemented mastery types; variants retain their original damage.
     for key, item in items.items():
         if item.get('slot') != 'weapon': continue

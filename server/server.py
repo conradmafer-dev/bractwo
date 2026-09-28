@@ -22,7 +22,7 @@ import time
 from aiohttp import web, WSMsgType
 try:
     from . import world_content as content
-    from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content
+    from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     from .combat_rules import CombatRounds
     from .dnd_game import DNDGame
     from . import dnd_content
@@ -31,11 +31,15 @@ try:
     from .fighter_rules import FighterGame
     from . import equipment_rules, caster_rules
     from .caster_game import CasterGame
+    from . import rest_rules, druid_circles, environment_rules
+    from .environment_rules import EnvironmentGame
+    from .druid_circle_game import DruidCircleGame
+    from .druid_circle_spells import DruidCircleSpells, configure as configure_circle_spells
     from .progression import ExpansionGame, same_floor, near, train, skill_level, private_state
     from . import progression_guide
 except ImportError:
     import world_content as content
-    import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content
+    import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     from combat_rules import CombatRounds
     from dnd_game import DNDGame
     import dnd_content
@@ -44,6 +48,10 @@ except ImportError:
     from fighter_rules import FighterGame
     import equipment_rules, caster_rules
     from caster_game import CasterGame
+    import rest_rules, druid_circles, environment_rules
+    from environment_rules import EnvironmentGame
+    from druid_circle_game import DruidCircleGame
+    from druid_circle_spells import DruidCircleSpells, configure as configure_circle_spells
     from progression import ExpansionGame, same_floor, near, train, skill_level, private_state
     import progression_guide
 
@@ -83,13 +91,13 @@ PVP_RULES = {"min_level": 8, "white_seconds": 120, "combat_seconds": 20,
              "normal_gold_loss": .05, "normal_xp_loss": .10,
              "red_gold_loss": .20, "red_xp_loss": .20,
              "red_item_loss": "one_unequipped; transferred_to_killer_if_space_else_destroyed"}
-REST_RULES = {"short_seconds": 15, "long_seconds": 15,
-              "short_hp_fraction": 1.0, "short_mana_fraction": 1.0,
-              "cooldown_seconds": 60, "pve_delay_seconds": 3, "long_safe_only": True}
+REST_RULES = {"short_seconds": 10, "long_seconds": 30,
+              "short_cooldown_seconds": 15, "long_cooldown_seconds": 60,
+              "pve_delay_seconds": 3, "long_safe_only": False}
 
 
-def rest_block_status(p, now, simulation_time):
-    """Rest has its own PvE wait; combat/logout and mana recovery stay unchanged."""
+def rest_block_status(p, now, simulation_time, kind=None):
+    """Rest has its own PvE wait and per-kind completion deadline."""
     if not p.alive:
         return "dead", 0
     if p.disconnected:
@@ -105,7 +113,7 @@ def rest_block_status(p, now, simulation_time):
         return "combat_pvp", max(pvp, pve)
     if pve:
         return "combat_pve", pve
-    cooldown = max(0, p.rest_cooldown_until-now)
+    cooldown = max(0, (p.rest_resources.get(kind+"_ready",0) if kind else 0)-now)
     if cooldown:
         return "cooldown", cooldown
     return "", 0
@@ -201,6 +209,18 @@ ENEMY_TYPES = {
 }
 
 
+content.STARTER_SPAWNS = [
+    ("wolf", 600, 790), ("wolf", 650, 620), ("wolf", 970, 640), ("wolf", 1090, 870),
+    ("wolf", 990, 280), ("wolf", 1280, 840),
+    ("wisp", 1940, 1010), ("wisp", 2140, 1240), ("wisp", 1880, 1530),
+    ("guardian", 2500, 750), ("guardian", 2660, 1030), ("guardian", 2190, 510),
+    ("boss", 2530, 1900),
+    ("rat", 810, 1460), ("rat", 700, 1580), ("rat", 910, 1660),
+    ("boar", 1060, 1840), ("boar", 1240, 1930), ("boar", 460, 530),
+    ("goblin", 1320, 580), ("goblin", 1350, 390), ("goblin", 1160, 200),
+    ("spider", 1840, 1900), ("spider", 2120, 1740), ("spider", 2100, 1490),
+    ("skeleton", 2720, 520), ("skeleton", 2630, 320), ("skeleton", 2880, 980),
+]
 content.configure(ITEMS, ZONES, NPCS, LANDMARKS, QUESTS, ENEMY_TYPES, OBSTACLES, MERCHANT)
 content.QUESTS_REF = QUESTS
 content.expand_wilderness(ZONES, NPCS, LANDMARKS, OBSTACLES)
@@ -211,6 +231,7 @@ combat_rules.configure(ITEMS, ENEMY_TYPES)
 hunt_content.configure(ENEMY_TYPES)
 loot_content.configure(ITEMS, ENEMY_TYPES, content.TIER_LEVELS)
 hunt_content.place(content, OBSTACLES, LANDMARKS)
+discovery_rules.configure(content, LANDMARKS, ZONES, ENEMY_TYPES)
 content.VERSION = "0.8.18"
 WIDTH, HEIGHT = content.WIDTH, content.HEIGHT
 for tier, level, amount, cost in ((2, 20, 220, 45), (3, 50, 520, 95), (4, 80, 950, 165)):
@@ -221,6 +242,10 @@ inventory_rules.configure(ITEMS, POTIONS)
 fighter_rules.configure(ITEMS, dnd_content.SPELLS, CLASSES)
 equipment_rules.configure(ITEMS)
 caster_rules.configure(dnd_content.SPELLS, CLASSES, dnd_content.STATUS_SPECS)
+druid_circles.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
+configure_circle_spells(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
+rest_rules.configure(dnd_content.SPELLS)
+environment_rules.configure_world()
 dnd_content.DEFAULT_HOTBARS["knight"] = ["second_wind", "action_surge"]
 dnd_content.STATUS_SPECS.update({
     "sap": dict(name="Osłabienie",icon="⚔",description="Następny rzut ataku z utrudnieniem. Efekt kończy się po tym ataku lub przed kolejną rundą wojownika.",harmful=True),
@@ -273,11 +298,20 @@ class Player:
     mastery: dict = field(default_factory=dict)
     primal_order: str = ""
     training_feats: dict = field(default_factory=dict)
+    druid_circle: str = ""
+    druid_circle_state: dict = field(default_factory=dict)
+    druid_circle_runtime: dict = field(default_factory=dict)
+    rest_resources: dict = field(default_factory=dict)
+    submerged: bool = False
+    breath_until: float = 0
+    exhaustion: int = 0
+    _feat_turn_until: float = 0
+    _savage_attack_used: bool = False
     caster_rules_version: int = 0
     legacy_medium_grace: bool = False
     casting_channel: dict = field(default_factory=dict)
     rest_state: dict = field(default_factory=dict)  # Session only; never persisted.
-    rest_cooldown_until: float = 0  # Persisted wall-clock deadline, shared by all rest entry points.
+    rest_cooldown_until: float = 0  # Legacy save field; new deadlines are in rest_resources.
     familiar_state: dict = field(default_factory=dict)
     caster_messages: list = field(default_factory=list)
     form_attack_index: int = 0
@@ -387,7 +421,8 @@ class Player:
         if freedom:surface=max(1.0,surface)
         slow=0.0 if combat_rules.active_buff(self,'restrained') else .25 if combat_rules.active_buff(self,'growth') else .5 if combat_rules.active_buff(self,'slow') else 1.0
         if combat_rules.active_buff(self,"prone"):return 0
-        return (self.base_speed*(caster_rules.form_spec(self).get('speed',30)/30 if self.form else 1)-equipment_rules.armor_speed_penalty(self)+(dnd_content.LONGSTRIDER_SPEED_BONUS if combat_rules.active_buff(self,'longstrider') else 0))*(1.2 if self.premium_demo_until > self.current_wall_time else 1)*(1.15 if self.wind_until > self.current_wall_time else 1)*surface*(1.0 if freedom else slow)
+        speed=(self.base_speed*(caster_rules.form_spec(self).get('speed',30)/30 if self.form else 1)-equipment_rules.armor_speed_penalty(self)+(dnd_content.LONGSTRIDER_SPEED_BONUS if combat_rules.active_buff(self,'longstrider') else 0))*(1.2 if self.premium_demo_until > self.current_wall_time else 1)*(1.15 if self.wind_until > self.current_wall_time else 1)*(1.0 if freedom else slow)
+        return environment_rules.movement_speed(self,max(0,speed-self.exhaustion*5*100/30),surface)
 
     @property
     def max_hp(self):
@@ -450,6 +485,13 @@ class Player:
                   "pvp_combat_remaining": max(0, self.pvp_combat_until-now), "disconnected": self.disconnected,
                   "party_id": self.party_id, "party_members": party_members or []}
         result["status_effects"] = dnd_content.status_effects(self.buffs,now,self)
+        result['environment']=environment_rules.public(self)
+        aura=self.buffs.get('wrath_of_sea',{})
+        sanctuary=druid_circles.runtime(self).get('sanctuary')
+        result['circle_visual']={'starry_form':druid_circles.starry_form(self),
+            'sea_radius':(64 if aura.get('level',0)>=25 else 32) if aura.get('until',0)>now else 0,
+            'sanctuary':sanctuary if sanctuary and sanctuary.get('until',0)>now else None,
+            'flight':environment_rules.flying(self),'submerged':self.submerged}
         if private:
             inventory_rules.ensure(self, ITEMS, POTIONS, make_item)
             try:
@@ -460,13 +502,16 @@ class Player:
             result['item_previews'] = equipment_rules.shop_previews(self)
             result['spell_profiles'] = spell_scaling.client_profiles(self)
             result.update(level_up.pending(self))
-            if self._hotbar_level != (self.class_id,self.level):dnd_content.sync_hotbar(self)
+            if self._hotbar_level != dnd_content.hotbar_signature(self):dnd_content.sync_hotbar(self)
             result.update(private_state(self, now))
             rest_reason, rest_wait = rest_block_status(self, now, simulation_time)
             result.update({"rest": {"kind": self.rest_state["kind"], "total": self.rest_state["total"],
                                      "remaining": round(max(0, self.rest_state["until"]-now), 3)} if self.rest_state else {},
                            "rest_block_reason": rest_reason, "rest_block_remaining": round(rest_wait, 3),
-                           "rest_cooldown_remaining": round(max(0, self.rest_cooldown_until-now), 3),
+                           "rest_cooldown_remaining": 0,
+                           "rest_short_remaining": round(max(0,self.rest_resources.get("short_ready",0)-now),3),
+                           "rest_long_remaining": round(max(0,self.rest_resources.get("long_ready",0)-now),3),
+                           "rest_resources": rest_rules.sheet(self),
                            "rest_safe": any(near(self, zone) for zone in content.CITIES)})
             result.update({"action_remaining": round(max(0, self.attack_cooldown_until-now), 3),
                            "action_duration": combat_rules.ROUND_SECONDS,
@@ -518,6 +563,7 @@ class Player:
     def save_data(self):
         return {key: getattr(self, key) for key in (
             "primal_order", "training_feats", "caster_rules_version", "legacy_medium_grace",
+            "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "exhaustion",
             "fighting_style", "weapon_grip", "fighter_rules_version",
             "level_up_batches", "rules_version", "mana_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
             "site_cooldowns", "wind_until", "ward_until", "premium_demo_until", "floor", "skill_tries", "promoted", "soul", "runes", "bank_gold", "depot", "home_city", "blessed", "mastery", "spell_cooldowns", "spell_ready", "rune_ready", "haste_until", "transition_ready",
@@ -577,12 +623,15 @@ class Enemy:
         return ENEMY_TYPES[self.kind]["hp"]
 
     def public(self, now=0):
+        self.current_wall_time=now
+        spec=environment_rules.enemy_spec(self)
         return {"id": self.id, "kind": self.kind, "name": ENEMY_TYPES[self.kind]["name"], "x": round(self.x, 2),
+                "form":getattr(self,'form',''), "temp_hp":getattr(self,'temp_hp',0),
                 "y": round(self.y, 2), "floor": self.floor, "hp": round(self.hp, 1), "max_hp": self.max_hp, "alive": self.alive,
-                "attack_until": self.attack_until, "facing": self.facing, "armor_class": ENEMY_TYPES[self.kind]["armor_class"], "attack_bonus": ENEMY_TYPES[self.kind]["attack_bonus"], "damage_dice": combat_rules.dice_text(ENEMY_TYPES[self.kind]["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
+                "attack_until": self.attack_until, "facing": self.facing, "armor_class": spec["armor_class"], "attack_bonus": spec["attack_bonus"], "damage_dice": combat_rules.dice_text(spec["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
 
 
-class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
+class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
     def __init__(self, db_path, clock=None):
         self.clock = clock or time.time
         self.rng = random.Random()
@@ -604,18 +653,8 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         self.effects, self.effect_serial = [], 0
         self.hazards = []
         self.init_dnd()
-        for i, (kind, x, y) in enumerate([
-            ("wolf", 600, 790), ("wolf", 650, 620), ("wolf", 970, 640), ("wolf", 1090, 870),
-            ("wolf", 990, 280), ("wolf", 1280, 840),
-            ("wisp", 1940, 1010), ("wisp", 2140, 1240), ("wisp", 1880, 1530),
-            ("guardian", 2500, 750), ("guardian", 2660, 1030), ("guardian", 2190, 510),
-            ("boss", 2530, 1900),
-            ("rat", 810, 1460), ("rat", 700, 1580), ("rat", 910, 1660),
-            ("boar", 1060, 1840), ("boar", 1240, 1930), ("boar", 460, 530),
-            ("goblin", 1320, 580), ("goblin", 1350, 390), ("goblin", 1160, 200),
-            ("spider", 1840, 1900), ("spider", 2120, 1740), ("spider", 2100, 1490),
-            ("skeleton", 2720, 520), ("skeleton", 2630, 320), ("skeleton", 2880, 980),
-        ]):
+        self.init_circle_spells()
+        for i, (kind, x, y) in enumerate(content.STARTER_SPAWNS):
             e = Enemy("boss" if kind == "boss" else f"e{i}", kind, x, y, ENEMY_TYPES[kind]["hp"], x, y)
             e.aoe_ready = 7
             self.enemies[e.id] = e
@@ -657,6 +696,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                 "terrain": content.TERRAIN, "surfaces": content.SURFACES, "premium": content.PREMIUM,
                 "elevations": content.ELEVATIONS, "waterways": content.WATERWAYS, "bridges": content.BRIDGES,
                 "pois": content.POIS, "canyons": content.CANYONS, "rarities": loot_tables.RARITIES,
+                "environment_trees": self.environment_trees(),
                 "dungeons": content.DUNGEONS, "hunting_grounds": content.HUNTING_GROUNDS, "roads": content.ROADS, "safe_zones": content.CITIES,
                 "spells": content.SPELLS, "class_progression": progression_guide.catalog(), "default_hotbars": dnd_content.DEFAULT_HOTBARS, "status_catalog": dnd_content.STATUS_SPECS, "runes": content.RUNES, "milestones": [{"level":v[0], "name":v[1], "description":v[2]} for v in content.MILESTONES],
                 "width": WIDTH, "height": HEIGHT, "sites": [], "chests": [], "obstacles": OBSTACLES,
@@ -682,7 +722,9 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                 "companions": [c.public() for c in (*self.companions.values(),*self.familiars.values()) if visible(c)],
                 "alarms": [dict(x=a["x"],y=a["y"],floor=a["floor"],remaining=max(0,a["until"]-now)) for owner,a in self.alarms.items() if owner==pid],
                 "enemies": [e.public(now) for e in (self.nearby_enemies(viewer, 1800) if viewer else self.enemies.values()) if visible(e)], "world": dict(self.flags),
-                "active_field_effects": [f.get("effect_id", "") for f in self.spell_fields],
+                "active_field_effects": [f.get("effect_id", "") for f in self.environment_fields()],
+                "circle_fields": [{k:f[k] for k in ('id','key','x','y','floor','radius','direction','segments','concentration') if k in f}|{k:f.get('profile',{})[k] for k in ('length','water_variant','damage_type') if k in f.get('profile',{})}
+                    for f in getattr(self,'circle_spell_fields',[]) if f.get('until',0)>now and (viewer is None or same_floor(viewer,f) and point_distance(viewer,f)<=2200)],
                 "effects": [dict(effect) for effect in self.effects if self.time-effect["time"] <= max(1.5,effect.get("duration",0)) and (viewer is None or (same_floor(viewer, effect) and point_distance(viewer, effect) <= 1800))]}
 
     def persist(self, extra_players=()):
@@ -703,6 +745,8 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         p.weapon = p.spec["weapon"]
         self.migrate_fighter(p, make_item)
         self.migrate_caster(p)
+        self.migrate_druid_circle(p)
+        rest_rules.migrate(p,self.now())
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
 
     def load_player(self, pid, name, ws, saved):
@@ -724,6 +768,8 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
         self.migrate_fighter(p, make_item)
         self.migrate_caster(p)
+        self.migrate_druid_circle(p)
+        rest_rules.migrate(p,self.now())
         if "mana" not in saved:
             p.mana = p.max_mana
         p.hp, p.mana = min(p.hp, p.max_hp), min(p.mana, p.max_mana)
@@ -839,7 +885,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
     def in_safe(self, p):
         return any(near(p, zone) for zone in content.CITIES)
 
-    def blocked(self, x, y, radius=RADIUS, floor=0):
+    def blocked(self, x, y, radius=RADIUS, floor=0, ignore_water=False, ignore_low=False):
         if x < radius or y < radius or x > WIDTH-radius or y > HEIGHT-radius:
             return True
         if floor != 0:
@@ -849,10 +895,12 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                     return True
         for cx in range(int((x-radius)//256), int((x+radius)//256)+1):
             for cy in range(int((y-radius)//256), int((y+radius)//256)+1):
-                if any(intersects(x, y, r, radius) for r in self.obstacle_cells.get((floor,cx,cy), [])):
+                if any(intersects(x, y, r, radius) for r in self.obstacle_cells.get((floor,cx,cy), []) if not (ignore_low and r.get('type') in ('rock','grove'))):
                     return True
+        if self.environment_wall_blocked(x,y,radius,floor):return True
         if floor != 0:
             return False
+        if ignore_water:return False
         if content.WATER_MAP.blocked(x, y, radius):
             return True
         if y-radius < RIVER["h"] and x+radius > RIVER["x"] and x-radius < RIVER["x"]+RIVER["w"]:
@@ -861,9 +909,11 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         return False
 
     def move(self, obj, dx, dy):
+        if environment_rules.immobile(obj,self.now()) and not getattr(obj,'_environment_forced',False):return
+        old_x,old_y=obj.x,obj.y
         parts = max(1, math.ceil(max(abs(dx), abs(dy))/10))
         def allowed(x, y):
-            if self.blocked(x, y, floor=obj.floor):
+            if self.blocked_for(obj,x,y):
                 return False
             if (isinstance(obj, Player) or getattr(obj, "is_companion", False)) and obj.pvp_combat_until > self.now():
                 for zone in content.CITIES:
@@ -880,12 +930,13 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                 obj.y += dy/parts
         if isinstance(obj, Enemy):
             self.reindex_enemy(obj)
+        if hasattr(self,'circle_note_movement'):self.circle_note_movement(obj,old_x,old_y)
 
     def line_clear(self, a, b):
         if not same_floor(a, b):
             return False
         steps = max(1, math.ceil(distance(a, b)/12))
-        return all(not self.blocked(a.x+(b.x-a.x)*i/steps, a.y+(b.y-a.y)*i/steps, 2, floor=a.floor) for i in range(1, steps))
+        return all(not self.blocked(a.x+(b.x-a.x)*i/steps, a.y+(b.y-a.y)*i/steps, 2, floor=a.floor,ignore_water=True) for i in range(1, steps))
 
     def award(self, p, xp, gold):
         p.xp += int(xp)
@@ -992,13 +1043,13 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
             self.caster_message(p, message)
         return True
 
-    async def start_rest(self, p, kind="short"):
+    async def start_rest(self, p, kind="short", recover=True):
         if not isinstance(kind, str) or kind not in ("short", "long"):
             return await self.notice(p, "Wybierz krótki albo długi odpoczynek.")
         if p.rest_state:
             return await self.notice(p, "Odpoczynek już trwa.")
         now = self.now()
-        reason, remaining = rest_block_status(p, now, self.time)
+        reason, remaining = rest_block_status(p, now, self.time, kind)
         if reason:
             messages = {"dead": "Nie możesz odpoczywać po śmierci.",
                         "disconnected": "Odpoczynek wymaga połączenia z grą.",
@@ -1008,13 +1059,13 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                         "combat_pvp": f"Odpoczynek po walce PvP za {math.ceil(remaining)} s.",
                         "combat_pve": f"Odpoczynek po walce za {math.ceil(remaining)} s."}
             return await self.notice(p, messages[reason])
-        if kind == "long" and not self.in_safe(p):
+        if kind == "long" and REST_RULES['long_safe_only'] and not self.in_safe(p):
             return await self.notice(p, "Długi odpoczynek wymaga bezpiecznej strefy miasta. W terenie wybierz krótki.")
         seconds = REST_RULES[kind+"_seconds"]
         self.stop_auto(p)
         p.rest_state = {"kind": kind, "total": seconds, "until": now+seconds,
-                        "x": p.x, "y": p.y, "floor": p.floor}
-        await self.notice(p, f'Pełny odpoczynek · {seconds} s. Ruch lub akcja przerywa odpoczynek.')
+                        "x": p.x, "y": p.y, "floor": p.floor, "recover": bool(recover)}
+        await self.notice(p, f'{"Krótki" if kind=="short" else "Długi"} odpoczynek · {seconds} s. Ruch lub akcja przerywa odpoczynek.')
 
     def tick_rest(self, p):
         rest = p.rest_state
@@ -1023,24 +1074,23 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         now = self.now()
         reason, _ = rest_block_status(p, now, self.time)
         if (reason or (p.x, p.y, p.floor) != (rest["x"], rest["y"], rest["floor"])
-                or (rest["kind"] == "long" and not self.in_safe(p))):
+                or (rest["kind"] == "long" and REST_RULES['long_safe_only'] and not self.in_safe(p))):
             self.cancel_rest(p)
             return
         if now < rest["until"]:
             return
         p.rest_state = {}
-        if rest["kind"] == "long":
-            p.hp, p.mana = p.max_hp, p.max_mana
-        else:
-            p.hp = min(p.max_hp, p.hp+p.max_hp*REST_RULES["short_hp_fraction"])
-            p.mana = min(p.max_mana, p.mana+p.max_mana*REST_RULES["short_mana_fraction"])
-        # Start the shared lock only when resources were actually awarded. Save
-        # the absolute deadline alongside those resources in the same transaction.
-        p.rest_cooldown_until = now+REST_RULES["cooldown_seconds"]
+        summary=rest_rules.finish(p,rest["kind"],self.combat_rng,rest.get("recover",True))
+        self.on_circle_rest(p,rest["kind"])
+        p.rest_resources[rest["kind"]+"_ready"]=now+REST_RULES[rest["kind"]+"_cooldown_seconds"]
+        p.rest_cooldown_until=0
+        if rest["kind"]=="long":
+            self.break_concentration(p);p.form="";p.form_until=0
+            p.buffs={};p.druid_circle_runtime={}
         with self.db:
             self.save_player(p)
         self.combat_effect(p, "heal", radius=65, duration=.9)
-        self.caster_message(p, "Odpoczynek zakończony: pełne zdrowie i mana.")
+        self.caster_message(p, "Długi odpoczynek: pełne zdrowie, mana i użycia zdolności." if rest["kind"]=="long" else f'Krótki odpoczynek: +{summary["hp"]:g} HP ({summary["hit_dice"]} kości), +{summary["mana"]:g} many; odnowiono zdolności krótkiego odpoczynku.')
 
     def begin_action(self, p, bonus=False):
         self.cancel_rest(p)
@@ -1346,7 +1396,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         if p is None:
             return await self.error(ws, "Najpierw zaloguj postać.")
         if kind == "rest":
-            return await self.start_rest(p, data.get("kind", "short"))
+            return await self.start_rest(p, data.get("kind", "short"),data.get("recover",True) is not False)
         if kind == "rest_cancel":
             self.cancel_rest(p)
             return
@@ -1354,8 +1404,15 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
             if level_up.dismiss(p, data.get("id")):
                 self.persist()
             return
+        if kind == "cast_circle_spell":
+            if environment_rules.incapacitated(p,self.now()):return
+            return await self.cast_circle_spell(p,data.get("spell"),data.get("enemy_id"),data.get("target_id"),data.get("options"))
+        if kind == "circle_spell_action":return await self.circle_spell_action(p,data.get("action"),data)
+        if kind == "environment_action":return await self.environment_action(p,data.get("action"),data.get("enabled"),data.get("enemy_id"),data.get("target_id"))
+        if kind == "druid_circle":return await self.select_druid_circle(p,data.get("circle"),data.get("land","arid"))
+        if kind == "circle_command":return await self.circle_command(p,data.get("action"),data.get("value"))
         if kind == "primal_order":return await self.select_primal_order(p,data.get("order"))
-        if kind == "training_feat":return await self.choose_training_feat(p,data.get("feat"),data.get("ability"))
+        if kind == "training_feat":return await self.choose_training_feat(p,data.get("feat"),data.get("ability",''),data.get("abilities"))
         if kind == "ritual":return await self.start_caster_channel(p,data.get("spell_id"),ritual=True)
         if kind == "channel_cancel":self.cancel_channel(p);return
         if kind == "familiar_command":return await self.familiar_command(p,data.get("mode"))
@@ -1473,7 +1530,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         else:
             await self.error(ws, "Nieznana komenda.")
 
-    def damage_player(self, p, damage, killer=None, unjust=False, rolled=False, damage_type="bludgeoning", damage_components=None):
+    def damage_player(self, p, damage, killer=None, unjust=False, rolled=False, damage_type="bludgeoning", damage_components=None, is_attack=False, source=None):
         if not p.alive:
             return
         now = self.now()
@@ -1483,12 +1540,13 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
         p.current_wall_time=now
         # Rolled combat uses KP for defense; do not subtract the old armor twice.
         def resist(amount, kind):
-            amount=max(0,int(amount))
+            amount=max(0,int(amount)-equipment_rules.heavy_armor_reduction(p,kind,is_attack=is_attack))
             amount=int(amount*combat_rules.resistance_multiplier(p,kind))
             return amount
         # Separate mixed damage (Ice Storm, Meteor Swarm, Hunter's Mark) before resistance.
         actual=sum(resist(c['damage'],c['type']) for c in damage_components) if damage_components is not None else resist(damage,damage_type)
         if actual<=0:return
+        damage_received=actual
         self.cancel_channel(p)
         self.concentration_damage(p,actual)
         if p.temp_hp>0:
@@ -1505,6 +1563,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
             p.last_pvp_hit_until = now+PVP_RULES["combat_seconds"]
         train(p, "shielding")
         p.hp = max(0, p.hp-actual)
+        self.circle_spell_damage_received(p,damage_received,source or killer)
         if p.alive:
             return
         # A monster finishing a recently assaulted victim does not erase the crime.
@@ -1571,14 +1630,7 @@ class Game(CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, Monste
                 continue
             if not p.disconnected and self.time-p.input_time <= .35:
                 self.move(p, p.dx*p.speed*dt, p.dy*p.speed*dt)
-            if p.combat_until <= now and p.pvp_combat_until <= now:
-                safe=self.in_safe(p)
-                if now>=p.mana_recovery_until and not p.casting_channel:
-                    seconds=dnd_content.MANA_RECOVERY_SAFE_SECONDS if safe else dnd_content.MANA_RECOVERY_FIELD_SECONDS
-                    p.mana=min(p.max_mana,p.mana+p.max_mana/seconds*dt*(1.25 if p.promoted else 1))
-                if safe:p.hp = min(p.max_hp, p.hp+2*dt)
-            if p.promoted and p.combat_until <= now:
-                p.hp = min(p.max_hp, p.hp+dt*2)
+            # Health and spell resources recover through the explicit rest rules.
             if not p.disconnected:
                 self.discover_landmarks(p)
             p.unjust_kills = [t for t in p.unjust_kills if t > now-86400]
@@ -1729,7 +1781,7 @@ def create_app(db_path="world.sqlite3", clock=None):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css")]:
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

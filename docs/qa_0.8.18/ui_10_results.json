@@ -1,0 +1,20 @@
+{
+  "revision": "UI_10",
+  "date": "2026-09-28",
+  "scope": "Small mobile camera presentation change; syntax and focused source review only.",
+  "syntax": {
+    "method": "node --check",
+    "passed": ["web/game.js"]
+  },
+  "source_review": [
+    "The existing world scale is multiplied by 0.85 only when BractwoMobile.active() is true.",
+    "The same mobile media query is shared with the HUD; resize recalculates the scale after orientation changes.",
+    "mobile.js is loaded before game.js, so active() exists before the initial resize call.",
+    "Pointer-to-world conversion, hit testing, world visibility, ground chunks and minimap camera bounds already use camera.scale.",
+    "Joystick direction uses its DOM rectangle, and no UI/CSS dimensions or desktop scale are changed."
+  ],
+  "mobile_world_scale_factor": 0.85,
+  "visible_span_increase_percent_approx": 18,
+  "not_run": ["New automated gameplay tests", "Browser or physical phone session", "Full regression suites"],
+  "deployment": "Local source and release packages only; no live deployment or player database changes."
+}

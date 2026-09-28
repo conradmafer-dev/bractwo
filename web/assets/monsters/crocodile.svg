@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="80" viewBox="0 0 320 80" shape-rendering="crispEdges">
+  <title>Krokodyl bagienny — cztery klatki chodu</title>
+  <defs>
+    <!-- Low, armoured silhouette; flat muzzle and a tapered tail, facing right. -->
+    <g id="body">
+      <path fill="#294830" d="M24 47h5v-5h6v-3h4v3h7v-3h4v4h7v3h4v-3h5v4h10v3h3v9h-4v3H55v2H30v-3h-6z"/>
+      <path fill="#52794b" d="M27 49h4v-5h22v3h5v3h17v3h2v4H54v4H31v-3h-4z"/>
+      <path fill="#77944f" d="M31 45h5v-3h2v3h9v-3h2v4h6v4H32zM58 48h6v-2h1v4h9v2H58z"/>
+      <path fill="#9aa866" d="M31 58h21v-3h25v3h-3v2H53v2H32z"/>
+      <path fill="#385a39" d="M33 48h4v3h-4zM41 47h4v3h-4zM49 49h4v3h-4zM29 53h4v3h-4zM37 53h4v3h-4zM45 54h4v3h-4zM57 54h20v2H57z"/>
+      <path fill="#b7b66a" d="M34 43h3v2h-3zM47 44h3v2h-3zM60 46h4v3h-4z"/>
+      <path fill="#152c24" d="M62 46h2v3h-2zM74 51h2v2h-2z"/>
+      <path fill="#e5deaf" d="M66 55h2v3h-2zM72 55h2v3h-2z"/>
+    </g>
+    <g id="tail-straight">
+      <path fill="#294830" d="M2 47h8v3h8v2h10v10H18v-4h-7v-3H6v-3H2z"/>
+      <path fill="#52794b" d="M6 49h4v3h9v2h9v6h-9v-4h-7v-3H6z"/>
+      <path fill="#819b52" d="M14 52h4v2h7v3h-5v-1h-6z"/>
+    </g>
+    <g id="tail-up">
+      <path fill="#294830" d="M3 43h5v5h6v3h8v2h7v9H18v-4h-7v-4H6v-5H3z"/>
+      <path fill="#52794b" d="M6 47h2v3h6v3h8v2h6v5h-9v-4h-7v-4H8v-3H6z"/>
+      <path fill="#819b52" d="M15 53h5v2h6v3h-5v-1h-6z"/>
+    </g>
+    <g id="tail-down">
+      <path fill="#294830" d="M2 51h9v2h8v1h10v8H17v-3h-7v-2H5v-2H2z"/>
+      <path fill="#52794b" d="M6 53h5v2h9v1h8v4H18v-3h-7v-2H6z"/>
+      <path fill="#819b52" d="M16 55h5v1h5v2h-6v-1h-4z"/>
+    </g>
+    <g id="legs-a">
+      <path fill="#294830" d="M32 46h5v-7h-9v3h4zM49 48h5v-9h8v3h-8v6zM29 57h7v10h-4v4H22v-4h7zM47 58h6v6h6v6H48v-5h-1z"/>
+      <path fill="#52794b" d="M31 59h3v7h-4v3h-5v-1h6zM49 59h3v7h5v2h-7v-4h-1z"/>
+      <path fill="#a7ae70" d="M23 69h2v2h-2zM27 69h2v2h-2zM54 68h2v2h-2zM50 68h2v2h-2z"/>
+    </g>
+    <g id="legs-b">
+      <path fill="#294830" d="M30 47h5v-7h7v3h-7v4zM48 47h6v-7h-8v3h2zM29 57h7v6h5v6H30v-4h-1zM47 58h7v9h-4v4H40v-4h7z"/>
+      <path fill="#52794b" d="M31 59h3v6h5v2h-7v-4h-1zM49 59h3v7h-4v3h-5v-1h6z"/>
+      <path fill="#a7ae70" d="M33 67h2v2h-2zM37 67h2v2h-2zM41 69h2v2h-2zM45 69h2v2h-2z"/>
+    </g>
+  </defs>
+  <g><use href="#tail-straight"/><use href="#legs-a"/><use href="#body"/></g>
+  <g transform="translate(80 -1)"><use href="#tail-up"/><use href="#legs-b"/><use href="#body"/></g>
+  <g transform="translate(160)"><use href="#tail-straight"/><use href="#legs-b"/><use href="#body"/></g>
+  <g transform="translate(240 -1)"><use href="#tail-down"/><use href="#legs-a"/><use href="#body"/></g>
+</svg>

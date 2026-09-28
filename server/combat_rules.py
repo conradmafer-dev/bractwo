@@ -5,13 +5,13 @@ import math
 try:
     from . import world_content as content
     from . import fighter_rules as fighter
-    from . import equipment_rules as gear, caster_rules as caster
+    from . import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment
     from .dnd_content import circle_for
     from .progression import same_floor
 except ImportError:
     import world_content as content
     import fighter_rules as fighter
-    import equipment_rules as gear, caster_rules as caster
+    import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment
     from dnd_content import circle_for
     from progression import same_floor
 
@@ -43,10 +43,10 @@ def proficiency(p): return 2+(effective_level(p)-1)//4
 def attributes(p):
     scores=dict(p.spec['attributes'])
     scores[p.spec['primary']]=min(20,scores[p.spec['primary']]+2*(p.level>=20)+2*(p.level>=40))
-    for key,ability in getattr(p,'training_feats',{}).items():
-        if key in gear.active_feats(p) and ability in gear.GENERAL_FEATS[key]['abilities']:
-            scores[ability]=min(20,scores[ability]+1)
+    for ability,amount in gear.feat_ability_bonuses(p).items():
+        scores[ability]=min(20,scores[ability]+amount)
     scores.update(caster.form_spec(p).get('attributes',{}))
+    scores.update(environment.polymorph(p).get('attributes',{}))
     return scores
 
 def ability_modifier(p, ability): return (attributes(p)[ability]-10)//2
@@ -68,37 +68,43 @@ def attack_ability(p):
 
 def attack_bonus(p):
     if getattr(p,'is_companion',False):return p.attack_bonus
-    if p.form:return caster.form_spec(p).get('attack_bonus',2)+max(0,proficiency(p)-2)
+    if environment.polymorph(p):return int(environment.polymorph(p).get('attack_bonus',0))
+    if p.form:return caster.form_spec(p).get('attack_bonus',2)+max(0,proficiency(p)-caster.form_spec(p).get('beast_proficiency',2))
     w=equipped_item(p,'weapon')
     pb=proficiency(p) if gear.proficient(p,w) else 0
     return pb+ability_modifier(p,attack_ability(p))+min(3,p.gear_bonus('attack_bonus'))
 
 def armor_class(p):
     if getattr(p,'is_companion',False):return p.armor_class
+    if environment.polymorph(p):return int(environment.polymorph(p).get('ac',10))
     dex=ability_modifier(p,'dexterity')
     equipped=set(p.equipment.values())
     armor=next((content.ITEMS[i['template']] for i in p.inventory if i['uid'] in equipped and content.ITEMS[i['template']]['slot']=='armor'),{})
     base=armor.get('base_ac',10)
     if armor.get('armor_kind')=='heavy':dex=0
-    elif armor.get('armor_kind')=='medium':dex=min(2,dex)
+    elif armor.get('armor_kind')=='medium':dex=min(3 if gear.has_feat(p,'medium_armor_master') and dex>=3 else 2,dex)
     ac=base+dex+min(3,p.gear_bonus('ac_bonus'))
-    if p.form:ac=caster.form_spec(p).get('ac',10)
+    if p.form:ac=max(caster.form_spec(p).get('ac',10),circles.armor_class_floor(p))
     if active_buff(p,'mage_armor') and (p.form or armor.get('armor_kind','none')=='none'):ac=max(ac,13+ability_modifier(p,'dexterity')+min(3,p.gear_bonus('ac_bonus')))
     if active_buff(p,'barkskin'):ac=max(ac,17)
     if active_buff(p,'shield'):ac+=5
     if not p.form:
         ac += fighter.shield_bonus(p)
         if getattr(p,'fighting_style','')=='defense' and fighter.style_active(p):ac+=1
-    return ac
+    return ac+(2 if active_buff(p,'nature_sanctuary') else 0)
 
 def save_bonus(p,ability='dexterity'):
     if getattr(p,'is_companion',False):return max(2,p.attack_bonus) if ability in ('strength','dexterity') else 1
-    return ability_modifier(p,ability)+(proficiency(p) if ability in p.spec['saves'] else 0)
+    if environment.polymorph(p):return caster.form_spec(p).get('saves',{}).get(ability,ability_modifier(p,ability))
+    base=ability_modifier(p,ability)+(proficiency(p) if ability in p.spec['saves'] else 0)
+    if p.form:base=max(base,caster.form_spec(p).get('saves',{}).get(ability,base))
+    return base+circles.save_bonus(p,ability)+(2 if ability=='dexterity' and active_buff(p,'nature_sanctuary') else 0)-getattr(p,'exhaustion',0)*2
 
 def max_hp(p):
     # Wild Shape retains the druid's own maximum HP, even with a beast's CON.
-    con=(p.spec['attributes']['constitution']+sum(a=='constitution' for k,a in getattr(p,'training_feats',{}).items() if k in gear.active_feats(p))-10)//2
-    return p.spec['hit_die']+con+((p.level-1)*(p.spec['hit_die']//2+1+con))//5+p.mastery.get('vitality',0)*2
+    con=(min(20,p.spec['attributes']['constitution']+gear.feat_ability_bonuses(p).get('constitution',0))-10)//2
+    return (p.spec['hit_die']+con+((p.level-1)*(p.spec['hit_die']//2+1+con))//5+p.mastery.get('vitality',0)*2
+            +(2*effective_level(p) if gear.has_feat(p,'tough') else 0))
 
 def cantrip_count(p):return 1+sum(p.level>=n for n in (20,50,80))
 
@@ -134,6 +140,7 @@ def attacks_per_round(p):
 
 def damage_type(p):
     if p.form:
+        if circles.lunar_damage_type(p):return circles.lunar_damage_type(p)
         f=caster.form_spec(p);types=f.get('attack_types',[f.get('damage','bludgeoning')])
         return types[min(len(types)-1,int(getattr(p,'form_attack_index',0)))]
     if gear.shillelagh_applies(p):return 'force'
@@ -142,7 +149,7 @@ def damage_type(p):
 def resistance_multiplier(p, kind):
     physical=kind in ('bludgeoning','piercing','slashing')
     gear_resist=not getattr(p,'form','') and any(kind in equipped_item(p,slot).get('resistances',[]) for slot in ('armor','ring'))
-    return .5 if (gear_resist or physical and active_buff(p,'stoneskin') or kind=='fire' and active_buff(p,'resist_fire')) else 1.0
+    return .5 if (circles.resists(p,kind) or kind in caster.form_spec(p).get('resistances',[]) or kind=='radiant' and active_buff(p,'fount_of_moonlight') or gear_resist or physical and active_buff(p,'stoneskin') or kind=='fire' and active_buff(p,'resist_fire')) else 1.0
 
 
 def damage_dice(power,sides=6):
@@ -159,6 +166,32 @@ def roll_damage(rng,dice,critical=False):
     n,s,m=dice
     rolls=[rng.randint(1,s) for _ in range(n*(2 if critical else 1))]
     return {'damage':max(0,sum(rolls)+m),'damage_dice':dice_text(dice),'damage_rolls':rolls,'damage_modifier':m}
+
+
+def begin_feat_turn(p,now):
+    """Main/bonus actions and Action Surge share the same three-second turn."""
+    if now>=getattr(p,'_feat_turn_until',0):
+        p._feat_turn_until=now+ROUND_SECONDS
+        p._savage_attack_used=False
+
+
+def savage_attacker_damage(p,result,rng,now):
+    """Choose complete weapon dice sets before styles and damage riders apply."""
+    if (not result.get('hit') or not gear.has_feat(p,'savage_attacker') or p.form
+            or not gear.weapon(p) or gear.is_focus(gear.weapon(p))):return
+    begin_feat_turn(p,now)
+    if getattr(p,'_savage_attack_used',False):return
+    first=list(result.get('damage_rolls',[]))
+    if not first:return
+    n,sides,modifier=weapon_dice(p)
+    second=[rng.randint(1,sides) for _ in first]
+    great_weapon=getattr(p,'fighting_style','')=='great_weapon' and fighter.style_active(p)
+    score=lambda rolls:sum(max(3,r) if great_weapon else r for r in rolls)
+    selected=1 if score(second)>score(first) else 0
+    chosen=second if selected else first
+    result.update(savage_attacker=True,savage_damage_rolls=[first,second],savage_chosen=selected,
+                  damage_rolls=chosen,damage=max(0,sum(chosen)+result.get('damage_modifier',modifier)))
+    p._savage_attack_used=True
 
 def roll_attack(rng,bonus,ac,dice,disadvantage=False,advantage=False):
     disadvantage,advantage=bool(disadvantage and not advantage),bool(advantage and not disadvantage)
@@ -235,6 +268,7 @@ def configure(items,enemies):
 
 class CombatRounds:
     def begin_action(self,p,bonus=False):
+        begin_feat_turn(p,self.now())
         if bonus:p.bonus_cooldown_until=self.now()+ROUND_SECONDS
         else:p.attack_cooldown_until=self.now()+ROUND_SECONDS
         p.attack_until=self.time+.3
@@ -270,18 +304,25 @@ class CombatRounds:
         return fx
 
     def hit_enemy(self,p,enemy,multiplier=1,action='Atak',power=None,dice=None,spell=False,melee=False,damage_kind=None):
-        spec=content.ENEMIES[enemy.kind]
+        spec=environment.enemy_spec(enemy)
         dice=tuple(dice or weapon_dice(p))
         disadvantage=(not melee and self.close_threat(p,spell=spell)) or active_buff(p,'blind') or active_buff(p,'restrained')
         advantage=active_buff(p,'foresight') or self.enemy_condition(enemy,'restrained') or self.enemy_condition(enemy,'blind')
         fdis,fadv=self.fighter_roll_flags(p,enemy)
-        result=roll_attack(self.combat_rng,spell_bonus(p) if spell else attack_bonus(p),spec['armor_class'],dice,disadvantage or fdis or (not spell and gear.weapon_disadvantage(p)),advantage or fadv or self.caster_attack_advantage(p,enemy))
-        if not spell:self.fighter_adjust_damage(p,result)
+        edis,eadv=self.environment_attack_flags(p,enemy)
+        bonus=(spell_bonus(p) if spell else attack_bonus(p))+self.circle_roll_adjustment(p,'attack',target=enemy)-getattr(p,'exhaustion',0)*2
+        result=roll_attack(self.combat_rng,bonus,spec['armor_class'],dice,disadvantage or fdis or edis or (not spell and gear.weapon_disadvantage(p)),advantage or fadv or eadv or self.caster_attack_advantage(p,enemy))
         result['damage_type']=damage_kind or damage_type(p)
+        self.environment_adjust_damage(p,enemy,result,dice,melee)
+        if not spell:
+            savage_attacker_damage(p,result,self.combat_rng,self.now())
+            self.fighter_adjust_damage(p,result)
+        self.circle_adjust_damage(p,enemy,result,weapon=not spell)
+        self.environment_attack_riders(p,enemy,result,melee)
         self.provoke_enemy(enemy,p)
         if result['hit'] or result.get('graze'):
             self.add_hunters_mark(p,enemy,result)
-            enemy.hp=max(0,enemy.hp-result['damage']);self.remember_attacker(enemy,p)
+            result['damage']=self.environment_damage_enemy(enemy,result['damage'],p,result['damage_type'],result.get('damage_components'));self.remember_attacker(enemy,p)
         self.report_roll(p,enemy,result,action,p)
         return result
 
@@ -298,7 +339,8 @@ class CombatRounds:
         if result.get('hit') or result.get('graze'):
             before=target.hp+getattr(target,'temp_hp',0)
             self.damage_player(target,result['damage'],killer=owner,unjust=unjust,rolled=True,
-                damage_type=result.get('damage_type','bludgeoning'),damage_components=result.get('damage_components'))
+                damage_type=result.get('damage_type','bludgeoning'),damage_components=result.get('damage_components'),
+                is_attack=result.get('check')=='attack' and bool(result.get('hit')),source=source)
             result['damage']=round(before-target.hp-getattr(target,'temp_hp',0),1)
         self.report_roll(source,target,result,action,owner)
         return result
@@ -310,12 +352,11 @@ class CombatRounds:
             source.current_wall_time=self.now()
             unjust=self.begin_pvp_hostility(source,target)
         target.current_wall_time=self.now()
-        spec=content.ENEMIES.get(getattr(source,'kind',''),{})
+        spec=environment.enemy_spec(source)
         chosen=tuple(dice or (weapon_dice(source) if pvp else spec['special_dice'] if area else spec['damage_dice']))
         kind=damage_kind or (damage_type(source) if pvp else 'fire' if area and spec.get('projectile')=='fire' else 'cold' if area and spec.get('projectile')=='ice' else 'bludgeoning')
         if area:
-            result=roll_save(self.combat_rng,save_bonus(target),spec['save_dc'],roll_damage(self.combat_rng,chosen),
-                advantage=active_buff(target,'foresight'),disadvantage=active_buff(target,'restrained') or gear.armor_penalty(target))
+            result=self.target_save(target,'dexterity',spec['save_dc'],roll_damage(self.combat_rng,chosen),half=True)
         else:
             if pvp:
                 is_melee=gear.melee(source) if melee is None else melee
@@ -329,9 +370,17 @@ class CombatRounds:
                 adv=active_buff(target,'restrained') or active_buff(target,'blind')
                 bonus=spec['attack_bonus']
             fdis,fadv=self.fighter_roll_flags(source,target)
-            result=roll_attack(self.combat_rng,bonus,armor_class(target),chosen,dis or active_buff(target,'foresight') or fdis,adv or fadv)
+            edis,eadv=self.environment_attack_flags(source,target)
+            bonus+=self.circle_roll_adjustment(source,'attack',target=target)-getattr(source,'exhaustion',0)*2
+            result=roll_attack(self.combat_rng,bonus,armor_class(target),chosen,dis or edis or active_buff(target,'foresight') or fdis,adv or fadv or eadv)
+            result['damage_type']=kind
+            self.environment_adjust_damage(source,target,result,chosen,melee if melee is not None else (gear.melee(source) if pvp else not spec.get('projectile')))
             if not getattr(target,'is_companion',False):self.shield_reaction(target,result)
-            if pvp and not spell:self.fighter_adjust_damage(source,result)
+            if pvp and not spell:
+                savage_attacker_damage(source,result,self.combat_rng,self.now())
+                self.fighter_adjust_damage(source,result)
         result['damage_type']=kind
+        if pvp:self.circle_adjust_damage(source,target,result,weapon=not spell)
+        if not area:self.environment_attack_riders(source,target,result,melee if melee is not None else (gear.melee(source) if pvp else not spec.get('projectile')))
         if pvp:self.add_hunters_mark(source,target,result)
         return self.resolve_player_hit(source,target,result,action or ('Atak' if pvp else spec['name']),owner=source if pvp else None,unjust=unjust)

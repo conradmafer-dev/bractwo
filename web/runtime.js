@@ -109,6 +109,27 @@
     if(seconds>=60)return `${Math.floor(seconds/60)}:${String(seconds%60).padStart(2,'0')} · ${rounds} r.`;
     return `${seconds} s · ${rounds} r.`;
   }
+  function statusAction(effect,player,target=null) {
+    if(!effect||!player)return null;
+    const other=!!target,ally=other&&target.party_id&&target.party_id===player.party_id;
+    const action=effect.escape_action_id||(effect.escape_action?'escape_restraint':'');
+    let packet,label,range=Infinity;
+    if(action==='wake'){
+      if(effect.spell_id!=='sleep'||!ally||target.alive===false||target.hp<=0)return null;
+      packet={type:'circle_spell_action',action,target_id:target.id};label='Obudź sojusznika · akcja';range=32;
+    }else if(action==='escape_web'||action==='escape_whirlpool'){
+      if(other)return null;
+      packet={type:'circle_spell_action',action};label=action==='escape_web'?'Wyrwij się · akcja':'Wydostań się z wiru · akcja';
+    }else if(action==='escape_restraint'){
+      if(other&&!ally)return null;
+      packet={type:'escape_restraint'};if(other)packet.target_id=target.id;
+      label=other?'Uwolnij sojusznika · akcja':'Wyrwij się · akcja';range=80;
+    }else return null;
+    const tooFar=other&&((target.floor||0)!==(player.floor||0)||Math.hypot(target.x-player.x,target.y-player.y)>range);
+    const unable=(player.status_effects||[]).some(e=>['paralyzed','unconscious','sleep_pending','stunned','stinking_poison'].includes(e.id));
+    return {packet,label,disabled:player.alive===false||player.hp<=0||player.action_remaining>0||unable||tooFar,
+      hint:tooFar?'Podejdź do sojusznika.':''};
+  }
   function manaBudgetText(budget) {
     if(budget?.progression==='per_level') {
       const bonus=budget.bonus?` + ${budget.bonus} premii`:'';
@@ -124,6 +145,7 @@
     return {...spec,...(player?.spell_profiles?.[spec.id]||{})};
   }
   function spellGate(spec,player) {
+    const required=Number(player?.spell_profiles?.[spec?.id]?.required_level??spec?.required_level);if(Number.isFinite(required))return required;
     const cls=player?.class_id;
     if(spec?.class_levels?.[cls]!==undefined)return Number(spec.class_levels[cls]);
     if(cls==='ranger'&&spec?.circle>0)return spec.circle===1?1:(spec.circle-1)*20;
@@ -137,6 +159,13 @@
   function spellMana(spec,player) {
     const s=spellProfile(spec,player);
     return s?.recast&&player?.concentration===s.id?0:Number(s?.mana)||0;
+  }
+  function spellUsable(spec,player) {
+    const s=spellProfile(spec,player);
+    if(!s||!player||player.hp<=0||player.alive===false||s.available===false)return false;
+    if(s.kind==='shape'&&player.form||s.kind==='reaction'||s.kind==='weapon_trigger'&&player.ensnaring_armed)return true;
+    if(player.form&&!s.cast_in_form&&!['druid_circle','beast_action'].includes(s.kind))return false;
+    return !(player.spell_cooldowns?.[s.id]>0)&&player.mana>=spellMana(s,player)&&s.uses_remaining!==0;
   }
   function queuedSpellLabel(spec,player) {
     if(!spec?.id||player?.queued_spell!==spec.id)return '';
@@ -159,8 +188,53 @@
     const result=roll.check==='save'?(roll.saved?(roll.save_half?'obrona · połowa':'obrona · brak obrażeń'):'nieudana obrona'):roll.shielded?'TARCZA':roll.critical?'KRYTYK':roll.hit?'trafienie':'PUDŁO';
     return `${name} · ${who}: ${check} · ${result}${roll.hit?` · ${roll.damage_dice} → ${roll.damage} obr.`:''}`;
   }
+  // Manual touch scrolling works even while another finger owns the joystick.
+  // Keep taps on their button; capture the pointer only once it becomes a swipe.
+  function bindTouchScroll(scroller, enabled = () => true) {
+    let gesture = null, lastSwipeEnd = -Infinity;
+    function finish(event, canceled = false) {
+      if (!gesture || (event && event.pointerId !== gesture.id)) return;
+      const old = gesture; gesture = null;
+      if (old.dragging || canceled) lastSwipeEnd = Date.now();
+      try { if (scroller.hasPointerCapture?.(old.id)) scroller.releasePointerCapture(old.id); } catch {}
+    }
+    function move(event) {
+      if (!gesture || event.pointerId !== gesture.id) return;
+      if (!enabled()) { finish(event, true); return; }
+      const dx = event.clientX - gesture.x;
+      if (!gesture.dragging && Math.abs(dx) <= 12) return;
+      if (!gesture.dragging) {
+        gesture.dragging = true;
+        try { scroller.setPointerCapture(event.pointerId); } catch {}
+      }
+      event.preventDefault();
+      scroller.scrollLeft = Math.max(0, Math.min(scroller.scrollWidth - scroller.clientWidth, gesture.scrollX - dx));
+    }
+    scroller.addEventListener('pointerdown', event => {
+      if (event.pointerType !== 'touch' || gesture || !enabled() || scroller.scrollWidth <= scroller.clientWidth) return;
+      gesture = { id: event.pointerId, x: event.clientX, scrollX: scroller.scrollLeft, dragging: false };
+    }, true);
+    scroller.addEventListener('pointermove', move, { capture: true, passive: false });
+    scroller.addEventListener('pointerup', event => { move(event); finish(event); }, true);
+    scroller.addEventListener('pointercancel', event => finish(event, true), true);
+    scroller.addEventListener('lostpointercapture', event => {
+      // A child loses implicit capture when the viewport takes over a swipe.
+      if (event.target === scroller) finish(event, true);
+    });
+    scroller.addEventListener('click', event => {
+      const fromTouch = event.pointerType === 'touch' || event.sourceCapabilities?.firesTouchEvents ||
+        (!event.pointerType && event.detail > 0);
+      if (fromTouch && Date.now() - lastSwipeEnd < 800) { event.preventDefault(); event.stopPropagation(); }
+    }, true);
+    scroller.addEventListener('contextmenu', event => {
+      if (gesture?.dragging) { event.preventDefault(); event.stopPropagation(); finish(null, true); }
+    }, true);
+    root.addEventListener?.('blur', () => finish(null, true));
+    root.document?.addEventListener('visibilitychange', () => { if (root.document.hidden) finish(null, true); });
+    return { cancel: () => finish(null, true) };
+  }
   // A second finger may produce PointerEvents without a compatibility click.
-  // Keep native horizontal scrolling: do not capture or cancel pointerdown/move.
+  // Tap detection observes movement and capture loss without owning the scroll.
   function bindTouchTap(button, activate, scrollParent = () => null) {
     const touches = new Map(); let lastTouchEnd = -Infinity;
     const scrollPosition = el => [el?.scrollLeft || 0, el?.scrollTop || 0];
@@ -201,7 +275,7 @@
       if (!button.disabled) activate(event);
     });
   }
-  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, queuedSpellLabel, combatSummary, bindTouchTap };
+  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, combatSummary, bindTouchTap, bindTouchScroll };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BractwoRuntime = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

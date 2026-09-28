@@ -253,7 +253,7 @@ def configure(c, obstacles, landmarks, quests, enemies):
     # Nearby hints, without revealing every distant surprise.
     landmarks.append({'id':'trail_board','name':'Drogowskaz Przystani','x':730,'y':1390,'floor':0,'radius':110,'biome':'town',
                       'decoration':'sign','hint':True,'recommended_level':1,
-                      'description':'Południe: rozbity wóz i bandyci. Za mostem: pajęczy zagajnik. Wschód: cmentarz, cyklopie wzgórze i smocza jama. K → Atlas → Okolica pokazuje kierunki.',
+                      'description':'Południe: rozbity wóz i bandyci. Za mostem: pajęczy zagajnik. Wschód: cmentarz, cyklopie wzgórze i smocza jama. N → Atlas → Okolica pokazuje kierunki.',
                       'reward':{'xp':5,'gold':0}})
     # More local loops: variety is reachable within the first few minutes.
     for end in [(item[0],item[1]) for item in local]:
