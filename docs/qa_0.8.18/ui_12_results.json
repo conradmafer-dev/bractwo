@@ -1,0 +1,30 @@
+{
+  "revision": "UI_12",
+  "date": "2026-09-28",
+  "scope": "HP interpolation between D&D checkpoints, Constitution and Tough, removal/refund of Vitality, save migration and advancement receipts.",
+  "backend": {
+    "command": "python -m unittest test_hp_growth_ui12 test_general_feats_0818 test_level_up_086.Receipts.test_level_ten_exact_increments test_level_up_086.Receipts.test_buffs_terrain_and_form_do_not_contaminate_growth test_level_up_086.Commands.test_allocate_from_sheet_without_master_nearby test_level_up_086.Commands.test_branch_and_prerequisites_are_validated -q",
+    "pythonpath": [".qa-python", ".", "tests"],
+    "tests": 20,
+    "passed": 20,
+    "failed": 0,
+    "duration_seconds": 10.169,
+    "coverage": [
+      "All 20 D&D checkpoints for all four classes and Constitution modifiers +2 through +5.",
+      "Positive integer HP gains at every game advancement from level 1 to 95 for current character attributes; fixed maximum thereafter.",
+      "Four advances in the initial interval, five in later intervals; accumulated rounding without lost fractions.",
+      "Retroactive Constitution, minimum one HP per D&D advancement, separate Tough bonus and druid's own HP in a form.",
+      "Death, full and partial health preserved through migration; Vitality points refunded; repeat login does not rescale again.",
+      "Pre-D&D saves migrate through both versions without changing health percentage twice.",
+      "Historical and new advancement receipts retain their respective formulas; server rejects new Vitality allocations."
+    ]
+  },
+  "frontend": {
+    "command": "node --check web/character_sheet.js; node --check web/game.js",
+    "passed": 2,
+    "notes": "Only removed the retired Vitality option from its name dictionary and both mastery panels. Other UI behavior unchanged."
+  },
+  "review": "Independent read-only review of HP formula, migration ordering and receipt versioning found no blocking issue.",
+  "limits": ["No full regression suite, physical phone check, browser session or live deployment for this update."],
+  "archive_verification": "The packaging tool reads back every file in both ZIPs and verifies it against the per-archive SHA-256 manifest before publishing the archives."
+}

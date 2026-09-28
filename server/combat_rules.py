@@ -16,6 +16,7 @@ except ImportError:
     from progression import same_floor
 
 ROUND_SECONDS=3.0
+HP_RULES_VERSION=1
 RULES={'round_seconds':3.0,'attack_die':20,'critical':20,'automatic_miss':1,
        'manual_attacks':True,'auto_selected_target':True,'focus_auto_attack':False,'target_required':False,
        'shared_actions':['attack','cast_action'], 'bonus_action_seconds':3.0,
@@ -100,11 +101,37 @@ def save_bonus(p,ability='dexterity'):
     if p.form:base=max(base,caster.form_spec(p).get('saves',{}).get(ability,base))
     return base+circles.save_bonus(p,ability)+(2 if ability=='dexterity' and active_buff(p,'nature_sanctuary') else 0)-getattr(p,'exhaustion',0)*2
 
-def max_hp(p):
+def legacy_max_hp(p):
+    """Pre-UI_12 totals, retained for save migration and historical receipts."""
     # Wild Shape retains the druid's own maximum HP, even with a beast's CON.
     con=(min(20,p.spec['attributes']['constitution']+gear.feat_ability_bonuses(p).get('constitution',0))-10)//2
     return (p.spec['hit_die']+con+((p.level-1)*(p.spec['hit_die']//2+1+con))//5+p.mastery.get('vitality',0)*2
             +(2*effective_level(p) if gear.has_feat(p,'tough') else 0))
+
+
+def max_hp(p):
+    if getattr(p,'hp_rules_version',HP_RULES_VERSION)<HP_RULES_VERSION:
+        return legacy_max_hp(p)
+    # The first interval is 1 -> 5 (four advances), then 5 -> 10 -> ... -> 95.
+    # Round the accumulated gain once; individual level gains never lose fractions.
+    level=max(1,min(95,int(p.level)))
+    con=(min(20,p.spec['attributes']['constitution']+gear.feat_ability_bonuses(p).get('constitution',0))-10)//2
+    die=p.spec['hit_die'];gain=max(1,die//2+1+con)
+    numerator,denominator=(level-1,4) if level<5 else (level,5)
+    return max(1,die+con)+numerator*gain//denominator+(2*effective_level(p) if gear.has_feat(p,'tough') else 0)
+
+
+def migrate_hp(p):
+    """Refund retired Vitality and change the maximum without changing HP fraction."""
+    upgrading=getattr(p,'hp_rules_version',0)<HP_RULES_VERSION
+    previous=max(1,max_hp(p)) if upgrading else 1
+    refunded=p.mastery.pop('vitality',0)
+    if upgrading:
+        fraction=max(0,min(1,p.hp/previous))
+        p.hp_rules_version=HP_RULES_VERSION
+        p.hp=p.max_hp*fraction
+    p._level_up_cache=None
+    return refunded
 
 def cantrip_count(p):return 1+sum(p.level>=n for n in (20,50,80))
 

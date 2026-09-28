@@ -1,6 +1,10 @@
-# Bractwo 0.8.18 UI_11 — atuty, kręgi druida i zasoby odpoczynku
+# Bractwo 0.8.18 UI_12 — HP zgodne z progami D&D i przyrost na każdy awans
 
 Baza: 0.8.17 z poprawką Mobile01. Zachowano układ telefonu, zasady różdżki i dotychczasowe postacie.
+
+**UI_12 — skalowanie HP:** przyrost z jednego poziomu D&D rozdzielany jest między pojedyncze poziomy gry, z zaokrągleniem łącznej puli. Na poziomach 1, 5, 10, 15…95 całkowite HP odpowiada oficjalnemu wariantowi stałego przyrostu danej klasy i Kondycji. Pierwszy odcinek 1→5 ma cztery awanse; kolejne odcinki mają pięć. Twardy zachowuje +2 HP za efektywny poziom D&D. Bazowy wzrost kończy się na poziomie 95, odpowiadającym 20. poziomowi D&D.
+
+Usunięto autorski bonus Witalności oraz jego zakup w obu panelach. Starsze punkty są zwracane do puli mistrzostwa przy wczytaniu. Jednorazowa migracja zachowuje procent aktualnego zdrowia i stan śmierci; kolejne logowania nie przeliczają zdrowia ponownie. Historyczne komunikaty awansu zachowują dawny wzór, nowe pokazują rzeczywisty przyrost bieżącej wersji. Szczegóły: `docs/HP_0.8.18_UI_12.md`; celowana weryfikacja: `docs/qa_0.8.18/ui_12_results.json`.
 
 **UI_11 — pięć atutów i cztery kręgi druida:** Twardy, Zacięty atak, Rozwój cech, Mistrz ciężkiego pancerza i Mistrz średniego pancerza. Kręgi Ziemi, Księżyca, Morza i Gwiazd odblokowują się na 10. poziomie gry. Bonusy obejmują działające czary, stany, zasoby, przemiany, pływanie, lot i efekty obszarowe; opis mechanik i przeliczeń znajduje się w `docs/DRUID_CIRCLES_0.8.18.md`.
 
@@ -91,7 +95,7 @@ Pełna paczka źródłowa dodatkowo zawiera testy, narzędzia, historyczną doku
 
 ## Weryfikacja
 
-Wyniki znajdują się w `docs/qa_0.8.18/`. Raport `ui_11_results.json` dotyczy bieżącej zmiany i wyłącznie jej celowanych sprawdzeń. Poniższe szersze kontrole przeprowadzono dla wcześniejszego wydania 0.8.18; nie powtarzano ich w UI_11.
+Wyniki znajdują się w `docs/qa_0.8.18/`. Raport `ui_12_results.json` dotyczy bieżącej zmiany HP. Raport `ui_11_results.json` zachowuje wyniki wcześniejszych sprawdzeń kręgów i odpoczynków. Poniższe szersze kontrole przeprowadzono dla wcześniejszego wydania 0.8.18; nie powtarzano ich w UI_12.
 
 Przeszło wtedy 296 unikalnych testów serwera, 56 testów JavaScript oraz 4 testy tras HTTP i plików aplikacji. Dwa scenariusze WebSocket przekroczyły limit czasu przy równoległym obciążeniu komputera; powtórzone osobno przeszły bez zmiany testów lub ich limitów. Raporty zachowują oba wyniki.
 

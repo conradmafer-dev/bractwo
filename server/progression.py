@@ -149,7 +149,7 @@ class ExpansionGame:
                 branch=data.get('branch')
                 if p.level<50 or not p.promoted:return await self.notice(p,'Specjalizacja wymaga promocji i poziomu 50.')
                 points=(p.level-50)//5+1-sum(p.mastery.values())
-                if not isinstance(branch,str) or branch not in ('power','vitality','focus') or points<1 or p.mastery.get(branch,0)>=20:
+                if not isinstance(branch,str) or branch not in ('power','focus') or points<1 or p.mastery.get(branch,0)>=20:
                     return await self.notice(p,'Brak punktu lub wybrana gałąź osiągnęła 20 punktów.')
                 p.mastery[branch]=p.mastery.get(branch,0)+1
             else:

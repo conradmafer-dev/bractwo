@@ -2,7 +2,7 @@
 (function(root){'use strict';
   const labels={strength:'Siła',dexterity:'Zręczność',constitution:'Kondycja',intelligence:'Inteligencja',wisdom:'Mądrość',charisma:'Charyzma'};
   const skillNames={melee:'Walka wręcz',distance:'Walka dystansowa',magic:'Magia',shielding:'Obrona'};
-  const masteryNames={power:'Potęga',vitality:'Witalność',focus:'Skupienie'};
+  const masteryNames={power:'Potęga',focus:'Skupienie'};
   const signed=n=>Number(n)>=0?'+'+n:String(n), dice=n=>'1k20'+signed(n);
   const node=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
   function button(text,fn,disabled=false){const e=node('button','',text);e.type='button';e.disabled=disabled;e.addEventListener('click',fn);return e;}
@@ -55,7 +55,7 @@
     }
     function allocation(p){const points=p.mastery_points||0;if(!points)return;
       const box=node('section','sheet-allocation');box.append(node('h3','',`Punkty mistrzostwa do przydzielenia: ${points}`),node('p','',p.combat_remaining>0?'Punkty przydzielisz po zakończeniu walki.':'Wybierz, co chcesz wzmocnić.'));
-      for(const[k,label,desc]of[['power','Potęga','+1 do obrażeń broni za każde 10 punktów'],['vitality','Witalność','+2 HP za punkt'],['focus','Skupienie','+4 many za punkt']]){
+      for(const[k,label,desc]of[['power','Potęga','+1 do obrażeń broni za każde 10 punktów'],['focus','Skupienie','+4 many za punkt']]){
         const row=node('div','sheet-allocation-row'),text=node('div');text.append(node('strong','',`${label} · ${p.mastery?.[k]||0}/20`),node('small','',desc));const b=button('+1 punkt',()=>{b.disabled=true;h.send({type:'mastery',branch:k});},!p.alive||p.combat_remaining>0||(p.mastery?.[k]||0)>=20);b.dataset.mastery=k;row.append(text,b);box.append(row);
       }content.append(box);
     }

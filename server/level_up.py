@@ -28,7 +28,7 @@ def record(p, first, last):
     context = copy.deepcopy(dict(class_id=p.class_id, promoted=p.promoted,
         primal_order=p.primal_order,training_feats=p.training_feats,caster_rules_version=p.caster_rules_version,
         druid_circle=p.druid_circle,druid_circle_state=p.druid_circle_state,
-        mana_rules_version=p.mana_rules_version,
+        mana_rules_version=p.mana_rules_version,hp_rules_version=p.hp_rules_version,
         mastery=p.mastery, fighting_style=p.fighting_style, weapon_grip=p.weapon_grip, equipment=p.equipment,
         inventory=[i for i in p.inventory if i.get('uid') in worn]))
     # Coalesce ordinary repeated awards only when their permanent profile agrees.
@@ -58,6 +58,7 @@ def permanent(p, level, context):
     q.druid_circle='';q.druid_circle_state={};q.druid_circle_runtime={}
     # Pre-0.8.16 receipts have no mana-version stamp: preserve their earned gains.
     q.mana_rules_version=2
+    q.hp_rules_version=0  # Preserve HP deltas in receipts earned before UI_12.
     for key,value in context.items():
         setattr(q,key,value)
     q.level=level

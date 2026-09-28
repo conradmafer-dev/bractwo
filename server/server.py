@@ -380,6 +380,7 @@ class Player:
     chat_at: float = -10
     rules_version: int = 8
     mana_rules_version: int = dnd_content.MANA_RULES_VERSION
+    hp_rules_version: int = combat_rules.HP_RULES_VERSION
     mana_recovery_until: float = 0
     _hotbar_level: tuple = field(default_factory=tuple)
     hotbar: list = field(default_factory=list)
@@ -565,7 +566,7 @@ class Player:
             "primal_order", "training_feats", "caster_rules_version", "legacy_medium_grace",
             "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "exhaustion",
             "fighting_style", "weapon_grip", "fighter_rules_version",
-            "level_up_batches", "rules_version", "mana_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
+            "level_up_batches", "rules_version", "mana_rules_version", "hp_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
             "site_cooldowns", "wind_until", "ward_until", "premium_demo_until", "floor", "skill_tries", "promoted", "soul", "runes", "bank_gold", "depot", "home_city", "blessed", "mastery", "spell_cooldowns", "spell_ready", "rune_ready", "haste_until", "transition_ready",
             "x", "y", "hp", "mana", "level", "xp", "gold", "class_id", "class_chosen", "weapon", "kills", "boss_kills",
             "inventory_rules_version", "potion_slots", "loot_discoveries",
@@ -754,6 +755,7 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         for attr in p.save_data():
             if attr in saved:
                 setattr(p, attr, saved[attr])
+        p.hp_rules_version=saved.get('hp_rules_version',0)
         if "class_id" not in saved:
             p.class_chosen = False
             p.class_id = "knight"
@@ -770,6 +772,8 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         self.migrate_caster(p)
         self.migrate_druid_circle(p)
         rest_rules.migrate(p,self.now())
+        refunded=combat_rules.migrate_hp(p)
+        if refunded:self.caster_message(p,f'Przeliczono HP według klasy i Kondycji. Zwrócono punkty Witalności: {refunded}.')
         if "mana" not in saved:
             p.mana = p.max_mana
         p.hp, p.mana = min(p.hp, p.max_hp), min(p.mana, p.max_mana)
