@@ -48,6 +48,10 @@ class AdventureGame:
 
     def hit_player(self,source,target,power=0,*,pvp=False,unjust=False,area=False,dice=None,damage_kind=None,spell=False,melee=None,action=None):
         spec=environment.enemy_spec(source)
+        # Regional UI_20 creatures use normal AI/hazards, while their contact
+        # attacks retain the weapon's actual type (arrows pass theirs explicitly).
+        if not pvp and damage_kind is None and spec.get('content_version')=='UI_20':
+            damage_kind=spec.get('melee_damage_type','bludgeoning')
         attacks=spec.get('adventure_attacks')
         if pvp or area or spell or dice is not None or not attacks or environment.polymorph(source):
             return super().hit_player(source,target,power,pvp=pvp,unjust=unjust,area=area,dice=dice,

@@ -95,7 +95,10 @@ class RangerMagic:
             value['next_damage'] = now + rules.ROUND_SECONDS
             paid = value['profile']
             periodic = {**paid, 'kind':'periodic', 'save':None}
-            self.spell_damage(owner, target, periodic)
+            impacts=[]
+            self._record_field_damage(owner,target,periodic,impacts)
+            self._field_tick_effect(owner,dict(x=target.x,y=target.y,floor=target.floor,
+                effect_id='condition:'+owner.id+':'+self.target_ref(target)+':'+ENSNARING),periodic,impacts)
             if target.hp <= 0 or not target.alive:
                 self.end_ensnaring_strike(target, key, value, owner)
                 return

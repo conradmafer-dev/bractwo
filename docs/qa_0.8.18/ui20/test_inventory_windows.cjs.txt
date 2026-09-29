@@ -1,0 +1,17 @@
+✔ compact potion includes strength and quantity, no zero weapon stats (0.902381ms)
+✔ weapon shows actual personalized rolls without repeating enchantment (0.150724ms)
+✔ armor and resistance use compact concrete descriptions (0.118566ms)
+✔ requirements display meaningful level but no class wall of text (0.149522ms)
+✔ all-class supplies need no class wall of text (0.146538ms)
+✔ no source row until server provides owner-discovered sources (0.142381ms)
+✔ negative window position remains on screen (0.588705ms)
+✔ offscreen close header is clamped to viewport (0.103344ms)
+✔ oversized saved window remains reachable on mobile (0.112177ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 8.524004

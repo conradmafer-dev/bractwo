@@ -1,0 +1,13 @@
+✔ concave region uses polygon, not rectangular bounds (0.790364ms)
+✔ coastal indentation and channel stay ocean while detached island stays land (0.194398ms)
+✔ shared coastline includes boundary edges and old no-coast worlds (0.145866ms)
+✔ polygon terrain footprint differs from legacy ellipse, with safe ellipse support (0.197433ms)
+✔ surface lookup shares polygon terrain and retains path precedence (0.496417ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6.933009

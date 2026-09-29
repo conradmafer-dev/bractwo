@@ -107,8 +107,10 @@ class ExpansionGame:
         boatman = next((n for n in content.NPCS if source and n['id'] == source.get('npc_id')), None)
         if not boatman or not near(p, boatman) or route_id not in boatman.get('routes', []):
             return await self.notice(p, 'Podejdź do przewoźnika obsługującego ten rejs.')
-        if not destination or p.level < route.get('min_level', 1) or p.gold < route['cost']:
-            return await self.notice(p, f"Rejs wymaga poziomu {route.get('min_level', 1)} i {route['cost']} złota.")
+        if not destination:
+            return await self.notice(p, 'Nie odnaleziono przystani docelowej.')
+        if p.gold < route['cost']:
+            return await self.notice(p, f"Rejs kosztuje {route['cost']} złota. Brakuje {route['cost'] - p.gold} złota.")
         x, y, floor = destination['x'], destination['y'], destination.get('floor', 0)
         if self.blocked(x, y, floor=floor):
             return await self.notice(p, 'Przystań docelowa jest niedostępna.')

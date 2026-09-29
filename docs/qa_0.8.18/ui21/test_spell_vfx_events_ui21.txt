@@ -1,0 +1,15 @@
+test_call_lightning_recast_is_only_one_immediate_strike (test_spell_vfx_events_ui21.SpellEvents.test_call_lightning_recast_is_only_one_immediate_strike) ... ok
+test_circle_field_snapshot_identity_age_and_one_real_initial_tick (test_spell_vfx_events_ui21.SpellEvents.test_circle_field_snapshot_identity_age_and_one_real_initial_tick) ... ok
+test_concentration_end_removes_field_and_prevents_future_tick (test_spell_vfx_events_ui21.SpellEvents.test_concentration_end_removes_field_and_prevents_future_tick) ... ok
+test_ground_area_center_is_selected_point_not_first_victim (test_spell_vfx_events_ui21.SpellEvents.test_ground_area_center_is_selected_point_not_first_victim) ... ok
+test_metadata_only_dispatch_uses_no_rng_or_combat_mutation (test_spell_vfx_events_ui21.SpellEvents.test_metadata_only_dispatch_uses_no_rng_or_combat_mutation) ... ok
+test_moonbeam_one_tick_for_actual_victims_no_extra_or_empty_hits (test_spell_vfx_events_ui21.SpellEvents.test_moonbeam_one_tick_for_actual_victims_no_extra_or_empty_hits) ... ok
+test_spike_growth_records_each_real_movement_damage_resolution (test_spell_vfx_events_ui21.SpellEvents.test_spike_growth_records_each_real_movement_damage_resolution) ... ok
+test_star_arrow_has_a_targeted_event_for_actual_shot (test_spell_vfx_events_ui21.SpellEvents.test_star_arrow_has_a_targeted_event_for_actual_shot) ... ok
+test_thunderwave_square_matches_real_width (test_spell_vfx_events_ui21.SpellEvents.test_thunderwave_square_matches_real_width) ... ok
+test_tree_stride_teleport_captures_departure_before_moving (test_spell_vfx_events_ui21.SpellEvents.test_tree_stride_teleport_captures_departure_before_moving) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.288s
+
+OK

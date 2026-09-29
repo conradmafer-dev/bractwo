@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs><radialGradient id="back"><stop stop-color="#373853"/><stop offset="1" stop-color="#112b29"/></radialGradient>
+    <linearGradient id="ink" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#a294cb"/><stop offset="1" stop-color="#d9d9ef"/></linearGradient></defs>
+  <rect x="1" y="1" width="62" height="62" rx="10" fill="url(#back)" stroke="#a294cb" stroke-opacity=".75"/>
+  <circle cx="32" cy="32" r="26" fill="none" stroke="#a294cb" stroke-opacity=".16"/>
+  <circle cx="32" cy="20" r="5" fill="url(#ink)" stroke="#e9f2d8" stroke-width="2" opacity="1"/><path d="M28 27L22 36M36 27L42 36M28 27H36L37 39L41 51M27 39L23 51M27 39H37" fill="none" stroke="#d6e9e5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1"/><path d="M13 28Q32 20 51 28M12 37Q32 46 52 37M15 47Q32 40 49 47" fill="none" stroke="#d8bd7b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="1"/><circle cx="15" cy="28" r="3" fill="#625276" stroke="#eddaa0" stroke-width="2" opacity="1"/><circle cx="49" cy="37" r="3" fill="#625276" stroke="#eddaa0" stroke-width="2" opacity="1"/>
+</svg>

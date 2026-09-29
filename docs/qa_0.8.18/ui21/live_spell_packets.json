@@ -1,0 +1,1924 @@
+[
+  {
+    "key": "call_lightning",
+    "name": "Wezwanie błyskawicy",
+    "spec": {
+      "name": "Wezwanie błyskawicy",
+      "english": "Call Lightning",
+      "words": "Call Lightning",
+      "circle": 3,
+      "class_ids": [
+        "druid"
+      ],
+      "min_level": 20,
+      "mana": 50,
+      "cooldown": 0,
+      "action": "action",
+      "kind": "save",
+      "description": "Wezwij błyskawicę w małym obszarze. Obrona ZRĘ zmniejsza obrażenia o połowę. Kolejne wezwania przy utrzymanej koncentracji nie kosztują many.",
+      "range": 310,
+      "radius": 32,
+      "effect": "spell",
+      "source": "SRD 5.2.1",
+      "dice": [
+        3,
+        10,
+        0
+      ],
+      "damage_type": "lightning",
+      "save": "dexterity",
+      "save_half": true,
+      "area": true,
+      "concentration": true,
+      "duration": 30,
+      "recast": true,
+      "id": "call_lightning",
+      "shape": "circle",
+      "visual": {
+        "style": "area",
+        "theme": "lightning",
+        "colors": [
+          "#7777ff",
+          "#c6c3ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "icon": "assets/spells/call_lightning.svg",
+      "targeting": "hostile",
+      "pvp": true,
+      "class_levels": {
+        "druid": 20
+      },
+      "cast_circle": 3,
+      "power_choice": 3,
+      "power_options": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "resolved": true,
+      "duration_rounds": 10,
+      "power_summary": "Rzucanie: krąg 3 · Obrażenia: 3k10 · 10 rund"
+    },
+    "events": [
+      {
+        "id": "fx100",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "world_11509",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 2.0500000000000007,
+        "duration": 0.9,
+        "radius": 32,
+        "spell_id": "call_lightning",
+        "visual": {
+          "style": "area",
+          "theme": "lightning",
+          "colors": [
+            "#7777ff",
+            "#c6c3ff",
+            "#ffffff"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 3,
+        "phase": "cast",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 2.0500000000000007,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false
+          }
+        ],
+        "area": {
+          "shape": "circle",
+          "origin": [
+            118470,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            1,
+            0
+          ],
+          "length": 310,
+          "width": 32,
+          "radius": 32,
+          "polygons": [],
+          "circles": [
+            [
+              118610,
+              18430,
+              32
+            ]
+          ],
+          "bounds": [
+            118578,
+            18398,
+            118642,
+            18462
+          ]
+        }
+      },
+      {
+        "id": "fx102",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "world_11509",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 2.25,
+        "duration": 0.9,
+        "radius": 32,
+        "spell_id": "call_lightning",
+        "visual": {
+          "style": "area",
+          "theme": "lightning",
+          "colors": [
+            "#7777ff",
+            "#c6c3ff",
+            "#ffffff"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 3,
+        "phase": "recast",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 2.25,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false
+          }
+        ],
+        "area": {
+          "shape": "circle",
+          "origin": [
+            118470,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            1,
+            0
+          ],
+          "length": 310,
+          "width": 32,
+          "radius": 32,
+          "polygons": [],
+          "circles": [
+            [
+              118610,
+              18430,
+              32
+            ]
+          ],
+          "bounds": [
+            118578,
+            18398,
+            118642,
+            18462
+          ]
+        }
+      }
+    ],
+    "fields": []
+  },
+  {
+    "key": "moonbeam",
+    "name": "Promień księżyca",
+    "spec": {
+      "name": "Promień księżyca",
+      "english": "Moonbeam",
+      "words": "Moonbeam",
+      "circle": 2,
+      "class_ids": [
+        "druid"
+      ],
+      "min_level": 10,
+      "mana": 30,
+      "cooldown": 0,
+      "action": "action",
+      "kind": "field",
+      "description": "Promieniste pole rani co rundę. Udana obrona KON zmniejsza obrażenia o połowę. Wymaga koncentracji.",
+      "range": 420,
+      "radius": 32,
+      "effect": "spell",
+      "source": "SRD 5.2.1",
+      "dice": [
+        2,
+        10,
+        0
+      ],
+      "damage_type": "radiant",
+      "save": "constitution",
+      "save_half": true,
+      "concentration": true,
+      "duration": 30,
+      "area": true,
+      "id": "moonbeam",
+      "shape": "circle",
+      "visual": {
+        "style": "area",
+        "theme": "cold",
+        "colors": [
+          "#46b9ff",
+          "#a0eaff",
+          "#f7ffff"
+        ],
+        "shots": 1
+      },
+      "icon": "assets/spells/moonbeam.svg",
+      "targeting": "hostile",
+      "pvp": true,
+      "class_levels": {
+        "druid": 10
+      },
+      "cast_circle": 2,
+      "power_choice": 2,
+      "power_options": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "resolved": true,
+      "duration_rounds": 10,
+      "power_summary": "Rzucanie: krąg 2 · Obrażenia: 2k10 · 10 rund"
+    },
+    "events": [
+      {
+        "id": "fx104",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "world_11509",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 2.499999999999999,
+        "duration": 30,
+        "radius": 32,
+        "spell_id": "moonbeam",
+        "visual": {
+          "style": "area",
+          "theme": "cold",
+          "colors": [
+            "#46b9ff",
+            "#a0eaff",
+            "#f7ffff"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 2,
+        "phase": "field",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 2.499999999999999,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false
+          }
+        ],
+        "area": {
+          "shape": "circle",
+          "origin": [
+            118470,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            1,
+            0
+          ],
+          "length": 420,
+          "width": 32,
+          "radius": 32,
+          "polygons": [],
+          "circles": [
+            [
+              118610,
+              18430,
+              32
+            ]
+          ],
+          "bounds": [
+            118578,
+            18398,
+            118642,
+            18462
+          ]
+        },
+        "persistent": true,
+        "field_id": "fx104"
+      },
+      {
+        "id": "fx106",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "",
+        "floor": -25,
+        "x": 118610,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 2.549999999999999,
+        "duration": 0.72,
+        "radius": 32,
+        "spell_id": "moonbeam",
+        "visual": {
+          "style": "area",
+          "theme": "cold",
+          "colors": [
+            "#46b9ff",
+            "#a0eaff",
+            "#f7ffff"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 2,
+        "phase": "tick",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 2.549999999999999,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false,
+            "damage": 7,
+            "hit": true,
+            "saved": true,
+            "damage_type": "radiant"
+          }
+        ],
+        "area": {
+          "shape": "circle",
+          "origin": [
+            118610,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            0,
+            1
+          ],
+          "length": 420,
+          "width": 32,
+          "radius": 32,
+          "polygons": [],
+          "circles": [
+            [
+              118610,
+              18430,
+              32
+            ]
+          ],
+          "bounds": [
+            118578,
+            18398,
+            118642,
+            18462
+          ]
+        },
+        "impacts": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false,
+            "damage": 7,
+            "hit": true,
+            "saved": true,
+            "damage_type": "radiant"
+          }
+        ],
+        "field_id": "fx104",
+        "field_started_at": 2.499999999999999,
+        "field_origin": [
+          118610,
+          18430
+        ]
+      }
+    ],
+    "fields": []
+  },
+  {
+    "key": "fireball",
+    "name": "Kula ognia",
+    "spec": {
+      "name": "Kula ognia",
+      "english": "Fireball",
+      "words": "Fireball",
+      "circle": 3,
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 20,
+      "mana": 50,
+      "cooldown": 0,
+      "action": "action",
+      "kind": "save",
+      "description": "Ognista eksplozja wokół celu. Udana obrona ZRĘ zmniejsza obrażenia o połowę.",
+      "range": 310,
+      "radius": 128,
+      "effect": "spell",
+      "source": "SRD 5.2.1",
+      "dice": [
+        8,
+        6,
+        0
+      ],
+      "damage_type": "fire",
+      "save": "dexterity",
+      "save_half": true,
+      "area": true,
+      "id": "fireball",
+      "shape": "circle",
+      "visual": {
+        "style": "area",
+        "theme": "fire",
+        "colors": [
+          "#ff7739",
+          "#ffd276",
+          "#fff5d1"
+        ],
+        "shots": 1
+      },
+      "icon": "assets/spells/fireball.svg",
+      "targeting": "hostile",
+      "pvp": true,
+      "class_levels": {
+        "mage": 20
+      },
+      "cast_circle": 3,
+      "power_choice": 3,
+      "power_options": [
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "resolved": true,
+      "power_summary": "Rzucanie: krąg 3 · Obrażenia: 8k6"
+    },
+    "events": [
+      {
+        "id": "fx109",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "world_11509",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 3.049999999999997,
+        "duration": 0.9,
+        "radius": 128,
+        "spell_id": "fireball",
+        "visual": {
+          "style": "area",
+          "theme": "fire",
+          "colors": [
+            "#ff7739",
+            "#ffd276",
+            "#fff5d1"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 3,
+        "phase": "cast",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 3.049999999999997,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false
+          }
+        ],
+        "area": {
+          "shape": "circle",
+          "origin": [
+            118470,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            1,
+            0
+          ],
+          "length": 310,
+          "width": 32,
+          "radius": 128,
+          "polygons": [],
+          "circles": [
+            [
+              118610,
+              18430,
+              128
+            ]
+          ],
+          "bounds": [
+            118482,
+            18302,
+            118738,
+            18558
+          ]
+        }
+      }
+    ],
+    "fields": []
+  },
+  {
+    "key": "ice_storm",
+    "name": "Lodowa burza",
+    "spec": {
+      "name": "Lodowa burza",
+      "english": "Ice Storm",
+      "words": "Ice Storm",
+      "circle": 4,
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "min_level": 30,
+      "mana": 60,
+      "cooldown": 0,
+      "action": "action",
+      "kind": "save",
+      "description": "Grad zadaje obrażenia obuchowe i od zimna; udana obrona ZRĘ zmniejsza je o połowę. Spowalnia na rundę. Wyższy krąg wzmacnia tylko grad.",
+      "range": 310,
+      "radius": 128,
+      "effect": "spell",
+      "source": "SRD 5.2.1",
+      "dice": [
+        2,
+        10,
+        0
+      ],
+      "extra_dice": [
+        4,
+        6,
+        0
+      ],
+      "damage_type": "bludgeoning",
+      "extra_type": "cold",
+      "save": "dexterity",
+      "save_half": true,
+      "area": true,
+      "slow": 3,
+      "id": "ice_storm",
+      "shape": "circle",
+      "visual": {
+        "style": "area",
+        "theme": "arcane",
+        "colors": [
+          "#608acc",
+          "#b6d2ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "icon": "assets/spells/ice_storm.svg",
+      "targeting": "hostile",
+      "pvp": true,
+      "class_levels": {
+        "mage": 30,
+        "druid": 30
+      },
+      "cast_circle": 4,
+      "power_choice": 4,
+      "power_options": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "resolved": true,
+      "power_summary": "Rzucanie: krąg 4 · Obrażenia: 2k10 + 4k6"
+    },
+    "events": [
+      {
+        "id": "fx111",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "world_11509",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 3.399999999999996,
+        "duration": 0.9,
+        "radius": 128,
+        "spell_id": "ice_storm",
+        "visual": {
+          "style": "area",
+          "theme": "arcane",
+          "colors": [
+            "#608acc",
+            "#b6d2ff",
+            "#ffffff"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 4,
+        "phase": "cast",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 3.399999999999996,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false
+          }
+        ],
+        "area": {
+          "shape": "circle",
+          "origin": [
+            118470,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            1,
+            0
+          ],
+          "length": 310,
+          "width": 32,
+          "radius": 128,
+          "polygons": [],
+          "circles": [
+            [
+              118610,
+              18430,
+              128
+            ]
+          ],
+          "bounds": [
+            118482,
+            18302,
+            118738,
+            18558
+          ]
+        }
+      }
+    ],
+    "fields": []
+  },
+  {
+    "key": "thorn_whip",
+    "name": "Ciernisty bicz",
+    "spec": {
+      "name": "Ciernisty bicz",
+      "english": "Thorn Whip",
+      "words": "Thorn Whip",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "min_level": 1,
+      "mana": 0,
+      "cooldown": 0,
+      "action": "action",
+      "kind": "attack",
+      "description": "Ciernisty bicz zadaje obrażenia kłute i przyciąga mniejszego przeciwnika do 10 stóp. Rzut ataku czarem wręcz.",
+      "range": 192,
+      "radius": 0,
+      "effect": "spell",
+      "source": "SRD 5.2.1",
+      "dice": [
+        4,
+        6,
+        0
+      ],
+      "damage_type": "piercing",
+      "scales": true,
+      "melee": true,
+      "pull": 64,
+      "id": "thorn_whip",
+      "shape": "single",
+      "visual": {
+        "style": "beam",
+        "theme": "piercing",
+        "colors": [
+          "#54743e",
+          "#a7d674",
+          "#eefbb8"
+        ],
+        "shots": 1
+      },
+      "icon": "assets/spells/thorn_whip.svg",
+      "targeting": "hostile",
+      "pvp": true,
+      "class_levels": {
+        "druid": 1
+      },
+      "cast_circle": 0,
+      "power_choice": 0,
+      "power_options": [],
+      "resolved": true,
+      "power_summary": "Obrażenia: 4k6"
+    },
+    "events": [
+      {
+        "id": "fx113",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "world_11509",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 3.7999999999999945,
+        "duration": 0.72,
+        "radius": 0,
+        "spell_id": "thorn_whip",
+        "visual": {
+          "style": "beam",
+          "theme": "piercing",
+          "colors": [
+            "#54743e",
+            "#a7d674",
+            "#eefbb8"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 0,
+        "phase": "cast",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 3.7999999999999945,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false
+          }
+        ]
+      }
+    ],
+    "fields": []
+  },
+  {
+    "key": "cure_wounds",
+    "name": "Leczenie ran",
+    "spec": {
+      "name": "Leczenie ran",
+      "english": "Cure Wounds",
+      "words": "Cure Wounds",
+      "circle": 1,
+      "class_ids": [
+        "druid",
+        "ranger"
+      ],
+      "min_level": 1,
+      "mana": 20,
+      "cooldown": 0,
+      "action": "action",
+      "kind": "heal",
+      "description": "Dotyk przywraca zdrowie. Domyślnie leczysz siebie; zaznacz członka drużyny, aby uleczyć jego.",
+      "range": 108,
+      "radius": 0,
+      "effect": "spell",
+      "source": "SRD 5.2.1",
+      "dice": [
+        2,
+        8,
+        5
+      ],
+      "add_ability": true,
+      "id": "cure_wounds",
+      "shape": "single",
+      "visual": {
+        "style": "heal",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "icon": "assets/spells/cure_wounds.svg",
+      "targeting": "ally",
+      "pvp": true,
+      "class_levels": {
+        "druid": 1,
+        "ranger": 1
+      },
+      "cast_circle": 1,
+      "power_choice": 1,
+      "power_options": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "resolved": true,
+      "power_summary": "Rzucanie: krąg 1 · Leczenie: 2k8+5"
+    },
+    "events": [
+      {
+        "id": "fx115",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "1",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118470,
+        "target_y": 18430,
+        "time": 4.099999999999993,
+        "duration": 0.72,
+        "radius": 0,
+        "spell_id": "cure_wounds",
+        "visual": {
+          "style": "heal",
+          "theme": "nature",
+          "colors": [
+            "#53a365",
+            "#b2eaa2",
+            "#f2ffce"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 1,
+        "phase": "cast",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 4.099999999999993,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "1",
+            "x": 118470,
+            "y": 18430,
+            "player": true
+          }
+        ]
+      }
+    ],
+    "fields": []
+  },
+  {
+    "key": "misty_step",
+    "name": "Mglisty krok",
+    "spec": {
+      "name": "Mglisty krok",
+      "english": "Misty Step",
+      "words": "Misty Step",
+      "circle": 2,
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 10,
+      "mana": 30,
+      "cooldown": 0,
+      "action": "bonus",
+      "kind": "teleport",
+      "description": "Akcja dodatkowa: teleport do widocznego, wolnego punktu przed postacią, maks. 192 jednostki.",
+      "range": 310,
+      "radius": 0,
+      "effect": "spell",
+      "source": "SRD 5.2.1",
+      "id": "misty_step",
+      "shape": "single",
+      "visual": {
+        "style": "teleport",
+        "theme": "arcane",
+        "colors": [
+          "#608acc",
+          "#b6d2ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "icon": "assets/spells/misty_step.svg",
+      "targeting": "self",
+      "pvp": true,
+      "class_levels": {
+        "mage": 10
+      },
+      "cast_circle": 2,
+      "power_choice": 0,
+      "power_options": [],
+      "resolved": true,
+      "power_summary": "Rzucanie: krąg 2"
+    },
+    "events": [
+      {
+        "id": "fx117",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "1",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118662,
+        "target_y": 18430,
+        "time": 4.399999999999992,
+        "duration": 0.72,
+        "radius": 0,
+        "spell_id": "misty_step",
+        "visual": {
+          "style": "teleport",
+          "theme": "arcane",
+          "colors": [
+            "#608acc",
+            "#b6d2ff",
+            "#ffffff"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 2,
+        "phase": "cast",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 4.399999999999992,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "1",
+            "x": 118662,
+            "y": 18430,
+            "player": false
+          }
+        ]
+      }
+    ],
+    "fields": []
+  },
+  {
+    "key": "fog_cloud",
+    "name": "Mglista chmura",
+    "spec": {
+      "id": "fog_cloud",
+      "name": "Mglista chmura",
+      "english": "Fog Cloud",
+      "words": "Mglista chmura",
+      "circle": 1,
+      "class_ids": [],
+      "class_levels": {},
+      "class_min_levels": {},
+      "min_level": 1,
+      "kind": "circle_field",
+      "action": "action",
+      "mana": 20,
+      "cooldown": 0,
+      "range": 768,
+      "radius": 128,
+      "shape": "circle",
+      "targeting": "enemy",
+      "source": "PHB 2024",
+      "description": "Silnie przesłaniająca mgła. Silny wiatr ją rozprasza; +20 stóp promienia za wyższy krąg.",
+      "icon": "assets/spells/fog_cloud.svg",
+      "effect": "spell",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "duration": 1800,
+      "concentration": true,
+      "obscure": true,
+      "ground_target": true,
+      "cast_circle": 1,
+      "power_choice": 1,
+      "power_options": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "resolved": true,
+      "duration_rounds": 600,
+      "power_summary": "Rzucanie: krąg 1 · 600 rund"
+    },
+    "events": [
+      {
+        "id": "fx118",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 4.699999999999991,
+        "duration": 1800,
+        "radius": 128,
+        "spell_id": "fog_cloud",
+        "visual": {
+          "style": "field",
+          "theme": "nature",
+          "colors": [
+            "#578879",
+            "#a2d9bd",
+            "#e2fff0"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 1,
+        "phase": "field",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 4.699999999999991,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [],
+        "area": {
+          "shape": "circle",
+          "origin": [
+            118610,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            0,
+            1
+          ],
+          "length": 768,
+          "width": 32,
+          "radius": 128,
+          "polygons": [],
+          "circles": [
+            [
+              118610,
+              18430,
+              128
+            ]
+          ],
+          "bounds": [
+            118482,
+            18302,
+            118738,
+            18558
+          ]
+        },
+        "persistent": true,
+        "field_id": "fx118"
+      }
+    ],
+    "fields": [
+      {
+        "id": "circle:1:fog_cloud:10117.445194639",
+        "key": "fog_cloud",
+        "x": 118610,
+        "y": 18430,
+        "floor": -25,
+        "radius": 128,
+        "concentration": true,
+        "shape": "circle",
+        "visual": {
+          "style": "field",
+          "theme": "nature",
+          "colors": [
+            "#578879",
+            "#a2d9bd",
+            "#e2fff0"
+          ],
+          "shots": 1
+        },
+        "effect_id": "fx118",
+        "spell_id": "fog_cloud",
+        "source_id": "1",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 4.699999999999991,
+        "age": 0.21095152599991707
+      }
+    ]
+  },
+  {
+    "key": "web",
+    "name": "Pajęczyna",
+    "spec": {
+      "id": "web",
+      "name": "Pajęczyna",
+      "english": "Web",
+      "words": "Pajęczyna",
+      "circle": 2,
+      "class_ids": [],
+      "class_levels": {},
+      "class_min_levels": {},
+      "min_level": 10,
+      "kind": "circle_field",
+      "action": "action",
+      "mana": 30,
+      "cooldown": 0,
+      "range": 384,
+      "radius": 64,
+      "shape": "square",
+      "targeting": "enemy",
+      "source": "PHB 2024",
+      "description": "Sześcian pajęczyn 20 stóp; obrona Zręczności albo spętanie. Akcja Atletyki uwalnia; ogień wypala pajęczynę.",
+      "icon": "assets/spells/web.svg",
+      "effect": "spell",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "duration": 1800,
+      "concentration": true,
+      "light_obscure": true,
+      "difficult_terrain": true,
+      "save": "dexterity",
+      "circle_options": {
+        "actions": [
+          {
+            "id": "escape_web",
+            "name": "Wyrwij się"
+          }
+        ]
+      },
+      "ground_target": true,
+      "cast_circle": 2,
+      "power_choice": 0,
+      "power_options": [],
+      "resolved": true,
+      "duration_rounds": 600,
+      "power_summary": "Rzucanie: krąg 2 · 600 rund"
+    },
+    "events": [
+      {
+        "id": "fx119",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 4.99999999999999,
+        "duration": 1800,
+        "radius": 64,
+        "spell_id": "web",
+        "visual": {
+          "style": "field",
+          "theme": "nature",
+          "colors": [
+            "#578879",
+            "#a2d9bd",
+            "#e2fff0"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 2,
+        "phase": "field",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 4.99999999999999,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [],
+        "area": {
+          "shape": "square",
+          "origin": [
+            118610,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            0,
+            1
+          ],
+          "length": 384,
+          "width": 128,
+          "radius": 64,
+          "polygons": [
+            [
+              [
+                118546,
+                18366
+              ],
+              [
+                118674,
+                18366
+              ],
+              [
+                118674,
+                18494
+              ],
+              [
+                118546,
+                18494
+              ]
+            ]
+          ],
+          "circles": [],
+          "bounds": [
+            118546,
+            18366,
+            118674,
+            18494
+          ]
+        },
+        "persistent": true,
+        "field_id": "fx119"
+      }
+    ],
+    "fields": [
+      {
+        "id": "circle:1:web:10117.733338691",
+        "key": "web",
+        "x": 118610,
+        "y": 18430,
+        "floor": -25,
+        "radius": 64,
+        "concentration": true,
+        "shape": "square",
+        "visual": {
+          "style": "field",
+          "theme": "nature",
+          "colors": [
+            "#578879",
+            "#a2d9bd",
+            "#e2fff0"
+          ],
+          "shots": 1
+        },
+        "effect_id": "fx119",
+        "spell_id": "web",
+        "source_id": "1",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 4.99999999999999,
+        "age": 0.22290653500022017
+      }
+    ]
+  },
+  {
+    "key": "insect_plague",
+    "name": "Plaga owadów",
+    "spec": {
+      "id": "insect_plague",
+      "name": "Plaga owadów",
+      "english": "Insect Plague",
+      "words": "Plaga owadów",
+      "circle": 5,
+      "class_ids": [],
+      "class_levels": {},
+      "class_min_levels": {},
+      "min_level": 40,
+      "kind": "circle_field",
+      "action": "action",
+      "mana": 70,
+      "cooldown": 0,
+      "range": 1920,
+      "radius": 128,
+      "shape": "circle",
+      "targeting": "enemy",
+      "source": "PHB 2024",
+      "description": "Przy pojawieniu, wejściu lub końcu tury: 4k10 kłutych, obrona Kondycji zmniejsza o połowę; raz na turę.",
+      "icon": "assets/spells/insect_plague.svg",
+      "effect": "spell",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "duration": 300,
+      "concentration": true,
+      "light_obscure": true,
+      "difficult_terrain": true,
+      "save": "constitution",
+      "save_half": true,
+      "dice": [
+        4,
+        10,
+        0
+      ],
+      "damage_type": "piercing",
+      "ground_target": true,
+      "cast_circle": 5,
+      "power_choice": 5,
+      "power_options": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "resolved": true,
+      "duration_rounds": 100,
+      "power_summary": "Rzucanie: krąg 5 · Obrażenia: 4k10 · 100 rund"
+    },
+    "events": [
+      {
+        "id": "fx120",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 5.399999999999989,
+        "duration": 300,
+        "radius": 128,
+        "spell_id": "insect_plague",
+        "visual": {
+          "style": "field",
+          "theme": "nature",
+          "colors": [
+            "#578879",
+            "#a2d9bd",
+            "#e2fff0"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 5,
+        "phase": "field",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 5.399999999999989,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [],
+        "area": {
+          "shape": "circle",
+          "origin": [
+            118610,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            0,
+            1
+          ],
+          "length": 1920,
+          "width": 32,
+          "radius": 128,
+          "polygons": [],
+          "circles": [
+            [
+              118610,
+              18430,
+              128
+            ]
+          ],
+          "bounds": [
+            118482,
+            18302,
+            118738,
+            18558
+          ]
+        },
+        "persistent": true,
+        "field_id": "fx120"
+      },
+      {
+        "id": "fx122",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "",
+        "floor": -25,
+        "x": 118610,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 5.399999999999989,
+        "duration": 0.72,
+        "radius": 128,
+        "spell_id": "insect_plague",
+        "visual": {
+          "style": "field",
+          "theme": "nature",
+          "colors": [
+            "#578879",
+            "#a2d9bd",
+            "#e2fff0"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 5,
+        "phase": "tick",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 5.399999999999989,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false,
+            "damage": 27,
+            "hit": true,
+            "saved": false,
+            "damage_type": "piercing"
+          }
+        ],
+        "area": {
+          "shape": "circle",
+          "origin": [
+            118610,
+            18430
+          ],
+          "center": [
+            118610,
+            18430
+          ],
+          "direction": [
+            0,
+            1
+          ],
+          "length": 1920,
+          "width": 32,
+          "radius": 128,
+          "polygons": [],
+          "circles": [
+            [
+              118610,
+              18430,
+              128
+            ]
+          ],
+          "bounds": [
+            118482,
+            18302,
+            118738,
+            18558
+          ]
+        },
+        "impacts": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false,
+            "damage": 27,
+            "hit": true,
+            "saved": false,
+            "damage_type": "piercing"
+          }
+        ],
+        "field_id": "fx120",
+        "field_started_at": 5.399999999999989,
+        "field_origin": [
+          118610,
+          18430
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "circle:1:insect_plague:10118.131796778",
+        "key": "insect_plague",
+        "x": 118610,
+        "y": 18430,
+        "floor": -25,
+        "radius": 128,
+        "concentration": true,
+        "damage_type": "piercing",
+        "shape": "circle",
+        "visual": {
+          "style": "field",
+          "theme": "nature",
+          "colors": [
+            "#578879",
+            "#a2d9bd",
+            "#e2fff0"
+          ],
+          "shots": 1
+        },
+        "effect_id": "fx120",
+        "spell_id": "insect_plague",
+        "source_id": "1",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 5.399999999999989,
+        "age": 0.22932562200003304
+      }
+    ]
+  },
+  {
+    "key": "magic_missile",
+    "name": "Magiczny pocisk",
+    "spec": {
+      "name": "Magiczny pocisk",
+      "english": "Magic Missile",
+      "words": "Magic Missile",
+      "circle": 1,
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 1,
+      "mana": 20,
+      "cooldown": 0,
+      "action": "action",
+      "kind": "missiles",
+      "description": "Pociski mocy trafiają automatycznie. Każdy zadaje 1k4+1 obrażeń. Tarcza zatrzymuje całą salwę.",
+      "range": 310,
+      "radius": 0,
+      "effect": "spell",
+      "source": "SRD 5.2.1",
+      "dice": [
+        1,
+        4,
+        1
+      ],
+      "damage_type": "force",
+      "shots": 3,
+      "id": "magic_missile",
+      "shape": "single",
+      "visual": {
+        "style": "missiles",
+        "theme": "force",
+        "colors": [
+          "#a981ff",
+          "#ecc6ff",
+          "#ffffff"
+        ],
+        "shots": 3
+      },
+      "icon": "assets/spells/magic_missile.svg",
+      "targeting": "hostile",
+      "pvp": true,
+      "class_levels": {
+        "mage": 1
+      },
+      "cast_circle": 1,
+      "power_choice": 1,
+      "power_options": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "resolved": true,
+      "power_summary": "Rzucanie: krąg 1 · 3 × 1k4+1"
+    },
+    "events": [
+      {
+        "id": "fx123",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "world_11509",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 5.699999999999988,
+        "duration": 0.72,
+        "radius": 0,
+        "spell_id": "magic_missile",
+        "visual": {
+          "style": "missiles",
+          "theme": "force",
+          "colors": [
+            "#a981ff",
+            "#ecc6ff",
+            "#ffffff"
+          ],
+          "shots": 3
+        },
+        "shots": 3,
+        "cast_circle": 1,
+        "phase": "cast",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 5.699999999999988,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false
+          }
+        ]
+      }
+    ],
+    "fields": []
+  },
+  {
+    "key": "ray_of_frost",
+    "name": "Promień mrozu",
+    "spec": {
+      "name": "Promień mrozu",
+      "english": "Ray of Frost",
+      "words": "Ray of Frost",
+      "circle": 0,
+      "class_ids": [
+        "mage"
+      ],
+      "min_level": 1,
+      "mana": 0,
+      "cooldown": 0,
+      "action": "action",
+      "kind": "attack",
+      "description": "Zimny promień. Trafiony cel porusza się wolniej przez jedną rundę.",
+      "range": 310,
+      "radius": 0,
+      "effect": "spell",
+      "source": "SRD 5.2.1",
+      "dice": [
+        4,
+        8,
+        0
+      ],
+      "damage_type": "cold",
+      "scales": true,
+      "slow": 3,
+      "id": "ray_of_frost",
+      "shape": "single",
+      "visual": {
+        "style": "beam",
+        "theme": "cold",
+        "colors": [
+          "#46b9ff",
+          "#a0eaff",
+          "#f7ffff"
+        ],
+        "shots": 1
+      },
+      "icon": "assets/spells/ray_of_frost.svg",
+      "targeting": "hostile",
+      "pvp": true,
+      "class_levels": {
+        "mage": 1
+      },
+      "cast_circle": 0,
+      "power_choice": 0,
+      "power_options": [],
+      "resolved": true,
+      "power_summary": "Obrażenia: 4k8"
+    },
+    "events": [
+      {
+        "id": "fx127",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "world_11509",
+        "floor": -25,
+        "x": 118470,
+        "y": 18430,
+        "target_x": 118610,
+        "target_y": 18430,
+        "time": 5.999999999999987,
+        "duration": 0.72,
+        "radius": 0,
+        "spell_id": "ray_of_frost",
+        "visual": {
+          "style": "beam",
+          "theme": "cold",
+          "colors": [
+            "#46b9ff",
+            "#a0eaff",
+            "#f7ffff"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 0,
+        "phase": "cast",
+        "cast_origin": [
+          118470,
+          18430
+        ],
+        "started_at": 5.999999999999987,
+        "source": {
+          "id": "1",
+          "x": 118470,
+          "y": 18430,
+          "floor": -25
+        },
+        "targets": [
+          {
+            "id": "world_11509",
+            "x": 118610,
+            "y": 18430,
+            "player": false
+          }
+        ]
+      }
+    ],
+    "fields": []
+  }
+]

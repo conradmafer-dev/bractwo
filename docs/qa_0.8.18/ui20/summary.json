@@ -1,0 +1,38 @@
+{
+  "revision": "UI_20",
+  "based_on": "BRACTWO_0.8.18_UI_19_FULL_SOURCE(1).zip",
+  "passed": true,
+  "built_at": "2026-09-29T18:35:26.359012+00:00",
+  "server_tests": 118,
+  "geography_tests": 8,
+  "browser_scenarios": 19,
+  "javascript_suites": 6,
+  "syntax_files": 58,
+  "reports": [
+    "core_regression.json",
+    "continent_results.json",
+    "javascript.json",
+    "syntax.json",
+    "browser_results.json"
+  ],
+  "scope": [
+    "Actual game server and SQLite state",
+    "Actual HTTP/WebSocket browser registration and rendering on desktop and touch viewport",
+    "All surface service/stair/port approaches and spawn collision",
+    "All new dungeon chambers, spawns, stairs, bosses and return routes",
+    "Rare loot sources and canonical ring effects",
+    "Auto-target spell behavior, explicit target priority and icon delivery"
+  ],
+  "not_tested": [
+    "Physical Android device",
+    "Live user Railway deployment",
+    "Godot engine import, runtime, native export/APK: engine unavailable"
+  ],
+  "native_review": [
+    "Shared world geometry, minimap, coast ground, docks and boats",
+    "Local stock, ring descriptions and attunement",
+    "Subclass spell availability and icon asset paths",
+    "Source resources reviewed; no engine execution claimed"
+  ],
+  "deployment_performed": false
+}

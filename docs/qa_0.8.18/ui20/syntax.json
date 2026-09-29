@@ -1,0 +1,260 @@
+{
+  "passed": true,
+  "files": 58,
+  "checks": [
+    {
+      "file": "server/adventure_combat.py",
+      "passed": true
+    },
+    {
+      "file": "server/adventure_content.py",
+      "passed": true
+    },
+    {
+      "file": "server/caster_game.py",
+      "passed": true
+    },
+    {
+      "file": "server/caster_rules.py",
+      "passed": true
+    },
+    {
+      "file": "server/character_sheet.py",
+      "passed": true
+    },
+    {
+      "file": "server/combat_rules.py",
+      "passed": true
+    },
+    {
+      "file": "server/continent_world.py",
+      "passed": true
+    },
+    {
+      "file": "server/discovery_rules.py",
+      "passed": true
+    },
+    {
+      "file": "server/dnd_content.py",
+      "passed": true
+    },
+    {
+      "file": "server/dnd_game.py",
+      "passed": true
+    },
+    {
+      "file": "server/druid_beasts.py",
+      "passed": true
+    },
+    {
+      "file": "server/druid_circle_game.py",
+      "passed": true
+    },
+    {
+      "file": "server/druid_circle_spells.py",
+      "passed": true
+    },
+    {
+      "file": "server/druid_circles.py",
+      "passed": true
+    },
+    {
+      "file": "server/environment_rules.py",
+      "passed": true
+    },
+    {
+      "file": "server/equipment_rules.py",
+      "passed": true
+    },
+    {
+      "file": "server/expedition_content.py",
+      "passed": true
+    },
+    {
+      "file": "server/fighter_rules.py",
+      "passed": true
+    },
+    {
+      "file": "server/hunt_content.py",
+      "passed": true
+    },
+    {
+      "file": "server/inventory_rules.py",
+      "passed": true
+    },
+    {
+      "file": "server/level_up.py",
+      "passed": true
+    },
+    {
+      "file": "server/living_world.py",
+      "passed": true
+    },
+    {
+      "file": "server/loot_content.py",
+      "passed": true
+    },
+    {
+      "file": "server/loot_economy.py",
+      "passed": true
+    },
+    {
+      "file": "server/loot_tables.py",
+      "passed": true
+    },
+    {
+      "file": "server/magic_items.py",
+      "passed": true
+    },
+    {
+      "file": "server/monster_ai.py",
+      "passed": true
+    },
+    {
+      "file": "server/progression.py",
+      "passed": true
+    },
+    {
+      "file": "server/progression_guide.py",
+      "passed": true
+    },
+    {
+      "file": "server/ranger_magic.py",
+      "passed": true
+    },
+    {
+      "file": "server/rest_rules.py",
+      "passed": true
+    },
+    {
+      "file": "server/server.py",
+      "passed": true
+    },
+    {
+      "file": "server/spell_geometry.py",
+      "passed": true
+    },
+    {
+      "file": "server/spell_scaling.py",
+      "passed": true
+    },
+    {
+      "file": "server/vertical_world.py",
+      "passed": true
+    },
+    {
+      "file": "server/world_content.py",
+      "passed": true
+    },
+    {
+      "file": "web/adventure_ui.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/app_shell.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/atlas_map.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/caster_ui.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/caster_vfx.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/character_sheet.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/circle_spell_ui.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/circle_vfx.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/fighter_ui.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/fighter_vfx.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/game.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/hotbar_ui.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/inventory_ui.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/level_up.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/loot_ui.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/mobile.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/rest_ui.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/runtime.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/spell_vfx.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/sw.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/windows.js",
+      "passed": true,
+      "error": ""
+    },
+    {
+      "file": "web/world_geometry.js",
+      "passed": true,
+      "error": ""
+    }
+  ]
+}

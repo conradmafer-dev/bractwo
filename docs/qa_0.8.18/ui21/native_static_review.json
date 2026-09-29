@@ -1,0 +1,22 @@
+{
+  "status": "static_review_complete",
+  "runtime_tested": false,
+  "engine_available": false,
+  "apk_built": false,
+  "review": [
+    "Dedicated elemental, nature, healing, teleport and protective spell routes checked against server payload schema.",
+    "Ten persistent field families read live circle_fields and return actually drawn effect IDs for deduplication.",
+    "Tick events are transient and never suppressed with persistent ambient fields.",
+    "Viewport intersections preserve crossing beams and exact field boundaries.",
+    "Thin wall panels use clamped insets. Draw loops and particles have fixed budgets.",
+    "Explicit GDScript types and resource references reviewed; engine import/parse not executed."
+  ],
+  "files": {
+    "client/scripts/spell_vfx.gd": "8f8985b5923a1a5cec87d74719d71469b084c4b45ce46c98764d3efa196cd24a",
+    "client/scripts/caster_vfx.gd": "033368dfbc435d2647515d96986c2e98b4dd2b466b912b597eaa1eb630dab8de",
+    "client/scripts/world_view.gd": "0d96303882990061173456a8f6f81a8d2bec3f6cc8bd99e4f187ba5916c8ad49"
+  },
+  "limits": [
+    "A real Godot import/run/export is still required to verify native rendering and produce an APK."
+  ]
+}

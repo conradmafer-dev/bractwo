@@ -1,6 +1,6 @@
 'use strict';
 const CACHE_PREFIX = 'bractwo-app-shell-';
-const CACHE_NAME = CACHE_PREFIX + '0.8.18';
+const CACHE_NAME = CACHE_PREFIX + '0.8.18-ui21';
 const OFFLINE = '/offline.html';
 const FALLBACK_ASSETS = [OFFLINE, '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png'];
 

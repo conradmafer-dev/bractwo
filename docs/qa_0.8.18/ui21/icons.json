@@ -1,0 +1,505 @@
+{
+  "passed": true,
+  "catalog_entries": 99,
+  "new_icons": 21,
+  "checks": [
+    {
+      "spell": "fire_bolt",
+      "icon": "assets/spells/fire_bolt.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "ray_of_frost",
+      "icon": "assets/spells/ray_of_frost.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "shocking_grasp",
+      "icon": "assets/spells/shocking_grasp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "acid_splash",
+      "icon": "assets/spells/acid_splash.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "shillelagh",
+      "icon": "assets/spells/shillelagh.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "produce_flame",
+      "icon": "assets/spells/produce_flame.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "thorn_whip",
+      "icon": "assets/spells/thorn_whip.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "starry_wisp",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "magic_missile",
+      "icon": "assets/spells/magic_missile.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "burning_hands",
+      "icon": "assets/spells/burning_hands.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "shield",
+      "icon": "assets/spells/shield.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "mage_armor",
+      "icon": "assets/spells/mage_armor.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "cure_wounds",
+      "icon": "assets/spells/cure_wounds.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "healing_word",
+      "icon": "assets/spells/healing_word.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "entangle",
+      "icon": "assets/spells/entangle.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "hunters_mark",
+      "icon": "assets/spells/hunters_mark.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "longstrider",
+      "icon": "assets/spells/longstrider.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "scorching_ray",
+      "icon": "assets/spells/scorching_ray.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "misty_step",
+      "icon": "assets/spells/misty_step.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "moonbeam",
+      "icon": "assets/spells/moonbeam.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "barkskin",
+      "icon": "assets/spells/barkskin.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "spike_growth",
+      "icon": "assets/spells/spike_growth.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "fireball",
+      "icon": "assets/spells/fireball.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "lightning_bolt",
+      "icon": "assets/spells/lightning_bolt.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "call_lightning",
+      "icon": "assets/spells/call_lightning.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "protection_from_energy",
+      "icon": "assets/spells/protection_from_energy.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "plant_growth",
+      "icon": "assets/spells/plant_growth.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "blight",
+      "icon": "assets/spells/blight.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "ice_storm",
+      "icon": "assets/spells/ice_storm.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "freedom_of_movement",
+      "icon": "assets/spells/freedom_of_movement.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "stoneskin",
+      "icon": "assets/spells/stoneskin.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "cone_of_cold",
+      "icon": "assets/spells/cone_of_cold.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "mass_cure_wounds",
+      "icon": "assets/spells/mass_cure_wounds.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "conjure_volley",
+      "icon": "assets/spells/conjure_volley.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "chain_lightning",
+      "icon": "assets/spells/chain_lightning.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "sunbeam",
+      "icon": "assets/spells/sunbeam.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "heal",
+      "icon": "assets/spells/heal.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "finger_of_death",
+      "icon": "assets/spells/finger_of_death.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "fire_storm",
+      "icon": "assets/spells/fire_storm.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "sunburst",
+      "icon": "assets/spells/sunburst.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "incendiary_cloud",
+      "icon": "assets/spells/incendiary_cloud.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "meteor_swarm",
+      "icon": "assets/spells/meteor_swarm.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "foresight",
+      "icon": "assets/spells/foresight.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "ensnaring_strike",
+      "icon": "assets/spells/ensnaring_strike.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "second_wind",
+      "icon": "assets/spells/second_wind.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "animal_companion",
+      "icon": "assets/spells/animal_companion.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_wolf",
+      "icon": "assets/spells/wild_shape_wolf.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_bear",
+      "icon": "assets/spells/wild_shape_bear.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "action_surge",
+      "icon": "assets/spells/action_surge.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "arcane_recovery",
+      "icon": "assets/spells/arcane_recovery.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "alarm",
+      "icon": "assets/spells/alarm.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "find_familiar",
+      "icon": "assets/spells/find_familiar.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "speak_with_animals",
+      "icon": "assets/spells/speak_with_animals.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_companion",
+      "icon": "assets/spells/wild_companion.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_cat",
+      "icon": "assets/spells/wild_shape_cat.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_black_bear",
+      "icon": "assets/spells/wild_shape_black_bear.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_polar_bear",
+      "icon": "assets/spells/wild_shape_bear.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_giant_scorpion",
+      "icon": "assets/spells/wild_shape_bear.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_elephant",
+      "icon": "assets/spells/wild_shape_bear.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_giant_crocodile",
+      "icon": "assets/spells/wild_shape_bear.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_mammoth",
+      "icon": "assets/spells/wild_shape_bear.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wild_shape_eagle",
+      "icon": "assets/spells/wild_shape_bear.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "beast_trample",
+      "icon": "assets/spells/wild_shape_bear.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "escape_grapple",
+      "icon": "assets/spells/entangle.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_lands_aid",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_natures_sanctuary",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_move_sanctuary",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_moonlight_step",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_wrath_of_sea",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_wrath_strike",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_oceanic_gift",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_oceanic_gift_shared",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_star_archer",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_star_chalice",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_star_dragon",
+      "icon": "assets/spells/starry_wisp.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "circle_star_arrow",
+      "icon": "assets/spells/star_arrow.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "blur",
+      "icon": "assets/spells/blur.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "fog_cloud",
+      "icon": "assets/spells/fog_cloud.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "hold_person",
+      "icon": "assets/spells/hold_person.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "sleet_storm",
+      "icon": "assets/spells/sleet_storm.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "wall_of_stone",
+      "icon": "assets/spells/wall_of_stone.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "sleep",
+      "icon": "assets/spells/sleep.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "tree_stride",
+      "icon": "assets/spells/tree_stride.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "ray_of_sickness",
+      "icon": "assets/spells/ray_of_sickness.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "web",
+      "icon": "assets/spells/web.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "stinking_cloud",
+      "icon": "assets/spells/stinking_cloud.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "polymorph",
+      "icon": "assets/spells/polymorph.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "insect_plague",
+      "icon": "assets/spells/insect_plague.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "gust_of_wind",
+      "icon": "assets/spells/gust_of_wind.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "shatter",
+      "icon": "assets/spells/shatter.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "thunderwave",
+      "icon": "assets/spells/thunderwave.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "water_breathing",
+      "icon": "assets/spells/water_breathing.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "control_water",
+      "icon": "assets/spells/control_water.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "conjure_elemental",
+      "icon": "assets/spells/conjure_elemental.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "hold_monster",
+      "icon": "assets/spells/hold_monster.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "conjure_animals",
+      "icon": "assets/spells/conjure_animals.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "fount_of_moonlight",
+      "icon": "assets/spells/fount_of_moonlight.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "guidance",
+      "icon": "assets/spells/guidance.svg",
+      "exists_and_mirrored": true
+    },
+    {
+      "spell": "guiding_bolt",
+      "icon": "assets/spells/guiding_bolt.svg",
+      "exists_and_mirrored": true
+    }
+  ],
+  "native_mirrors_restored": [
+    "assets/spells/star_arrow.svg"
+  ]
+}

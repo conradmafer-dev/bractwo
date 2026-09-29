@@ -1,0 +1,3719 @@
+{
+  "phase": "UI20 baseline audit for UI21 remediation",
+  "catalog_count": 99,
+  "category_counts": {
+    "base_spell": 47,
+    "class_feature": 7,
+    "wild_shape": 10,
+    "circle_feature": 12,
+    "circle_bonus_spell": 23
+  },
+  "scope": "All 99 runtime catalog entries, including class features and wild forms. Static code-path review, not proof that every full gameplay cast was executed.",
+  "source_hashes": {
+    "server/dnd_content.py": "09c846f20c86f7be4f24d437ed746fc10d3d65d6a56fe515d6e78ce8a49e1359",
+    "server/dnd_game.py": "8c8409c435ed8d59ee407ee702eec51c2b9ed2c201aaa1388c524802009699a2",
+    "server/caster_rules.py": "284976cc63aebe515814bc5ba4c1991fcc894e8f78bd815ebd1a665b08912ddb",
+    "server/caster_game.py": "4fc5bd80bb6d6e2b947676b79867c76cb7d20a4bf4fceb4bb8402ac613d6f24d",
+    "server/druid_circles.py": "02901c1c6890f7284cc52f290acbcc2b18310e461052500dd740467ab1a247a2",
+    "server/druid_circle_game.py": "ffcb5bbefcdfdb0c409731b64862c57493bae87a5c9c7c52aeedb7516eb6b522",
+    "server/druid_circle_spells.py": "88ce0d8dfc83bc83edf3807fbf8ec93a6bca1f84fa61e6ca7a8dfc3fbeaf0e25",
+    "web/spell_vfx.js": "17480a9f0283919135fa1d9d0bebbe9504c73b5d5bee9ab00936ca2773710369",
+    "web/circle_vfx.js": "0e07c3e28351848a988d1b030d30db937544a4f1ad0ac6f3303610fa2a2869bf",
+    "web/caster_vfx.js": "b8b3c5335032835320d9c1d7977decaf6f53ffc1695bfe5abccc322d55400bc5",
+    "client/scripts/spell_vfx.gd": "dba396583f71cbd2a2e08a647d953e65acce2441d7c3b9761cd46a4133c959cd",
+    "client/scripts/caster_vfx.gd": "fa26606383f83627784a24767793bd74a2a13e047d69c44e09339beec46959d2",
+    "client/scripts/world_view.gd": "91b2d2ad89654305f7be50e3f1893dc5d2a234dee3e143e4a58841ffa57a9ee8"
+  },
+  "priority_scale": {
+    "1": "Missing emitted/recognizable effect, invisible live state or misleading geometry; address first",
+    "2": "Generic effect or weak distinction; preserve exact geometry and gameplay",
+    "3": "Existing suitable baseline or intentionally no spell animation"
+  },
+  "spells": [
+    {
+      "id": "fire_bolt",
+      "name": "Ognisty pocisk",
+      "category": "base_spell",
+      "circle": 0,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "attack",
+      "style": "projectile",
+      "theme": "fire",
+      "visual": {
+        "style": "projectile",
+        "theme": "fire",
+        "colors": [
+          "#ff7739",
+          "#ffd276",
+          "#fff5d1"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wspólny kolorowy pocisk i iskry przy celu",
+      "native_baseline": "Wspólny kolorowy pocisk i iskry przy celu",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "ray_of_frost",
+      "name": "Promień mrozu",
+      "category": "base_spell",
+      "circle": 0,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "attack",
+      "style": "beam",
+      "theme": "cold",
+      "visual": {
+        "style": "beam",
+        "theme": "cold",
+        "colors": [
+          "#46b9ff",
+          "#a0eaff",
+          "#f7ffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wspólna warstwowa wiązka z lodowymi odłamkami",
+      "native_baseline": "Wspólna warstwowa wiązka z lodowymi odłamkami",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "shocking_grasp",
+      "name": "Porażający uścisk",
+      "category": "base_spell",
+      "circle": 0,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "attack",
+      "style": "beam",
+      "theme": "lightning",
+      "visual": {
+        "style": "beam",
+        "theme": "lightning",
+        "colors": [
+          "#7777ff",
+          "#c6c3ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 108,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wspólna warstwowa wiązka",
+      "native_baseline": "Wspólna warstwowa wiązka",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "acid_splash",
+      "name": "Rozprysk kwasu",
+      "category": "base_spell",
+      "circle": 0,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "acid",
+      "visual": {
+        "style": "area",
+        "theme": "acid",
+        "colors": [
+          "#76bd36",
+          "#c4f878",
+          "#f4ffd7"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 32,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Obszar i paleta są obecne, ale wnętrze koła korzysta ze wspólnych drobin i fali. Można wyróżnić kulę/kwas/rozbłysk przy zachowaniu geometrii."
+    },
+    {
+      "id": "shillelagh",
+      "name": "Shillelagh · magiczna laska",
+      "category": "base_spell",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "buff",
+      "style": "aura",
+      "theme": "nature",
+      "visual": {
+        "style": "aura",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "produce_flame",
+      "name": "Wytworzenie płomienia",
+      "category": "base_spell",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "attack",
+      "style": "projectile",
+      "theme": "fire",
+      "visual": {
+        "style": "projectile",
+        "theme": "fire",
+        "colors": [
+          "#ff7739",
+          "#ffd276",
+          "#fff5d1"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 192,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wspólny kolorowy pocisk i iskry przy celu",
+      "native_baseline": "Wspólny kolorowy pocisk i iskry przy celu",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "thorn_whip",
+      "name": "Ciernisty bicz",
+      "category": "base_spell",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "attack",
+      "style": "beam",
+      "theme": "piercing",
+      "visual": {
+        "style": "beam",
+        "theme": "piercing",
+        "colors": [
+          "#54743e",
+          "#a7d674",
+          "#eefbb8"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 192,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wspólna warstwowa wiązka",
+      "native_baseline": "Wspólna warstwowa wiązka",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Zwykła prosta wiązka zamiast elastycznego cierniowego bicza. Nie zmieniać zasięgu, punktu celu ani autorytatywnego przyciągnięcia."
+    },
+    {
+      "id": "starry_wisp",
+      "name": "Gwiaździsty ognik",
+      "category": "base_spell",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "attack",
+      "style": "projectile",
+      "theme": "radiant",
+      "visual": {
+        "style": "projectile",
+        "theme": "radiant",
+        "colors": [
+          "#eaba53",
+          "#fff2b7",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wspólny kolorowy pocisk i iskry przy celu",
+      "native_baseline": "Wspólny kolorowy pocisk i iskry przy celu",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "magic_missile",
+      "name": "Magiczny pocisk",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "missiles",
+      "style": "missiles",
+      "theme": "force",
+      "visual": {
+        "style": "missiles",
+        "theme": "force",
+        "colors": [
+          "#a981ff",
+          "#ecc6ff",
+          "#ffffff"
+        ],
+        "shots": 3
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Łuki magicznych pocisków, liczba z event.shots",
+      "native_baseline": "Łuki magicznych pocisków, liczba z event.shots",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "burning_hands",
+      "name": "Płonące dłonie",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "fire",
+      "visual": {
+        "style": "area",
+        "theme": "fire",
+        "colors": [
+          "#ff7739",
+          "#ffd276",
+          "#fff5d1"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "cone",
+      "radius": 0,
+      "range": 96,
+      "width": 96,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny stożek + wachlarz promieni",
+      "native_baseline": "Dokładny stożek + wachlarz promieni",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "shield",
+      "name": "Tarcza",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "reaction",
+      "style": "aura",
+      "theme": "arcane",
+      "visual": {
+        "style": "aura",
+        "theme": "arcane",
+        "colors": [
+          "#608acc",
+          "#b6d2ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:reaction shield (on successful reaction, not toggle)",
+      "event_kind": "spell",
+      "web_baseline": "Dedykowany kontur tarczy",
+      "native_baseline": "Dedykowany kontur tarczy",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "mage_armor",
+      "name": "Zbroja maga",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "buff",
+      "style": "aura",
+      "theme": "arcane",
+      "visual": {
+        "style": "aura",
+        "theme": "arcane",
+        "colors": [
+          "#608acc",
+          "#b6d2ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dedykowany kontur tarczy",
+      "native_baseline": "Dedykowany kontur tarczy",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "cure_wounds",
+      "name": "Leczenie ran",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "druid",
+        "ranger"
+      ],
+      "kind": "heal",
+      "style": "heal",
+      "theme": "nature",
+      "visual": {
+        "style": "heal",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 108,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Aura + unoszące się krzyżyki",
+      "native_baseline": "Aura + unoszące się krzyżyki",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "healing_word",
+      "name": "Uzdrawiające słowo",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "heal",
+      "style": "heal",
+      "theme": "nature",
+      "visual": {
+        "style": "heal",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 300,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Aura + unoszące się krzyżyki",
+      "native_baseline": "Aura + unoszące się krzyżyki",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "entangle",
+      "name": "Oplątanie",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "control",
+      "style": "area",
+      "theme": "nature",
+      "visual": {
+        "style": "area",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "square",
+      "radius": 91,
+      "range": 380,
+      "width": 128,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar + wspólne zielone pędy",
+      "native_baseline": "Dokładny obszar + wspólne kreski",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "hunters_mark",
+      "name": "Znak łowcy",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "ranger"
+      ],
+      "kind": "mark",
+      "style": "mark",
+      "theme": "force",
+      "visual": {
+        "style": "mark",
+        "theme": "force",
+        "colors": [
+          "#a981ff",
+          "#ecc6ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dedykowany celownik + żywy overlay statusu",
+      "native_baseline": "Dedykowany celownik + żywy overlay statusu",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "longstrider",
+      "name": "Długonogi",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "mage",
+        "druid",
+        "ranger"
+      ],
+      "kind": "buff",
+      "style": "aura",
+      "theme": "nature",
+      "visual": {
+        "style": "aura",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 108,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "scorching_ray",
+      "name": "Palący promień",
+      "category": "base_spell",
+      "circle": 2,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "attack",
+      "style": "beam",
+      "theme": "fire",
+      "visual": {
+        "style": "beam",
+        "theme": "fire",
+        "colors": [
+          "#ff7739",
+          "#ffd276",
+          "#fff5d1"
+        ],
+        "shots": 3
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wspólna warstwowa wiązka",
+      "native_baseline": "Wspólna warstwowa wiązka",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "misty_step",
+      "name": "Mglisty krok",
+      "category": "base_spell",
+      "circle": 2,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "teleport",
+      "style": "teleport",
+      "theme": "arcane",
+      "visual": {
+        "style": "teleport",
+        "theme": "arcane",
+        "colors": [
+          "#608acc",
+          "#b6d2ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Aura + światło w źródle i celu",
+      "native_baseline": "Ogólny łuk/burst przy celu",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Misty step ma oba końce w web, lecz Godot nie ma osobnej gałęzi teleport. Moonlight step ma poprawne współrzędne źródła/celu, ale styl buff; wspólnie przenoszony sojusznik nie otrzymuje własnego eventu."
+    },
+    {
+      "id": "moonbeam",
+      "name": "Promień księżyca",
+      "category": "base_spell",
+      "circle": 2,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "field",
+      "style": "area",
+      "theme": "cold",
+      "visual": {
+        "style": "area",
+        "theme": "cold",
+        "colors": [
+          "#46b9ff",
+          "#a0eaff",
+          "#f7ffff"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 32,
+      "range": 420,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Obszar koła + pionowy księżycowy słup",
+      "native_baseline": "Obszar koła + pionowy księżycowy słup",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "barkskin",
+      "name": "Dębowa skóra",
+      "category": "base_spell",
+      "circle": 2,
+      "class_ids": [
+        "druid",
+        "ranger"
+      ],
+      "kind": "buff",
+      "style": "aura",
+      "theme": "nature",
+      "visual": {
+        "style": "aura",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "spike_growth",
+      "name": "Kolczasty wzrost",
+      "category": "base_spell",
+      "circle": 2,
+      "class_ids": [
+        "druid",
+        "ranger"
+      ],
+      "kind": "field",
+      "style": "area",
+      "theme": "piercing",
+      "visual": {
+        "style": "area",
+        "theme": "piercing",
+        "colors": [
+          "#54743e",
+          "#a7d674",
+          "#eefbb8"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 128,
+      "range": 310,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar + wspólne zielone pędy",
+      "native_baseline": "Dokładny obszar + wspólne kreski",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "fireball",
+      "name": "Kula ognia",
+      "category": "base_spell",
+      "circle": 3,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "fire",
+      "visual": {
+        "style": "area",
+        "theme": "fire",
+        "colors": [
+          "#ff7739",
+          "#ffd276",
+          "#fff5d1"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 128,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Obszar i paleta są obecne, ale wnętrze koła korzysta ze wspólnych drobin i fali. Można wyróżnić kulę/kwas/rozbłysk przy zachowaniu geometrii."
+    },
+    {
+      "id": "lightning_bolt",
+      "name": "Błyskawica",
+      "category": "base_spell",
+      "circle": 3,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "lightning",
+      "visual": {
+        "style": "area",
+        "theme": "lightning",
+        "colors": [
+          "#7777ff",
+          "#c6c3ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "line",
+      "radius": 0,
+      "range": 640,
+      "width": 32,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny prostokąt obszaru + wspólna wiązka",
+      "native_baseline": "Dokładny prostokąt obszaru + wspólna wiązka",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "call_lightning",
+      "name": "Wezwanie błyskawicy",
+      "category": "base_spell",
+      "circle": 3,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "lightning",
+      "visual": {
+        "style": "area",
+        "theme": "lightning",
+        "colors": [
+          "#7777ff",
+          "#c6c3ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 32,
+      "range": 310,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Brak błyskawicy z góry: zwykły obrys koła i pionowe drobiny. Każde rzeczywiste ponowienie czaru emituje osobny event; dekoracja nie powinna dodawać automatycznych trafień."
+    },
+    {
+      "id": "protection_from_energy",
+      "name": "Ochrona przed energią",
+      "category": "base_spell",
+      "circle": 3,
+      "class_ids": [
+        "druid",
+        "ranger",
+        "mage"
+      ],
+      "kind": "buff",
+      "style": "aura",
+      "theme": "nature",
+      "visual": {
+        "style": "aura",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "plant_growth",
+      "name": "Rozrost roślin",
+      "category": "base_spell",
+      "circle": 3,
+      "class_ids": [
+        "druid",
+        "ranger"
+      ],
+      "kind": "field",
+      "style": "area",
+      "theme": "nature",
+      "visual": {
+        "style": "area",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 640,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": true,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar + wspólne zielone pędy",
+      "native_baseline": "Dokładny obszar + wspólne kreski",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "blight",
+      "name": "Uschnięcie",
+      "category": "base_spell",
+      "circle": 4,
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "kind": "save",
+      "style": "projectile",
+      "theme": "necrotic",
+      "visual": {
+        "style": "projectile",
+        "theme": "necrotic",
+        "colors": [
+          "#843fad",
+          "#c17cf0",
+          "#f0ccff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wspólny kolorowy pocisk i iskry przy celu",
+      "native_baseline": "Wspólny kolorowy pocisk i iskry przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Ogólny nekrotyczny pocisk; brak efektu więdnięcia przy celu. Serwer posiada prawidłowy cel."
+    },
+    {
+      "id": "ice_storm",
+      "name": "Lodowa burza",
+      "category": "base_spell",
+      "circle": 4,
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "arcane",
+      "visual": {
+        "style": "area",
+        "theme": "arcane",
+        "colors": [
+          "#608acc",
+          "#b6d2ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 128,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Główny typ bludgeoning wybiera paletę arcane. Brakuje spadającego gradu/lodu pomimo poprawnego obszaru koła."
+    },
+    {
+      "id": "freedom_of_movement",
+      "name": "Swoboda ruchu",
+      "category": "base_spell",
+      "circle": 4,
+      "class_ids": [
+        "druid",
+        "ranger"
+      ],
+      "kind": "buff",
+      "style": "aura",
+      "theme": "nature",
+      "visual": {
+        "style": "aura",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "stoneskin",
+      "name": "Kamienna skóra",
+      "category": "base_spell",
+      "circle": 4,
+      "class_ids": [
+        "mage",
+        "druid",
+        "ranger"
+      ],
+      "kind": "buff",
+      "style": "aura",
+      "theme": "nature",
+      "visual": {
+        "style": "aura",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "cone_of_cold",
+      "name": "Stożek zimna",
+      "category": "base_spell",
+      "circle": 5,
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "cold",
+      "visual": {
+        "style": "area",
+        "theme": "cold",
+        "colors": [
+          "#46b9ff",
+          "#a0eaff",
+          "#f7ffff"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "cone",
+      "radius": 0,
+      "range": 384,
+      "width": 384,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny stożek + wachlarz promieni",
+      "native_baseline": "Dokładny stożek + wachlarz promieni",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "mass_cure_wounds",
+      "name": "Masowe leczenie ran",
+      "category": "base_spell",
+      "circle": 5,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "heal",
+      "style": "heal",
+      "theme": "nature",
+      "visual": {
+        "style": "heal",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": true,
+      "shape": "circle",
+      "radius": 192,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Event ma party, więc renderer wybiera gałąź obszaru przed stylem heal; krzyżyki leczenia są pomijane. Serwer emituje event osobno dla uleczonych osób: nie sugerować nowego pola obrażeń."
+    },
+    {
+      "id": "conjure_volley",
+      "name": "Przywołanie salwy",
+      "category": "base_spell",
+      "circle": 5,
+      "class_ids": [
+        "ranger"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "force",
+      "visual": {
+        "style": "area",
+        "theme": "force",
+        "colors": [
+          "#a981ff",
+          "#ecc6ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 256,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Ogólne fioletowe koło i drobiny mocy; brak deszczu strzał. Używać istniejących granic trafień, bez własnego większego promienia."
+    },
+    {
+      "id": "chain_lightning",
+      "name": "Łańcuch błyskawic",
+      "category": "base_spell",
+      "circle": 6,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "save",
+      "style": "chain",
+      "theme": "lightning",
+      "visual": {
+        "style": "chain",
+        "theme": "lightning",
+        "colors": [
+          "#7777ff",
+          "#c6c3ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "chain",
+      "radius": 192,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wiązka do głównego celu i gałęzie do event.targets",
+      "native_baseline": "Wiązka do głównego celu i gałęzie do event.targets",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "sunbeam",
+      "name": "Promień słońca",
+      "category": "base_spell",
+      "circle": 6,
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "radiant",
+      "visual": {
+        "style": "area",
+        "theme": "radiant",
+        "colors": [
+          "#eaba53",
+          "#fff2b7",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "line",
+      "radius": 0,
+      "range": 384,
+      "width": 32,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny prostokąt obszaru + wspólna wiązka",
+      "native_baseline": "Dokładny prostokąt obszaru + wspólna wiązka",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "heal",
+      "name": "Uzdrowienie",
+      "category": "base_spell",
+      "circle": 6,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "heal",
+      "style": "heal",
+      "theme": "nature",
+      "visual": {
+        "style": "heal",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Aura + unoszące się krzyżyki",
+      "native_baseline": "Aura + unoszące się krzyżyki",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "finger_of_death",
+      "name": "Palec śmierci",
+      "category": "base_spell",
+      "circle": 7,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "save",
+      "style": "beam",
+      "theme": "necrotic",
+      "visual": {
+        "style": "beam",
+        "theme": "necrotic",
+        "colors": [
+          "#843fad",
+          "#c17cf0",
+          "#f0ccff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Wspólna warstwowa wiązka",
+      "native_baseline": "Wspólna warstwowa wiązka",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Ta sama wiązka co inne promienie, jedynie nekrotyczna paleta; warto wyróżnić końcowy impakt bez dodawania mechaniki."
+    },
+    {
+      "id": "fire_storm",
+      "name": "Burza ognia",
+      "category": "base_spell",
+      "circle": 7,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "fire",
+      "visual": {
+        "style": "area",
+        "theme": "fire",
+        "colors": [
+          "#ff7739",
+          "#ffd276",
+          "#fff5d1"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "cubes",
+      "radius": 173,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar cubes + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar cubes + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Dokładne dziesięć sześcianów jest zachowane, ale dekoracja to wspólne ogniste drobiny. Potrzebne pionowe języki ognia wewnątrz istniejących paneli."
+    },
+    {
+      "id": "sunburst",
+      "name": "Rozbłysk słońca",
+      "category": "base_spell",
+      "circle": 8,
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "radiant",
+      "visual": {
+        "style": "area",
+        "theme": "radiant",
+        "colors": [
+          "#eaba53",
+          "#fff2b7",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 384,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Obszar i paleta są obecne, ale wnętrze koła korzysta ze wspólnych drobin i fali. Można wyróżnić kulę/kwas/rozbłysk przy zachowaniu geometrii."
+    },
+    {
+      "id": "incendiary_cloud",
+      "name": "Zapalająca chmura",
+      "category": "base_spell",
+      "circle": 8,
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "kind": "field",
+      "style": "area",
+      "theme": "fire",
+      "visual": {
+        "style": "area",
+        "theme": "fire",
+        "colors": [
+          "#ff7739",
+          "#ffd276",
+          "#fff5d1"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 128,
+      "range": 310,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "meteor_swarm",
+      "name": "Rój meteorów",
+      "category": "base_spell",
+      "circle": 9,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "save",
+      "style": "area",
+      "theme": "fire",
+      "visual": {
+        "style": "area",
+        "theme": "fire",
+        "colors": [
+          "#ff7739",
+          "#ffd276",
+          "#fff5d1"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "meteors",
+      "radius": 256,
+      "range": 600,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Cztery koła + cztery spadające meteory",
+      "native_baseline": "Cztery koła + cztery spadające meteory",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "foresight",
+      "name": "Przewidywanie",
+      "category": "base_spell",
+      "circle": 9,
+      "class_ids": [
+        "mage",
+        "druid"
+      ],
+      "kind": "buff",
+      "style": "aura",
+      "theme": "nature",
+      "visual": {
+        "style": "aura",
+        "theme": "nature",
+        "colors": [
+          "#53a365",
+          "#b2eaa2",
+          "#f2ffce"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "ensnaring_strike",
+      "name": "Uderzenie oplątujące",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "ranger"
+      ],
+      "kind": "weapon_trigger",
+      "style": "vines",
+      "theme": "piercing",
+      "visual": {
+        "style": "vines",
+        "theme": "piercing",
+        "colors": [
+          "#54743e",
+          "#a7d674",
+          "#eefbb8"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/ranger_magic.py:RangerMagic.trigger_ensnaring_strike (after legal weapon hit)",
+      "event_kind": "spell",
+      "web_baseline": "Dedykowane pnącza przy celu + żywy overlay statusu",
+      "native_baseline": "Dedykowane pnącza przy celu + żywy overlay statusu",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "second_wind",
+      "name": "Drugi oddech",
+      "category": "class_feature",
+      "circle": 0,
+      "class_ids": [
+        "knight"
+      ],
+      "kind": "heal",
+      "style": "heal",
+      "theme": "arcane",
+      "visual": {
+        "style": "heal",
+        "theme": "arcane",
+        "colors": [
+          "#608acc",
+          "#b6d2ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Aura + unoszące się krzyżyki",
+      "native_baseline": "Aura + unoszące się krzyżyki",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "animal_companion",
+      "name": "Zew towarzysza",
+      "category": "class_feature",
+      "circle": 0,
+      "class_ids": [
+        "ranger"
+      ],
+      "kind": "companion",
+      "style": "summon",
+      "theme": "arcane",
+      "visual": {
+        "style": "summon",
+        "theme": "arcane",
+        "colors": [
+          "#608acc",
+          "#b6d2ff",
+          "#ffffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 310,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "snapshot.companions: wilk dostępny w obu klientach"
+      ],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "wild_shape_wolf",
+      "name": "Dziki kształt · wilk",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "wild_shape_bear",
+      "name": "Dziki kształt · niedźwiedź brunatny",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "action_surge",
+      "name": "Zryw akcji",
+      "category": "class_feature",
+      "circle": 0,
+      "class_ids": [
+        "knight"
+      ],
+      "kind": "surge",
+      "style": "surge",
+      "theme": "steel",
+      "visual": {
+        "style": "surge",
+        "theme": "steel",
+        "colors": [
+          "#dfb654",
+          "#ffdf8b",
+          "#fff6cf"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 108,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/dnd_game.py:DNDGame.dnd_attack",
+      "event_kind": "fighter/mastery=surge + ordinary attack",
+      "web_baseline": "Dedykowany zryw i normalny atak",
+      "native_baseline": "Dedykowany zryw i normalny atak",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "Działająca wspólna animacja zgodna z typem; kosmetyczne dopracowanie opcjonalne."
+    },
+    {
+      "id": "arcane_recovery",
+      "name": "Odzyskanie mocy",
+      "category": "class_feature",
+      "circle": 0,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "recovery",
+      "style": "recovery",
+      "theme": "force",
+      "visual": {
+        "style": "recovery",
+        "theme": "force",
+        "colors": [
+          "#546bb2",
+          "#aacfff",
+          "#eef7ff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_arcane_recovery -> server/server.py:Game.tick_rest",
+      "event_kind": "heal at completed rest",
+      "web_baseline": "Interfejs odpoczynku + wspólna animacja heal",
+      "native_baseline": "Interfejs odpoczynku + wspólna animacja heal",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Nie idzie przez spell_effect: rozpoczyna rzeczywisty krótki odpoczynek. Koniec odpoczynku używa wspólnego kind=heal, również przy odnowieniu many. Nie dodawać pocisku ani animacji natychmiastowego zwrotu many."
+    },
+    {
+      "id": "alarm",
+      "name": "Alarm",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "ritual_alarm",
+      "style": "ritual_alarm",
+      "theme": "force",
+      "visual": {
+        "style": "ritual_alarm",
+        "theme": "force",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "square",
+      "radius": 64,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.start_caster_channel + complete_channel",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "snapshot.alarms: trwały obrys dostępny w obu klientach"
+      ],
+      "priority": 2,
+      "baseline_finding": "Początek/koniec rytuału lub przywołania ma ogólną aurę. Własny kanał i rzeczywista sowa/alarm istnieją osobno; nie skracać rytuału animacją."
+    },
+    {
+      "id": "find_familiar",
+      "name": "Przywołanie chowańca",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "mage"
+      ],
+      "kind": "familiar",
+      "style": "familiar",
+      "theme": "force",
+      "visual": {
+        "style": "familiar",
+        "theme": "force",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.start_caster_channel + complete_channel",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "snapshot.companions: sowa dostępna w obu klientach"
+      ],
+      "priority": 2,
+      "baseline_finding": "Początek/koniec rytuału lub przywołania ma ogólną aurę. Własny kanał i rzeczywista sowa/alarm istnieją osobno; nie skracać rytuału animacją."
+    },
+    {
+      "id": "speak_with_animals",
+      "name": "Rozmowa ze zwierzętami",
+      "category": "base_spell",
+      "circle": 1,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "animal_speech",
+      "style": "animal_speech",
+      "theme": "nature",
+      "visual": {
+        "style": "animal_speech",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.start_caster_channel + complete_channel",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Początek/koniec rytuału lub przywołania ma ogólną aurę. Własny kanał i rzeczywista sowa/alarm istnieją osobno; nie skracać rytuału animacją."
+    },
+    {
+      "id": "wild_companion",
+      "name": "Dziki towarzysz",
+      "category": "class_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "wild_familiar",
+      "style": "wild_familiar",
+      "theme": "nature",
+      "visual": {
+        "style": "wild_familiar",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "snapshot.companions: sowa dostępna w obu klientach"
+      ],
+      "priority": 2,
+      "baseline_finding": "Początek/koniec rytuału lub przywołania ma ogólną aurę. Własny kanał i rzeczywista sowa/alarm istnieją osobno; nie skracać rytuału animacją."
+    },
+    {
+      "id": "wild_shape_cat",
+      "name": "Dziki kształt · kot",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "wild_shape_black_bear",
+      "name": "Dziki kształt · niedźwiedź czarny",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "wild_shape_polar_bear",
+      "name": "Dziki kształt · niedźwiedź polarny",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "wild_shape_giant_scorpion",
+      "name": "Dziki kształt · olbrzymi skorpion",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "wild_shape_elephant",
+      "name": "Dziki kształt · słoń",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "wild_shape_giant_crocodile",
+      "name": "Dziki kształt · olbrzymi krokodyl",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "wild_shape_mammoth",
+      "name": "Dziki kształt · mamut",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "wild_shape_eagle",
+      "name": "Dziki kształt · orzeł",
+      "category": "wild_shape",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "shape",
+      "style": "shape",
+      "theme": "nature",
+      "visual": {
+        "style": "shape",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/caster_game.py:CasterGame.cast_wild_shape",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie i powrót korzystają z ogólnego stylu shape. Właściwa bestia pochodzi ze stanu form, nie z eventu; krótki efekt przemiany może być wspólny, ale nie może zmienić sylwetki ani czasu mechaniki."
+    },
+    {
+      "id": "beast_trample",
+      "name": "Tratowanie",
+      "category": "class_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "beast_action",
+      "style": "beast_action",
+      "theme": "nature",
+      "visual": {
+        "style": "beast_action",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_beast_action",
+      "event_kind": "combat_roll only",
+      "web_baseline": "Brak osobnego impaktu",
+      "native_baseline": "Brak osobnego impaktu",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Zatwierdzony atak zadaje obrażenia i wysyła combat_roll, lecz nie emituje uderzenia. Wskazany krótki fizyczny impakt, bez magicznego promienia."
+    },
+    {
+      "id": "escape_grapple",
+      "name": "Wyrwij się z chwytu",
+      "category": "class_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "beast_action",
+      "style": "beast_action",
+      "theme": "nature",
+      "visual": {
+        "style": "beast_action",
+        "theme": "nature",
+        "colors": [
+          "#438c86",
+          "#b8e5cf",
+          "#eaffee"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "self",
+      "radius": 0,
+      "range": 128,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_beast_action",
+      "event_kind": "combat_roll + status change",
+      "web_baseline": "Log testu; brak zaklęcia (zamierzone)",
+      "native_baseline": "Log testu; brak zaklęcia (zamierzone)",
+      "additional_state": [],
+      "priority": 3,
+      "baseline_finding": "To test wyrwania się, nie zaklęcie: brak eventu spell jest zamierzony. Jest combat_roll i zmiana stanów. Ewentualna animacja wyłącznie po faktycznym powodzeniu."
+    },
+    {
+      "id": "circle_lands_aid",
+      "name": "Pomoc ziemi",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_land_aid",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Bieżący event ma koło R64 i ogólne drobiny; brak rozróżnienia nekrotycznego ataku i leczenia jednego sojusznika. Zachować przekazany obszar."
+    },
+    {
+      "id": "circle_natures_sanctuary",
+      "name": "Sanktuarium natury",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_sanctuary",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar square + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar square + wspólne drobiny/fala",
+      "additional_state": [
+        "circle_visual.sanctuary: trwała strefa wyłącznie web"
+      ],
+      "priority": 1,
+      "baseline_finding": "Przelotny kwadrat jest w event.area, trwały kwadrat 96×96 w circle_visual.sanctuary tylko w web. Godot nie konsumuje tego stanu; ruch pola nie może pozostawić starej dekoracji."
+    },
+    {
+      "id": "circle_move_sanctuary",
+      "name": "Przesuń sanktuarium",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_sanctuary",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar square + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar square + wspólne drobiny/fala",
+      "additional_state": [
+        "circle_visual.sanctuary: trwała strefa wyłącznie web"
+      ],
+      "priority": 1,
+      "baseline_finding": "Przelotny kwadrat jest w event.area, trwały kwadrat 96×96 w circle_visual.sanctuary tylko w web. Godot nie konsumuje tego stanu; ruch pola nie może pozostawić starej dekoracji."
+    },
+    {
+      "id": "circle_moonlight_step",
+      "name": "Księżycowy krok",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_moonlight",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Misty step ma oba końce w web, lecz Godot nie ma osobnej gałęzi teleport. Moonlight step ma poprawne współrzędne źródła/celu, ale styl buff; wspólnie przenoszony sojusznik nie otrzymuje własnego eventu."
+    },
+    {
+      "id": "circle_wrath_of_sea",
+      "name": "Gniew morza",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_sea",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "circle_visual.sea_radius: aura wyłącznie web"
+      ],
+      "priority": 1,
+      "baseline_finding": "Event jest skierowany na rzucającego, a trafiony wróg znajduje się w targets. Samo buff pokazuje aurę zamiast fali do wybranego wroga; trwały promień morza istnieje w web.circle_visual."
+    },
+    {
+      "id": "circle_wrath_strike",
+      "name": "Uderzenie fali",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_sea",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "circle_visual.sea_radius: aura wyłącznie web"
+      ],
+      "priority": 1,
+      "baseline_finding": "Event jest skierowany na rzucającego, a trafiony wróg znajduje się w targets. Samo buff pokazuje aurę zamiast fali do wybranego wroga; trwały promień morza istnieje w web.circle_visual."
+    },
+    {
+      "id": "circle_oceanic_gift",
+      "name": "Dar oceanu",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_sea",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "circle_visual.sea_radius: aura wyłącznie web"
+      ],
+      "priority": 2,
+      "baseline_finding": "Ogólna aura przy obdarowanym; jego circle_visual.sea_radius istnieje w web. Godot nie odtwarza trwałej aury morza."
+    },
+    {
+      "id": "circle_oceanic_gift_shared",
+      "name": "Wspólny dar oceanu",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_sea",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "circle_visual.sea_radius: aura wyłącznie web"
+      ],
+      "priority": 2,
+      "baseline_finding": "Ogólna aura przy obdarowanym; jego circle_visual.sea_radius istnieje w web. Godot nie odtwarza trwałej aury morza."
+    },
+    {
+      "id": "circle_star_archer",
+      "name": "Gwiezdna postać · Łucznik",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_star",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "circle_visual.starry_form: konstelacje wyłącznie web"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie/przełączenie ma ogólną aurę, web nakłada konstelację zależną od formy; Godot nie konsumuje circle_visual.starry_form. Aktywacja łucznika może także wykonać atak bez osobnego pocisku."
+    },
+    {
+      "id": "circle_star_chalice",
+      "name": "Gwiezdna postać · Kielich",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_star",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "circle_visual.starry_form: konstelacje wyłącznie web"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie/przełączenie ma ogólną aurę, web nakłada konstelację zależną od formy; Godot nie konsumuje circle_visual.starry_form. Aktywacja łucznika może także wykonać atak bez osobnego pocisku."
+    },
+    {
+      "id": "circle_star_dragon",
+      "name": "Gwiezdna postać · Smok",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_star",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "circle_visual.starry_form: konstelacje wyłącznie web"
+      ],
+      "priority": 2,
+      "baseline_finding": "Rzucenie/przełączenie ma ogólną aurę, web nakłada konstelację zależną od formy; Godot nie konsumuje circle_visual.starry_form. Aktywacja łucznika może także wykonać atak bez osobnego pocisku."
+    },
+    {
+      "id": "circle_star_arrow",
+      "name": "Gwiezdna strzała",
+      "category": "circle_feature",
+      "circle": 0,
+      "class_ids": [
+        "druid"
+      ],
+      "kind": "druid_circle",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#619da2",
+          "#b3dcf0",
+          "#edffff"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "single",
+      "radius": 0,
+      "range": 768,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_game.py:DruidCircleGame._circle_star",
+      "event_kind": "combat_roll only",
+      "web_baseline": "Brak eventu pocisku",
+      "native_baseline": "Brak eventu pocisku",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Gałąź ataku nie wysyła spell_effect: obrażenia i combat_roll bez widocznego pocisku. Naprawić emiter przed dodawaniem animacji."
+    },
+    {
+      "id": "blur",
+      "name": "Rozmycie",
+      "category": "circle_bonus_spell",
+      "circle": 2,
+      "class_ids": [],
+      "kind": "buff",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 0.0,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "fog_cloud",
+      "name": "Mglista chmura",
+      "category": "circle_bonus_spell",
+      "circle": 1,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 128.0,
+      "range": 768.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Przezroczyste elipsy mgły + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu."
+    },
+    {
+      "id": "hold_person",
+      "name": "Unieruchomienie osoby",
+      "category": "circle_bonus_spell",
+      "circle": 2,
+      "class_ids": [],
+      "kind": "circle_control",
+      "style": "circle_control",
+      "theme": "nature",
+      "visual": {
+        "style": "circle_control",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 384.0,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Kontrola używa ogólnego stylu circle_control; brak czytelnych więzów i trwałego wyróżnienia sparaliżowanej postaci poza ikoną statusu. Lista targets może obejmować wiele legalnych celów."
+    },
+    {
+      "id": "sleet_storm",
+      "name": "Śnieżyca",
+      "category": "circle_bonus_spell",
+      "circle": 3,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 128.0,
+      "range": 960.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Koło z kreskami śniegu + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu."
+    },
+    {
+      "id": "wall_of_stone",
+      "name": "Kamienny mur",
+      "category": "circle_bonus_spell",
+      "circle": 5,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 768.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Kamienne panele + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu."
+    },
+    {
+      "id": "sleep",
+      "name": "Sen",
+      "category": "circle_bonus_spell",
+      "circle": 1,
+      "class_ids": [],
+      "kind": "circle_control",
+      "style": "circle_control",
+      "theme": "nature",
+      "visual": {
+        "style": "circle_control",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 32.0,
+      "range": 384.0,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Emiter wybiera pierwszą trafioną istotę zamiast wybranego punktu obszaru, więc rysowany zasięg może być przesunięty względem faktycznych trafień. Sam efekt jest ogólny; zachować właściwy środek i figurę serwera."
+    },
+    {
+      "id": "tree_stride",
+      "name": "Wędrówka drzew",
+      "category": "circle_bonus_spell",
+      "circle": 5,
+      "class_ids": [],
+      "kind": "buff",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 0.0,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "tree_step: brak eventu po udanym przeniesieniu"
+      ],
+      "priority": 1,
+      "baseline_finding": "Rzucenie daje ogólną aurę, ale udane tree_step zmienia pozycję bez eventu wejścia/wyjścia. Animować wyłącznie zatwierdzoną przez serwer podróż."
+    },
+    {
+      "id": "ray_of_sickness",
+      "name": "Promień choroby",
+      "category": "circle_bonus_spell",
+      "circle": 1,
+      "class_ids": [],
+      "kind": "attack",
+      "style": "attack",
+      "theme": "nature",
+      "visual": {
+        "style": "attack",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 384.0,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Styl attack nie jest obsługiwany przez bazowy renderer, więc pocisk/promień zamienia się w ogólną aurę przy celu. Wymaga właściwego toru od rzucającego do celu."
+    },
+    {
+      "id": "web",
+      "name": "Pajęczyna",
+      "category": "circle_bonus_spell",
+      "circle": 2,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "square",
+      "radius": 64.0,
+      "range": 384.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Kwadrat pajęczej siatki + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu. Web ma siatkę, lecz snapshot nie przekazuje wypalonych/płonących komórek; renderer nie może udawać ich stanu."
+    },
+    {
+      "id": "stinking_cloud",
+      "name": "Śmierdząca chmura",
+      "category": "circle_bonus_spell",
+      "circle": 3,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 128.0,
+      "range": 576.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Przezroczyste zielone elipsy + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu."
+    },
+    {
+      "id": "polymorph",
+      "name": "Polimorfia",
+      "category": "circle_bonus_spell",
+      "circle": 4,
+      "class_ids": [],
+      "kind": "circle_control",
+      "style": "circle_control",
+      "theme": "nature",
+      "visual": {
+        "style": "circle_control",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 384.0,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [
+        "Stan entity.form odpowiada za sylwetkę bestii"
+      ],
+      "priority": 2,
+      "baseline_finding": "Przejście jest ogólną aurą; stan form zmienia wygląd. Nowa dekoracja musi kończyć się wraz z potwierdzoną przemianą i nie ukrywać trafionego celu."
+    },
+    {
+      "id": "insect_plague",
+      "name": "Plaga owadów",
+      "category": "circle_bonus_spell",
+      "circle": 5,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 128.0,
+      "range": 1920.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Koło z drobnymi owadami + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu."
+    },
+    {
+      "id": "gust_of_wind",
+      "name": "Podmuch wiatru",
+      "category": "circle_bonus_spell",
+      "circle": 2,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "line",
+      "radius": 32.0,
+      "range": 384.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Pas wiatru ze strzałkami + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu."
+    },
+    {
+      "id": "shatter",
+      "name": "Roztrzaskanie",
+      "category": "circle_bonus_spell",
+      "circle": 2,
+      "class_ids": [],
+      "kind": "save",
+      "style": "save",
+      "theme": "nature",
+      "visual": {
+        "style": "save",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "circle",
+      "radius": 64.0,
+      "range": 384.0,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar circle + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Emiter wybiera pierwszą trafioną istotę zamiast wybranego punktu obszaru, więc rysowany zasięg może być przesunięty względem faktycznych trafień. Sam efekt jest ogólny; zachować właściwy środek i figurę serwera."
+    },
+    {
+      "id": "thunderwave",
+      "name": "Fala gromu",
+      "category": "circle_bonus_spell",
+      "circle": 1,
+      "class_ids": [],
+      "kind": "save",
+      "style": "save",
+      "theme": "nature",
+      "visual": {
+        "style": "save",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": true,
+      "party": false,
+      "shape": "square",
+      "radius": 48.0,
+      "range": 96.0,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Dokładny obszar square + wspólne drobiny/fala",
+      "native_baseline": "Dokładny obszar square + wspólne drobiny/fala",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Emiter wybiera pierwszą trafioną istotę zamiast wybranego punktu obszaru, więc rysowany zasięg może być przesunięty względem faktycznych trafień. Sam efekt jest ogólny; zachować właściwy środek i figurę serwera."
+    },
+    {
+      "id": "water_breathing",
+      "name": "Oddychanie wodą",
+      "category": "circle_bonus_spell",
+      "circle": 3,
+      "class_ids": [],
+      "kind": "buff",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 192.0,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "control_water",
+      "name": "Kontrola wody",
+      "category": "circle_bonus_spell",
+      "circle": 4,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "square",
+      "radius": 320.0,
+      "range": 1920.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Kwadrat fal + opcjonalny wir + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu. Web rozróżnia wir, pozostałe warianty podobne; używać water_variant, nie wyprowadzać mechaniki z wyglądu."
+    },
+    {
+      "id": "conjure_elemental",
+      "name": "Przywołanie żywiołaka",
+      "category": "circle_bonus_spell",
+      "circle": 5,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 64.0,
+      "range": 384.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Neutralne obłoki bez wariantu żywiołu + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu. Web pokazuje jedynie neutralne obłoki, mimo przekazywanego damage_type żywiołu; brak rozpoznawalnego ducha."
+    },
+    {
+      "id": "hold_monster",
+      "name": "Unieruchomienie potwora",
+      "category": "circle_bonus_spell",
+      "circle": 5,
+      "class_ids": [],
+      "kind": "circle_control",
+      "style": "circle_control",
+      "theme": "nature",
+      "visual": {
+        "style": "circle_control",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 576.0,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Kontrola używa ogólnego stylu circle_control; brak czytelnych więzów i trwałego wyróżnienia sparaliżowanej postaci poza ikoną statusu. Lista targets może obejmować wiele legalnych celów."
+    },
+    {
+      "id": "conjure_animals",
+      "name": "Przywołanie zwierząt",
+      "category": "circle_bonus_spell",
+      "circle": 3,
+      "class_ids": [],
+      "kind": "circle_field",
+      "style": "field",
+      "theme": "nature",
+      "visual": {
+        "style": "field",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 96.0,
+      "range": 384.0,
+      "width": null,
+      "concentration": true,
+      "persistent": true,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell persistent + spell transient + circle_fields snapshot",
+      "web_baseline": "Krążące zarysy duchów zwierząt + dodatkowa ogólna aura",
+      "native_baseline": "Ogólna aura; brak żywego pola circle_fields",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzeczywiste pole jest w circle_fields; web rysuje je osobno, Godot go nie konsumuje. Dodatkowy persistent event stylu field bez event.area daje tylko ogólną aurę. Geometrię brać z żywego snapshotu, nie ze starego eventu."
+    },
+    {
+      "id": "fount_of_moonlight",
+      "name": "Źródło księżycowego blasku",
+      "category": "circle_bonus_spell",
+      "circle": 4,
+      "class_ids": [],
+      "kind": "buff",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 0.0,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "guidance",
+      "name": "Wskazówki",
+      "category": "circle_bonus_spell",
+      "circle": 0,
+      "class_ids": [],
+      "kind": "buff",
+      "style": "buff",
+      "theme": "nature",
+      "visual": {
+        "style": "buff",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 32.0,
+      "width": null,
+      "concentration": true,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 2,
+      "baseline_finding": "Rzucenie pokazuje ogólną aurę; czas trwania jest w status_effects/HUD, bez właściwego trwałego motywu w świecie. Krótki motyw należy powiązać z prawdziwym statusem i nie mnożyć świecących obrysów."
+    },
+    {
+      "id": "guiding_bolt",
+      "name": "Wiodący pocisk",
+      "category": "circle_bonus_spell",
+      "circle": 1,
+      "class_ids": [],
+      "kind": "attack",
+      "style": "attack",
+      "theme": "nature",
+      "visual": {
+        "style": "attack",
+        "theme": "nature",
+        "colors": [
+          "#578879",
+          "#a2d9bd",
+          "#e2fff0"
+        ],
+        "shots": 1
+      },
+      "area": false,
+      "party": false,
+      "shape": "circle",
+      "radius": 0,
+      "range": 768.0,
+      "width": null,
+      "concentration": false,
+      "persistent": false,
+      "emitter": "server/druid_circle_spells.py:DruidCircleSpells._cast_circle_spell",
+      "event_kind": "spell",
+      "web_baseline": "Ogólna aura: elipsa, poświata i orbitujące kreski",
+      "native_baseline": "Ogólny łuk i burst przy celu",
+      "additional_state": [],
+      "priority": 1,
+      "baseline_finding": "Styl attack nie jest obsługiwany przez bazowy renderer, więc pocisk/promień zamienia się w ogólną aurę przy celu. Wymaga właściwego toru od rzucającego do celu."
+    }
+  ]
+}

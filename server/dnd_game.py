@@ -380,13 +380,51 @@ class DNDGame(RangerMagic):
         if ref not in p.condition_targets:p.condition_targets.append(ref)
         return True
 
-    def spell_effect(self,p,key,target=None,targets=None,duration=None,area=None,spec=None):
+    def spell_effect(self,p,key,target=None,targets=None,duration=None,area=None,spec=None,phase='cast',visual_only=False):
         s=spec if spec is not None else spell_scaling.resolve(p,key);target=target or p
-        event=self.combat_effect(p,'spell',target,radius=s.get('radius',0),duration=duration or (.9 if s.get('area') else .72))
+        source=SimpleNamespace(id=p.id,x=p.x,y=p.y,floor=p.floor) if visual_only else p
+        event=self.combat_effect(source,'spell',target,radius=s.get('radius',0),duration=duration or (.9 if s.get('area') else .72))
         event.update(spell_id=key,visual=s['visual'],shots=s.get('shots',1),cast_circle=s.get('cast_circle',s['circle']),
-            targets=[dict(id=t.id,x=t.x,y=t.y,player=self.is_player_target(t)) for t in (targets or [target])])
+            phase=phase,cast_origin=[p.x,p.y],started_at=self.time,
+            source=dict(id=p.id,x=p.x,y=p.y,floor=p.floor),
+            targets=[dict(id=t.id,x=t.x,y=t.y,player=self.is_player_target(t)) for t in (targets if targets is not None else [target])])
         if s.get('area') or s.get('party'):
             event['area']=area or spell_geometry.build(s,p,target)
+        elif area is not None:event['area']=area
+        return event
+
+    def _record_field_damage(self,p,target,s,impacts):
+        """Attach rendering evidence to the existing damage resolution, once."""
+        point=dict(id=target.id,x=target.x,y=target.y,player=self.is_player_target(target))
+        result=self.spell_damage(p,target,s)
+        if result is not None:
+            point.update(damage=result.get('damage',0),hit=result.get('hit',False),
+                saved=result.get('saved',False),damage_type=s.get('damage_type','force'))
+            impacts.append(point)
+        return result
+
+    def _field_visual_area(self,f,s):
+        center=SimpleNamespace(id='',x=f['x'],y=f['y'],floor=f['floor'],facing=f.get('direction',[0,1]))
+        spec=dict(s,range=s.get('length',s['range']))
+        if spec.get('shape')=='square':spec['width']=2*f['radius']
+        target=center
+        if f.get('direction'):
+            dx,dy=f['direction'];target=SimpleNamespace(x=center.x+dx*spec['range'],y=center.y+dy*spec['range'])
+            spec['width']=2*f['radius']
+        return spell_geometry.build(spec,center,target)
+
+    def _field_tick_effect(self,p,f,s,impacts):
+        if not impacts:return None
+        # One field activation may resolve against several creatures. Represent
+        # it once; movement-triggered repeats remain explicit in impacts.
+        center=SimpleNamespace(id=p.id,x=f['x'],y=f['y'],floor=f['floor'],facing=f.get('direction',[0,1]))
+        point=SimpleNamespace(id='',x=f['x'],y=f['y'],floor=f['floor'])
+        event=self.spell_effect(center,s['id'],point,[],duration=.72,
+            area=self._field_visual_area(f,s),spec=s,phase='tick',visual_only=True)
+        unique={entry['id']:entry for entry in impacts}
+        event.update(targets=list(unique.values()),impacts=impacts,field_id=f.get('effect_id',f.get('id','')),
+            cast_origin=list(f.get('cast_origin',[p.x,p.y])),field_started_at=f.get('visual_started_at',self.time),
+            source=dict(id=p.id,x=p.x,y=p.y,floor=p.floor),field_origin=[f['x'],f['y']])
         return event
 
     def spell_targets(self, p, s, enemy_id=None, target_id=None):
@@ -600,10 +638,11 @@ class DNDGame(RangerMagic):
             target=targets[0]
             for q in targets:
                 if self.is_player_target(q):self.begin_pvp_hostility(p,q)
-            field_effect=self.spell_effect(p,key,target,targets,duration=s['duration'],spec=s)
-            field_effect['persistent']=True
+            field_effect=self.spell_effect(p,key,target,targets,duration=s['duration'],spec=s,phase='field')
+            field_effect.update(persistent=True,field_id=field_effect['id'])
             self.spell_fields.append(dict(effect_id=field_effect['id'],owner=p.id,key=key,x=target.x,y=target.y,floor=p.floor,until=now+s['duration'],next=now,
-                concentration=bool(s.get('concentration')),positions={},radius=s['radius'],profile=s))
+                concentration=bool(s.get('concentration')),positions={},radius=s['radius'],profile=s,
+                cast_origin=[p.x,p.y],visual_started_at=self.time))
 
         elif s['kind']=='teleport':
             self.spell_effect(p,key,SimpleNamespace(id=p.id,x=dest.x,y=dest.y,floor=p.floor),spec=s)
@@ -617,7 +656,7 @@ class DNDGame(RangerMagic):
             pet.current_wall_time=now;self.companions[p.id]=pet
             self.spell_effect(p,key,p,spec=s)
         else:
-            self.spell_effect(p,key,targets[0],targets,spec=s)
+            self.spell_effect(p,key,targets[0],targets,spec=s,phase='recast' if recast else 'cast')
             for e in targets:
                 for shot in range(s.get('shots',1)):
                     if e.hp<=0:break
@@ -682,7 +721,7 @@ class DNDGame(RangerMagic):
             if not p.pvp_safety:candidates+=list(self.players.values())
             nearby=[e for e in candidates if e.alive and e.hp>0 and same_floor(center,e) and dist(center,e)<=f['radius'] and self.line_clear(center,e)
                 and (not self.is_player_target(e) or not self.pvp_error(p,e))]
-            present=set()
+            present=set();impacts=[]
             for target in nearby:
                 ref=self.target_ref(target);present.add(ref)
                 player_target=self.is_player_target(target)
@@ -698,13 +737,14 @@ class DNDGame(RangerMagic):
                     f['positions'][ref]=(target.x,target.y,moved%step)
                     for _ in range(ticks):
                         if not target.alive or target.hp<=0:break
-                        self.spell_damage(p,target,s)
+                        self._record_field_damage(p,target,s,impacts)
                     if target.alive and target.hp>0:
                         if player_target:unjust=self.begin_pvp_hostility(p,target)
                         applied=self.apply_status(p,target,'slow',.15,s)
                         if player_target and applied:self.record_pvp_effect(p,target,unjust)
-                elif due:self.spell_damage(p,target,s)
+                elif due:self._record_field_damage(p,target,s,impacts)
             f['positions']={k:v for k,v in f['positions'].items() if k in present}
+            self._field_tick_effect(p,f,s,impacts)
         for owner_id,pet in tuple(self.companions.items()):
             p=self.players.get(owner_id);pet.current_wall_time=now
             if p is None or not p.alive or p.disconnected or pet.floor!=p.floor or not pet.alive:

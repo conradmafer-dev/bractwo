@@ -1,0 +1,19 @@
+✔ physical row one uses digits 1..0, Minus and Equal (0.851856ms)
+✔ F1..F12 occupy row two while adaptive F is not a slot (0.11458ms)
+✔ labels remain correct for second row and overflow bank (0.166157ms)
+✔ all rendered shapes agree with Python geometry at sampled boundaries (14.052371ms)
+✔ three missiles take distinct curved paths and converge at one target (0.886567ms)
+✔ missiles do not produce NaN when actor positions coincide (0.173659ms)
+✔ every current spell draws valid canvas commands and balances save/restore (15.937051ms)
+✔ legacy effects remain with the existing renderer (0.15497ms)
+✔ all upcast magic missiles have separate curves and converge on the target (0.393755ms)
+✔ eleven coincident-origin missiles remain finite at all animation phases (0.296981ms)
+✔ scaled missile volleys and scorching rays draw all animation phases without canvas imbalance (3.753738ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 42.705848

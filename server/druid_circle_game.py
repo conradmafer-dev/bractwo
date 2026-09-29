@@ -278,6 +278,7 @@ class DruidCircleGame:
         if self.is_player_target(target) and self.pvp_error(p, target): return
         self.begin_action(p, True)
         self._circle_damage(p, target, key, tuple(spec['dice']), 'bludgeoning', 'dexterity', True, dc=spec['save_dc'])
+        self.spell_effect(p,key,target,[target],spec=dnd.SPELLS[key],visual_only=True)
         self.tag(p); await self._circle_kills([target]); self._circle_save(p)
 
     def caster_attack_advantage(self, p, target):
@@ -383,6 +384,8 @@ class DruidCircleGame:
         p.x, p.y = destination.x, destination.y
         p.buffs['moonlight_advantage'] = dict(until=p._feat_turn_until, spell_id=key)
         if ally_dest:
+            self.spell_effect(companion,key,SimpleNamespace(id=companion.id,x=ally_dest.x,y=ally_dest.y,floor=companion.floor),
+                spec=dnd.SPELLS[key],visual_only=True)
             companion.x, companion.y = ally_dest.x, ally_dest.y; self.join_pvp_support(p, companion); self._circle_save(companion)
 
     async def _circle_sea(self, p, key, enemy_id, target_id, initial=False):
@@ -455,6 +458,7 @@ class DruidCircleGame:
             return
         target = targets[0]
         self._circle_damage(p, target, key, (2 if p.level >= 45 else 1, 8, circles.wisdom(p)), 'radiant', attack=True)
+        self.spell_effect(p,'circle_star_arrow',target,[target],spec=dnd.SPELLS['circle_star_arrow'],visual_only=True)
         self.tag(p); await self._circle_kills([target])
 
     async def cast_circle_feature(self, p, key, enemy_id=None, target_id=None):

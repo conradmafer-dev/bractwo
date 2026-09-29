@@ -1,0 +1,12 @@
+✔ offscreen flashes are culled without mutating their lifetime (0.778396ms)
+✔ beam crossing the viewport is retained with both endpoints outside (0.125937ms)
+✔ server area can intersect the viewport when its center is offscreen (0.102983ms)
+✔ descending lightning and chain branches remain visible at the edge (0.102031ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5.796273

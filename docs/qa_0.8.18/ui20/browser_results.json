@@ -1,0 +1,201 @@
+{
+  "ok": true,
+  "transport": "Actual production HTTP assets and native WebSockets against isolated in-memory server",
+  "checks": [
+    {
+      "name": "desktop: production HTTP registration and native WebSocket world metadata",
+      "worldRevision": 20,
+      "landmasses": 19,
+      "ports": 20,
+      "routes": 54
+    },
+    {
+      "name": "desktop: level-1 Brzezina voyage enabled with exact fare; actual move and payment",
+      "route": "boat_brzezina_przystan",
+      "cost": 45,
+      "recommendedLevel": 8
+    },
+    {
+      "name": "desktop: Brzezina merchant has a small local stock",
+      "stock": [
+        "ranger_weapon_1",
+        "druid_weapon_1",
+        "health_potion",
+        "health_potion_2",
+        "druid_leather",
+        "wooden_shield"
+      ]
+    },
+    {
+      "name": "desktop: ring property details rendered from real inventory",
+      "text": "Pierścień ochrony\nZałóż\nZestrój · 10 s\nSprzedaj · 4000 zł\nZestrój się z przedmiotem, aby używać jego magii.\nPierścień\n+1 do KP i wszystkich rzutów obronnych. Wymaga zestrojenia.\nZestrojenia: 0/3"
+    },
+    {
+      "name": "desktop: guidance and guiding bolt SVGs load in spellbook"
+    },
+    {
+      "name": "desktop: full-world atlas renders real continent and island data"
+    },
+    {
+      "name": "Production atlas renderer exports 1400 × 1010 using unchanged live server metadata"
+    },
+    {
+      "name": "desktop: shaman world view rendered"
+    },
+    {
+      "name": "desktop: new third-level crypt and its guardian render",
+      "boss": "Akharet, Król Zgasłego Słońca"
+    },
+    {
+      "name": "desktop: guiding bolt casts on an automatic off-facing monster target",
+      "sent": [
+        {
+          "type": "cast",
+          "spell_id": "guiding_bolt"
+        }
+      ],
+      "target": "world_20",
+      "effect": {
+        "id": "fx2",
+        "kind": "spell",
+        "source_id": "1",
+        "target_id": "world_20",
+        "floor": -2,
+        "x": 70420,
+        "y": 18050,
+        "target_x": 70510,
+        "target_y": 18050,
+        "time": 7.349999999999982,
+        "duration": 0.72,
+        "radius": 0,
+        "spell_id": "guiding_bolt",
+        "visual": {
+          "style": "attack",
+          "theme": "nature",
+          "colors": [
+            "#578879",
+            "#a2d9bd",
+            "#e2fff0"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 1,
+        "targets": [
+          {
+            "id": "world_20",
+            "x": 70510,
+            "y": 18050,
+            "player": false
+          }
+        ]
+      }
+    },
+    {
+      "name": "touch-landscape: production HTTP registration and native WebSocket world metadata",
+      "worldRevision": 20,
+      "landmasses": 19,
+      "ports": 20,
+      "routes": 54
+    },
+    {
+      "name": "touch-landscape: level-1 Brzezina voyage enabled with exact fare; actual move and payment",
+      "route": "boat_brzezina_przystan",
+      "cost": 45,
+      "recommendedLevel": 8
+    },
+    {
+      "name": "touch-landscape: Brzezina merchant has a small local stock",
+      "stock": [
+        "ranger_weapon_1",
+        "druid_weapon_1",
+        "health_potion",
+        "health_potion_2",
+        "druid_leather",
+        "wooden_shield"
+      ]
+    },
+    {
+      "name": "touch-landscape: ring property details rendered from real inventory",
+      "text": "Pierścień ochrony\nZałóż\nZestrój · 10 s\nSprzedaj · 4000 zł\nZestrój się z przedmiotem, aby używać jego magii.\nPierścień\n+1 do KP i wszystkich rzutów obronnych. Wymaga zestrojenia.\nZestrojenia: 0/3"
+    },
+    {
+      "name": "touch-landscape: guidance and guiding bolt SVGs load in spellbook"
+    },
+    {
+      "name": "touch-landscape: full-world atlas renders real continent and island data"
+    },
+    {
+      "name": "touch-landscape: shaman world view rendered"
+    },
+    {
+      "name": "touch-landscape: new third-level crypt and its guardian render",
+      "boss": "Akharet, Król Zgasłego Słońca"
+    },
+    {
+      "name": "touch-landscape: guiding bolt casts on an automatic off-facing monster target",
+      "sent": [
+        {
+          "type": "cast",
+          "spell_id": "guiding_bolt"
+        }
+      ],
+      "target": "world_20",
+      "effect": {
+        "id": "fx4",
+        "kind": "spell",
+        "source_id": "2",
+        "target_id": "world_20",
+        "floor": -2,
+        "x": 70420,
+        "y": 18050,
+        "target_x": 70510,
+        "target_y": 18050,
+        "time": 13.850000000000062,
+        "duration": 0.72,
+        "radius": 0,
+        "spell_id": "guiding_bolt",
+        "visual": {
+          "style": "attack",
+          "theme": "nature",
+          "colors": [
+            "#578879",
+            "#a2d9bd",
+            "#e2fff0"
+          ],
+          "shots": 1
+        },
+        "shots": 1,
+        "cast_circle": 1,
+        "targets": [
+          {
+            "id": "world_20",
+            "x": 70510,
+            "y": 18050,
+            "player": false
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "failedRequests": [],
+  "limitations": [
+    "Chromium desktop and touch simulation; no physical Android or live Railway test. Server test fixture places characters, grants inventory and pauses monster movement."
+  ],
+  "visual_review": {
+    "reviewed": [
+      "desktop-atlas-full-resolution.png",
+      "desktop-atlas-canvas.png",
+      "desktop-orc-shaman.png",
+      "desktop-crypt-boss.png"
+    ],
+    "findings": [
+      "Repeated per-biome perimeter circles removed; region road layouts now visibly vary.",
+      "Unequal island and archipelago coastlines, ocean gaps, shore ports and dashed sea routes visible.",
+      "Orc shaman is clearly humanoid with green body, staff and headdress.",
+      "New crypt boss and undead artwork render without missing assets."
+    ],
+    "atlas_export": "1400x1010 PNG, production atlas drawTerrain, unchanged live WebSocket world metadata and actual full-world atlas bounds."
+  }
+}

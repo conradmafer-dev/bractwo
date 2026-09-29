@@ -1,6 +1,11 @@
 """0.8.8 original monster variants, animated sprite metadata and authored habitats.
 Append-only spawns preserve IDs of earlier quest monsters and deterministic world layout.
 """
+try:
+    from .continent_world import region_at
+except ImportError:
+    from continent_world import region_at
+
 import math
 from copy import deepcopy
 try:
@@ -141,7 +146,7 @@ def place(c, obstacles, landmarks):
         spots=[(x,y) for k,x,y in added if k==kind]
         # Nearest to the starter town is listed in the player-facing atlas and release guide.
         x,y=min(spots,key=lambda p:math.hypot(p[0]-560,p[1]-1180))
-        region=next(r for r in c.REGIONS if r['x']<=x<r['x']+r['w'] and r['y']<=y<r['y']+r['h'])
+        region=region_at(c.REGIONS,x,y) or min(c.REGIONS,key=lambda r:math.hypot(x-r.get('label_x',r['x']+r['w']/2),y-r.get('label_y',r['y']+r['h']/2)))
         s=c.ENEMIES[kind]
         entry=dict(id='loot_hunt_'+kind,name=s['name'],kind=kind,x=x,y=y,floor=0,
                    region=region['name'],level=s['level'],count=len(spots))

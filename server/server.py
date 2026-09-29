@@ -23,7 +23,7 @@ from aiohttp import web, WSMsgType
 try:
     from . import world_content as content
     from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
-    from . import continent_world, adventure_content
+    from . import continent_world, adventure_content, expedition_content
     from .adventure_combat import AdventureGame
     from .combat_rules import CombatRounds
     from .dnd_game import DNDGame
@@ -31,7 +31,7 @@ try:
     from .monster_ai import MonsterAI
     from . import level_up, spell_scaling, inventory_rules, fighter_rules
     from .fighter_rules import FighterGame
-    from . import equipment_rules, caster_rules, magic_items
+    from . import equipment_rules, caster_rules, magic_items, loot_economy
     from .caster_game import CasterGame
     from . import rest_rules, druid_circles, environment_rules
     from .environment_rules import EnvironmentGame
@@ -42,7 +42,7 @@ try:
 except ImportError:
     import world_content as content
     import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
-    import continent_world, adventure_content
+    import continent_world, adventure_content, expedition_content
     from adventure_combat import AdventureGame
     from combat_rules import CombatRounds
     from dnd_game import DNDGame
@@ -50,7 +50,7 @@ except ImportError:
     from monster_ai import MonsterAI
     import level_up, spell_scaling, inventory_rules, fighter_rules
     from fighter_rules import FighterGame
-    import equipment_rules, caster_rules, magic_items
+    import equipment_rules, caster_rules, magic_items, loot_economy
     from caster_game import CasterGame
     import rest_rules, druid_circles, environment_rules
     from environment_rules import EnvironmentGame
@@ -237,6 +237,7 @@ loot_content.configure(ITEMS, ENEMY_TYPES, content.TIER_LEVELS)
 hunt_content.place(content, OBSTACLES, LANDMARKS)
 continent_world.configure(content, OBSTACLES, LANDMARKS, ZONES, NPCS, QUESTS, ENEMY_TYPES)
 adventure_content.configure(content, OBSTACLES, LANDMARKS, ZONES, ENEMY_TYPES, NPCS, QUESTS)
+expedition_content.configure(content, OBSTACLES, LANDMARKS, ZONES, ENEMY_TYPES, NPCS, QUESTS)
 for monster_id, monster_spec in ENEMY_TYPES.items():
     monster_spec['respawn'] = max(180 if monster_spec.get('boss') or monster_id=='boss' else 45,
                                   round(monster_spec.get('respawn',35)*1.75))
@@ -255,6 +256,7 @@ for potion_id in POTIONS:
 fighter_rules.configure(ITEMS, dnd_content.SPELLS, CLASSES)
 equipment_rules.configure(ITEMS)
 magic_items.configure(ITEMS)
+loot_economy.configure(ITEMS, ENEMY_TYPES)
 caster_rules.configure(dnd_content.SPELLS, CLASSES, dnd_content.STATUS_SPECS)
 druid_circles.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 configure_circle_spells(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
@@ -317,7 +319,7 @@ class Player:
     bank_gold: int = 0
     depot: list = field(default_factory=list)
     home_city: str = "przystan"
-    world_revision: int = 19
+    world_revision: int = 20
     magic_items_version: int = 0
     magic_attunements: list = field(default_factory=list)
     blessed: bool = False
@@ -722,7 +724,7 @@ class Game(AdventureGame,EnvironmentGame,DruidCircleSpells,DruidCircleGame,Caste
 
     def metadata(self):
         return {"version": content.VERSION, "combat_rules": combat_rules.RULES, "regions": content.REGIONS, "cities": content.CITIES, "stairs": content.STAIRS,
-                "world_revision": 19, "landmasses": getattr(content,"LANDMASSES",[]),
+                "world_revision": getattr(content,"WORLD_REVISION",20), "landmasses": getattr(content,"LANDMASSES",[]),
                 "ports": getattr(content,"PORTS",[]), "sea_routes": getattr(content,"SEA_ROUTES",[]),
                 "magic_items": magic_items.metadata(),
                 "terrain": content.TERRAIN, "surfaces": content.SURFACES, "premium": content.PREMIUM,
@@ -755,7 +757,7 @@ class Game(AdventureGame,EnvironmentGame,DruidCircleSpells,DruidCircleGame,Caste
                 "alarms": [dict(x=a["x"],y=a["y"],floor=a["floor"],remaining=max(0,a["until"]-now)) for owner,a in self.alarms.items() if owner==pid],
                 "enemies": [e.public(now) for e in (self.nearby_enemies(viewer, 1800) if viewer else self.enemies.values()) if visible(e)], "world": dict(self.flags),
                 "active_field_effects": [f.get("effect_id", "") for f in self.environment_fields()],
-                "circle_fields": [{k:f[k] for k in ('id','key','x','y','floor','radius','direction','segments','concentration') if k in f}|{k:f.get('profile',{})[k] for k in ('length','water_variant','damage_type') if k in f.get('profile',{})}
+                "circle_fields": [self.circle_field_snapshot(f,now)
                     for f in getattr(self,'circle_spell_fields',[]) if f.get('until',0)>now and (viewer is None or same_floor(viewer,f) and point_distance(viewer,f)<=2200)],
                 "effects": [dict(effect) for effect in self.effects if self.time-effect["time"] <= max(1.5,effect.get("duration",0)) and (viewer is None or (same_floor(viewer, effect) and point_distance(viewer, effect) <= 1800))]}
 
@@ -818,14 +820,14 @@ class Game(AdventureGame,EnvironmentGame,DruidCircleSpells,DruidCircleGame,Caste
         if p.hp <= 0 and not p.respawn_until:
             p.respawn_until = self.now() + 4
         # Old relic progression may have saved a character in an invalid tile.
-        stranded = (saved.get("world_revision",18) < 19 and p.floor == 0
+        stranded = (saved.get("world_revision",18) < getattr(content,"WORLD_REVISION",20) and p.floor == 0
                     and getattr(content.WATER_MAP,"is_ocean",lambda *_:False)(p.x,p.y))
         if (stranded or self.blocked_for(p,p.x,p.y)) and p.combat_until <= self.now():
             home = next((c for c in content.CITIES if c["id"] == p.home_city),content.CITIES[0])
             p.x, p.y, p.floor = home["x"], home["y"], 0
         # A combat lock may defer relocation; preserve the migration marker so
         # the next login can still rescue an old position swallowed by the sea.
-        p.world_revision = saved.get("world_revision",18) if stranded and p.combat_until > self.now() else 19
+        p.world_revision = saved.get("world_revision",18) if stranded and p.combat_until > self.now() else getattr(content,"WORLD_REVISION",20)
         p.unjust_kills = [t for t in p.unjust_kills if t > self.now()-86400]
         p.aggressors = {k: t for k, t in p.aggressors.items() if t > self.now()}
         self.remember_city_visit(p)
@@ -1864,7 +1866,7 @@ def create_app(db_path="world.sqlite3", clock=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_21","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):

@@ -1,0 +1,87 @@
+{
+  "suite": "UI20 current source integration and regressions",
+  "checks": [
+    {
+      "module": "test_transport_ui20",
+      "tests": 2,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 10.462
+    },
+    {
+      "module": "test_spell_fixes_ui20",
+      "tests": 9,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 1.0
+    },
+    {
+      "module": "test_magic_items_ui19",
+      "tests": 13,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 1.443
+    },
+    {
+      "module": "test_ui19_core_integration",
+      "tests": 5,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 0.553
+    },
+    {
+      "module": "test_druid_circle_spells_0818",
+      "tests": 17,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 1.888
+    },
+    {
+      "module": "test_guiding_bolt_growth_ui17",
+      "tests": 16,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 0.559
+    },
+    {
+      "module": "test_inventory_windows_0810",
+      "tests": 36,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 3.825
+    },
+    {
+      "module": "test_loot_economy_ui20",
+      "tests": 7,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 0.761
+    },
+    {
+      "module": "test_expedition_ui20",
+      "tests": 6,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 0.32
+    },
+    {
+      "module": "test_adventure_ui19",
+      "tests": 7,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 0.445
+    }
+  ],
+  "passed": true,
+  "tests": 118
+}

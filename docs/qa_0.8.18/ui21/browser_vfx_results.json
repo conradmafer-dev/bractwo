@@ -1,0 +1,140 @@
+{
+  "ok": true,
+  "source_hashes": {
+    "web/spell_vfx.js": "907712b5671ff135095a04fbad34e96bdcf2d860a18351460025015412ea832d",
+    "web/circle_vfx.js": "e2e20931afd45ee8ddb1a15e109f75b4bff9d86056af8b905402de0c44f8585f",
+    "web/caster_vfx.js": "705e65bfe8b02b8f0640cd2aa7721076c85388ee5620890304791f22b52fb307",
+    "web/game.js": "b19c1b26abae64944762523b95c03865a057cd511a8227f417f93c554bb25041",
+    "web/runtime.js": "c052cf001d1e7bf027319551f7e49cf411795f5d8d631ee5f963cc9b0660d1f7",
+    "server/dnd_game.py": "2fa66e49125ccba82fc9e4273f8d4375b1ae21854dd6b3b622d6d070f4d4388b",
+    "server/druid_circle_game.py": "e88033cb3663ef16bd2e3ab33cfd43338dd9234abd233795f5d1cc6f84202b4b",
+    "server/druid_circle_spells.py": "58505ea33166c4b63180b30f2f6f5f62465c3d6cfbb3fdc3a70e8d1b4b6e5e9d",
+    "server/dnd_content.py": "09c846f20c86f7be4f24d437ed746fc10d3d65d6a56fe515d6e78ce8a49e1359",
+    "server/server.py": "661b3ae10d11611138558ecfe6eca23622b5018b2c642c0b3fc0feceee7f7b9c"
+  },
+  "checks": [
+    {
+      "name": "Production HTTP/native WS login and complete server event catalog",
+      "spells": 99
+    },
+    {
+      "name": "Real Call Lightning initial cast + explicit recast emits separate bolts, no automatic tick and no second mana charge",
+      "phases": [
+        "cast",
+        "recast"
+      ],
+      "mana": 1180
+    },
+    {
+      "name": "Real Moonbeam field damage tick emits tick VFX",
+      "phases": [
+        "field",
+        "tick"
+      ],
+      "damage": 10
+    },
+    {
+      "name": "Real WebSocket cast: fireball",
+      "effects": 1,
+      "fields": 0
+    },
+    {
+      "name": "Real WebSocket cast: ice_storm",
+      "effects": 1,
+      "fields": 0
+    },
+    {
+      "name": "Real WebSocket cast: thorn_whip",
+      "effects": 1,
+      "fields": 0
+    },
+    {
+      "name": "Real WebSocket cast: cure_wounds",
+      "effects": 1,
+      "fields": 0
+    },
+    {
+      "name": "Real WebSocket cast: misty_step",
+      "effects": 1,
+      "fields": 0
+    },
+    {
+      "name": "Real WebSocket cast: fog_cloud",
+      "effects": 1,
+      "fields": 1
+    },
+    {
+      "name": "Real WebSocket cast: web",
+      "effects": 1,
+      "fields": 1
+    },
+    {
+      "name": "Real WebSocket cast: insect_plague",
+      "effects": 2,
+      "fields": 1
+    },
+    {
+      "name": "Real WebSocket cast: magic_missile",
+      "effects": 1,
+      "fields": 0
+    },
+    {
+      "name": "Real WebSocket cast: ray_of_frost",
+      "effects": 1,
+      "fields": 0
+    },
+    {
+      "name": "Every server spell event draws at six phases; finite canvas commands, balanced state, unchanged packets and Python geometry",
+      "spells": 99,
+      "draws": 594,
+      "maxCanvasCallsPerSpell": 713,
+      "canvasOperations": 89126
+    },
+    {
+      "name": "Twelve-spell visual contact sheet uses actual cast packets and live fields",
+      "file": "spell-vfx-contact-sheet.png"
+    },
+    {
+      "name": "All persistent field families and water/element modes render from production snapshot constructor",
+      "modes": 16,
+      "file": "persistent-field-modes.png"
+    },
+    {
+      "name": "Mobile-sized 12-effect overlap stress remains bounded",
+      "viewport": "844x390",
+      "simultaneous": 12,
+      "frames": 75,
+      "p50ms": 0.7000000011175871,
+      "p95ms": 1.400000000372529,
+      "maxCanvasCallsPerFrame": 2612,
+      "depth": 0,
+      "measurement": "CPU time to submit Canvas commands on this container, including numeric validation wrapper; excludes GPU completion and frame presentation."
+    },
+    {
+      "name": "Three-second twelve-spell looping preview encoded",
+      "file": "spell-vfx-preview.mp4"
+    }
+  ],
+  "errors": [],
+  "httpFailures": [],
+  "limits": [
+    "Headless Chromium desktop/touch simulation; timings describe this container, not physical Android.",
+    "Isolated in-memory server; fixture grants class/levels, moves actors and pauses enemy AI. Spells are sent through production WebSocket dispatch.",
+    "All-catalog replay uses Game.spell_effect packets; it covers drawing, not every spell prerequisite."
+  ],
+  "visual_review": {
+    "artifacts": [
+      "spell-vfx-contact-sheet.png",
+      "persistent-field-modes.png",
+      "live-call_lightning.png",
+      "live-web.png"
+    ],
+    "findings": [
+      "Lightning descends from above onto its actual target.",
+      "Moonbeam column, icy hail, thorn vine, healing helix and two-ended teleport have distinct visual forms.",
+      "Magic Missile base-rank preview has three curved projectiles.",
+      "Persistent field families and four water/four elemental modes remain visually distinct, with actors visible through translucent fields."
+    ],
+    "cast_rank": "Explicit base rank for contact-sheet actual casts; character level90 only unlocks availability."
+  }
+}

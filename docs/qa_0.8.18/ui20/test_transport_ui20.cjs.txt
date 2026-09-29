@@ -1,0 +1,1 @@
+PASS UI20 ferry UI: sufficient gold at level 1; five real locks have explanations.

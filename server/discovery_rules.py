@@ -1,6 +1,10 @@
 """One persistent discovery catalogue for named world sites and entrances."""
 import math
 from itertools import chain
+try:
+    from .continent_world import region_at, contains
+except ImportError:
+    from continent_world import region_at, contains
 
 
 def discovery_xp(biome_level, enemy_level, city_distance, previous_xp=0):
@@ -57,11 +61,11 @@ def configure(content, landmarks, zones, enemies):
         spawn_cells.setdefault((floor, int(x // 700), int(y // 700)), []).append((kind, x, y))
     for point in landmarks:
         x, y, floor = point['x'], point['y'], point.get('floor', 0)
-        region = next((r for r in regions if r['x'] <= x < r['x'] + r['w']
-                       and r['y'] <= y < r['y'] + r['h']), {})
+        region = region_at(regions,x,y) or {}
         local_zones = [z for z in zones if z.get('floor', 0) == floor
                        and z['x'] <= x < z['x'] + z.get('w', 0)
-                       and z['y'] <= y < z['y'] + z.get('h', 0)]
+                       and z['y'] <= y < z['y'] + z.get('h', 0)
+                       and (not z.get('points') or contains(z['points'],x,y))]
         site_level = point.get('discovery_difficulty', {}).get('site_level',
                      max(point.get('recommended_level', 1), point.get('min_level', 1)))
         biome_level = max([1, region.get('min_level', 1), site_level]

@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "script": "test_transport_ui20.cjs",
+      "passed": true
+    },
+    {
+      "script": "test_ring_facts_ui20.cjs",
+      "passed": true
+    },
+    {
+      "script": "test_atlas_0811.cjs",
+      "passed": true
+    },
+    {
+      "script": "test_client_runtime.cjs",
+      "passed": true
+    },
+    {
+      "script": "test_world_geometry_ui20.cjs",
+      "passed": true
+    },
+    {
+      "script": "test_inventory_windows.cjs",
+      "passed": true
+    }
+  ]
+}

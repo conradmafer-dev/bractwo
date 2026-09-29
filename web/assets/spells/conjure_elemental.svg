@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs><radialGradient id="back"><stop stop-color="#3b443b"/><stop offset="1" stop-color="#112b29"/></radialGradient>
+    <linearGradient id="ink" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#a9aa85"/><stop offset="1" stop-color="#ded4ae"/></linearGradient></defs>
+  <rect x="1" y="1" width="62" height="62" rx="10" fill="url(#back)" stroke="#a9aa85" stroke-opacity=".75"/>
+  <circle cx="32" cy="32" r="26" fill="none" stroke="#a9aa85" stroke-opacity=".16"/>
+  <path d="M32 8V56M8 32H56" fill="none" stroke="#c2c9a7" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/><path d="M19 9Q27 18 22 25Q13 30 11 21L16 13L16 22Q21 20 19 9" fill="#ed9f65" stroke="#f4d9a2" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="1"/><path d="M46 9Q34 22 41 26Q52 30 54 21Z" fill="#87d0de" stroke="#d2efeb" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="1"/><path d="M12 43L20 35L27 41L24 54L14 52Z" fill="#b3aa88" stroke="#dfd3a8" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" opacity="1"/><path d="M36 43H49Q56 43 53 37M37 49H48Q55 49 52 55" fill="none" stroke="#d5e4dc" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" opacity="1"/><circle cx="32" cy="32" r="6" fill="#d3c995" stroke="#f2efd5" stroke-width="1.6" opacity="1"/>
+</svg>

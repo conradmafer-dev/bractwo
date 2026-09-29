@@ -141,6 +141,15 @@ class DruidCircleSpells:
         if not hasattr(self,'circle_spell_fields'): self.init_circle_spells()
         return self.circle_spell_fields
 
+    def circle_field_snapshot(self,f,now):
+        s=f.get('profile',{})
+        data={k:f[k] for k in ('id','key','x','y','floor','radius','direction','segments','concentration') if k in f}
+        data.update({k:s[k] for k in ('length','water_variant','damage_type','flow','shape','visual') if k in s})
+        data.update(effect_id=f.get('effect_id',''),spell_id=f['key'],source_id=f['owner'],
+            cast_origin=list(f.get('cast_origin',[f['x'],f['y']])),
+            started_at=f.get('visual_started_at',self.time),age=max(0,now-f.get('born',now)))
+        return data
+
     def _persist_circle_wall(self,f):
         if f.get('concentration'):return
         record={k:f[k] for k in ('id','owner','key','x','y','floor','radius','profile','segments')}
@@ -274,12 +283,16 @@ class DruidCircleSpells:
         if key=='conjure_elemental' and (not isinstance(options.get('variant','fire'),str) or options.get('variant','fire') not in ELEMENTS): return
         if key=='control_water' and options.get('variant','flood') not in ('flood','part','redirect','whirlpool'): return
         if key=='wall_of_stone' and options.get('variant','thick') not in ('thick','thin'):return
+        # A selected or locked target remains authoritative, even when it has
+        # disappeared or moved out of range. Only an untargeted cast may acquire
+        # the nearest legal monster; never redirect it toward another player.
+        if not enemy_id and not target_id and s['kind']!='buff':
+            enemy_id=p.auto_enemy_id or None;target_id=p.auto_target_id or None
         target=self.players.get(target_id) if target_id else self.enemies.get(enemy_id) if enemy_id else None
-        if target is None and s['kind'] not in ('buff',):
-            target=self.players.get(p.auto_target_id) if p.auto_target_id else self.enemies.get(p.auto_enemy_id)
-        if target is None and s['kind'] not in ('buff',) and key not in FIELD_KEYS and not s.get('area'):
-            options=[e for e in self.nearby_enemies(p,s['range']) if self._spell_legal(p,e,s['range'],s['kind']=='circle_control') and self.line_clear(p,e)]
-            target=min(options,key=lambda e:distance(p,e)) if options else None
+        if not enemy_id and not target_id and s['kind']!='buff' and key not in FIELD_KEYS and not s.get('area'):
+            candidates=[e for e in self.nearby_enemies(p,s['range'])
+                if not self.is_player_target(e) and self._spell_legal(p,e,s['range'],s['kind']=='circle_control') and self.line_clear(p,e)]
+            target=min(candidates,key=lambda e:(distance(p,e),str(e.id))) if candidates else None
         targets=[];point=None;form=None;friendly=False
         if s['kind']=='buff':
             if s.get('targeting')=='self':
@@ -360,7 +373,12 @@ class DruidCircleSpells:
                 self.spell_damage(p,t,s)
                 if t.hp<=0 and not self.is_player_target(t): await self.defeat(t)
             if key=='shatter':self._shatter_objects(p,s,point)
-        self.spell_effect(p,key,targets[0] if targets else point or p,targets or None,spec=s)
+        # Field creation already emitted its persistent lifecycle event. For
+        # ground-targeted areas, preserve the chosen point rather than shifting
+        # the rendering footprint to whichever victim happens to sort first.
+        if key not in FIELD_KEYS:
+            footprint=self._field_visual_area(dict(x=point.x,y=point.y,floor=p.floor,radius=s['radius']),s) if point is not None and s.get('area') else None
+            self.spell_effect(p,key,point if point is not None else targets[0] if targets else p,targets,spec=s,area=footprint)
         with self.db:
             self.save_player(p)
             for t in targets:
@@ -489,7 +507,8 @@ class DruidCircleSpells:
         if segments is not None:self._wall_escape_reactions(p,s,segments)
         f=dict(id=f'circle:{p.id}:{key}:{now}',owner=p.id,key=key,x=point.x,y=point.y,floor=p.floor,
             radius=s['radius'],until=now+s['duration'],next=now+TURN,concentration=True,profile=dict(s),
-            positions={},hits={},entered=set(),born=now,options=dict(options),dc=rules.spell_dc(p))
+            positions={},hits={},entered=set(),born=now,options=dict(options),dc=rules.spell_dc(p),
+            cast_origin=[p.x,p.y],visual_started_at=self.time)
         if segments is not None: f['segments']=segments
         if key=='gust_of_wind':
             dx,dy=point.x-p.x,point.y-p.y;n=math.hypot(dx,dy) or 1
@@ -502,7 +521,9 @@ class DruidCircleSpells:
         f['entered']={self.target_ref(t) for t in occupants}
         f['spirit_space']={self.target_ref(t) for t in occupants if distance(point,t)<=5*FT}
         self._circle_fields().append(f)
-        effect=self.spell_effect(p,key,point,duration=s['duration'],spec=s);effect['persistent']=True;f['effect_id']=effect['id']
+        effect=self.spell_effect(p,key,point,[],duration=s['duration'],spec=f['profile'],
+            area=self._field_visual_area(f,f['profile']),phase='field')
+        effect.update(persistent=True,field_id=effect['id']);f['effect_id']=effect['id']
         if key in ('insect_plague','gust_of_wind'): self._tick_circle_field(f,initial=True)
 
     def _field_contains(self,f,t):
@@ -575,7 +596,7 @@ class DruidCircleSpells:
                 if key=='gust_of_wind':self._circle_status(p,t,'headwind',.2,s,hostile,direction=list(f['direction']))
         due=now>=f['next']
         if due:f['next']=now+TURN
-        present=set();spirit_space=set();newly_restrained=False
+        present=set();spirit_space=set();newly_restrained=False;impacts=[]
         for t in nearby:
             ref=self.target_ref(t);present.add(ref);entered=ref not in f['entered']
             if distance(center,t)<=5*FT:spirit_space.add(ref)
@@ -591,17 +612,17 @@ class DruidCircleSpells:
                 if cell in f.get('burnt',set()): continue
                 f['hits'][ref]=turn
                 if f.get('burning',{}).get(cell,0)>now:
-                    self.spell_damage(p,t,dict(s,kind='save',save='',dice=[2,4,0],damage_type='fire',resolved=True))
+                    self._record_field_damage(p,t,dict(s,kind='save',save='',dice=[2,4,0],damage_type='fire',resolved=True),impacts)
                 elif not self._circle_save_roll(p,t,s): self._circle_status(p,t,'web_restrained',max(.1,f['until']-now),s,field_id=f['id'])
             elif key=='stinking_cloud' and due and not self._circle_save_roll(p,t,s):
                 self._circle_status(p,t,'stinking_poison',TURN,s,concentration=False)
             elif key in ('insect_plague','conjure_animals') and (entered or due or initial or f.get('moved')) and ready:
                 if key=='conjure_animals' and not self._spell_visible(p,t): continue
-                f['hits'][ref]=turn;self.spell_damage(p,t,dict(s,kind='save'))
+                f['hits'][ref]=turn;self._record_field_damage(p,t,dict(s,kind='save'),impacts)
             elif key=='gust_of_wind' and (due or initial) and not self._circle_save_roll(p,t,s):
                 dx,dy=f['direction'];self.environment_forced_move(t,dx*15*FT,dy*15*FT)
             elif key=='conjure_elemental' and (due or ref in spirit_space and ref not in f.get('spirit_space',set())) and not f.get('restrained') and ready and self._spell_visible(p,t):
-                f['hits'][ref]=turn;result=self.spell_damage(p,t,dict(s,kind='save'))
+                f['hits'][ref]=turn;result=self._record_field_damage(p,t,dict(s,kind='save'),impacts)
                 if result and not result.get('saved') and t.hp>0:
                     if self._circle_status(p,t,'elemental_restrained',max(.1,f['until']-now),s,field_id=f['id']): f['restrained']=ref;newly_restrained=True
         if key=='web':
@@ -619,7 +640,7 @@ class DruidCircleSpells:
             if t is None or not self._spell_legal(p,t) or not self.target_condition(t,'elemental_restrained'): f.pop('restrained',None)
             else:
                 profile=dict(s,kind='save',dice=[4+s.get('cast_circle',5)-5,8,0])
-                result=self.spell_damage(p,t,profile)
+                result=self._record_field_damage(p,t,profile,impacts)
                 if not result or result.get('saved') or t.hp<=0: self.target_conditions(t).pop('elemental_restrained',None);f.pop('restrained',None)
         if key=='gust_of_wind':
             for other in tuple(self._circle_fields()):
@@ -639,8 +660,9 @@ class DruidCircleSpells:
                     self._circle_status(p,t,'whirlpool',.2,s,field_id=f['id'])
                     if (due or ref not in f['entered']) and f['hits'].get(ref)!=turn:
                         f['hits'][ref]=turn
-                        self.spell_damage(p,t,dict(s,kind='save',save='strength',save_half=True,dice=[2,8,0],damage_type='bludgeoning',resolved=True))
+                        self._record_field_damage(p,t,dict(s,kind='save',save='strength',save_half=True,dice=[2,8,0],damage_type='bludgeoning',resolved=True),impacts)
         f['entered']=present;f['spirit_space']=spirit_space;f.pop('moved',None)
+        self._field_tick_effect(p,f,s,impacts)
 
     async def circle_spell_action(self,p,action,options=None):
         options=options or {}
@@ -714,6 +736,7 @@ class DruidCircleSpells:
             x=dest['x']+math.cos(math.radians(angle))*(dest.get('radius',0)+40);y=dest['y']+math.sin(math.radians(angle))*(dest.get('radius',0)+40)
             q=SimpleNamespace(x=x,y=y,floor=p.floor)
             if self.blocked_for(p,x,y) or p.pvp_combat_until>now and self.in_safe(q):continue
+            self.spell_effect(p,'tree_stride',SimpleNamespace(id=p.id,x=x,y=y,floor=p.floor),spec=dnd.SPELLS['tree_stride'],phase='recast',visual_only=True)
             p.x,p.y=x,y;buff['step_until']=now+TURN;p.buffs['tree_movement_cost']={'until':now+TURN,'feet':10};return
 
     async def _attack_wall(self,p,options):

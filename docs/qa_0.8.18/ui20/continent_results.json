@@ -1,0 +1,84 @@
+{
+  "suite": "UI20 continent, archipelago and biome integration",
+  "checks": {
+    "collision": {
+      "counts": {
+        "npcs": 60,
+        "stair_origins": 150,
+        "stair_destinations": 150,
+        "ports": 20,
+        "new_discoveries": 83,
+        "spawns": 11550
+      },
+      "failures": []
+    },
+    "local_approaches": {
+      "counts": {
+        "npcs": 60,
+        "surface_stairs": 36,
+        "ports": 20,
+        "adventure_anchors": 8
+      },
+      "visited_nodes": 20970,
+      "failures": []
+    },
+    "transport_and_variety": {
+      "ports": 20,
+      "directed_routes": 54,
+      "reachable_ports": 20,
+      "authored_plans": 20,
+      "distinct_actual_road_footprints": 20,
+      "failures": []
+    },
+    "natural_regions": {
+      "regions": 20,
+      "coverage_samples": 3136,
+      "distinct_sizes": 20,
+      "failures": []
+    },
+    "shore_landings": {
+      "ports": 20,
+      "authored_landmasses": 17,
+      "served_landmasses": 17,
+      "failures": []
+    },
+    "sea_barriers": {
+      "ocean_road_points": 0,
+      "region_scale_closed_road_loops": []
+    },
+    "landscape_variety": {
+      "landmass_area_million_units": {
+        "mainland": 6430.69,
+        "sun_island": 457.52,
+        "ember_island": 419.8,
+        "frost_island": 173.06,
+        "dragon_island": 180.39,
+        "rift_island": 358.62,
+        "obsidian_island": 161.93,
+        "ash_island": 238.18,
+        "glass_key": 11.38,
+        "dragon_tooth": 19.93,
+        "ember_tooth": 18.07,
+        "salt_key": 11.06,
+        "frost_key": 8.7,
+        "cinder_key": 9.34,
+        "whisper_key": 9.26,
+        "seal_key": 7.08,
+        "black_sail_key": 7.88
+      },
+      "named_landforms": 10,
+      "terrain_patches": 123,
+      "canyons": 6
+    },
+    "connected_entrance_landmasses": {
+      "surface_entrances": 36,
+      "overlap_edges": 4,
+      "failures": []
+    }
+  },
+  "passed": true,
+  "tests": 8,
+  "seconds": 13.503,
+  "errors": [],
+  "failures": 0
+}

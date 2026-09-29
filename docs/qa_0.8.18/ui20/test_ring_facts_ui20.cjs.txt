@@ -1,0 +1,11 @@
+✔ old ring instance resolves actual property description from world catalog (1.015369ms)
+✔ ring description is visible even without magic_id and never repeated (0.205846ms)
+✔ catalog fallback preserves owner-only sources and live preview (0.14793ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5.879324

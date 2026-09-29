@@ -1,0 +1,65 @@
+{
+  "revision": "UI_21",
+  "version": "0.8.18",
+  "world_revision": 20,
+  "status": "passed_web_and_server_native_static_only",
+  "server": {
+    "passed": true,
+    "tests": 61,
+    "report": "core_regression.json"
+  },
+  "javascript": {
+    "passed": true,
+    "tests": 49,
+    "suites": 5,
+    "report": "javascript.json"
+  },
+  "browser": {
+    "passed": true,
+    "checks": 18,
+    "catalog_entries": 99,
+    "replay_draws": 594,
+    "actual_spell_paths": 12,
+    "persistent_field_modes": 16,
+    "javascript_errors": 0,
+    "http_failures": 0,
+    "report": "browser_vfx_results.json",
+    "source_hashes_match_release": true
+  },
+  "assets": {
+    "catalog_icons": 99,
+    "all_present_and_native_mirrored": true,
+    "new_circle_icons": 21,
+    "report": "icons.json"
+  },
+  "gameplay": {
+    "rules_unchanged": true,
+    "report": "gameplay_compatibility.json"
+  },
+  "native": {
+    "static_review_complete": true,
+    "engine_run": false,
+    "apk_built": false,
+    "report": "native_static_review.json"
+  },
+  "visual_review": {
+    "inspected": [
+      "spell-vfx-contact-sheet.png",
+      "persistent-field-modes.png",
+      "circle-spell-icons.png",
+      "live-call_lightning.png"
+    ],
+    "preview": "spell-vfx-preview.mp4"
+  },
+  "limits": [
+    "Headless Chromium desktop/touch simulation; timings describe this container, not physical Android.",
+    "Isolated in-memory server; fixture grants class/levels, moves actors and pauses enemy AI. Spells are sent through production WebSocket dispatch.",
+    "All-catalog replay uses Game.spell_effect packets; it covers drawing, not every spell prerequisite.",
+    "A real Godot import/run/export is still required to verify native rendering and produce an APK."
+  ],
+  "reproduce": [
+    "python tools/check_ui21.py",
+    "python tools/run_browser_ui21.py"
+  ],
+  "deployment": "not_performed"
+}

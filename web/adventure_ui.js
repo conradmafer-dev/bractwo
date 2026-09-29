@@ -1,5 +1,17 @@
 /* Nearby conversations, local quests and actual boat connections. */
 (function(root){'use strict';
+  // One explanation for every actual lock; destination danger is advisory.
+  function boatReason(p,npc,route){
+    if(!p||p.hp<=0)return 'Rejs jest dostępny dla żywej postaci.';
+    if((p.floor||0)!==(npc.floor||0)||Math.hypot(p.x-npc.x,p.y-npc.y)>(npc.radius||125))return 'Podejdź bliżej przewoźnika.';
+    if(p.combat_remaining>0)return 'Zakończ walkę i zaczekaj na koniec blokady.';
+    if(p.gold<route.cost)return `Brakuje ${route.cost-p.gold} złota.`;
+    return '';
+  }
+  function routeText(route){
+    const danger=route.recommended_level||route.min_level||1;
+    return `${route.cost?route.cost+' złota':'Przeprawa bezpłatna'}${danger>1?' · zalecany poziom '+danger:''}`;
+  }
   function create(h){
     const node=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
     const button=(text,fn,disabled=false)=>{const e=node('button',text);e.type='button';e.disabled=disabled;e.onclick=fn;return e;};
@@ -27,8 +39,8 @@
       if(routes.length){
         body.append(node('h3','Miejscowe przeprawy'));
         for(const route of routes){const port=(w.ports||[]).find(p=>p.id===route.to_id);if(!port)continue;
-          const row=node('article',undefined,'adventure-quest');row.append(node('strong',port.name),node('p',`${route.cost?route.cost+' złota':'Przeprawa bezpłatna'}${route.min_level>1?' · poziom '+route.min_level:''}`));
-          row.append(button('Wypłyń',()=>h.send({type:'boat',route_id:route.id}),!closeEnough||p.combat_remaining>0||p.level<(route.min_level||1)||p.gold<route.cost));body.append(row);
+          const row=node('article',undefined,'adventure-quest');row.append(node('strong',port.name),node('p',routeText(route)));
+          const reason=boatReason(p,npc,route),sail=button('Wypłyń',()=>h.send({type:'boat',route_id:route.id}),!!reason);sail.title=reason;row.append(sail);if(reason)row.append(node('small',reason,'adventure-warning'));body.append(row);
         }
       }
       for(const q of quests){
@@ -48,5 +60,6 @@
     }
     return {open,close,render,get visible(){return !panel.hidden;}};
   }
-  root.BractwoAdventureUI={create};
+  root.BractwoAdventureUI={create,boatReason,routeText};
+  if(typeof module!=='undefined')module.exports=root.BractwoAdventureUI;
 })(globalThis);

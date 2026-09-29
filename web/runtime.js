@@ -44,9 +44,9 @@
         const dx=e.b[0]-e.a[0],dy=e.b[1]-e.a[1],q=Math.max(0,Math.min(1,((x-e.a[0])*dx+(y-e.a[1])*dy)/Math.max(1,dx*dx+dy*dy)));
         if(Math.hypot(x-e.a[0]-q*dx,y-e.a[1]-q*dy)<=33)return 'path';
       }
-      for(let i=entries.length-1;i>=0;i--){const e=entries[i];if(e.kind==='patch'){const p=e.p;if(((x-p.x-p.w/2)/(p.w/2))**2+((y-p.y-p.h/2)/(p.h/2))**2<=1)return p.kind;}}
+      for(let i=entries.length-1;i>=0;i--){const e=entries[i];if(e.kind==='patch'){const p=e.p;if(root.BractwoWorldGeometry?.patchAt(p,x,y)??(((x-p.x-p.w/2)/(p.w/2))**2+((y-p.y-p.h/2)/(p.h/2))**2<=1))return p.kind;}}
       if(x<3200&&y<2304){if(x>1720&&x<2220&&y>1370)return 'mud';if(x>2250)return 'stone';if(y<900&&x<1400)return 'forest';return 'grass';}
-      const r=(this.world.regions||[]).find(r=>x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h);
+      const r=root.BractwoWorldGeometry?.regionAt(this.world,x,y)||(this.world.regions||[]).find(r=>!r.points?.length&&x>=r.x&&x<r.x+r.w&&y>=r.y&&y<r.y+r.h);
       return ({forest:'forest',swamp:'mud',desert:'sand',snow:'snow',lava:'ash',obsidian:'ash',mountain:'stone',ruins:'stone'})[r?.biome]||'grass';
     }
     roads(left,top,right,bottom){return this.index.query(left,top,right,bottom).filter(e=>e.kind==='road');}
@@ -286,7 +286,29 @@
       if (!button.disabled) activate(event);
     });
   }
-  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, displayHotbar, hotbarGroupForSpell, spellCostText, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, combatSummary, bindTouchTap, bindTouchScroll };
+  // Keep beams crossing the viewport, broad server areas and high lightning
+  // columns visible even when their origin is outside the camera. No timers or
+  // effect state are changed by culling; moving the camera can reveal them.
+  function effectVisible(effect, view) {
+    const x=Number(effect.x)||0,y=Number(effect.y)||0;
+    const tx=Number.isFinite(effect.target_x)?effect.target_x:x;
+    const ty=Number.isFinite(effect.target_y)?effect.target_y:y;
+    const radius=Math.max(0,Number(effect.radius)||0);
+    let left=Math.min(x,tx)-radius,right=Math.max(x,tx)+radius;
+    let top=Math.min(y,ty)-radius,bottom=Math.max(y,ty)+radius;
+    const bounds=effect.area?.bounds;
+    if(Array.isArray(bounds)&&bounds.length===4&&bounds.every(Number.isFinite)){
+      left=Math.min(left,bounds[0]);top=Math.min(top,bounds[1]);
+      right=Math.max(right,bounds[2]);bottom=Math.max(bottom,bounds[3]);
+    }
+    for(const target of effect.targets||[]){
+      if(!Number.isFinite(target.x)||!Number.isFinite(target.y))continue;
+      left=Math.min(left,target.x);right=Math.max(right,target.x);
+      top=Math.min(top,target.y);bottom=Math.max(bottom,target.y);
+    }
+    return right+100>=view.left&&left-100<=view.right&&bottom+100>=view.top&&top-360<=view.bottom;
+  }
+  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, effectVisible, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, displayHotbar, hotbarGroupForSpell, spellCostText, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, combatSummary, bindTouchTap, bindTouchScroll };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BractwoRuntime = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

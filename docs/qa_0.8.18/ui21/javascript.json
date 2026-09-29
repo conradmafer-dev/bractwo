@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "script": "test_spell_vfx.cjs",
+      "passed": true
+    },
+    {
+      "script": "test_circle_vfx_ui21.cjs",
+      "passed": true
+    },
+    {
+      "script": "test_vfx_visibility_ui21.cjs",
+      "passed": true
+    },
+    {
+      "script": "test_client_runtime.cjs",
+      "passed": true
+    },
+    {
+      "script": "test_spell_vfx_ui21.cjs",
+      "passed": true
+    }
+  ]
+}

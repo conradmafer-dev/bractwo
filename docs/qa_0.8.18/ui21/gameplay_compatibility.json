@@ -1,0 +1,37 @@
+{
+  "passed": true,
+  "unchanged_rules": [
+    {
+      "file": "server/dnd_content.py",
+      "identical_to_ui20": true
+    },
+    {
+      "file": "server/druid_circles.py",
+      "identical_to_ui20": true
+    },
+    {
+      "file": "server/spell_scaling.py",
+      "identical_to_ui20": true
+    },
+    {
+      "file": "server/spell_geometry.py",
+      "identical_to_ui20": true
+    },
+    {
+      "file": "server/combat_rules.py",
+      "identical_to_ui20": true
+    },
+    {
+      "file": "server/environment_rules.py",
+      "identical_to_ui20": true
+    }
+  ],
+  "review": "Read-only comparison of changed gameplay dispatch files found identical damage resolution calls, RNG, costs, concentration conditions and target selection. Changes add visual metadata and correct drawing centers.",
+  "reviewed_files": [
+    "server/dnd_game.py",
+    "server/druid_circle_game.py",
+    "server/druid_circle_spells.py",
+    "server/ranger_magic.py",
+    "server/server.py"
+  ]
+}

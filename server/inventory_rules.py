@@ -134,11 +134,17 @@ def sources(p, template, enemies):
 
 
 def public_item(p, item, enemies):
+    # Saved instances retain ownership/quantity; display fields come from the
+    # current catalog, just like combat. A stale ring must not lose its effect
+    # description until the next reconnect or migration.
+    try: from . import world_content
+    except ImportError: import world_content
     result=dict(item)
+    result.update(world_content.ITEMS.get(item.get('template'), {}))
     result['sources']=sources(p,item.get('template',''),enemies)
     try: from . import equipment_rules
     except ImportError: import equipment_rules
-    result['preview']=equipment_rules.cached_preview(p,item)
+    result['preview']=equipment_rules.cached_preview(p,result)
     return result
 
 

@@ -1,0 +1,16 @@
+✔ field geometry keeps authoritative square, circle and wind dimensions (1.075679ms)
+✔ all ten families render finite commands with balanced state and clipped interiors (7.049085ms)
+✔ particle work stays bounded when an upcast radius grows fivefold (1.35243ms)
+✔ snapshot removal clears fields immediately without renderer-owned lifetime (0.876943ms)
+✔ four water modes and elemental damage variants have distinct stable artwork (0.984803ms)
+✔ destroyed wall panels disappear and damaged living panels crack (0.176772ms)
+✔ alarm maintains exact boundary and culls wrong floors and distant wards (0.365092ms)
+✔ ritual families keep actor art separate and balance channel progress overlays (0.681092ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18.179944

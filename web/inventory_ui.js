@@ -4,6 +4,8 @@
  const node=(t,text,cls)=>{const e=document.createElement(t);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
  const button=(text,fn,disabled=false)=>{const e=node('button',text);e.type='button';e.disabled=disabled;e.onclick=ev=>{ev.stopPropagation();fn();};return e;};
  function facts(item,w={}){
+  // Resolve legacy/saved instances through the same catalog used by merchants.
+  item={...item,...(w.items?.[item.template]||{}),preview:item.preview,sources:item.sources};
   const lines=[],p=item.preview||{},dtype=damageNames[p.damage_type||item.damage_type]||item.damage_type||'';
   if(item.slot==='potion'){
    lines.push('Odnawia '+(item.effect_summary||item.restore+' punktów'));
@@ -32,11 +34,14 @@
    if(p.untrained_shield)lines.push('Brak wyszkolenia — bez premii KP');
   }else if(item.slot==='ring'){
    lines.push('Pierścień');
-   if(item.ac_bonus)lines.push('KP +'+item.ac_bonus);
-   if(item.attack_bonus)lines.push('Atak bronią +'+item.attack_bonus);
-   if(item.attack)lines.push('Obrażenia +'+item.attack);
+   if(item.description)lines.push(item.description);
+   else{
+    if(item.ac_bonus)lines.push('KP +'+item.ac_bonus);
+    if(item.attack_bonus)lines.push('Atak bronią +'+item.attack_bonus);
+    if(item.attack)lines.push('Obrażenia +'+item.attack);
+   }
   }else if(item.description)lines.push(item.description);
-   if(item.magic_id&&item.description)lines.push(item.description);
+   if(item.magic_id&&item.description&&!lines.includes(item.description))lines.push(item.description);
    if(item.resistances?.length)lines.push('Odporność: '+item.resistances.map(x=>damageNames[x]||x).join(', '));
   if(item.min_level>1)lines.push('Poziom '+item.min_level);
   if(p.equip_error&&!p.equip_error.startsWith('Wymagany poziom'))lines.push(p.equip_error);
@@ -115,7 +120,7 @@
    items=items.filter(item=>item.slot!=='potion'||item.potion_kind==='health');
    for(const item of items){const row=node('article',undefined,'merchant-item');row.dataset.template=item.template;
     const img=node('img');img.src=item.icon||'assets/equipment/empty.svg';img.alt='';row.append(img);
-    const text=node('div',undefined,'merchant-item-text');text.append(node('strong',item.name+(item.quantity>1?' ×'+item.quantity:'')),node('small',(item.effect_summary||item.armor_summary||item.damage_dice||'')+(item.min_level>1?' · Poziom '+item.min_level:'')));row.append(text);
+    const text=node('div',undefined,'merchant-item-text');text.append(node('strong',item.name+(item.quantity>1?' ×'+item.quantity:'')),node('small',(item.effect_summary||item.armor_summary||item.damage_dice||(item.slot==='ring'?item.description:'')||'')+(item.min_level>1?' · Poziom '+item.min_level:'')));row.append(text);
     const actions=node('div',undefined,'merchant-item-actions');const price=tab==='buy'?item.price:item.value;actions.append(node('span',`${price} zł / szt.`));
     if(tab==='buy')actions.append(button('Kup',()=>h.send({type:'buy',item:item.template}),!trade||p.gold<price||p.level<(item.min_level||1)));
     else{actions.append(button('Sprzedaj'+(item.quantity>1?' 1':''),()=>h.send({type:'sell',uid:item.uid}),!trade));if(item.quantity>1)actions.append(button('Cały stos',()=>h.send({type:'sell',uid:item.uid,quantity:item.quantity}),!trade));}

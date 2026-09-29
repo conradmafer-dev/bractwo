@@ -1,0 +1,21 @@
+✔ world view fits the entire rectangular world without cropping (1.175517ms)
+✔ each left/right zoom doubles/halves bounded camera scale (0.249491ms)
+✔ zoom preserves cursor location except when camera reaches border (0.120389ms)
+✔ local camera includes player near world edge (0.122752ms)
+✔ zero coordinates are not mistaken for missing location (0.1616ms)
+✔ pan is bounded and does not zoom (0.183412ms)
+✔ all resets persistent camera after zoom and pan (0.106819ms)
+✔ original starter river and its bridge are included along with expanded geometry (0.677867ms)
+✔ all bridges draw after all water segments (0.223622ms)
+✔ missing optional river and expanded geometry safely draw nothing (0.198154ms)
+✔ projection uses same river coordinates in atlas and minimap (0.304763ms)
+✔ thin river remains at least one screen pixel at world zoom (0.17479ms)
+✔ offscreen river segments do not issue drawing calls on local map (0.108361ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10.347392

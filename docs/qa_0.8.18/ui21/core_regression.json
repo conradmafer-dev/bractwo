@@ -1,0 +1,46 @@
+{
+  "passed": true,
+  "tests": 61,
+  "checks": [
+    {
+      "module": "test_spell_vfx_events_ui21",
+      "tests": 10,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 11.33
+    },
+    {
+      "module": "test_spell_fixes_ui20",
+      "tests": 9,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 1.359
+    },
+    {
+      "module": "test_druid_circle_spells_0818",
+      "tests": 17,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 2.063
+    },
+    {
+      "module": "test_druid_circles_0818",
+      "tests": 9,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 1.005
+    },
+    {
+      "module": "test_guiding_bolt_growth_ui17",
+      "tests": 16,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "seconds": 0.587
+    }
+  ]
+}

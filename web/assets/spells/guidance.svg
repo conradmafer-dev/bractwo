@@ -1,6 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="10" fill="#10251f"/>
-  <circle cx="32" cy="32" r="18" fill="#1f5a48" stroke="#d8e5a8" stroke-width="3"/>
-  <path d="M32 16v32M16 32h32M22 22l20 20M42 22 22 42" stroke="#f3e79b" stroke-width="4" stroke-linecap="round"/>
-  <circle cx="32" cy="32" r="4" fill="#fff8c8"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="a"><stop stop-color="#376b68"/><stop offset="1" stop-color="#102729"/></radialGradient>
+    <linearGradient id="b" x2="0" y2="1"><stop stop-color="#fff4cb"/><stop offset="1" stop-color="#d29b62"/></linearGradient>
+  </defs>
+  <rect x="1" y="1" width="62" height="62" rx="10" fill="url(#a)" stroke="#9aceb8" stroke-opacity=".75"/>
+  <circle cx="34" cy="23" r="16" fill="none" stroke="#a2d8bc" stroke-opacity=".25"/>
+  <path d="M10 53 18 42l7-1 5-8c2-3 6-1 4 2l-3 6 10-5 9-9c3-3 6 0 4 3L43 46l-17 7-5 7" fill="url(#b)" stroke="#795f49" stroke-width="2" stroke-linejoin="round"/>
+  <path d="m34 8 3 10 10 4-10 4-3 10-4-10-10-4 10-4z" fill="#fff3a6" stroke="#fff8d6" stroke-width="1.5"/>
+  <path d="M14 16h6m-3-3v6M47 10h6m-3-3v6" stroke="#b3eee0" stroke-width="2" stroke-linecap="round"/>
+  <path d="m9 53 7-10 9 10-5 8" fill="#427b69" stroke="#a2d8bc" stroke-width="1.5"/>
 </svg>
