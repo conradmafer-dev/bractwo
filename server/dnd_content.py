@@ -311,6 +311,69 @@ def sync_hotbar(p):
     return p.hotbar
 
 
+# Browser-only projection. The saved legacy hotbar remains a list of real spells,
+# so existing native clients and player databases keep their previous format.
+HOTBAR_GROUPS = {
+    'group_wild_shape': dict(name='Dziki kształt', icon='assets/spells/wild_shape_wolf.svg'),
+    'group_starry_form': dict(name='Gwiezdna postać', icon='assets/spells/starry_wisp.svg'),
+}
+
+
+def hotbar_group_key(key):
+    if not isinstance(key, str): return ''
+    if key.startswith('wild_shape_') or key == 'beast_trample': return 'group_wild_shape'
+    if key in ('circle_star_archer', 'circle_star_chalice', 'circle_star_dragon', 'circle_star_arrow'):
+        return 'group_starry_form'
+    return key
+
+
+def hotbar_group_catalog():
+    return {key: dict(spec, members=[spell for spell in SPELLS if hotbar_group_key(spell) == key])
+            for key, spec in HOTBAR_GROUPS.items()}
+
+
+def grouped_hotbar(p):
+    """Merge variants, not unrelated spells; keep intentional empty/custom slots."""
+    bar, seen = [], set()
+    for spell in p.hotbar:
+        if not spell:
+            bar.append('')
+            continue
+        if not spell_allowed(p, spell): continue
+        key = hotbar_group_key(spell)
+        if key in seen: continue
+        seen.add(key)
+        bar.append(key)
+    while bar and not bar[-1]: bar.pop()
+    size = max(HOTBAR_PAGE_SIZE, ((len(bar)+HOTBAR_PAGE_SIZE-1)//HOTBAR_PAGE_SIZE)*HOTBAR_PAGE_SIZE)
+    return bar + ['']*(size-len(bar))
+
+
+def bind_grouped_hotbar(p, slot, spell):
+    """Swap visible groups and expand back to real spell IDs for persistence."""
+    if type(slot) is not int or not isinstance(spell, str): return False
+    bar = grouped_hotbar(p)
+    if not 0 <= slot < len(bar): return False
+    key = hotbar_group_key(spell)
+    if key not in bar or not key: return False
+    if spell not in HOTBAR_GROUPS and not spell_allowed(p, spell): return False
+    previous = bar.index(key)
+    bar[previous], bar[slot] = bar[slot], key
+    members = {}
+    for current in p.hotbar:
+        if current and spell_allowed(p, current):
+            members.setdefault(hotbar_group_key(current), []).append(current)
+    expanded = []
+    for entry in bar:
+        expanded.extend(members.get(entry, ['']))
+    # Validate before assigning; do not truncate a high-level character's spells.
+    while expanded and not expanded[-1]: expanded.pop()
+    if len(expanded) > HOTBAR_MAX_SLOTS: return False
+    p.hotbar = expanded
+    sync_hotbar(p)
+    return True
+
+
 def spell_level(spec, class_id):
     override = spec.get('class_min_levels', {}).get(class_id)
     if override is not None:return override

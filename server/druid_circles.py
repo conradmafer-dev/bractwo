@@ -192,6 +192,7 @@ def feature_allowed(p, key):
 def feature_ready(p, key):
     if not feature_allowed(p, key): return False
     now = getattr(p, 'current_wall_time', 0)
+    if key == 'circle_star_' + starry_form(p): return False
     if not getattr(p, 'alive', False) or any(active(p, x) for x in ('incapacitated', 'paralyzed', 'unconscious', 'stunned', 'sleep_pending', 'stinking_poison', 'polymorph')): return False
     switching = key.startswith('circle_star_') and key != 'circle_star_arrow' and starry_form(p) and p.level >= 45
     if switching: return runtime(p).get('star_switch_ready', 0) <= now
@@ -209,6 +210,13 @@ def configure(spells, statuses):
             kind='druid_circle', action=action, mana=0, cooldown=0, range=768, radius=0, shape='single', targeting='self', feature=True,
             source='Player’s Handbook 2024 · poziomy ×5', description=name, icon='assets/spells/starry_wisp.svg', effect='spell',
             visual=dict(style='buff', theme='nature', colors=['#619da2', '#b3dcf0', '#edffff'], shots=1))
+    descriptions = {
+        'circle_star_archer': 'Włącz Łucznika za 1 użycie Dzikiego kształtu. Kolejne ataki wykonuj Gwiezdną strzałą: nie zużywa many ani użyć przemiany.',
+        'circle_star_chalice': 'Kielich dodaje leczenie po czarze leczącym, który zużył manę. Samo włączenie nie leczy i nie daje regeneracji.',
+        'circle_star_dragon': 'Smok podnosi wyniki k20 poniżej 10 do 10 przy koncentracji oraz testach Inteligencji i Mądrości. Nie jest przemianą w bestię i nie daje zionięcia.',
+        'circle_star_arrow': 'Dodatkowy atak promienisty podczas postaci Łucznika. Zużywa akcję dodatkową, ale nie manę ani użycia Dzikiego kształtu.',
+    }
+    for key, description in descriptions.items(): spells[key]['description'] = description
     for key, name, icon in [('starry_form', 'Gwiezdna postać', '✧'), ('wrath_of_sea', 'Gniew morza', '≈'), ('nature_sanctuary', 'Sanktuarium natury', '♧'), ('moonlight_advantage', 'Blask księżyca', '☽')]:
         statuses[key] = dict(name=name, icon=icon, description='', harmful=False)
 

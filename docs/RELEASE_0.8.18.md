@@ -1,4 +1,10 @@
-# Bractwo 0.8.18 UI_12 — HP zgodne z progami D&D i przyrost na każdy awans
+# Bractwo 0.8.18 UI_13 — pogrupowany pasek i jawne celowanie
+
+Zbudowano na dostarczonym UI_12. Dwie grupy zastępują osobne pola każdego wariantu przemiany: Dziki kształt i Gwiezdna postać. Aktywny Łucznik używa tego samego miejsca do strzału. Dodano wspólny licznik użyć, opisy efektów i blokadę wydania kolejnego użycia na tę samą aktywną konstelację. Zwykły klik terenu nie włącza już celownika; nowe czary obszarowe najpierw proszą o wskazanie miejsca.
+
+Szczegóły, zgodność zapisów i ograniczenia: [UI_13](HOTBAR_0.8.18_UI_13.md). Wyniki tej poprawki są w `qa_0.8.18/ui13/`. Poniżej zachowano historię wcześniejszych rewizji.
+
+## UI_12 — HP zgodne z progami D&D i przyrost na każdy awans
 
 Baza: 0.8.17 z poprawką Mobile01. Zachowano układ telefonu, zasady różdżki i dotychczasowe postacie.
 

@@ -24,7 +24,7 @@
   let inventorySignature = "", playersSignature = "", legacyPrompted = false, lastTargetWarning = 0;
   let panelMode = "inventory", questSignature = "", activeGoal = null, trackedQuestId = null;
   let groundChunks=new Map(), expansionTab='growth', expansionSignature='', selectedRune='fire', atlasMode='nearby', navigationGoal=null;
-  let hotbarPage=0;
+  let hotbarPage=0, hotbarMenu=null, pendingPointTarget=null;
   let atlasView=null, atlasController=null;
   let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null, mobileHud=null, restUI=null, appShell=null;
   let effects = new Map(), seenEffects = new Map(), floatingTexts = [];
@@ -209,7 +209,7 @@
     }
     for (const key of visuals.keys()) if (!present.has(key)) visuals.delete(key);
     if (me && (!previousMe || !sameFloor(me,previousMe) || distance(me,previousMe)>450 || (previousMe.hp <= 0 && me.hp > 0))) { camera.x = me.x; camera.y = me.y; }
-    if(selectedWorldPoint&&(!me?.alive||!sameFloor(me,selectedWorldPoint)||distance(me,selectedWorldPoint)>3500))selectedWorldPoint=null;
+    if(pendingPointTarget&&(!me?.alive||pendingPointTarget.floor!==(me.floor||0)))cancelPointTarget();
     if (selectedTarget && !snapshot.players.some(player => String(player.id) === selectedTarget && player.hp > 0 && sameFloor(me,player))) clearTarget();
     if (selectedEnemy && (!me?.alive || !snapshot.enemies.some(enemy => String(enemy.id) === selectedEnemy && enemy.hp > 0 && sameFloor(me,enemy)))) clearTarget();
     const activeFields=new Set(packet.active_field_effects||[]);
@@ -529,6 +529,7 @@
   function typing() { const active=document.activeElement; return ["INPUT", "TEXTAREA", "SELECT"].includes(active?.tagName) && !["button", "checkbox", "radio"].includes(active?.type) || !!active?.isContentEditable; }
   function canControl() { return playing && me && me.hp > 0 && !document.hidden && !blurPaused && ui.disconnectPanel.hidden && ui.legacyClassPanel.hidden && !mobileHud?.blocksControls() && !restUI?.blocksControls() && !appShell?.blocksControls() && !typing(); }
   function resetControls() {
+    cancelPointTarget(); hotbarMenu?.close();
     heldKeys.clear(); joystick.x = 0; joystick.y = 0; joystick.pointer = null; attackPointer = null; attackHeld = false;
     ui.joystickKnob.style.transform = ""; ui.attackButton.classList.remove("held");
     if (playing) send({ type: "input", x: 0, y: 0 });
@@ -575,18 +576,29 @@
   canvas.addEventListener("pointerdown",event=>{
     if(!canControl())return;
     const x=(event.clientX-viewport.w/2)/camera.scale+camera.x,y=(event.clientY-viewport.h/2)/camera.scale+camera.y;
+    if(pendingPointTarget){
+      const grove=(world.obstacles||[]).find(o=>o.type==='grove'&&sameFloor(me,o)&&x>=o.x&&x<=o.x+o.w&&y>=o.y-35&&y<=o.y+o.h);
+      const tree=pendingPointTarget.packet.action==='tree_step'&&grove;
+      commitPointTarget({x:tree?grove.x+grove.w/2:x,y:tree?grove.y+grove.h:y,floor:me.floor||0});event.preventDefault();return;
+    }
     const nearest=Runtime.hitActor(visuals.values(),x,y,myId,me.floor||0,camera.scale);
     if(nearest){if(nearest.kind==='e')selectEnemy(String(nearest.entity.id));else selectTarget(String(nearest.entity.id));}
     else {
       const npc=(world.npcs||[]).find(n=>sameFloor(me,n)&&Math.hypot(n.x-x,n.y-20-y)<36);
       if(npc?.service==="merchant"){merchantPanel.open();}else if(npc?.service){openExpansion(npc.service==="master"?"growth":"services");}else if(npc){setPanel("journal");const row=Array.from(ui.questList.children).find(q=>q.dataset.npcId===npc.id);row?.scrollIntoView({block:"nearest"});}
-      else{const grove=(world.obstacles||[]).find(o=>o.type==='grove'&&sameFloor(me,o)&&x>=o.x&&x<=o.x+o.w&&y>=o.y-35&&y<=o.y+o.h);clearTarget();selectedWorldPoint={x:grove?grove.x+grove.w/2:x,y:grove?grove.y+grove.h:y,floor:me.floor||0};}
+      // Empty terrain does not arm a crosshair or remove the selected enemy.
     }
   });
+  canvas.addEventListener('pointermove',event=>{
+    if(!pendingPointTarget||!me||event.pointerType==='touch')return;
+    selectedWorldPoint={x:(event.clientX-viewport.w/2)/camera.scale+camera.x,
+      y:(event.clientY-viewport.h/2)/camera.scale+camera.y,floor:me.floor||0};
+  });
+  canvas.addEventListener('contextmenu',event=>{if(pendingPointTarget){event.preventDefault();cancelPointTarget();}});
   // Enter opens chat, while layout/app controls retain native keyboard activation.
   addEventListener("keydown",event=>{
     if(!playing||mobileHud?.blocksControls()||restUI?.blocksControls()||appShell?.blocksControls())return;
-    if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton'))return;
+    if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton, #hotbarGroupMenu button, .hotbar-group-toggle'))return;
     if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
     if(merchantPanel?.visible&&event.code==='Escape'){event.preventDefault();merchantPanel.close();return;}
     if(lootPanel?.visible&&event.code==='Escape'){event.preventDefault();lootPanel.close();return;}
@@ -600,7 +612,7 @@
       return;
     }
     if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(event.code)||Runtime.hotbarSlotForCode(event.code)>=0)event.preventDefault();
-    if(event.code==="Escape"){event.preventDefault();if(characterSheet.visible){characterSheet.close();return;}if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}if(!ui.helpPanel.hidden){ui.helpPanel.hidden=true;return;}if(!ui.legacyClassPanel.hidden){ui.legacyClassPanel.hidden=true;return;}clearTarget();return;}
+    if(event.code==="Escape"){event.preventDefault();if(pendingPointTarget){cancelPointTarget();return;}if(hotbarMenu?.visible){hotbarMenu.close();return;}if(characterSheet.visible){characterSheet.close();return;}if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}if(!ui.helpPanel.hidden){ui.helpPanel.hidden=true;return;}if(!ui.legacyClassPanel.hidden){ui.legacyClassPanel.hidden=true;return;}clearTarget();return;}
     if(!event.repeat){
       if(event.code==="PageUp"||event.code==="PageDown"){event.preventDefault();changeHotbarPage(event.code==="PageDown"?1:-1);return;}
       if(event.code==="KeyH"){toggleHelp();return;}
@@ -613,7 +625,7 @@
       if(event.code==="KeyJ"){togglePanel("journal");return;}
     }
     if(!canControl())return;heldKeys.add(event.code);
-    if(!event.repeat){if(event.code==="Space")attemptAttack();if(event.code==="KeyE")interact();if(event.code==="KeyF")ability();if(event.code==="KeyQ")useQuickPotion("q");if(event.code==="KeyR")restUI.open(event.shiftKey?"long":"short");const slot=Runtime.hotbarSlotForCode(event.code);if(slot>=0)cast(Runtime.hotbarKey(me.hotbar,hotbarPage,slot));}
+    if(!event.repeat){if(event.code==="Space")attemptAttack();if(event.code==="KeyE")interact();if(event.code==="KeyF")ability();if(event.code==="KeyQ")useQuickPotion("q");if(event.code==="KeyR")restUI.open(event.shiftKey?"long":"short");const slot=Runtime.hotbarSlotForCode(event.code);if(slot>=0)activateHotbarSlot(slot);}
   },true);
   // Capture release even when a focused window control consumes the event.
   addEventListener("keyup", (event) => { heldKeys.delete(event.code); }, true);
@@ -680,17 +692,50 @@
   function spellsForClass(){return Object.entries(world.spells||{}).filter(([,s])=>me?.spell_profiles?.[s.id]?.available||!s.class_ids||s.class_ids.includes(me?.class_id));}
   function spellGate(s){return Runtime.spellGate(s,me);}
   function spellAvailable(s){const p=me?.spell_profiles?.[s?.id];return !!me&&(p?.available!==undefined?p.available:(!s.class_ids||s.class_ids.includes(me.class_id))&&me.level>=spellGate(s));}
+  function cancelPointTarget(){
+    pendingPointTarget=null;selectedWorldPoint=null;
+    ui.groundTargetHint?.setAttribute('hidden','');canvas.classList.remove('aiming-spell');
+  }
+  function beginPointTarget(packet,spec){
+    cancelPointTarget();hotbarMenu?.close();
+    pendingPointTarget={packet,spec,floor:me.floor||0};
+    selectedWorldPoint=targetPoint();
+    if(!ui.groundTargetHint){
+      const hint=document.createElement('div');hint.id='groundTargetHint';hint.className='ground-target-hint';
+      const text=document.createElement('span'),cancel=document.createElement('button');cancel.type='button';cancel.textContent='×';
+      cancel.setAttribute('aria-label','Anuluj wskazywanie miejsca');cancel.addEventListener('click',cancelPointTarget);
+      hint.append(text,cancel);ui.gameUI.append(hint);ui.groundTargetHint=hint;
+    }
+    ui.groundTargetHint.querySelector('span').textContent=`${spec.name} — wskaż miejsce. Esc: anuluj.`;
+    ui.groundTargetHint.hidden=false;canvas.classList.add('aiming-spell');
+    characterSheet?.close();ui.sidePanel.hidden=true;
+  }
+  function beginPointAction(packet,name){
+    if(!playing||!me?.alive)return;
+    const spec=world.spells?.[packet.spell]||{};
+    beginPointTarget(packet,{...spec,name:name||spec.name||'Wskaż miejsce'});
+  }
+  function commitPointTarget(point){
+    if(!pendingPointTarget||!me?.alive)return;
+    const {packet,floor}=pendingPointTarget;
+    if(floor!==(me.floor||0)){cancelPointTarget();return;}
+    const outgoing=packet.type==='cast_circle_spell'?{...packet,options:{...packet.options,point}}:{...packet,point};
+    cancelPointTarget();send(outgoing);
+  }
   function cast(id){
     if(!id||!playing||!me?.alive)return;
-    const spec=world.spells?.[id];if(!spec)return;
-    const packet=spec.circle_options||['circle_control','circle_field'].includes(spec.kind)?{type:'cast_circle_spell',spell:id,options:globalThis.BractwoCircleSpellUI?.options(id,me,spec)||{}}:{type:'cast',spell_id:id};
-    if(packet.options&&selectedWorldPoint&&sameFloor(me,selectedWorldPoint))packet.options.point={...selectedWorldPoint};
+    const spec=Runtime.spellProfile(world.spells?.[id],me);if(!spec||!Runtime.spellUsable(spec,me))return;
+    if(pendingPointTarget?.packet?.spell===id){cancelPointTarget();return;}
+    cancelPointTarget();
+    const packet=spec.ground_target||spec.circle_options||['circle_control','circle_field'].includes(spec.kind)?{type:'cast_circle_spell',spell:id,options:globalThis.BractwoCircleSpellUI?.options(id,me,spec)||{}}:{type:'cast',spell_id:id};
+    // Explicit ground spells collect a point only after the spell is chosen.
     const friend=selectedTarget&&snapshot.players.find(q=>q.id===selectedTarget);
     if(spec.targeting==='ally'&&friend&&(friend.id===me.id||me.party_id&&friend.party_id===me.party_id))packet.target_id=selectedTarget;
     else if(['attack','save','missiles','mark','control','field','circle_control','circle_field','druid_circle','beast_action'].includes(spec.kind)||spec.targeting==='hostile'){
       if(selectedEnemy)packet.enemy_id=selectedEnemy;
       else if(selectedTarget)packet.target_id=selectedTarget;
     }
+    if(spec.ground_target){beginPointTarget(packet,spec);return;}
     send(packet);
   }
   function spellMana(spec){return Runtime.spellMana(spec,me);}
@@ -1385,9 +1430,12 @@
     mctx.strokeStyle='#f9e4b8';mctx.strokeRect(w/2-viewport.w/camera.scale*sx/2,h/2-viewport.h/camera.scale*sy/2,viewport.w/camera.scale*sx,viewport.h/camera.scale*sy);
   }
   function drawWorldPoint(t){
-    if(!selectedWorldPoint||!me||!sameFloor(me,selectedWorldPoint)||!inView(selectedWorldPoint.x,selectedWorldPoint.y))return;
+    if(!pendingPointTarget||!selectedWorldPoint||!me||!sameFloor(me,selectedWorldPoint)||!inView(selectedWorldPoint.x,selectedWorldPoint.y))return;
     const{x,y}=selectedWorldPoint,radius=10+Math.sin(t*3)*1.5;
-    ctx.save();ctx.strokeStyle='#bdeafa';ctx.lineWidth=1.5/camera.scale;ctx.beginPath();ctx.arc(x,y,radius,0,TAU);ctx.moveTo(x-15,y);ctx.lineTo(x-6,y);ctx.moveTo(x+6,y);ctx.lineTo(x+15,y);ctx.moveTo(x,y-15);ctx.lineTo(x,y-6);ctx.moveTo(x,y+6);ctx.lineTo(x,y+15);ctx.stroke();ctx.restore();
+    ctx.save();ctx.strokeStyle='#bdeafa';ctx.lineWidth=1.5/camera.scale;
+    const preview=pendingPointTarget.spec;
+    if(preview.radius>0&&preview.shape!=='line'){ctx.globalAlpha=.55;ctx.beginPath();if(preview.shape==='square')ctx.rect(x-preview.radius,y-preview.radius,preview.radius*2,preview.radius*2);else ctx.arc(x,y,preview.radius,0,TAU);ctx.stroke();ctx.globalAlpha=1;}
+    ctx.beginPath();ctx.arc(x,y,radius,0,TAU);ctx.moveTo(x-15,y);ctx.lineTo(x-6,y);ctx.moveTo(x+6,y);ctx.lineTo(x+15,y);ctx.moveTo(x,y-15);ctx.lineTo(x,y-6);ctx.moveTo(x,y+6);ctx.lineTo(x,y+15);ctx.stroke();ctx.restore();
   }
   function drawTreeTargets(t){
     if(!me||me.concentration!=='tree_stride'&&!me.status_effects?.some(e=>e.id==='tree_stride'))return;
@@ -1433,34 +1481,67 @@
   const spellIcons={longstrider:'»',mage_armor:'◇',burning_hands:'♨',healing_word:'♥',starry_wisp:'✧',shocking_grasp:'ϟ',fire_bolt:'✹',ray_of_frost:'❄',acid_splash:'◉',magic_missile:'✦',shield:'⬡',scorching_ray:'☄',fireball:'☀',misty_step:'»',shillelagh:'♧',thorn_whip:'⌁',produce_flame:'♨',cure_wounds:'♥',entangle:'♜',moonbeam:'☾',wild_shape_wolf:'♞',wild_shape_bear:'♟',animal_companion:'♞',hunters_mark:'⌖',ensnaring_strike:'⌁',second_wind:'♥'};
   Runtime.bindTouchScroll(ui.hotbarSlots.closest('.hotbar-viewport'),()=>ui.gameUI.classList.contains('mobile-hud'));
   const hotbarButtons=Array.from({length:24},(_,slot)=>{
+    const cell=document.createElement('div');cell.className='hotbar-cell';
     const button=document.createElement('button');button.className='hotbar-slot';button.dataset.slot=slot;
     button.innerHTML=`<kbd>${Runtime.hotbarLabel(slot,false)}</kbd><span></span><small></small><b></b>`;
-    Runtime.bindTouchTap(button,()=>{if(canControl())cast(Runtime.hotbarKey(me?.hotbar,hotbarPage,slot));},()=>button.closest('.hotbar-viewport'));
-    button.addEventListener('contextmenu',event=>{event.preventDefault();openExpansion('spells');});
-    (slot<12?ui.hotbarSlots:ui.hotbarFunctionSlots).append(button);return button;
+    const toggle=document.createElement('button');toggle.type='button';toggle.className='hotbar-group-toggle';toggle.textContent='▾';toggle.hidden=true;
+    toggle.setAttribute('aria-label','Wybierz postać');toggle.setAttribute('aria-haspopup','dialog');toggle.setAttribute('aria-controls','hotbarGroupMenu');
+    Runtime.bindTouchTap(button,()=>{if(canControl())activateHotbarSlot(slot);},()=>button.closest('.hotbar-viewport'));
+    Runtime.bindTouchTap(toggle,()=>{if(canControl())hotbarMenu.open(Runtime.hotbarKey(Runtime.displayHotbar(me),hotbarPage,slot),toggle);},()=>toggle.closest('.hotbar-viewport'));
+    button.addEventListener('contextmenu',event=>{event.preventDefault();const id=Runtime.hotbarKey(Runtime.displayHotbar(me),hotbarPage,slot);if(world.hotbar_groups?.[id])hotbarMenu.open(id,toggle);else openExpansion('spells');});
+    button.groupToggle=toggle;cell.append(button,toggle);
+    (slot<12?ui.hotbarSlots:ui.hotbarFunctionSlots).append(cell);return button;
   });
+  hotbarMenu=globalThis.BractwoHotbarUI.create({parent:ui.gameUI,state:()=>({player:me,world}),cast,send});
+  ui.hotbarSlots.closest('.hotbar-viewport').addEventListener('scroll',()=>hotbarMenu.close(),{passive:true});
+  function activateHotbarSlot(slot){
+    const id=Runtime.hotbarKey(Runtime.displayHotbar(me),hotbarPage,slot);
+    const group=globalThis.BractwoHotbarUI.groupState(id,me,world);
+    if(group){
+      if(group.primary){hotbarMenu.close();cast(group.primary.id);}
+      else hotbarMenu.open(id,hotbarButtons[slot].groupToggle);
+    }else{hotbarMenu.close();cast(id);}
+  }
   function updateHotbar(){
     if(!me)return;
-    const pages=Runtime.hotbarPageCount(me.hotbar);
+    const bar=Runtime.displayHotbar(me),pages=Runtime.hotbarPageCount(bar);
     hotbarPage=Math.min(hotbarPage,pages-1);
     ui.hotbarPages.hidden=pages<=1;
     ui.hotbarPageLabel.textContent=`${hotbarPage+1}/${pages}`;
+    ui.hotbarPageLabel.title=`Zestaw ${hotbarPage+1} z ${pages}. Page Up / Page Down zmienia zestaw.`;
     for(let i=0;i<24;i++){
-      const id=Runtime.hotbarKey(me.hotbar,hotbarPage,i),s=Runtime.spellProfile(world.spells?.[id],me),b=hotbarButtons[i],available=s&&spellAvailable(s);
-      const revert=s?.kind==='shape'&&me.form;const cd=me.spell_cooldowns?.[id]||0;
-      b.dataset.spell=id||'';b.classList.toggle('empty',!s);
+      const id=Runtime.hotbarKey(bar,hotbarPage,i),b=hotbarButtons[i],group=globalThis.BractwoHotbarUI.groupState(id,me,world);
+      b.groupToggle.hidden=!group;b.parentElement.classList.toggle('empty',!id);
+      b.dataset.spell=id||'';
+      if(group){
+        const span=b.querySelector('span');if(span.dataset.spell!==id){span.dataset.spell=id;span.replaceChildren();const img=document.createElement('img');img.src=group.group.icon;img.className='spell-icon';img.alt='';span.append(img);}
+        b.classList.remove('empty','locked','queued');b.classList.toggle('active-spell',group.active);
+        b.querySelector('small').textContent=group.label;
+        b.querySelector('b').textContent=group.primary?(group.star==='archer'?'Koszt: 0 użyć':'Powrót'):`${group.pool.remaining}/${group.pool.maximum} użyć`;
+        b.disabled=!me.alive||!!(group.primary&&!Runtime.spellUsable(group.primary,me));b.groupToggle.disabled=!me.alive;
+        b.groupToggle.title=`${group.group.name} · wspólna pula ${group.pool.remaining}/${group.pool.maximum}`;
+        b.groupToggle.setAttribute('aria-label','Wybierz: '+group.group.name);
+        b.title=`${group.group.name} · Dziki kształt ${group.pool.remaining}/${group.pool.maximum}\n`+(group.primary?`${group.primary.power_summary||group.primary.description}\n`:'Wybierz postać z rozwijanego menu.\n')+'Przycisk ▾ otwiera wybór postaci. K otwiera pełną księgę.';
+        continue;
+      }
+      const s=Runtime.spellProfile(world.spells?.[id],me),available=s&&spellAvailable(s);
+      const revert=s?.kind==='shape'&&me.form,cd=me.spell_cooldowns?.[id]||0;
+      b.classList.toggle('empty',!s);
       if(b.querySelector('span').dataset.spell!==id){const span=b.querySelector('span');span.dataset.spell=id;span.replaceChildren();if(s){const img=document.createElement('img');img.src=s.icon;img.className='spell-icon';img.alt='';span.append(img);}else span.textContent='·';}
       b.querySelector('small').textContent=s?.name||'Pusty';
       b.querySelector('b').textContent=!s?'':!available?'poz. '+spellGate(s):Runtime.queuedSpellLabel(s,me)|| (revert?'Powrót':s.kind==='reaction'?(me.shield_armed?'ON':'OFF'):s.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cd>0?Math.ceil(cd)+' s':s.uses_remaining!==undefined?s.uses_remaining+'/'+s.uses_maximum:spellMana(s)?spellMana(s)+' MP':'0 MP');
       b.disabled=!s||!available||!Runtime.spellUsable(s,me);
       if(s?.kind==='recovery')b.disabled=!globalThis.BractwoCasterUI.canRecover(me);
       b.classList.toggle('locked',!!s&&!available);b.classList.toggle('queued',!!id&&me.queued_spell===id);b.classList.toggle('active-spell',!!s&&(s.kind==='reaction'&&me.shield_armed||revert||!!(s.buff&&me.statuses?.[s.buff]>0)||me.concentration===id||s.kind==='weapon_trigger'&&me.ensnaring_armed));
-      b.title=s?`Zestaw ${hotbarPage+1} / ${Runtime.hotbarLabel(i,false)} · ${s.name} (${s.english}) · ${s.feature?'zdolność':s.circle?'krąg '+s.circle:'sztuczka'} · poz. ${spellGate(s)} · ${spellMana(s)} many\n${s.power_summary||''}\n${s.description}\n${Runtime.concentrationWarning(s,me,world.spells)}`:'Pusty slot — przypisz czar w księdze K';
+      b.title=s?`Zestaw ${hotbarPage+1} / ${Runtime.hotbarLabel(i,false)} · ${s.name} (${s.english}) · ${s.feature?'zdolność':s.circle?'krąg '+s.circle:'sztuczka'} · poz. ${spellGate(s)} · ${Runtime.spellCostText(s,me)}\n${s.power_summary||''}\n${s.description}\n${Runtime.concentrationWarning(s,me,world.spells)}`:'Pusty slot — przypisz czar w księdze K';
     }
+    hotbarMenu.refresh();
   }
   function changeHotbarPage(delta){
     if(!me)return;
-    hotbarPage=(hotbarPage+delta+Runtime.hotbarPageCount(me.hotbar))%Runtime.hotbarPageCount(me.hotbar);
+    hotbarMenu.close();
+    hotbarPage=(hotbarPage+delta+Runtime.hotbarPageCount(Runtime.displayHotbar(me)))%Runtime.hotbarPageCount(Runtime.displayHotbar(me));
+    ui.hotbarSlots.closest('.hotbar-viewport').scrollLeft=0;
     updateHotbar();
   }
   ui.hotbarPrev.addEventListener('click',()=>changeHotbarPage(-1));
@@ -1473,6 +1554,7 @@
     state:()=>({player:me,world}),send,cast,gate:spellGate,mana:spellMana,nearMaster:()=>!!nearbyService("master"),
     selectedAlly:()=>snapshot.players.find(q=>String(q.id)===String(selectedTarget)&&q.hp>0&&me?.party_id&&q.party_id===me.party_id)||null,
     targetPoint,
+    beginPointAction,
     studyTarget:()=>selectedEnemy?{enemy_id:selectedEnemy}:selectedTarget?{target_id:selectedTarget}:null,
     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
     prepare:()=>{merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},

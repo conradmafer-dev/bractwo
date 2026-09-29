@@ -519,7 +519,7 @@ class Player:
                            "damage_dice": combat_rules.dice_text(combat_rules.weapon_dice(self)),
                            "save_bonus": combat_rules.save_bonus(self), "save_dc": combat_rules.spell_dc(self),
                            "last_roll": self.last_roll if self.last_roll.get("expires_at", 0) > now else {}})
-            result.update({"hotbar": list(self.hotbar), "hotbar_page_size": dnd_content.HOTBAR_PAGE_SIZE, "hotbar_row_size": dnd_content.HOTBAR_ROW_SIZE, "favorite_spell": dnd_content.favorite_spell(self), "mana_budget": dnd_content.mana_budget_info(self),
+            result.update({"hotbar": list(self.hotbar), "grouped_hotbar": dnd_content.grouped_hotbar(self), "hotbar_page_size": dnd_content.HOTBAR_PAGE_SIZE, "hotbar_row_size": dnd_content.HOTBAR_ROW_SIZE, "favorite_spell": dnd_content.favorite_spell(self), "mana_budget": dnd_content.mana_budget_info(self),
                            "mana_recovery_remaining": max(0,self.mana_recovery_until-now), "attributes": combat_rules.attributes(self),
                            "proficiency": combat_rules.proficiency(self), "effective_level": combat_rules.effective_level(self),
                            "spell_circle": dnd_content.circle_for(self.class_id,self.level),
@@ -699,7 +699,7 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
                 "pois": content.POIS, "canyons": content.CANYONS, "rarities": loot_tables.RARITIES,
                 "environment_trees": self.environment_trees(),
                 "dungeons": content.DUNGEONS, "hunting_grounds": content.HUNTING_GROUNDS, "roads": content.ROADS, "safe_zones": content.CITIES,
-                "spells": content.SPELLS, "class_progression": progression_guide.catalog(), "default_hotbars": dnd_content.DEFAULT_HOTBARS, "status_catalog": dnd_content.STATUS_SPECS, "runes": content.RUNES, "milestones": [{"level":v[0], "name":v[1], "description":v[2]} for v in content.MILESTONES],
+                "spells": content.SPELLS, "class_progression": progression_guide.catalog(), "default_hotbars": dnd_content.DEFAULT_HOTBARS, "hotbar_groups": dnd_content.hotbar_group_catalog(), "status_catalog": dnd_content.STATUS_SPECS, "runes": content.RUNES, "milestones": [{"level":v[0], "name":v[1], "description":v[2]} for v in content.MILESTONES],
                 "width": WIDTH, "height": HEIGHT, "sites": [], "chests": [], "obstacles": OBSTACLES,
                 "zones": ZONES, "npcs": NPCS, "landmarks": LANDMARKS, "quests": QUESTS,
                 "enemy_types": inventory_rules.metadata_enemies(ENEMY_TYPES), "loot_hunts": content.LOOT_HUNTS, "spawn": SPAWN, "river": RIVER, "trail_gate": TRAIL_GATE, "weapons": WEAPONS,
@@ -809,7 +809,7 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         # Ordered WebSockets: send unchanged private catalogs only once per login.
         # Public actor fields always remain complete; legacy clients get full states.
         previous = self.owner_cache.setdefault(p.id, {})
-        private_keys = ("quests", "discoveries", "inventory", "equipment", "depot", "skills", "runes", "mastery", "potions", "hotbar", "character_sheet", "spell_profiles", "favorite_spell", "attributes", "combat_log", "pending_level_ups", "potion_slots", "known_loot", "item_previews")
+        private_keys = ("quests", "discoveries", "inventory", "equipment", "depot", "skills", "runes", "mastery", "potions", "hotbar", "grouped_hotbar", "character_sheet", "spell_profiles", "favorite_spell", "attributes", "combat_log", "pending_level_ups", "potion_slots", "known_loot", "item_previews")
         own = next(entry for entry in packet["players"] if entry["id"] == p.id)
         for key in private_keys:
             encoded = json.dumps(own[key], ensure_ascii=False, separators=(",", ":"))
@@ -1439,6 +1439,8 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
             p.pending_spell = {}
             return
         if kind == "hotbar":
+            if data.get("grouped") is True:
+                return await self.bind_grouped_spell(p,data.get("slot"),data.get("spell_id"))
             return await self.bind_spell(p,data.get("slot"),data.get("spell_id"))
         if kind == "auto_pause":
             if type(data.get("paused")) is bool:
@@ -1785,7 +1787,7 @@ def create_app(db_path="world.sqlite3", clock=None):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js")]:
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

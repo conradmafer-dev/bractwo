@@ -124,6 +124,12 @@ class DNDGame(RangerMagic):
         p.form='';p.form_until=0;p.temp_hp=0;p.buffs={};p.concentration='';p.concentration_until=0;p.mark_target='';p.concentration_profile={}
         p.current_wall_time=self.now()
 
+    async def bind_grouped_spell(self,p,slot,key):
+        dnd.sync_hotbar(p)
+        if not dnd.bind_grouped_hotbar(p,slot,key):
+            return await self.notice(p,'Nieprawidłowy skrót lub niedostępna grupa zdolności.')
+        with self.db:self.save_player(p)
+
     async def bind_spell(self,p,slot,key):
         if type(slot) is not int or not isinstance(key,str) or not 0<=slot<len(p.hotbar):
             return await self.notice(p,'Nieprawidłowy skrót czaru.')

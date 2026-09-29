@@ -1,0 +1,58 @@
+[
+  {
+    "path": "server/dnd_content.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/dnd_game.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/druid_circle_game.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/druid_circle_spells.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/druid_circles.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/server.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/spell_scaling.py",
+    "status": "modified"
+  },
+  {
+    "path": "web/character_sheet.js",
+    "status": "modified"
+  },
+  {
+    "path": "web/circle_spell_ui.js",
+    "status": "modified"
+  },
+  {
+    "path": "web/game.js",
+    "status": "modified"
+  },
+  {
+    "path": "web/hotbar_ui.css",
+    "status": "added"
+  },
+  {
+    "path": "web/hotbar_ui.js",
+    "status": "added"
+  },
+  {
+    "path": "web/index.html",
+    "status": "modified"
+  },
+  {
+    "path": "web/runtime.js",
+    "status": "modified"
+  }
+]

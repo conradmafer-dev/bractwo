@@ -98,6 +98,17 @@
   }
   const HOTBAR_ROW_SIZE=12,HOTBAR_PAGE_SIZE=24;
   const HOTBAR_KEYS=['Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digit8','Digit9','Digit0','Minus','Equal',...Array.from({length:12},(_,i)=>'F'+(i+1))];
+  function displayHotbar(player) { return player?.grouped_hotbar||player?.hotbar||[]; }
+  function hotbarGroupForSpell(id,world) {
+    return Object.entries(world?.hotbar_groups||{}).find(([,group])=>group.members?.includes(id))?.[0]||id;
+  }
+  function spellCostText(spec,player) {
+    const s=spellProfile(spec,player);if(!s)return '';
+    if(s.already_active)return 'Aktywna postać';
+    if(s.resource_cost>0)return `${s.resource_name||'Użycia'}: koszt ${s.resource_cost} · pozostało ${s.uses_remaining??0}/${s.uses_maximum??0}`;
+    if(s.resource_cost===0&&!spellMana(s,player))return 'Bez many i użyć przemiany';
+    return spellMana(s,player)?`${spellMana(s,player)} many`:'Bez many';
+  }
   function hotbarPageCount(bar) { return Math.max(1,Math.ceil((bar?.length||0)/HOTBAR_PAGE_SIZE)); }
   function hotbarKey(bar,page,slot) { return Array.isArray(bar)&&Number.isInteger(page)&&page>=0&&Number.isInteger(slot)&&slot>=0&&slot<HOTBAR_PAGE_SIZE?bar[page*HOTBAR_PAGE_SIZE+slot]||'':''; }
   function hotbarSlotForCode(code) { return HOTBAR_KEYS.indexOf(code); }
@@ -162,10 +173,10 @@
   }
   function spellUsable(spec,player) {
     const s=spellProfile(spec,player);
-    if(!s||!player||player.hp<=0||player.alive===false||s.available===false)return false;
+    if(!s||!player||player.hp<=0||player.alive===false||s.available===false||s.already_active)return false;
     if(s.kind==='shape'&&player.form||s.kind==='reaction'||s.kind==='weapon_trigger'&&player.ensnaring_armed)return true;
     if(player.form&&!s.cast_in_form&&!['druid_circle','beast_action'].includes(s.kind))return false;
-    return !(player.spell_cooldowns?.[s.id]>0)&&player.mana>=spellMana(s,player)&&s.uses_remaining!==0;
+    return !(player.spell_cooldowns?.[s.id]>0)&&player.mana>=spellMana(s,player)&&(s.resource_cost===0||s.uses_remaining===undefined||s.uses_remaining>=(s.resource_cost||1));
   }
   function queuedSpellLabel(spec,player) {
     if(!spec?.id||player?.queued_spell!==spec.id)return '';
@@ -275,7 +286,7 @@
       if (!button.disabled) activate(event);
     });
   }
-  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, combatSummary, bindTouchTap, bindTouchScroll };
+  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, displayHotbar, hotbarGroupForSpell, spellCostText, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, combatSummary, bindTouchTap, bindTouchScroll };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BractwoRuntime = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

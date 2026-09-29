@@ -26,13 +26,13 @@
    b.addEventListener('click',()=>{
     const latest=current();if(!latest.alive)return;
     const packet={type:'circle_spell_action',action:action.id,spell:spec.id};
-    if(['move_pack','redirect_wind','tree_step','attack_wall'].includes(action.id)){const point=h.targetPoint?.();if(point)packet.point=point;}
+    if(['move_pack','redirect_wind','tree_step','attack_wall'].includes(action.id)&&h.beginPointAction){h.beginPointAction(packet,action.name);return;}
     if(action.id==='control_water')packet.variant=options(spec.id,latest,spec).variant;
     if(action.id==='wake'){const ally=h.selectedAlly?.();if(!ally)return;packet.target_id=String(ally.id);}
     h.send(packet);
    });box.append(b);
   }
-  if(metadata.actions?.some(action=>['move_pack','redirect_wind','tree_step'].includes(action.id))){const hint=document.createElement('small');hint.textContent='Kliknij wybrane miejsce w świecie, a następnie użyj przycisku tej zdolności.';hint.className='circle-spell-point-hint';box.append(hint);}
+  if(metadata.actions?.some(action=>['move_pack','redirect_wind','tree_step'].includes(action.id))){const hint=document.createElement('small');hint.textContent='Najpierw wybierz akcję, potem wskaż miejsce w świecie. Esc anuluje.';hint.className='circle-spell-point-hint';box.append(hint);}
   if(box.childNodes.length)parent.append(box);
  }
  const api={options,append};root.BractwoCircleSpellUI=api;if(typeof module!=='undefined')module.exports=api;

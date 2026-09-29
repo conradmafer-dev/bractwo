@@ -275,7 +275,33 @@ def client_profiles(p):
         if key in rest_rules.NAMES:
             result[key]['uses_remaining']=rest_rules.remaining(p,key)
             result[key]['uses_maximum']=rest_rules.maximum(p,key)
+        if key in dc.SPELL_FEATURES:
+            current = dc.starry_form(p)
+            is_form = key in ('circle_star_archer', 'circle_star_chalice', 'circle_star_dragon')
+            free = key in ('circle_star_arrow', 'circle_move_sanctuary', 'circle_wrath_strike')
+            free = free or (is_form and bool(current) and p.level >= 45)
+            free = free or (key == 'circle_wrath_of_sea' and dc.active(p, 'wrath_of_sea'))
+            if key == 'circle_moonlight_step':
+                result[key].update(uses_remaining=dc.feature_remaining(p,'moonlight_step'),
+                    uses_maximum=max(1,dc.wisdom(p)),resource_cost=1,resource_name='Księżycowy krok')
+            else:
+                result[key].update(resource_cost=0 if free else 2 if key=='circle_oceanic_gift_shared' else 1,
+                    resource_name='Dziki kształt')
+                if not free:
+                    result[key].update(uses_remaining=dc.shape_remaining(p),uses_maximum=dc.shape_max(p))
+            if is_form: result[key]['already_active'] = key == 'circle_star_'+current
+            amount = (2 if p.level >= 45 else 1)
+            wisdom = dc.wisdom(p)
+            dice = str(amount)+'k8'+('+' if wisdom>=0 else '')+str(wisdom)
+            if key in ('circle_star_archer','circle_star_arrow'):
+                result[key]['power_summary'] = dice+' obrażeń promienistych · akcja dodatkowa. Strzały nie zużywają użyć przemiany.'
+            elif key == 'circle_star_chalice':
+                result[key]['power_summary'] = '+'+dice+' leczenia po czarze leczącym opłaconym maną. Bez pasywnej regeneracji.'
+            elif key == 'circle_star_dragon':
+                result[key]['power_summary'] = 'Minimum 10 na k20: koncentracja, testy INT i MĄD.'+(' Lot 20 stóp.' if p.level>=45 else '')
         if key.startswith('wild_shape_') or key=='wild_companion':
+            result[key]['resource_cost']=0 if key.startswith('wild_shape_') and p.form else 1
+            result[key]['resource_name']='Dziki kształt'
             result[key]['uses_remaining']=dc.shape_remaining(p)
             result[key]['uses_maximum']=dc.shape_max(p)
     p._spell_profiles_cache=(signature,result)

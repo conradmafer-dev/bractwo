@@ -1,4 +1,17 @@
-# Bractwo 0.8.18 — odpoczynek, pełny ekran i aplikacja
+# Bractwo 0.8.18 UI_13 — pogrupowany pasek druida
+
+Przemiany zwierzęce są pod jednym przyciskiem, a gwiezdne postacie pod drugim. Po włączeniu Łucznika główny przycisk służy do Gwiezdnej strzały. Druid Kręgu Gwiazd na poziomie 15 zajmuje 17 pól zamiast 21. Automatyczne odblokowania, księga K, kolejne zestawy skrótów i przewijanie na telefonie są zachowane.
+
+Poprawiono pokazywanie użyć Dzikiego kształtu, blokadę ponownego włączenia tej samej konstelacji i celowanie: kliknięcie pustego terenu nie zostawia celownika. Czary wymagające miejsca najpierw włączają wskazywanie.
+
+[Opis UI_13, obsługa, zakres testów i ograniczenia](docs/HOTBAR_0.8.18_UI_13.md). Celowane testy: 47 serwerowych, 54 JavaScript i 12 kontroli Chromium. To nie jest deklaracja pełnej regresji historycznych testów ani test produkcyjnego wdrożenia.
+
+Aktualizacja klienta przeglądarkowego wymaga nowych plików serwera i `web`. Reset postaci nie jest potrzebny. Natywny klient Godota nie otrzymał nowego menu wizualnego.
+
+## Historia wcześniejszych zmian
+
+Poniższe wpisy UI_10 i starsze zachowano jako historię. Aktualne zasady odpoczynku po UI_11 są w `docs/RELEASE_0.8.18.md`; dawne 15 sekund pełnej regeneracji i pasywna regeneracja nie opisują obecnej wersji.
+
 
 Gra RPG online na komputer i telefon. Aktualizacja bazuje na 0.8.17 z mobilnym układem Mobile01.
 

@@ -1,0 +1,334 @@
+TAP version 13
+# Subtest: first druid path does not require a master
+ok 1 - first druid path does not require a master
+  ---
+  duration_ms: 5.382478
+  type: 'test'
+  ...
+# Subtest: reselection requires master
+ok 2 - reselection requires master
+  ---
+  duration_ms: 0.370069
+  type: 'test'
+  ...
+# Subtest: dead, combat, transformed and non-druid cannot pick path
+ok 3 - dead, combat, transformed and non-druid cannot pick path
+  ---
+  duration_ms: 0.288447
+  type: 'test'
+  ...
+# Subtest: simple and martial labels; no third/exotic fallback
+ok 4 - simple and martial labels; no third/exotic fallback
+  ---
+  duration_ms: 1.865799
+  type: 'test'
+  ...
+# Subtest: proficient weapon has no redundant affirmative proficiency row
+ok 5 - proficient weapon has no redundant affirmative proficiency row
+  ---
+  duration_ms: 0.227084
+  type: 'test'
+  ...
+# Subtest: missing weapon training shown once, does not subtract from actual attack twice
+ok 6 - missing weapon training shown once, does not subtract from actual attack twice
+  ---
+  duration_ms: 0.237782
+  type: 'test'
+  ...
+# Subtest: personalized zero spell bonus overrides staff nominal focus bonus for noncasters
+ok 7 - personalized zero spell bonus overrides staff nominal focus bonus for noncasters
+  ---
+  duration_ms: 0.178675
+  type: 'test'
+  ...
+# Subtest: mastery lock independent of proficiency
+ok 8 - mastery lock independent of proficiency
+  ---
+  duration_ms: 0.302601
+  type: 'test'
+  ...
+# Subtest: armor shows actual wearer AC and warns about missing training
+ok 9 - armor shows actual wearer AC and warns about missing training
+  ---
+  duration_ms: 0.479161
+  type: 'test'
+  ...
+# Subtest: untrained shield explicitly denies AC bonus
+ok 10 - untrained shield explicitly denies AC bonus
+  ---
+  duration_ms: 1.145977
+  type: 'test'
+  ...
+# Subtest: tooltip text remains text not injected HTML
+ok 11 - tooltip text remains text not injected HTML
+  ---
+  duration_ms: 0.785683
+  type: 'test'
+  ...
+# Subtest: shared staff and bow artwork follows type rather than former class restriction
+ok 12 - shared staff and bow artwork follows type rather than former class restriction
+  ---
+  duration_ms: 0.431078
+  type: 'test'
+  ...
+# Subtest: untrained armor warning renders the message, not its CSS class
+ok 13 - untrained armor warning renders the message, not its CSS class
+  ---
+  duration_ms: 0.379074
+  type: 'test'
+  ...
+# Subtest: spatial queries preserve every visible object at boundaries and across floors
+ok 14 - spatial queries preserve every visible object at boundaries and across floors
+  ---
+  duration_ms: 30.394179
+  type: 'test'
+  ...
+# Subtest: FPS measures actual frame timestamps, including slow frames and reset
+ok 15 - FPS measures actual frame timestamps, including slow frames and reset
+  ---
+  duration_ms: 1.026273
+  type: 'test'
+  ...
+# Subtest: motion interpolates evenly and snaps on floor change or distant travel
+ok 16 - motion interpolates evenly and snaps on floor change or distant travel
+  ---
+  duration_ms: 0.547424
+  type: 'test'
+  ...
+# Subtest: picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+ok 17 - picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+  ---
+  duration_ms: 0.745445
+  type: 'test'
+  ...
+# Subtest: owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+ok 18 - owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+  ---
+  duration_ms: 1.103168
+  type: 'test'
+  ...
+# Subtest: surface index gives trails priority, curved segments, ellipse edges and floor stone
+ok 19 - surface index gives trails priority, curved segments, ellipse edges and floor stone
+  ---
+  duration_ms: 1.670848
+  type: 'test'
+  ...
+# Subtest: large monster picking follows species size and ignores other floors
+ok 20 - large monster picking follows species size and ignores other floors
+  ---
+  duration_ms: 0.634115
+  type: 'test'
+  ...
+# Subtest: combat readout explains lower d20, misses, criticals and saving throws
+ok 21 - combat readout explains lower d20, misses, criticals and saving throws
+  ---
+  duration_ms: 0.979942
+  type: 'test'
+  ...
+# Subtest: companion cannot be accidentally selected as a hostile monster
+ok 22 - companion cannot be accidentally selected as a hostile monster
+  ---
+  duration_ms: 0.626516
+  type: 'test'
+  ...
+# Subtest: combat summary exposes actual damage dice and zero save damage
+ok 23 - combat summary exposes actual damage dice and zero save damage
+  ---
+  duration_ms: 0.717424
+  type: 'test'
+  ...
+# Subtest: paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+ok 24 - paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+  ---
+  duration_ms: 1.219874
+  type: 'test'
+  ...
+# Subtest: hotbar pages handle empty lists and exact twenty-four-slot boundaries
+ok 25 - hotbar pages handle empty lists and exact twenty-four-slot boundaries
+  ---
+  duration_ms: 0.24218
+  type: 'test'
+  ...
+# Subtest: status timer distinguishes six hundred rounds from real-world duration
+ok 26 - status timer distinguishes six hundred rounds from real-world duration
+  ---
+  duration_ms: 0.294925
+  type: 'test'
+  ...
+# Subtest: mana budget UI names mixed slot distribution and flexible pool
+ok 27 - mana budget UI names mixed slot distribution and flexible pool
+  ---
+  duration_ms: 0.425603
+  type: 'test'
+  ...
+# Subtest: spell profile overlays owner scaling without mutating the shared catalogue
+ok 28 - spell profile overlays owner scaling without mutating the shared catalogue
+  ---
+  duration_ms: 0.544174
+  type: 'test'
+  ...
+# Subtest: hotbar mana uses selected casting rank, never static base spell cost
+ok 29 - hotbar mana uses selected casting rank, never static base spell cost
+  ---
+  duration_ms: 0.218801
+  type: 'test'
+  ...
+# Subtest: repeating active concentration is free, other spell costs remain payable
+ok 30 - repeating active concentration is free, other spell costs remain payable
+  ---
+  duration_ms: 0.161876
+  type: 'test'
+  ...
+# Subtest: missing locked spell profile falls back to a safe base and empty slots stay empty
+ok 31 - missing locked spell profile falls back to a safe base and empty slots stay empty
+  ---
+  duration_ms: 0.303012
+  type: 'test'
+  ...
+# Subtest: owner delta replaces spell profiles completely and never leaks them across accounts
+ok 32 - owner delta replaces spell profiles completely and never leaks them across accounts
+  ---
+  duration_ms: 0.233764
+  type: 'test'
+  ...
+# Subtest: second-finger swipe keeps joystick movement and survives child capture loss
+ok 33 - second-finger swipe keeps joystick movement and survives child capture loss
+  ---
+  duration_ms: 10.875132
+  type: 'test'
+  ...
+# Subtest: swiping never casts or ghost-clicks; the next tap, mouse and keyboard still cast
+ok 34 - swiping never casts or ghost-clicks; the next tap, mouse and keyboard still cast
+  ---
+  duration_ms: 2.840997
+  type: 'test'
+  ...
+# Subtest: gaps and disabled-slot hit targets scroll; pointer IDs, cancellation and edges stay independent
+ok 35 - gaps and disabled-slot hit targets scroll; pointer IDs, cancellation and edges stay independent
+  ---
+  duration_ms: 0.957814
+  type: 'test'
+  ...
+# Subtest: desktop, mouse and non-overflow rows are not taken over by touch scrolling
+ok 36 - desktop, mouse and non-overflow rows are not taken over by touch scrolling
+  ---
+  duration_ms: 0.575673
+  type: 'test'
+  ...
+# Subtest: grouped projection and book refer to the same slot
+ok 37 - grouped projection and book refer to the same slot
+  ---
+  duration_ms: 2.225731
+  type: 'test'
+  ...
+# Subtest: exhausted transformations are disabled, zero-cost arrow and switch remain valid
+ok 38 - exhausted transformations are disabled, zero-cost arrow and switch remain valid
+  ---
+  duration_ms: 0.422607
+  type: 'test'
+  ...
+# Subtest: archer main button is an arrow, not another activation
+ok 39 - archer main button is an arrow, not another activation
+  ---
+  duration_ms: 0.595873
+  type: 'test'
+  ...
+# Subtest: resource cost text is distinct from zero mana
+ok 40 - resource cost text is distinct from zero mana
+  ---
+  duration_ms: 0.866708
+  type: 'test'
+  ...
+# Subtest: second-finger touch casts on release without click and ignores its compatibility click
+ok 41 - second-finger touch casts on release without click and ignores its compatibility click
+  ---
+  duration_ms: 3.626728
+  type: 'test'
+  ...
+# Subtest: horizontal swipe, changed scroll position and canceled gestures never cast
+ok 42 - horizontal swipe, changed scroll position and canceled gestures never cast
+  ---
+  duration_ms: 0.872498
+  type: 'test'
+  ...
+# Subtest: release outside the button or a newly disabled button does not cast
+ok 43 - release outside the button or a newly disabled button does not cast
+  ---
+  duration_ms: 0.262807
+  type: 'test'
+  ...
+# Subtest: mouse and keyboard clicks still work immediately after a touch
+ok 44 - mouse and keyboard clicks still work immediately after a touch
+  ---
+  duration_ms: 2.649622
+  type: 'test'
+  ...
+# Subtest: touches are independent: canceling one pointer does not discard another tap
+ok 45 - touches are independent: canceling one pointer does not discard another tap
+  ---
+  duration_ms: 0.648476
+  type: 'test'
+  ...
+# Subtest: actual game release handler preserves the joystick when another finger is released
+ok 46 - actual game release handler preserves the joystick when another finger is released
+  ---
+  duration_ms: 3.124123
+  type: 'test'
+  ...
+# Subtest: status controls let noncasters escape hazards and wake allies without spell access
+ok 47 - status controls let noncasters escape hazards and wake allies without spell access
+  ---
+  duration_ms: 10.070242
+  type: 'test'
+  ...
+# Subtest: only the server-acknowledged pending spell gets a queue caption
+ok 48 - only the server-acknowledged pending spell gets a queue caption
+  ---
+  duration_ms: 3.689878
+  type: 'test'
+  ...
+# Subtest: ready pending command remains visible until the server executes it
+ok 49 - ready pending command remains visible until the server executes it
+  ---
+  duration_ms: 0.193627
+  type: 'test'
+  ...
+# Subtest: no empty slot or absent player can show a phantom pending spell
+ok 50 - no empty slot or absent player can show a phantom pending spell
+  ---
+  duration_ms: 0.10504
+  type: 'test'
+  ...
+# Subtest: queue label disappears after completion or cancellation
+ok 51 - queue label disappears after completion or cancellation
+  ---
+  duration_ms: 0.156386
+  type: 'test'
+  ...
+# Subtest: hotbar, F and book share the same queue formatter
+ok 52 - hotbar, F and book share the same queue formatter
+  ---
+  duration_ms: 4.301583
+  type: 'test'
+  ...
+# Subtest: wand instruction is determined by actual weapon and mentions manual Space
+ok 53 - wand instruction is determined by actual weapon and mentions manual Space
+  ---
+  duration_ms: 3.260038
+  type: 'test'
+  ...
+# Subtest: native client mirrors the queue and actual weapon instruction
+ok 54 - native client mirrors the queue and actual weapon instruction
+  ---
+  duration_ms: 2.989029
+  type: 'test'
+  ...
+1..54
+# tests 54
+# suites 0
+# pass 54
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 308.952974

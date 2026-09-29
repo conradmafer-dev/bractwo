@@ -46,7 +46,9 @@ def configure(spells, statuses):
             description='', icon=f'assets/spells/{key}.svg', effect='spell',
             visual=dict(style='field' if key in FIELD_KEYS else kind, theme='nature',
                         colors=['#578879','#a2d9bd','#e2fff0'], shots=1))
-        spec.update(kw); spells[key]=spec
+        spec.update(kw)
+        if key in FIELD_KEYS or key in ('sleep','shatter'): spec['ground_target'] = True
+        spells[key]=spec
     add('blur','Rozmycie',2,'buff',0,buff='blur',targeting='self',duration=30,concentration=True,
         description='Ataki przeciw tobie mają utrudnienie; ślepowidzenie i prawdziwe widzenie je omijają.')
     add('fog_cloud','Mglista chmura',1,'circle_field',120,radius=20*FT,duration=1800,concentration=True,

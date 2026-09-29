@@ -1,0 +1,61 @@
+{
+  "tested": [
+    "test_mana_hotbar_statuses.ManaGameplay.test_buff_cast_delays_out_of_combat_recovery",
+    "test_mana_hotbar_statuses.ManaGameplay.test_mana_regeneration_does_not_exceed_capacity",
+    "test_mana_hotbar_statuses.ManaGameplay.test_regeneration_rate_is_pool_relative_and_safe_is_faster",
+    "test_wand_casting_0817.WandCasting.test_recovery_preserves_queued_spell_and_movement",
+    "test_casters_0814.CasterGame.test_fighter_has_no_duplicate_training_options",
+    "test_casters_0814.CasterGame.test_recovery_cd_survives_save_load",
+    "test_casters_0814.CasterGame.test_recovery_damage_does_not_undo_it",
+    "test_casters_0814.CasterGame.test_recovery_is_immediate",
+    "test_casters_0814.CasterGame.test_recovery_movement_does_not_undo_it",
+    "test_casters_0814.CasterGame.test_recovery_works_in_combat",
+    "test_casters_0814.CasterGame.test_shape_shared_cooldown_return_not_refund",
+    "test_casters_0814.CasterGame.test_wild_companion_no_mana_or_gold_uses_shape_cd",
+    "test_casters_0814.Catalog.test_all_new_art_in_both_clients",
+    "test_casters_0814.Catalog.test_only_real_rituals"
+  ],
+  "baseline": {
+    "run": 14,
+    "failures": [
+      "test_mana_hotbar_statuses.ManaGameplay.test_buff_cast_delays_out_of_combat_recovery",
+      "test_mana_hotbar_statuses.ManaGameplay.test_mana_regeneration_does_not_exceed_capacity",
+      "test_mana_hotbar_statuses.ManaGameplay.test_regeneration_rate_is_pool_relative_and_safe_is_faster",
+      "test_wand_casting_0817.WandCasting.test_recovery_preserves_queued_spell_and_movement",
+      "test_casters_0814.CasterGame.test_fighter_has_no_duplicate_training_options",
+      "test_casters_0814.CasterGame.test_recovery_damage_does_not_undo_it",
+      "test_casters_0814.CasterGame.test_recovery_is_immediate",
+      "test_casters_0814.CasterGame.test_recovery_movement_does_not_undo_it",
+      "test_casters_0814.CasterGame.test_recovery_works_in_combat",
+      "test_casters_0814.CasterGame.test_shape_shared_cooldown_return_not_refund",
+      "test_casters_0814.Catalog.test_only_real_rituals"
+    ],
+    "errors": [
+      "test_casters_0814.CasterGame.test_recovery_cd_survives_save_load",
+      "test_casters_0814.CasterGame.test_wild_companion_no_mana_or_gold_uses_shape_cd",
+      "test_casters_0814.Catalog.test_all_new_art_in_both_clients"
+    ]
+  },
+  "ui13": {
+    "run": 14,
+    "failures": [
+      "test_mana_hotbar_statuses.ManaGameplay.test_buff_cast_delays_out_of_combat_recovery",
+      "test_mana_hotbar_statuses.ManaGameplay.test_mana_regeneration_does_not_exceed_capacity",
+      "test_mana_hotbar_statuses.ManaGameplay.test_regeneration_rate_is_pool_relative_and_safe_is_faster",
+      "test_wand_casting_0817.WandCasting.test_recovery_preserves_queued_spell_and_movement",
+      "test_casters_0814.CasterGame.test_fighter_has_no_duplicate_training_options",
+      "test_casters_0814.CasterGame.test_recovery_damage_does_not_undo_it",
+      "test_casters_0814.CasterGame.test_recovery_is_immediate",
+      "test_casters_0814.CasterGame.test_recovery_movement_does_not_undo_it",
+      "test_casters_0814.CasterGame.test_recovery_works_in_combat",
+      "test_casters_0814.CasterGame.test_shape_shared_cooldown_return_not_refund",
+      "test_casters_0814.Catalog.test_only_real_rituals"
+    ],
+    "errors": [
+      "test_casters_0814.CasterGame.test_recovery_cd_survives_save_load",
+      "test_casters_0814.CasterGame.test_wild_companion_no_mana_or_gold_uses_shape_cd",
+      "test_casters_0814.Catalog.test_all_new_art_in_both_clients"
+    ]
+  },
+  "same_failure_ids": true
+}

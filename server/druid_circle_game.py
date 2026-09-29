@@ -428,6 +428,7 @@ class DruidCircleGame:
         if key != 'circle_star_arrow':
             form = key.rsplit('_', 1)[-1]
             if form not in ('archer', 'chalice', 'dragon'): return
+            if form == current: return
             switching = bool(current and p.level >= 45)
             if switching:
                 if rt.get('star_switch_ready', 0) > now: return
