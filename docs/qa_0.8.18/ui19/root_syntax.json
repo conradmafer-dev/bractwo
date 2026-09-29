@@ -1,0 +1,40 @@
+{
+  "python_syntax": [
+    "server/server.py",
+    "server/progression.py",
+    "server/loot_tables.py",
+    "tools/package_0818.py"
+  ],
+  "javascript_syntax": [
+    {
+      "file": "web/game.js",
+      "ok": true,
+      "output": ""
+    },
+    {
+      "file": "web/adventure_ui.js",
+      "ok": true,
+      "output": ""
+    },
+    {
+      "file": "web/world_geometry.js",
+      "ok": true,
+      "output": ""
+    },
+    {
+      "file": "web/atlas_map.js",
+      "ok": true,
+      "output": ""
+    },
+    {
+      "file": "web/character_sheet.js",
+      "ok": true,
+      "output": ""
+    },
+    {
+      "file": "web/inventory_ui.js",
+      "ok": true,
+      "output": ""
+    }
+  ]
+}

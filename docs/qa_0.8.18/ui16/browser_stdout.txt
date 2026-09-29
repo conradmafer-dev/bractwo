@@ -1,0 +1,11 @@
+PASS Desktop: all ten spell-rank sections occur once, class features last
+PASS Subclass grants are mixed with native spells of the same base rank
+PASS All displayed web spell icons load, including Guidance and Guiding Bolt
+PASS Changing spell power does not move the spell between sections
+PASS Opening and refreshing the sorted book preserves saved hotbar order
+PASS Guidance skill picker and Use button still send the correct cast
+PASS Shortcut assignment from a sorted row still binds the chosen spell
+PASS Changing tabs keeps the same unique ordered sections
+PASS Touch landscape: identical sections, Guidance in Sztuczki
+PASS Touch portrait: same grouping, no horizontal spellbook overflow
+PASS No JavaScript exceptions during the browser checks

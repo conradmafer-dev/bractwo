@@ -1,0 +1,124 @@
+{
+  "suite": "UI_19 adventures and SRD creature traits",
+  "test_file": "tests/test_adventure_ui19.py",
+  "report_date": "2026-09-29",
+  "source": "Recorded unittest outputs from the completed implementation session; tests were not rerun to prepare this report.",
+  "status": "passed",
+  "unique_test_count": 7,
+  "latest_results": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0,
+    "aggregation": "Latest actual result of each test, collected across the initial run and focused reruns. This is not a claim of a later single seven-test run."
+  },
+  "runs": [
+    {
+      "id": "initial_suite",
+      "command": "python -m unittest test_adventure_ui19 -v",
+      "tests_run": 7,
+      "passed": 6,
+      "failed": 1,
+      "duration_seconds": 35.039,
+      "exit_code": 1,
+      "failure": {
+        "test": "test_adventure_ui19.AdventureWorld.test_every_chamber_and_objective_is_reachable_inside_its_floor",
+        "message": "('adv_starter_ruins_floor_10', 'adv_starter_ruins_1_3', 'unreachable')",
+        "cause": "A room decoration narrowed the doorway to the final chamber.",
+        "fix": "Room decorations were moved away from doorway approaches. Lower-terrace discoveries and spawns were also moved onto the exposed ledge after the separate continent integration check."
+      }
+    },
+    {
+      "id": "topology_after_fix",
+      "command": "python -m unittest test_adventure_ui19.AdventureWorld.test_every_chamber_and_objective_is_reachable_inside_its_floor -v",
+      "tests_run": 1,
+      "passed": 1,
+      "failed": 0,
+      "duration_seconds": 2.917,
+      "exit_code": 0,
+      "reason": "Verify actual collision reachability after the doorway and terrace corrections."
+    },
+    {
+      "id": "critical_attack_integration",
+      "command": "python -m unittest test_adventure_ui19.AdventureCombat.test_undead_fortitude_con_save_and_exceptions -v",
+      "tests_run": 1,
+      "passed": 1,
+      "failed": 0,
+      "duration_seconds": 0.305,
+      "exit_code": 0,
+      "reason": "The existing Undead Fortitude test was extended to exercise a real critical hit through Game.hit_enemy after the central critical flag integration.",
+      "additional_unique_test": false
+    },
+    {
+      "id": "final_world_after_content_changes",
+      "command": "python -m unittest test_adventure_ui19.AdventureWorld -v",
+      "tests_run": 3,
+      "passed": 3,
+      "failed": 0,
+      "duration_seconds": 2.550,
+      "exit_code": 0,
+      "reason": "Final focused rerun after adding the six extra initially present quest guards and explicit loot entries. Checks now require enough initially present targets for each kill objective and valid loot templates without rings."
+    }
+  ],
+  "tests": [
+    {
+      "name": "test_adventure_ui19.AdventureCombat.test_grick_grapple_is_persistent_escapable_and_ends_out_of_reach",
+      "status": "passed",
+      "latest_run": "initial_suite",
+      "checks": "Grick grapple DC 12, availability of the existing escape_grapple action, persistence through condition ticking, stopped movement, successful escape and release outside reach."
+    },
+    {
+      "name": "test_adventure_ui19.AdventureCombat.test_multiattack_rolls_separately_and_damage_types_match",
+      "status": "passed",
+      "latest_run": "initial_suite",
+      "checks": "Animated Armor makes two separate attack rolls; Giant Bat bite uses piercing damage."
+    },
+    {
+      "name": "test_adventure_ui19.AdventureCombat.test_poison_condition_immunity_and_flight_speed",
+      "status": "passed",
+      "latest_run": "initial_suite",
+      "checks": "Poison damage and poisoned/stinking_poison immunity for the relevant creatures; actual Giant Bat flying movement speed."
+    },
+    {
+      "name": "test_adventure_ui19.AdventureCombat.test_undead_fortitude_con_save_and_exceptions",
+      "status": "passed",
+      "latest_run": "critical_attack_integration",
+      "checks": "Successful and failed Constitution saves, critical-hit exclusion, radiant damage and mixed radiant component exclusion, plus critical propagation through the real Game.hit_enemy caller."
+    },
+    {
+      "name": "test_adventure_ui19.AdventureWorld.test_content_references_and_unique_rewards",
+      "status": "passed",
+      "latest_run": "final_world_after_content_changes",
+      "checks": "18 quests, 12 NPCs, unique greetings and IDs, valid dependencies and discovery references, eight distinct final item rewards, enough initially present monsters for each kill objective."
+    },
+    {
+      "name": "test_adventure_ui19.AdventureWorld.test_every_chamber_and_objective_is_reachable_inside_its_floor",
+      "status": "passed",
+      "latest_run": "final_world_after_content_changes",
+      "previous_failure_resolved": true,
+      "checks": "Flood-fill using Game.blocked across all 19 new dungeon/terrace areas. Discoveries, stairs and spawns are unblocked and reachable from an entrance on their floor."
+    },
+    {
+      "name": "test_adventure_ui19.AdventureWorld.test_monster_stat_blocks_and_svg_assets",
+      "status": "passed",
+      "latest_run": "final_world_after_content_changes",
+      "checks": "Six configured creature HP/AC/attack/XP and attack profiles match authored SRD fixtures; declared saving throw bonuses match; six four-frame SVGs parse with 320x80 dimensions; loot entries reference valid templates and contain no rings."
+    }
+  ],
+  "content_counts": {
+    "outdoor_npcs": 12,
+    "quests": 18,
+    "authored_discoveries": 68,
+    "small_dungeons": 6,
+    "catacomb_floors": 3,
+    "cave_floors": 4,
+    "total_dungeon_areas": 13,
+    "hills": 3,
+    "hill_terraces": 6,
+    "new_creature_types": 6,
+    "four_frame_svg_sprites": 6
+  },
+  "limitations": [
+    "The topology test checks interior collision reachability; surface approaches and the port network are recorded separately in continent_results.json.",
+    "SVG verification here checks asset structure and metadata, not a separate rendered visual review."
+  ]
+}

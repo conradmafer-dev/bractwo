@@ -1,0 +1,237 @@
+test_auto_scaled_missiles_respect_pvp_safety (test_spell_scaling_087.ScalingCombat.test_auto_scaled_missiles_respect_pvp_safety) ... ok
+test_base_selection_preserves_three_cheap_missiles (test_spell_scaling_087.ScalingCombat.test_base_selection_preserves_three_cheap_missiles) ... ok
+test_chain_hits_seven_distinct_targets_at_ninth_circle (test_spell_scaling_087.ScalingCombat.test_chain_hits_seven_distinct_targets_at_ninth_circle) ... ok
+test_changing_power_does_not_change_active_repeated_spell (test_spell_scaling_087.ScalingCombat.test_changing_power_does_not_change_active_repeated_spell) ... ok
+test_cure_rolls_actual_healing_dice_and_modifier_once (test_spell_scaling_087.ScalingCombat.test_cure_rolls_actual_healing_dice_and_modifier_once) ... ok
+test_favorite_key_uses_selected_real_spell_rank (test_spell_scaling_087.ScalingCombat.test_favorite_key_uses_selected_real_spell_rank) ... ok
+test_fireball_real_scaled_damage_not_cosmetic (test_spell_scaling_087.ScalingCombat.test_fireball_real_scaled_damage_not_cosmetic) ... ok
+test_freedom_really_protects_two_party_members_at_circle_five (test_spell_scaling_087.ScalingCombat.test_freedom_really_protects_two_party_members_at_circle_five) ... ok
+test_hunters_mark_real_scaled_duration_and_fixed_bonus (test_spell_scaling_087.ScalingCombat.test_hunters_mark_real_scaled_duration_and_fixed_bonus) ... ok
+test_longstrider_does_not_touch_strangers_or_out_of_range (test_spell_scaling_087.ScalingCombat.test_longstrider_does_not_touch_strangers_or_out_of_range) ... ok
+test_longstrider_keeps_pvp_support_safety (test_spell_scaling_087.ScalingCombat.test_longstrider_keeps_pvp_support_safety) ... ok
+test_longstrider_scales_number_of_nearby_allies (test_spell_scaling_087.ScalingCombat.test_longstrider_scales_number_of_nearby_allies) ... ok
+test_maximum_missile_count_eleven_really_damages (test_spell_scaling_087.ScalingCombat.test_maximum_missile_count_eleven_really_damages) ... ok
+test_moonbeam_keeps_original_strength_after_levelling (test_spell_scaling_087.ScalingCombat.test_moonbeam_keeps_original_strength_after_levelling) ... ok
+test_moonbeam_uses_paid_higher_rank (test_spell_scaling_087.ScalingCombat.test_moonbeam_uses_paid_higher_rank) ... ok
+test_not_enough_mana_never_silently_casts_weaker_spell (test_spell_scaling_087.ScalingCombat.test_not_enough_mana_never_silently_casts_weaker_spell) ... ok
+test_old_save_migrates_to_auto_no_xp_or_mana_reset (test_spell_scaling_087.ScalingCombat.test_old_save_migrates_to_auto_no_xp_or_mana_reset) ... ok
+test_power_choice_packet_is_owner_scoped_and_persistent (test_spell_scaling_087.ScalingCombat.test_power_choice_packet_is_owner_scoped_and_persistent) ... ok
+test_profiles_are_private_not_leaked_to_other_players (test_spell_scaling_087.ScalingCombat.test_profiles_are_private_not_leaked_to_other_players) ... ok
+test_queued_spell_uses_current_cost_without_duplicate_shots (test_spell_scaling_087.ScalingCombat.test_queued_spell_uses_current_cost_without_duplicate_shots) ... ok
+test_real_auto_missiles_cost_damage_and_visual_count (test_spell_scaling_087.ScalingCombat.test_real_auto_missiles_cost_damage_and_visual_count) ... ok
+test_repeat_lightning_cannot_gain_free_upcast (test_spell_scaling_087.ScalingCombat.test_repeat_lightning_cannot_gain_free_upcast) ... ok
+test_scaled_area_retains_friendly_fire_protections (test_spell_scaling_087.ScalingCombat.test_scaled_area_retains_friendly_fire_protections) ... ok
+test_scaled_status_still_clears_when_concentration_breaks (test_spell_scaling_087.ScalingCombat.test_scaled_status_still_clears_when_concentration_breaks) ... ok
+test_scorching_ray_each_added_ray_has_separate_attack (test_spell_scaling_087.ScalingCombat.test_scorching_ray_each_added_ray_has_separate_attack) ... ok
+test_second_wind_does_not_double_add_caster_level (test_spell_scaling_087.ScalingCombat.test_second_wind_does_not_double_add_caster_level) ... ok
+test_shield_blocks_entire_upcast_salvo (test_spell_scaling_087.ScalingCombat.test_shield_blocks_entire_upcast_salvo) ... ok
+test_stop_concentration_clears_fields_no_resource_refund (test_spell_scaling_087.ScalingCombat.test_stop_concentration_clears_fields_no_resource_refund) ... ok
+test_all_damage_upcasts_increase_correct_die_count (test_spell_scaling_087.ScalingProfiles.test_all_damage_upcasts_increase_correct_die_count) ... ok
+test_base_power_can_be_selected_and_auto_restored (test_spell_scaling_087.ScalingProfiles.test_base_power_can_be_selected_and_auto_restored) ... ok
+test_cantrip_milestones_and_zero_cost (test_spell_scaling_087.ScalingProfiles.test_cantrip_milestones_and_zero_cost) ... ok
+test_chain_adds_targets_not_damage (test_spell_scaling_087.ScalingProfiles.test_chain_adds_targets_not_damage) ... ok
+test_corrupt_saved_preferences_are_sanitized (test_spell_scaling_087.ScalingProfiles.test_corrupt_saved_preferences_are_sanitized) ... ok
+test_freedom_adds_allies_at_full_and_delayed_caster_gates (test_spell_scaling_087.ScalingProfiles.test_freedom_adds_allies_at_full_and_delayed_caster_gates) ... ok
+test_heal_adds_ten_fixed_hp_per_circle (test_spell_scaling_087.ScalingProfiles.test_heal_adds_ten_fixed_hp_per_circle) ... ok
+test_ice_storm_does_not_scale_cold_component (test_spell_scaling_087.ScalingProfiles.test_ice_storm_does_not_scale_cold_component) ... ok
+test_invalid_growth_interval_is_rejected (test_spell_scaling_087.ScalingProfiles.test_invalid_growth_interval_is_rejected) ... ok
+test_invalid_rank_wrong_class_locked_spell_are_rejected (test_spell_scaling_087.ScalingProfiles.test_invalid_rank_wrong_class_locked_spell_are_rejected) ... ok
+test_longstrider_adds_targets_not_speed_or_duration (test_spell_scaling_087.ScalingProfiles.test_longstrider_adds_targets_not_speed_or_duration) ... ok
+test_magic_missile_automatic_progression (test_spell_scaling_087.ScalingProfiles.test_magic_missile_automatic_progression) ... ok
+test_mark_uses_delayed_ranger_gates_and_useful_ranks (test_spell_scaling_087.ScalingProfiles.test_mark_uses_delayed_ranger_gates_and_useful_ranks) ... ok
+test_mass_healing_adds_one_die_per_circle (test_spell_scaling_087.ScalingProfiles.test_mass_healing_adds_one_die_per_circle) ... ok
+test_next_upgrade_uses_correct_name_free_delta_and_cap (test_spell_scaling_087.ScalingProfiles.test_next_upgrade_uses_correct_name_free_delta_and_cap) ... ok
+test_no_caster_modifier_added_to_magic_missile (test_spell_scaling_087.ScalingProfiles.test_no_caster_modifier_added_to_magic_missile) ... ok
+test_non_scaling_spells_stay_base_cost_and_effect (test_spell_scaling_087.ScalingProfiles.test_non_scaling_spells_stay_base_cost_and_effect) ... ok
+test_one_caster_level_every_five_game_levels (test_spell_scaling_087.ScalingProfiles.test_one_caster_level_every_five_game_levels) ... ok
+test_profiles_cached_and_invalidated_after_level_change (test_spell_scaling_087.ScalingProfiles.test_profiles_cached_and_invalidated_after_level_change) ... ok
+test_ranger_other_magic_does_not_inherit_full_caster_gates (test_spell_scaling_087.ScalingProfiles.test_ranger_other_magic_does_not_inherit_full_caster_gates) ... ok
+test_scorching_ray_increases_count_not_each_ray_damage (test_spell_scaling_087.ScalingProfiles.test_scorching_ray_increases_count_not_each_ray_damage) ... ok
+test_second_wind_grows_at_five_not_each_level (test_spell_scaling_087.ScalingProfiles.test_second_wind_grows_at_five_not_each_level) ... ok
+test_shillelagh_current_weapon_dice_match_real_weapon (test_spell_scaling_087.ScalingProfiles.test_shillelagh_current_weapon_dice_match_real_weapon) ... ok
+test_srd_2024_healing_uses_two_added_dice (test_spell_scaling_087.ScalingProfiles.test_srd_2024_healing_uses_two_added_dice) ... ok
+test_static_catalogue_not_mutated (test_spell_scaling_087.ScalingProfiles.test_static_catalogue_not_mutated) ... ok
+test_three_caster_levels_every_fifteen_game_levels (test_spell_scaling_087.ScalingProfiles.test_three_caster_levels_every_fifteen_game_levels) ... ok
+test_two_caster_levels_every_ten_game_levels (test_spell_scaling_087.ScalingProfiles.test_two_caster_levels_every_ten_game_levels) ... ok
+test_useless_hunters_mark_ranks_cannot_be_selected (test_spell_scaling_087.ScalingProfiles.test_useless_hunters_mark_ranks_cannot_be_selected) ... ok
+test_burning_hands_one_die_separate_line (test_spell_scaling_087.ScalingReceipts.test_burning_hands_one_die_separate_line) ... ok
+test_duration_gain_appears_only_on_actual_mark_threshold (test_spell_scaling_087.ScalingReceipts.test_duration_gain_appears_only_on_actual_mark_threshold) ... ok
+test_every_single_level_has_separate_gains (test_spell_scaling_087.ScalingReceipts.test_every_single_level_has_separate_gains) ... ok
+test_freedom_level_40_reports_one_added_ally (test_spell_scaling_087.ScalingReceipts.test_freedom_level_40_reports_one_added_ally) ... ok
+test_gain_payload_contains_no_before_after_or_zero_rows (test_spell_scaling_087.ScalingReceipts.test_gain_payload_contains_no_before_after_or_zero_rows) ... ok
+test_heal_dice_and_ability_bonus_separate_lines (test_spell_scaling_087.ScalingReceipts.test_heal_dice_and_ability_bonus_separate_lines) ... ok
+test_longstrider_only_targets_not_duration (test_spell_scaling_087.ScalingReceipts.test_longstrider_only_targets_not_duration) ... ok
+test_magic_missile_one_projectile_not_old_new_or_extra_die (test_spell_scaling_087.ScalingReceipts.test_magic_missile_one_projectile_not_old_new_or_extra_die) ... ok
+test_non_scalable_and_unchanged_spells_do_not_add_noise (test_spell_scaling_087.ScalingReceipts.test_non_scalable_and_unchanged_spells_do_not_add_noise) ... ok
+test_old_saved_receipts_do_not_acquire_retroactive_scaling (test_spell_scaling_087.ScalingReceipts.test_old_saved_receipts_do_not_acquire_retroactive_scaling) ... ok
+test_second_wind_flat_increment_only_at_fifth_level (test_spell_scaling_087.ScalingReceipts.test_second_wind_flat_increment_only_at_fifth_level) ... ok
+test_selected_lower_rank_does_not_hide_new_capability (test_spell_scaling_087.ScalingReceipts.test_selected_lower_rank_does_not_hide_new_capability) ... ok
+test_allocate_from_sheet_without_master_nearby (test_level_up_086.Commands.test_allocate_from_sheet_without_master_nearby) ... ok
+test_branch_and_prerequisites_are_validated (test_level_up_086.Commands.test_branch_and_prerequisites_are_validated) ... ok
+test_cannot_spend_same_point_twice (test_level_up_086.Commands.test_cannot_spend_same_point_twice) ... ok
+test_close_command_persists_even_in_combat (test_level_up_086.Commands.test_close_command_persists_even_in_combat) ... ok
+test_dead_or_fighting_cannot_allocate (test_level_up_086.Commands.test_dead_or_fighting_cannot_allocate) ... ok
+test_new_assets_served_by_real_http (test_level_up_086.Commands.test_new_assets_served_by_real_http) ... /mnt/data/bractwo_ui16_baseline/Bractwo_0.8.18/server/server.py:1780: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["game"]=Game(db_path, clock=clock)
+ok
+test_promotion_and_reset_still_need_master (test_level_up_086.Commands.test_promotion_and_reset_still_need_master) ... ok
+test_buffs_terrain_and_form_do_not_contaminate_growth (test_level_up_086.Receipts.test_buffs_terrain_and_form_do_not_contaminate_growth) ... ok
+test_cantrips_list_added_dice_not_total (test_level_up_086.Receipts.test_cantrips_list_added_dice_not_total) ... ok
+test_compact_snapshot_restates_dismissal (test_level_up_086.Receipts.test_compact_snapshot_restates_dismissal) ... ok
+test_dismiss_does_not_spend_or_change_stats (test_level_up_086.Receipts.test_dismiss_does_not_spend_or_change_stats) ... ok
+test_every_intermediate_level_gets_own_receipt (test_level_up_086.Receipts.test_every_intermediate_level_gets_own_receipt) ... ok
+test_knight_additional_attack (test_level_up_086.Receipts.test_knight_additional_attack) ... ok
+test_later_healing_gains_shown (test_level_up_086.Receipts.test_later_healing_gains_shown) ... ok
+test_legacy_save_does_not_spam_past_levels (test_level_up_086.Receipts.test_legacy_save_does_not_spam_past_levels) ... ok
+test_level_ten_exact_increments (test_level_up_086.Receipts.test_level_ten_exact_increments) ... ok
+test_mastery_action_is_conditional (test_level_up_086.Receipts.test_mastery_action_is_conditional) ... ok
+test_new_form_has_icon (test_level_up_086.Receipts.test_new_form_has_icon) ... ok
+test_no_before_after_values_in_payload (test_level_up_086.Receipts.test_no_before_after_values_in_payload) ... ok
+test_no_fabricated_feat_or_point_rewards (test_level_up_086.Receipts.test_no_fabricated_feat_or_point_rewards) ... ok
+test_no_receipt_without_advancement (test_level_up_086.Receipts.test_no_receipt_without_advancement) ... ok
+test_only_owner_receives_history (test_level_up_086.Receipts.test_only_owner_receives_history) ... ok
+test_other_character_cannot_dismiss (test_level_up_086.Receipts.test_other_character_cannot_dismiss) ... ok
+test_pending_receipts_do_not_expire (test_level_up_086.Receipts.test_pending_receipts_do_not_expire) ... ok
+test_persistence_after_restart (test_level_up_086.Receipts.test_persistence_after_restart) ... ok
+test_pet_improvements_match_new_summon (test_level_up_086.Receipts.test_pet_improvements_match_new_summon) ... ok
+test_primary_score_mod_and_attack_are_separate (test_level_up_086.Receipts.test_primary_score_mod_and_attack_are_separate) ... ok
+test_receipt_immutable_after_equipment_or_mastery_change (test_level_up_086.Receipts.test_receipt_immutable_after_equipment_or_mastery_change) ... ok
+test_reject_invalid_ids (test_level_up_086.Receipts.test_reject_invalid_ids) ... ok
+test_repeated_dismiss_is_idempotent (test_level_up_086.Receipts.test_repeated_dismiss_is_idempotent) ... ok
+test_separate_saving_throws (test_level_up_086.Receipts.test_separate_saving_throws) ... ok
+test_shillelagh_shows_only_labeled_average_gain (test_level_up_086.Receipts.test_shillelagh_shows_only_labeled_average_gain) ... ok
+test_single_click_dismisses_only_its_id (test_level_up_086.Receipts.test_single_click_dismisses_only_its_id) ... ok
+test_thousands_of_levels_are_not_dropped_or_allocated_eagerly (test_level_up_086.Receipts.test_thousands_of_levels_are_not_dropped_or_allocated_eagerly) ... ok
+test_zero_changes_omitted (test_level_up_086.Receipts.test_zero_changes_omitted) ... ok
+test_breaking_concentration_restores_polymorph_without_old_temp_hp (test_druid_circle_spells_0818.CircleSpells.test_breaking_concentration_restores_polymorph_without_old_temp_hp) ... ok
+test_catalogue_covers_every_bonus_without_global_unlocks (test_druid_circle_spells_0818.CircleSpells.test_catalogue_covers_every_bonus_without_global_unlocks) ... ok
+test_elemental_does_not_apply_initial_and_repeat_damage_same_tick (test_druid_circle_spells_0818.CircleSpells.test_elemental_does_not_apply_initial_and_repeat_damage_same_tick) ... ok
+test_field_damage_once_per_turn_and_concentration_removes_field (test_druid_circle_spells_0818.CircleSpells.test_field_damage_once_per_turn_and_concentration_removes_field) ... ok
+test_guidance_skill_applies_repeatedly_only_to_chosen_skill (test_druid_circle_spells_0818.CircleSpells.test_guidance_skill_applies_repeatedly_only_to_chosen_skill) ... ok
+test_guiding_bolt_grants_one_attack_advantage_and_free_use_commits_once (test_druid_circle_spells_0818.CircleSpells.test_guiding_bolt_grants_one_attack_advantage_and_free_use_commits_once) ... ok
+test_hold_paralyzes_then_save_releases_without_recasting (test_druid_circle_spells_0818.CircleSpells.test_hold_paralyzes_then_save_releases_without_recasting) ... ok
+test_invalid_payload_and_protected_target_do_not_spend_resources (test_druid_circle_spells_0818.CircleSpells.test_invalid_payload_and_protected_target_do_not_spend_resources) ... ok
+test_pack_movement_requires_actual_owner_movement_and_stays_once_per_turn (test_druid_circle_spells_0818.CircleSpells.test_pack_movement_requires_actual_owner_movement_and_stays_once_per_turn) ... ok
+test_permanent_wall_survives_reload_and_damage_is_saved (test_druid_circle_spells_0818.CircleSpells.test_permanent_wall_survives_reload_and_damage_is_saved) ... ok
+test_polymorph_keeps_hp_and_ends_when_temp_hp_is_exhausted (test_druid_circle_spells_0818.CircleSpells.test_polymorph_keeps_hp_and_ends_when_temp_hp_is_exhausted) ... ok
+test_queued_spell_keeps_selected_options (test_druid_circle_spells_0818.CircleSpells.test_queued_spell_keeps_selected_options) ... ok
+test_ray_of_sickness_poison_does_not_roll_a_second_save (test_druid_circle_spells_0818.CircleSpells.test_ray_of_sickness_poison_does_not_roll_a_second_save) ... ok
+test_sleep_two_saves_and_damage_wakes (test_druid_circle_spells_0818.CircleSpells.test_sleep_two_saves_and_damage_wakes) ... ok
+test_thunderwave_cube_includes_corners_and_pushes_failed_save (test_druid_circle_spells_0818.CircleSpells.test_thunderwave_cube_includes_corners_and_pushes_failed_save) ... ok
+test_water_breathing_ritual_is_free_and_requires_completed_channel (test_druid_circle_spells_0818.CircleSpells.test_water_breathing_ritual_is_free_and_requires_completed_channel) ... ok
+test_web_terrain_slows_owner_and_concentration_clears_it (test_druid_circle_spells_0818.CircleSpells.test_web_terrain_slows_owner_and_concentration_clears_it) ... ok
+test_bonus_spell_access_and_natural_recovery_commits_once (test_druid_circles_0818.CircleRules.test_bonus_spell_access_and_natural_recovery_commits_once) ... ok
+test_higher_beast_forms_have_progressive_cr_and_actual_poison (test_druid_circles_0818.CircleRules.test_higher_beast_forms_have_progressive_cr_and_actual_poison) ... ok
+test_land_aid_damage_heal_and_invalid_target_no_resource (test_druid_circles_0818.CircleRules.test_land_aid_damage_heal_and_invalid_target_no_resource) ... ok
+test_level_mapping_and_shape_resources (test_druid_circles_0818.CircleRules.test_level_mapping_and_shape_resources) ... ok
+test_moon_teleport_and_single_extra_damage_per_turn (test_druid_circles_0818.CircleRules.test_moon_teleport_and_single_extra_damage_per_turn) ... ok
+test_omen_reaction_respects_floor_range_and_uses (test_druid_circles_0818.CircleRules.test_omen_reaction_respects_floor_range_and_uses) ... ok
+test_scorpion_grapple_releases_without_action (test_druid_circles_0818.CircleRules.test_scorpion_grapple_releases_without_action) ... ok
+test_sea_aura_damage_and_push_share_wild_shape_resource (test_druid_circles_0818.CircleRules.test_sea_aura_damage_and_push_share_wild_shape_resource) ... ok
+test_star_dragon_and_chalice_have_real_effects (test_druid_circles_0818.CircleRules.test_star_dragon_and_chalice_have_real_effects) ... ok
+test_constitution_is_retroactive_and_minimum_dnd_gain_is_one (test_hp_growth_ui12.HitPointGrowth.test_constitution_is_retroactive_and_minimum_dnd_gain_is_one) ... ok
+test_every_dnd_checkpoint_and_every_intermediate_level (test_hp_growth_ui12.HitPointGrowth.test_every_dnd_checkpoint_and_every_intermediate_level) ... ok
+test_initial_and_regular_intervals_carry_fractional_gains (test_hp_growth_ui12.HitPointGrowth.test_initial_and_regular_intervals_carry_fractional_gains) ... ok
+test_new_and_historical_receipts_keep_their_own_hp_rules (test_hp_growth_ui12.HitPointGrowth.test_new_and_historical_receipts_keep_their_own_hp_rules) ... ok
+test_tough_is_separate_and_shapes_do_not_replace_own_constitution (test_hp_growth_ui12.HitPointGrowth.test_tough_is_separate_and_shapes_do_not_replace_own_constitution) ... ok
+test_legacy_health_fraction_vitality_refund_and_relogin (test_hp_growth_ui12.HitPointMigration.test_legacy_health_fraction_vitality_refund_and_relogin) ... ok
+test_pre_dnd_save_is_not_rescaled_twice (test_hp_growth_ui12.HitPointMigration.test_pre_dnd_save_is_not_rescaled_twice) ... ok
+test_all_awards_are_integer_monotone_and_bounded (test_mana_growth_0816.GrowthNumbers.test_all_awards_are_integer_monotone_and_bounded) ... ok
+test_every_original_milestone_and_final_cap_preserved (test_mana_growth_0816.GrowthNumbers.test_every_original_milestone_and_final_cap_preserved) ... ok
+test_focus_bonus_added_after_smoothing_once_and_capped (test_mana_growth_0816.GrowthNumbers.test_focus_bonus_added_after_smoothing_once_and_capped) ... ok
+test_full_casters_every_level_one_to_ten (test_mana_growth_0816.GrowthNumbers.test_full_casters_every_level_one_to_ten) ... ok
+test_guide_lists_small_gains_and_recovery_only_for_mage (test_mana_growth_0816.GrowthNumbers.test_guide_lists_small_gains_and_recovery_only_for_mage) ... ok
+test_intermediate_mana_is_not_misrepresented_as_slots (test_mana_growth_0816.GrowthNumbers.test_intermediate_mana_is_not_misrepresented_as_slots) ... ok
+test_interpolation_rounds_halves_up_and_clamps_boundaries (test_mana_growth_0816.GrowthNumbers.test_interpolation_rounds_halves_up_and_clamps_boundaries) ... ok
+test_knight_mana_is_unchanged_including_focus (test_mana_growth_0816.GrowthNumbers.test_knight_mana_is_unchanged_including_focus) ... ok
+test_level_ten_to_twenty_full_and_half_and_recovery (test_mana_growth_0816.GrowthNumbers.test_level_ten_to_twenty_full_and_half_and_recovery) ... ok
+test_next_recovery_upgrade_is_next_level_not_next_fifth (test_mana_growth_0816.GrowthNumbers.test_next_recovery_upgrade_is_next_level_not_next_fifth) ... ok
+test_ranger_every_level_one_to_ten (test_mana_growth_0816.GrowthNumbers.test_ranger_every_level_one_to_ten) ... ok
+test_recovery_every_level_one_to_ten (test_mana_growth_0816.GrowthNumbers.test_recovery_every_level_one_to_ten) ... ok
+test_spells_costs_and_circle_gates_are_unchanged (test_mana_growth_0816.GrowthNumbers.test_spells_costs_and_circle_gates_are_unchanged) ... ok
+test_all_classes_old_save_ratio_preserved_exactly_once (test_mana_growth_0816.LiveGrowth.test_all_classes_old_save_ratio_preserved_exactly_once) ... ok
+test_current_save_does_not_refill_partial_mana (test_mana_growth_0816.LiveGrowth.test_current_save_does_not_refill_partial_mana) ... ok
+test_db_roundtrip_saves_new_version_and_receipt_context (test_mana_growth_0816.LiveGrowth.test_db_roundtrip_saves_new_version_and_receipt_context) ... ok
+test_each_award_gets_a_separate_mana_line (test_mana_growth_0816.LiveGrowth.test_each_award_gets_a_separate_mana_line) ... ok
+test_in_combat_recovery_at_intermediate_levels_is_real (test_mana_growth_0816.LiveGrowth.test_in_combat_recovery_at_intermediate_levels_is_real) ... FAIL
+test_leveling_does_not_clear_paid_recovery_cooldown (test_mana_growth_0816.LiveGrowth.test_leveling_does_not_clear_paid_recovery_cooldown) ... ERROR
+test_migrating_does_not_create_retroactive_level_ups (test_mana_growth_0816.LiveGrowth.test_migrating_does_not_create_retroactive_level_ups) ... ok
+test_migration_keeps_cooldowns_choices_xp_hp_and_gear (test_mana_growth_0816.LiveGrowth.test_migration_keeps_cooldowns_choices_xp_hp_and_gear) ... ok
+test_multi_level_award_equals_individual_level_awards (test_mana_growth_0816.LiveGrowth.test_multi_level_award_equals_individual_level_awards) ... ok
+test_old_unclosed_receipts_keep_original_gains (test_mana_growth_0816.LiveGrowth.test_old_unclosed_receipts_keep_original_gains) ... ok
+test_private_snapshot_book_feats_and_cache_use_current_values (test_mana_growth_0816.LiveGrowth.test_private_snapshot_book_feats_and_cache_use_current_values) ... ok
+test_recovery_stays_capped_at_missing_mana (test_mana_growth_0816.LiveGrowth.test_recovery_stays_capped_at_missing_mana) ... FAIL
+test_version_one_migration_full_caster_and_ranger (test_mana_growth_0816.LiveGrowth.test_version_one_migration_full_caster_and_ranger) ... ok
+test_version_zero_migration_direct_to_new_pool (test_mana_growth_0816.LiveGrowth.test_version_zero_migration_direct_to_new_pool) ... ok
+test_every_index_script_and_stylesheet_is_served_by_production_routes (test_hotbar_ui13.BrowserAssets.test_every_index_script_and_stylesheet_is_served_by_production_routes) ... ok
+test_all_unlocks_remain_represented_through_level100 (test_hotbar_ui13.GroupedHotbar.test_all_unlocks_remain_represented_through_level100) ... ok
+test_archer_arrow_appears_inside_same_group_without_moving_other_keys (test_hotbar_ui13.GroupedHotbar.test_archer_arrow_appears_inside_same_group_without_moving_other_keys) ... ok
+test_invalid_bind_does_not_change_layout (test_hotbar_ui13.GroupedHotbar.test_invalid_bind_does_not_change_layout) ... ok
+test_level15_stars_six_variants_become_two_slots (test_hotbar_ui13.GroupedHotbar.test_level15_stars_six_variants_become_two_slots) ... ok
+test_non_druid_bars_are_unchanged (test_hotbar_ui13.GroupedHotbar.test_non_druid_bars_are_unchanged) ... ok
+test_only_explicit_point_spells_are_flagged (test_hotbar_ui13.GroupedHotbar.test_only_explicit_point_spells_are_flagged) ... ok
+test_shape_exhaustion_and_free_high_level_switch_have_explicit_costs (test_hotbar_ui13.GroupedHotbar.test_shape_exhaustion_and_free_high_level_switch_have_explicit_costs) ... ok
+test_whole_group_moves_with_any_member_and_is_saved_as_real_spells (test_hotbar_ui13.GroupedHotbar.test_whole_group_moves_with_any_member_and_is_saved_as_real_spells) ... ok
+test_arrow_does_not_consume_remaining_shape_uses (test_hotbar_ui13.StarActivation.test_arrow_does_not_consume_remaining_shape_uses) ... ok
+test_grouped_bind_keeps_legacy_spell_data (test_hotbar_ui13.StarActivation.test_grouped_bind_keeps_legacy_spell_data) ... ok
+test_same_constellation_never_spends_twice (test_hotbar_ui13.StarActivation.test_same_constellation_never_spends_twice) ... ok
+test_archer_has_action_instruction_and_distinct_icon (test_ui14_forms.OwnerForms.test_archer_has_action_instruction_and_distinct_icon) ... ok
+test_dismiss_during_bonus_cooldown_with_zero_uses (test_ui14_forms.OwnerForms.test_dismiss_during_bonus_cooldown_with_zero_uses) ... ok
+test_effect_survives_loss_of_visual_runtime_cache (test_ui14_forms.OwnerForms.test_effect_survives_loss_of_visual_runtime_cache) ... ok
+test_expiry_and_death_clear_authoritative_state (test_ui14_forms.OwnerForms.test_expiry_and_death_clear_authoritative_state) ... ok
+test_high_level_switch_updates_canonical_buff_and_status (test_ui14_forms.OwnerForms.test_high_level_switch_updates_canonical_buff_and_status) ... ok
+test_incapacitated_actor_cannot_dismiss_or_shoot (test_ui14_forms.OwnerForms.test_incapacitated_actor_cannot_dismiss_or_shoot) ... ok
+test_old_effect_without_form_can_read_runtime_or_spell_id (test_ui14_forms.OwnerForms.test_old_effect_without_form_can_read_runtime_or_spell_id) ... ok
+test_owner_field_sent_even_when_other_private_data_is_omitted (test_ui14_forms.OwnerForms.test_owner_field_sent_even_when_other_private_data_is_omitted) ... ok
+test_star_arrow_damages_target_at_zero_uses_and_zero_mana (test_ui14_forms.OwnerForms.test_star_arrow_damages_target_at_zero_uses_and_zero_mana) ... ok
+
+======================================================================
+ERROR: test_leveling_does_not_clear_paid_recovery_cooldown (test_mana_growth_0816.LiveGrowth.test_leveling_does_not_clear_paid_recovery_cooldown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/mnt/data/bractwo_ui16_baseline/Bractwo_0.8.18/tests/test_mana_growth_0816.py", line 185, in test_leveling_does_not_clear_paid_recovery_cooldown
+    until=p.spell_cooldowns['arcane_recovery']
+          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+KeyError: 'arcane_recovery'
+
+======================================================================
+FAIL: test_in_combat_recovery_at_intermediate_levels_is_real (test_mana_growth_0816.LiveGrowth.test_in_combat_recovery_at_intermediate_levels_is_real)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/mnt/data/bractwo_ui16_baseline/Bractwo_0.8.18/tests/test_mana_growth_0816.py", line 172, in test_in_combat_recovery_at_intermediate_levels_is_real
+    self.assertEqual(p.mana,amount)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+AssertionError: 0 != 22
+
+======================================================================
+FAIL: test_recovery_stays_capped_at_missing_mana (test_mana_growth_0816.LiveGrowth.test_recovery_stays_capped_at_missing_mana)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python3.13/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "/usr/lib/python3.13/asyncio/base_events.py", line 725, in run_until_complete
+    return future.result()
+           ~~~~~~~~~~~~~^^
+  File "/mnt/data/bractwo_ui16_baseline/Bractwo_0.8.18/tests/test_mana_growth_0816.py", line 179, in test_recovery_stays_capped_at_missing_mana
+    self.assertEqual(p.mana,84)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^
+AssertionError: 77 != 84
+
+----------------------------------------------------------------------
+Ran 184 tests in 15.810s
+
+FAILED (failures=2, errors=1)

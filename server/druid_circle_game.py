@@ -322,7 +322,7 @@ class DruidCircleGame:
             unjust = self.begin_pvp_hostility(p, target)
             self.resolve_player_hit(p, target, result, spec['name'], owner=p, unjust=unjust)
         else:
-            if hasattr(self, 'environment_damage_enemy'): result['damage'] = self.environment_damage_enemy(target, result['damage'], p, kind)
+            if hasattr(self, 'environment_damage_enemy'): result['damage'] = self.environment_damage_enemy(target, result['damage'], p, kind, critical=result.get('critical',False))
             else: target.hp = max(0, target.hp-result['damage'])
             self.remember_attacker(target, p)
             self.report_roll(p, target, result, spec['name'], p)

@@ -2,22 +2,30 @@
 import math
 from types import SimpleNamespace
 try:
-    from . import world_content as content, caster_rules as caster, druid_circles as circles
+    from . import world_content as content, caster_rules as caster, druid_circles as circles, magic_items
     from .living_world import segment_distance
     from .progression import same_floor
 except ImportError:
-    import world_content as content, caster_rules as caster, druid_circles as circles
+    import world_content as content, caster_rules as caster, druid_circles as circles, magic_items
     from living_world import segment_distance
     from progression import same_floor
 
 def conditions(actor):return getattr(actor,'buffs',getattr(actor,'conditions',{}))
-def active(actor,key,now=None):return conditions(actor).get(key,{}).get('until',0)>(getattr(actor,'current_wall_time',0) if now is None else now)
+def active(actor,key,now=None):
+    value=conditions(actor).get(key,{})
+    return value.get('until',0)>(getattr(actor,'current_wall_time',0) if now is None else now) and not magic_items.reduces_magic_condition(actor,key,value)
 def incapacitated(actor,now=None):return any(active(actor,k,now) for k in ('incapacitated','paralyzed','unconscious','stunned','sleep_pending'))
 def actions_blocked(actor,now=None):return incapacitated(actor,now) or active(actor,'stinking_poison',now)
 def immobile(actor,now=None):
     if any(active(actor,k,now) for k in ('paralyzed','unconscious','stunned','grappled')):return True
     return not active(actor,'freedom',now) and any(active(actor,k,now) for k in ('restrained','web_restrained','elemental_restrained'))
 def polymorph(actor):return conditions(actor).get('polymorph',{}) if active(actor,'polymorph') else {}
+def physical_form(actor):
+    transformed=polymorph(actor)
+    if transformed:return caster.FORMS.get(transformed.get('form',''),transformed)
+    if getattr(actor,'class_id',''):return caster.form_spec(actor)
+    spec=content.ENEMIES.get(getattr(actor,'kind',''),{})
+    return dict(spec,speed=spec.get('walking_speed_ft',30))
 def enemy_spec(actor):
     base=content.ENEMIES.get(getattr(actor,'kind',''),{})
     form=polymorph(actor)
@@ -36,6 +44,7 @@ def water_info(point):
     x,y=point.x,point.y
     water=content.WATER_MAP.blocked(x,y,0) or 1500<x<1680 and 0<y<2304 and not 1080<y<1230
     depth=30 if water else 0;width=180 if water else 0
+    if getattr(content.WATER_MAP,'is_ocean',lambda *_:False)(x,y):water=True;depth=80;width=1280
     for kind,segment in content.WATER_MAP.cells.get((math.floor(x/512),math.floor(y/512)),()):
         if kind=='water' and segment_distance(x,y,segment['a'],segment['b'])<segment['width']/2:
             depth=max(depth,segment.get('depth_ft',30));width=max(width,segment['width'])
@@ -49,23 +58,25 @@ def configure_world():
         pool=segment([5880,8050],[5880,8250],400,'deep_river_pool');pool['depth_ft']=40
         content.WATERWAYS.append(pool);content.WATER_MAP=WaterMap(content.WATERWAYS,content.BRIDGES)
 
-def flying(actor):return bool(circles.flight_speed(actor) or caster.form_spec(actor).get('fly',0)) and not immobile(actor)
-def swimming(actor):return bool(circles.can_swim(actor) or caster.form_spec(actor).get('swim',0) or active(actor,'freedom'))
+def flying(actor):return bool(circles.flight_speed(actor) or physical_form(actor).get('fly',0)) and not immobile(actor)
+def swimming(actor):return bool(circles.can_swim(actor) or physical_form(actor).get('swim',0) or active(actor,'freedom') or magic_items.effect(actor,'swim'))
 def effective_water_info(actor):
     resolver=getattr(actor,'_environment_water_resolver',None)
     return resolver(actor) if callable(resolver) else water_info(actor)
 
 def movement_speed(actor,speed,surface=1):
     if immobile(actor):return 0
-    flight=circles.flight_speed(actor) or caster.form_spec(actor).get('fly',0)
+    form=physical_form(actor)
+    flight=circles.flight_speed(actor) or form.get('fly',0)
     if flight:
-        if flight!='walking':speed=speed*float(flight)/max(1,caster.form_spec(actor).get('speed',30))
+        if flight!='walking':speed=speed*float(flight)/max(1,form.get('speed',30))
         surface=1
     elif effective_water_info(actor)['water']:
-        form=caster.form_spec(actor)
         swim=float(form.get('swim',0))/max(1,float(form.get('speed',30)))
+        swim=max(swim,float(magic_items.effect(actor,'swim'))/30)
         surface=max(swim,1 if circles.can_swim(actor) or active(actor,'freedom') else 0) or .5
-    if active(actor,'difficult_terrain') and not flight and not active(actor,'freedom'):surface*=.5
+    elif magic_items.effect(actor,'free_action'):surface=max(surface,1)
+    if active(actor,'difficult_terrain') and not flight and not active(actor,'freedom') and not magic_items.effect(actor,'free_action'):surface*=.5
     wind=conditions(actor).get('headwind',{})
     if active(actor,'headwind'):
         wx,wy=wind.get('direction',(0,0))
@@ -201,6 +212,7 @@ class EnvironmentGame:
             import combat_rules as rules
         if not result.get('critical') and math.hypot(source.x-target.x,source.y-target.y)<=32 and any(active(target,k,self.now()) for k in ('paralyzed','unconscious')):
             result.update(rules.roll_damage(self.combat_rng,dice,True),critical=True)
+        magic_items.prevent_critical(target,result)
     def environment_attack_riders(self,source,target,result,melee=False):
         if not result.get('hit'):return
         try:
@@ -212,7 +224,7 @@ class EnvironmentGame:
             result.setdefault('damage_components',[dict(type=result.get('damage_type','bludgeoning'),damage=result['damage'])]).append(dict(type='radiant',damage=extra['damage']))
             result['damage']+=extra['damage'];result['damage_dice']+=' + 2k6 promienistych'
 
-    def environment_damage_enemy(self,target,amount,source=None,damage_type='bludgeoning',components=None):
+    def environment_damage_enemy(self,target,amount,source=None,damage_type='bludgeoning',components=None,critical=False):
         spec=enemy_spec(target)
         def resisted(value,kind):
             if kind in spec.get('immunities',()):return 0
@@ -253,6 +265,8 @@ class EnvironmentGame:
         except ImportError:
             import combat_rules as rules
         now=self.now();dis=active(actor,'poisoned',now) or active(actor,'stinking_poison',now)
+        if skill=='stealth' and hasattr(actor,'class_id') and not getattr(actor,'form',''):
+            dis=dis or rules.equipped_item(actor,'armor').get('stealth_disadvantage',False)
         adv=active(actor,'foresight',now)
         bonus=rules.ability_modifier(actor,ability) if hasattr(actor,'class_id') else enemy_spec(actor).get('saves',{}).get(ability,0)
         if skill in getattr(actor,'skill_proficiencies',()):bonus+=rules.proficiency(actor)

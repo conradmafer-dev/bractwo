@@ -1,0 +1,526 @@
+TAP version 13
+# Subtest: late-granted cantrips and circle-I spells stay in the first matching section
+ok 1 - late-granted cantrips and circle-I spells stay in the first matching section
+  ---
+  duration_ms: 3.116207
+  type: 'test'
+  ...
+# Subtest: class features are in one final section, never between spell circles
+ok 2 - class features are in one final section, never between spell circles
+  ---
+  duration_ms: 0.338056
+  type: 'test'
+  ...
+# Subtest: upcasting cannot move a base circle-I spell to circle-II or create a new group
+ok 3 - upcasting cannot move a base circle-I spell to circle-II or create a new group
+  ---
+  duration_ms: 0.171442
+  type: 'test'
+  ...
+# Subtest: the catalogue is the authority for section rank even with a profile override
+ok 4 - the catalogue is the authority for section rank even with a profile override
+  ---
+  duration_ms: 0.121739
+  type: 'test'
+  ...
+# Subtest: spells are alphabetic inside each circle using Polish collation
+ok 5 - spells are alphabetic inside each circle using Polish collation
+  ---
+  duration_ms: 0.418014
+  type: 'test'
+  ...
+# Subtest: class plus subclass access creates only one row, not two copies
+ok 6 - class plus subclass access creates only one row, not two copies
+  ---
+  duration_ms: 0.692006
+  type: 'test'
+  ...
+# Subtest: visibility and locked-state rules are preserved, and unrelated classes stay hidden
+ok 7 - visibility and locked-state rules are preserved, and unrelated classes stay hidden
+  ---
+  duration_ms: 1.263466
+  type: 'test'
+  ...
+# Subtest: empty or incomplete state does not create empty sections or fail
+ok 8 - empty or incomplete state does not create empty sections or fail
+  ---
+  duration_ms: 0.132445
+  type: 'test'
+  ...
+# Subtest: building sections never mutates the catalogue, profiles or saved hotbar
+ok 9 - building sections never mutates the catalogue, profiles or saved hotbar
+  ---
+  duration_ms: 0.474477
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//1
+ok 10 - production catalogue: druid/base//1
+  ---
+  duration_ms: 1.137571
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//10
+ok 11 - production catalogue: druid/base//10
+  ---
+  duration_ms: 0.588505
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//18
+ok 12 - production catalogue: druid/base//18
+  ---
+  duration_ms: 0.243818
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//20
+ok 13 - production catalogue: druid/base//20
+  ---
+  duration_ms: 0.302975
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//45
+ok 14 - production catalogue: druid/base//45
+  ---
+  duration_ms: 0.613101
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//80
+ok 15 - production catalogue: druid/base//80
+  ---
+  duration_ms: 0.332659
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//100
+ok 16 - production catalogue: druid/base//100
+  ---
+  duration_ms: 0.299049
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//1
+ok 17 - production catalogue: druid/stars//1
+  ---
+  duration_ms: 1.760452
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//10
+ok 18 - production catalogue: druid/stars//10
+  ---
+  duration_ms: 0.309104
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//18
+ok 19 - production catalogue: druid/stars//18
+  ---
+  duration_ms: 0.534735
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//20
+ok 20 - production catalogue: druid/stars//20
+  ---
+  duration_ms: 0.273863
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//45
+ok 21 - production catalogue: druid/stars//45
+  ---
+  duration_ms: 0.282935
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//80
+ok 22 - production catalogue: druid/stars//80
+  ---
+  duration_ms: 0.255956
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//100
+ok 23 - production catalogue: druid/stars//100
+  ---
+  duration_ms: 0.199393
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//1
+ok 24 - production catalogue: druid/moon//1
+  ---
+  duration_ms: 0.369863
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//10
+ok 25 - production catalogue: druid/moon//10
+  ---
+  duration_ms: 0.310326
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//18
+ok 26 - production catalogue: druid/moon//18
+  ---
+  duration_ms: 0.197671
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//20
+ok 27 - production catalogue: druid/moon//20
+  ---
+  duration_ms: 0.41528
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//45
+ok 28 - production catalogue: druid/moon//45
+  ---
+  duration_ms: 0.240924
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//80
+ok 29 - production catalogue: druid/moon//80
+  ---
+  duration_ms: 0.34739
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//100
+ok 30 - production catalogue: druid/moon//100
+  ---
+  duration_ms: 0.255826
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//1
+ok 31 - production catalogue: druid/sea//1
+  ---
+  duration_ms: 0.193334
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//10
+ok 32 - production catalogue: druid/sea//10
+  ---
+  duration_ms: 0.345698
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//18
+ok 33 - production catalogue: druid/sea//18
+  ---
+  duration_ms: 0.475809
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//20
+ok 34 - production catalogue: druid/sea//20
+  ---
+  duration_ms: 1.931257
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//45
+ok 35 - production catalogue: druid/sea//45
+  ---
+  duration_ms: 0.614192
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//80
+ok 36 - production catalogue: druid/sea//80
+  ---
+  duration_ms: 0.543228
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//100
+ok 37 - production catalogue: druid/sea//100
+  ---
+  duration_ms: 0.514516
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/1
+ok 38 - production catalogue: druid/land/arid/1
+  ---
+  duration_ms: 0.418996
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/10
+ok 39 - production catalogue: druid/land/arid/10
+  ---
+  duration_ms: 0.451414
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/18
+ok 40 - production catalogue: druid/land/arid/18
+  ---
+  duration_ms: 0.425766
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/20
+ok 41 - production catalogue: druid/land/arid/20
+  ---
+  duration_ms: 0.504171
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/45
+ok 42 - production catalogue: druid/land/arid/45
+  ---
+  duration_ms: 0.468638
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/80
+ok 43 - production catalogue: druid/land/arid/80
+  ---
+  duration_ms: 0.536358
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/100
+ok 44 - production catalogue: druid/land/arid/100
+  ---
+  duration_ms: 0.493445
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/1
+ok 45 - production catalogue: druid/land/polar/1
+  ---
+  duration_ms: 0.467877
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/10
+ok 46 - production catalogue: druid/land/polar/10
+  ---
+  duration_ms: 0.448439
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/18
+ok 47 - production catalogue: druid/land/polar/18
+  ---
+  duration_ms: 0.518221
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/20
+ok 48 - production catalogue: druid/land/polar/20
+  ---
+  duration_ms: 0.270377
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/45
+ok 49 - production catalogue: druid/land/polar/45
+  ---
+  duration_ms: 0.232181
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/80
+ok 50 - production catalogue: druid/land/polar/80
+  ---
+  duration_ms: 1.167084
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/100
+ok 51 - production catalogue: druid/land/polar/100
+  ---
+  duration_ms: 0.241945
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/1
+ok 52 - production catalogue: druid/land/temperate/1
+  ---
+  duration_ms: 0.330505
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/10
+ok 53 - production catalogue: druid/land/temperate/10
+  ---
+  duration_ms: 0.247233
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/18
+ok 54 - production catalogue: druid/land/temperate/18
+  ---
+  duration_ms: 0.239612
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/20
+ok 55 - production catalogue: druid/land/temperate/20
+  ---
+  duration_ms: 0.194115
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/45
+ok 56 - production catalogue: druid/land/temperate/45
+  ---
+  duration_ms: 0.203429
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/80
+ok 57 - production catalogue: druid/land/temperate/80
+  ---
+  duration_ms: 0.504411
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/100
+ok 58 - production catalogue: druid/land/temperate/100
+  ---
+  duration_ms: 0.448479
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/1
+ok 59 - production catalogue: druid/land/tropical/1
+  ---
+  duration_ms: 0.356023
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/10
+ok 60 - production catalogue: druid/land/tropical/10
+  ---
+  duration_ms: 0.406598
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/18
+ok 61 - production catalogue: druid/land/tropical/18
+  ---
+  duration_ms: 0.412586
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/20
+ok 62 - production catalogue: druid/land/tropical/20
+  ---
+  duration_ms: 0.464121
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/45
+ok 63 - production catalogue: druid/land/tropical/45
+  ---
+  duration_ms: 0.503389
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/80
+ok 64 - production catalogue: druid/land/tropical/80
+  ---
+  duration_ms: 0.460246
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/100
+ok 65 - production catalogue: druid/land/tropical/100
+  ---
+  duration_ms: 0.427588
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//1
+ok 66 - production catalogue: mage/base//1
+  ---
+  duration_ms: 0.461448
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//10
+ok 67 - production catalogue: mage/base//10
+  ---
+  duration_ms: 0.283266
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//18
+ok 68 - production catalogue: mage/base//18
+  ---
+  duration_ms: 0.363264
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//20
+ok 69 - production catalogue: mage/base//20
+  ---
+  duration_ms: 0.283096
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//45
+ok 70 - production catalogue: mage/base//45
+  ---
+  duration_ms: 0.268184
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//80
+ok 71 - production catalogue: mage/base//80
+  ---
+  duration_ms: 0.404174
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//100
+ok 72 - production catalogue: mage/base//100
+  ---
+  duration_ms: 0.281854
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//1
+ok 73 - production catalogue: ranger/base//1
+  ---
+  duration_ms: 0.224239
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//10
+ok 74 - production catalogue: ranger/base//10
+  ---
+  duration_ms: 0.187165
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//18
+ok 75 - production catalogue: ranger/base//18
+  ---
+  duration_ms: 0.206754
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//20
+ok 76 - production catalogue: ranger/base//20
+  ---
+  duration_ms: 0.185412
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//45
+ok 77 - production catalogue: ranger/base//45
+  ---
+  duration_ms: 0.172132
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//80
+ok 78 - production catalogue: ranger/base//80
+  ---
+  duration_ms: 0.178081
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//100
+ok 79 - production catalogue: ranger/base//100
+  ---
+  duration_ms: 0.179174
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//1
+ok 80 - production catalogue: knight/base//1
+  ---
+  duration_ms: 0.206413
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//10
+ok 81 - production catalogue: knight/base//10
+  ---
+  duration_ms: 0.162389
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//18
+ok 82 - production catalogue: knight/base//18
+  ---
+  duration_ms: 0.14306
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//20
+ok 83 - production catalogue: knight/base//20
+  ---
+  duration_ms: 0.141238
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//45
+ok 84 - production catalogue: knight/base//45
+  ---
+  duration_ms: 0.131503
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//80
+ok 85 - production catalogue: knight/base//80
+  ---
+  duration_ms: 0.167206
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//100
+ok 86 - production catalogue: knight/base//100
+  ---
+  duration_ms: 0.176259
+  type: 'test'
+  ...
+1..86
+# tests 86
+# suites 0
+# pass 86
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4797.630208

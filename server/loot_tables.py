@@ -52,7 +52,9 @@ def configure(items, enemies, tier_levels):
 def ordinary(vocation, tier, rng):
     armor = ['cloth', 'leather', 'scale'][tier-1] if tier <= 3 else f'armor_{tier}'
     ring = ('copper_ring' if tier == 1 else 'hunter_ring') if tier <= 3 else f'ring_{tier}'
-    return rng.choice([f'{vocation}_weapon_{tier}', armor, ring])
+    # Legacy rings now have real magic properties; they are an uncommon find,
+    # not one third of every ordinary equipment roll or repeatable cache.
+    return ring if rng.random() < .025 else rng.choice([f'{vocation}_weapon_{tier}', armor])
 
 
 def unique(vocation, family, rng):

@@ -33,3 +33,12 @@
 
 /* A concentration replacement is a choice, not a second concurrent buff. */
 .spell-concentration-warning{color:#f4c789!important;font-weight:600}
+
+
+.hotbar-spell-detail{position:fixed;z-index:55;padding:10px 12px;border-radius:10px;border:1px solid #9bb37a;background:linear-gradient(180deg,#17372dee,#0d211df8);box-shadow:0 18px 40px #0008;color:#e8f0d9;pointer-events:none}
+.hotbar-spell-detail strong{display:block;font-size:15px;margin-bottom:4px;color:#f4e4b3}
+.hotbar-spell-detail .muted{font:11px/1.4 system-ui,sans-serif;color:#b7c7b1;margin-bottom:6px}
+.hotbar-spell-detail-summary,.hotbar-spell-detail-description{margin:0;font:12px/1.45 system-ui,sans-serif}
+.hotbar-spell-detail-summary:empty{display:none}
+.hotbar-spell-detail-description{margin-top:6px;color:#dbe7d4}
+@media (max-width:700px){.hotbar-spell-detail{max-width:calc(100vw - 20px)}.hotbar-spell-detail strong{font-size:14px}.hotbar-spell-detail-summary,.hotbar-spell-detail-description{font-size:11px}}

@@ -258,7 +258,7 @@ class DNDGame(RangerMagic):
         return environment_rules.conditions(target)
 
     def target_condition(self, target, key):
-        return self.target_conditions(target).get(key, {}).get('until', 0) > self.now()
+        return environment_rules.active(target,key,self.now())
 
     def target_save_bonus(self, target, ability):
         return rules.save_bonus(target, ability) if self.is_player_target(target) else environment_rules.enemy_spec(target).get('saves',{}).get(ability,0)
@@ -350,7 +350,7 @@ class DNDGame(RangerMagic):
         if roll+bonus<dc:self.break_concentration(p)
 
     def shield_reaction(self,p,result):
-        if result['hit'] and not result['critical'] and p.shield_armed and dnd.spell_allowed(p,'shield') and p.mana>=dnd.SPELLS['shield']['mana'] and p.reaction_ready<=self.now() and not p.form and not rules.gear.armor_penalty(p) and not rules.active_buff(p,'no_reactions'):
+        if result['hit'] and not result['critical'] and result.get('roll')!=20 and p.shield_armed and dnd.spell_allowed(p,'shield') and p.mana>=dnd.SPELLS['shield']['mana'] and p.reaction_ready<=self.now() and not p.form and not rules.gear.armor_penalty(p) and not rules.active_buff(p,'no_reactions'):
             if result['total']<p.armor_class+5:
                 self.spend_mana(p,dnd.SPELLS['shield']['mana']);p.buffs['shield']={'until':self.now()+3,'spell_id':'shield'};p.reaction_ready=self.now()+3
                 result.update(hit=False,damage=0,shielded=True,defense=p.armor_class)
@@ -368,6 +368,7 @@ class DNDGame(RangerMagic):
         return False
 
     def apply_status(self, p, target, key, duration, spec, hostile=True):
+        if rules.magic_items.reduces_magic_condition(target,key,{'spell_id':spec.get('id',''),'magical':spec.get('magical',False)}):return False
         if self.is_player_target(target):
             if hostile and self.pvp_error(p, target):return False
             if key in ('restrained', 'slow', 'growth') and self.target_condition(target, 'freedom'):return False
@@ -457,7 +458,7 @@ class DNDGame(RangerMagic):
                 result['damage_components'] = components
                 self.resolve_player_hit(p,target,result,s['name'],owner=p,unjust=unjust)
             else:
-                result['damage']=self.environment_damage_enemy(target,result['damage'],p,result['damage_type'],components);self.remember_attacker(target,p)
+                result['damage']=self.environment_damage_enemy(target,result['damage'],p,result['damage_type'],components,critical=result.get('critical',False));self.remember_attacker(target,p)
                 self.report_roll(p,target,result,s['name'],p)
         if result and target.alive and result.get('hit') and (result.get('damage',0)>0 or not result.get('saved')):
             applied = False
@@ -690,9 +691,11 @@ class DNDGame(RangerMagic):
                     applied=self.apply_status(p,target,'growth',.15,s)
                     if player_target and applied:self.record_pvp_effect(p,target,unjust)
                 elif s.get('movement_damage'):
-                    prev=f['positions'].get(ref,(target.x,target.y,0))
-                    moved=prev[2]+math.hypot(target.x-prev[0],target.y-prev[1]);ticks=min(8,int(moved//32))
-                    f['positions'][ref]=(target.x,target.y,moved%32)
+                    step=max(1,float(s.get('movement_step',32)))
+                    cap=max(1,int(s.get('movement_tick_cap',8)))
+                    prev=f['positions'].get(ref,(target.x,target.y,0.0))
+                    moved=prev[2]+math.hypot(target.x-prev[0],target.y-prev[1]);ticks=min(cap,int(moved//step))
+                    f['positions'][ref]=(target.x,target.y,moved%step)
                     for _ in range(ticks):
                         if not target.alive or target.hp<=0:break
                         self.spell_damage(p,target,s)
@@ -737,7 +740,7 @@ class DNDGame(RangerMagic):
                     self.resolve_player_hit(pet,target,result,'Ugryzienie towarzysza',owner=p,unjust=unjust)
                 else:
                     if result['hit']:
-                        result['damage']=self.environment_damage_enemy(target,result['damage'],pet,'piercing');self.remember_attacker(target,p);target.attacker_id=pet.id
+                        result['damage']=self.environment_damage_enemy(target,result['damage'],pet,'piercing',critical=result.get('critical',False));self.remember_attacker(target,p);target.attacker_id=pet.id
                     self.report_roll(pet,target,result,'Ugryzienie towarzysza',p)
                 self.tag(p,player_target);self.tag(pet,player_target);self.combat_effect(pet,'sword',target)
             elif not target and pet.combat_until<=now:pet.hp=min(pet.max_hp,pet.hp+dt)

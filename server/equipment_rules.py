@@ -289,6 +289,11 @@ def preview(p,item):
     # Runtime item templates are canonical; catalog callers always provide key.
     if candidate['template'] not in _content().ITEMS:return result
     q.inventory.append(candidate);q.equipment[slot]=uid
+    if canonical.get('requires_attunement'):
+        # Explicitly show the potential after a completed attunement, never grant it.
+        q.magic_attunements=[dict(uid=uid,template=candidate['template'])]
+        result['requires_attunement']=True
+        result['attuned']=any(v.get('uid')==item.get('uid') for v in getattr(p,'magic_attunements',[]) if isinstance(v,dict))
     q.form=''  # clearly a gear preview, never the beast's attack
     if slot=='weapon':
         if canonical.get('two_handed'):q.equipment['shield']=''
@@ -318,7 +323,7 @@ def public_item(p,item):
 def _preview_signature(p):
     return (p.class_id,p.level,getattr(p,'primal_order',''),tuple(sorted(getattr(p,'training_feats',{}).items())),
         getattr(p,'weapon_grip','one'),getattr(p,'fighting_style',''),p.form,
-        tuple(sorted(p.mastery.items())),tuple(sorted(p.equipment.items())),
+        tuple(sorted(p.mastery.items())),tuple(sorted(p.equipment.items())),tuple(v.get('uid','') for v in getattr(p,'magic_attunements',[]) if isinstance(v,dict)),
         tuple((i.get('uid'),i.get('template')) for i in p.inventory if i.get('uid') in p.equipment.values()),
         tuple(sorted(k for k,v in p.buffs.items() if v.get('until',0)>p.current_wall_time)),
         bool(getattr(p,'legacy_medium_grace',False)))

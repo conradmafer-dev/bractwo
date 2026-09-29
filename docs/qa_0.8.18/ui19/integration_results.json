@@ -1,0 +1,32 @@
+{
+  "suite": "tests/test_ui19_core_integration.py",
+  "status": "passed",
+  "tests_run": 5,
+  "failures": 0,
+  "errors": 0,
+  "duration_seconds": 4.305,
+  "game": "real UI19 Game with in-memory SQLite",
+  "cases": [
+    {
+      "test": "__main__.GameIntegration.test_01_local_boat_payment_destination_home_and_remote_rejection",
+      "status": "passed"
+    },
+    {
+      "test": "__main__.GameIntegration.test_02_nearest_merchant_stock_is_authoritative",
+      "status": "passed"
+    },
+    {
+      "test": "__main__.GameIntegration.test_03_potion_and_spell_share_bonus_action_across_save_load",
+      "status": "passed"
+    },
+    {
+      "test": "__main__.GameIntegration.test_04_attunement_full_rest_interrupt_and_persistence",
+      "status": "passed"
+    },
+    {
+      "test": "__main__.GameIntegration.test_05_ocean_migration_only_moves_legacy_revision",
+      "status": "passed"
+    }
+  ],
+  "scope": "Only five requested core integration scenarios; no legacy suite discovery."
+}

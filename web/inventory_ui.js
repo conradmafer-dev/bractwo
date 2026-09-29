@@ -7,6 +7,7 @@
   const lines=[],p=item.preview||{},dtype=damageNames[p.damage_type||item.damage_type]||item.damage_type||'';
   if(item.slot==='potion'){
    lines.push('Odnawia '+(item.effect_summary||item.restore+' punktów'));
+    lines.push('Użycie: akcja dodatkowa');
    lines.push('Liczba: '+(item.quantity||1));
   }else if(item.slot==='weapon'){
    lines.push(item.weapon_name?(item.weapon_name+(item.weapon_category?' · '+(item.weapon_category==='simple'?'Prosta':'Żołnierska'):'')):'Broń');
@@ -35,7 +36,8 @@
    if(item.attack_bonus)lines.push('Atak bronią +'+item.attack_bonus);
    if(item.attack)lines.push('Obrażenia +'+item.attack);
   }else if(item.description)lines.push(item.description);
-  if(item.resistances?.length)lines.push('Odporność: '+item.resistances.map(x=>damageNames[x]||x).join(', '));
+   if(item.magic_id&&item.description)lines.push(item.description);
+   if(item.resistances?.length)lines.push('Odporność: '+item.resistances.map(x=>damageNames[x]||x).join(', '));
   if(item.min_level>1)lines.push('Poziom '+item.min_level);
   if(p.equip_error&&!p.equip_error.startsWith('Wymagany poziom'))lines.push(p.equip_error);
   if(item.sources?.length)lines.push('Zdobyto: '+[...new Set(item.sources.map(x=>x.name))].join(', '));
@@ -70,10 +72,20 @@
   const actions=node('footer',undefined,'item-actions');
   const worn=Object.entries(p.equipment||{}).find(([,uid])=>String(uid)===String(item.uid));
   if(item.slot==='potion'&&item.potion_kind==='health'){
-   actions.append(button('Użyj',()=>h.send({type:'potion',item:item.template}),!p.alive||p.level<(item.min_level||1)));
+    actions.append(button('Wypij · akcja dodatkowa',()=>h.send({type:'potion',item:item.template}),!p.alive||p.level<(item.min_level||1)||p.bonus_remaining>0||!!p.character_sheet?.caster?.channel?.key));
    actions.append(button(p.potion_slots?.q===item.template?'✓ Q':'Przypisz Q',()=>h.send({type:'potion_bind',slot:'q',item:item.template}),!p.alive||p.level<(item.min_level||1)));
   }else if(worn)actions.append(button('Zdejmij',()=>h.send({type:'unequip',slot:worn[0]}),!p.alive||!!p.form));
   else if(['weapon','armor','ring','shield'].includes(item.slot))actions.append(button('Załóż',()=>h.send({type:'equip',uid:item.uid}),!p.alive||!!p.form||!!item.preview?.equip_error||p.level<(item.min_level||1)));
+   const magic=p.character_sheet?.magic_items,magicState=magic?.items?.find(i=>i.uid===item.uid);
+   if(magicState){
+    stats.prepend(node('div',magicState.active?'✓ Magiczna właściwość działa':magicState.requires_attunement&&!magicState.attuned?'Zestrój się z przedmiotem, aby używać jego magii.':'Załóż przedmiot, aby działał.'));
+    if(magicState.requires_attunement){
+      const pending=magicState.pending;
+      actions.append(button(pending?'Trwa skupienie…':`${magicState.attuned?'Zakończ zestrojenie':'Zestrój'} · ${w.rest_rules?.short_seconds||10} s`,()=>h.send({type:'magic_item',action:magicState.action,uid:item.uid}),!p.alive||!!p.form||!!magicState.attunement_error||pending||!!p.rest?.kind));
+      stats.append(node('div',`Zestrojenia: ${magic.used}/${magic.limit}`));
+      if(magicState.attunement_error)stats.append(node('div',magicState.attunement_error));
+    }
+   }
   if(worn?.[0]==='weapon'&&item.versatile_dice){
    for(const [grip,label] of [['one','Jednorącz'],['two','Oburącz']])actions.append(button((p.character_sheet?.training?.grip===grip?'✓ ':'')+label,()=>h.send({type:'weapon_grip',grip}),!p.alive||!!p.form||p.combat_remaining>0));
   }
@@ -94,11 +106,12 @@
   function close(){panel.hidden=true;hide();if(focus?.isConnected&&focus.getClientRects().length)focus.focus({preventScroll:true});}
   function open(){focus=document.activeElement;h.prepare?.();panel.hidden=false;signature='';render();tabs.firstChild.focus({preventScroll:true});}
   function render(){if(panel.hidden)return;const {player:p,world:w}=h.state();if(!p)return;const trade=h.canTrade();
-   const key=JSON.stringify([tab,p.inventory,p.equipment,p.gold,p.level,p.alive,trade,p.item_previews]);if(key===signature)return;signature=key;
+    const key=JSON.stringify([tab,p.inventory,p.equipment,p.gold,p.level,p.alive,trade,p.item_previews,p.merchant]);if(key===signature)return;signature=key;
+    header.firstChild.textContent=p.merchant?.name||'Kupiec';
    summary.textContent=`Złoto: ${p.gold} · `+(trade?'Wybierz przedmiot.':'Handel tylko przy kupcu, poza walką.');foot.firstChild.disabled=!p.alive;
    for(const b of tabs.children){b.classList.toggle('active',b.dataset.tradeTab===tab);b.setAttribute('aria-selected',String(b.dataset.tradeTab===tab));}
    const scroll=body.scrollTop;body.replaceChildren();
-   let items=tab==='buy'?Object.entries(w.items||{}).filter(([,spec])=>Number.isFinite(spec.price)).map(([key,spec])=>({...spec,template:key,preview:p.item_previews?.[key]})):p.inventory.filter(i=>!Object.values(p.equipment||{}).includes(i.uid));
+    let items=tab==='buy'?Object.entries(w.items||{}).filter(([key,spec])=>Number.isFinite(spec.price)&&p.merchant?.stock?.includes(key)).map(([key,spec])=>({...spec,template:key,preview:p.item_previews?.[key]})):p.inventory.filter(i=>!Object.values(p.equipment||{}).includes(i.uid));
    items=items.filter(item=>item.slot!=='potion'||item.potion_kind==='health');
    for(const item of items){const row=node('article',undefined,'merchant-item');row.dataset.template=item.template;
     const img=node('img');img.src=item.icon||'assets/equipment/empty.svg';img.alt='';row.append(img);
@@ -108,7 +121,7 @@
     else{actions.append(button('Sprzedaj'+(item.quantity>1?' 1':''),()=>h.send({type:'sell',uid:item.uid}),!trade));if(item.quantity>1)actions.append(button('Cały stos',()=>h.send({type:'sell',uid:item.uid,quantity:item.quantity}),!trade));}
     row.append(actions);bind(row,item,w);body.append(row);
    }
-   if(!items.length)body.append(node('p','Nie masz przedmiotów do sprzedaży. Założone wyposażenie pozostaje chronione.','sheet-hint'));
+    if(!items.length)body.append(node('p',tab==='buy'?'Podejdź do miejscowego kupca, aby zobaczyć jego towary.':'Nie masz przedmiotów do sprzedaży. Założone wyposażenie pozostaje chronione.','sheet-hint'));
    body.scrollTop=scroll;
   }
   return {open,close,render,get visible(){return !panel.hidden;}};

@@ -1,0 +1,19 @@
+2026-09-28: final 4 focused discovery checks passed in 31.035 seconds.
+Python stdlib only; no game server, browser, live player database or broad regression.
+
+Passed: configure idempotency, unique IDs, historical ID/gold preservation, objective coordinates.
+Passed: increasing XP for city distance, biome level, enemy level and boss status;
+        STARTER_SPAWNS legacy HP fallback uses ceiling(hp/10), affecting only the surface floor.
+Passed: actual Game.discover_landmarks, Game.save_player, Player.save_data and Game.load_player methods
+        exercised using sqlite :memory: with inert unrelated migrations; correct floor and no duplicate reward before/after reload.
+Passed: production catalogue construction via AST, all points with positive XP, all named habitats,
+        stairs and cities reference an existing discovery within its radius and on the same floor.
+Passed within catalogue check: all 28 starter spawns equal the UI_07 archive AST list;
+        unchanged creation-loop body and target preserve their IDs, order and coordinates.
+
+Catalogue: 168 historical points; 266 final points; 12 named habitats; 106 stairs; 5 cities.
+XP range: 17-1351.
+Examples (XP/gold): old_mill 20/8; fortress 52/15; habitat_0 78/10; delve_19_-2 1351/135.
+
+All four checks rerun after the production fix for starter creatures missing from discovery difficulty.
+No production edits by this test task.

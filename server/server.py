@@ -23,36 +23,40 @@ from aiohttp import web, WSMsgType
 try:
     from . import world_content as content
     from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
+    from . import continent_world, adventure_content
+    from .adventure_combat import AdventureGame
     from .combat_rules import CombatRounds
     from .dnd_game import DNDGame
     from . import dnd_content
     from .monster_ai import MonsterAI
     from . import level_up, spell_scaling, inventory_rules, fighter_rules
     from .fighter_rules import FighterGame
-    from . import equipment_rules, caster_rules
+    from . import equipment_rules, caster_rules, magic_items
     from .caster_game import CasterGame
     from . import rest_rules, druid_circles, environment_rules
     from .environment_rules import EnvironmentGame
     from .druid_circle_game import DruidCircleGame
     from .druid_circle_spells import DruidCircleSpells, configure as configure_circle_spells
-    from .progression import ExpansionGame, same_floor, near, train, skill_level, private_state
+    from .progression import ExpansionGame, same_floor, near, train, skill_level, private_state, merchant_at
     from . import progression_guide
 except ImportError:
     import world_content as content
     import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
+    import continent_world, adventure_content
+    from adventure_combat import AdventureGame
     from combat_rules import CombatRounds
     from dnd_game import DNDGame
     import dnd_content
     from monster_ai import MonsterAI
     import level_up, spell_scaling, inventory_rules, fighter_rules
     from fighter_rules import FighterGame
-    import equipment_rules, caster_rules
+    import equipment_rules, caster_rules, magic_items
     from caster_game import CasterGame
     import rest_rules, druid_circles, environment_rules
     from environment_rules import EnvironmentGame
     from druid_circle_game import DruidCircleGame
     from druid_circle_spells import DruidCircleSpells, configure as configure_circle_spells
-    from progression import ExpansionGame, same_floor, near, train, skill_level, private_state
+    from progression import ExpansionGame, same_floor, near, train, skill_level, private_state, merchant_at
     import progression_guide
 
 WIDTH, HEIGHT, SPEED, RADIUS = content.WIDTH, content.HEIGHT, 100, 18
@@ -231,6 +235,11 @@ combat_rules.configure(ITEMS, ENEMY_TYPES)
 hunt_content.configure(ENEMY_TYPES)
 loot_content.configure(ITEMS, ENEMY_TYPES, content.TIER_LEVELS)
 hunt_content.place(content, OBSTACLES, LANDMARKS)
+continent_world.configure(content, OBSTACLES, LANDMARKS, ZONES, NPCS, QUESTS, ENEMY_TYPES)
+adventure_content.configure(content, OBSTACLES, LANDMARKS, ZONES, ENEMY_TYPES, NPCS, QUESTS)
+for monster_id, monster_spec in ENEMY_TYPES.items():
+    monster_spec['respawn'] = max(180 if monster_spec.get('boss') or monster_id=='boss' else 45,
+                                  round(monster_spec.get('respawn',35)*1.75))
 discovery_rules.configure(content, LANDMARKS, ZONES, ENEMY_TYPES)
 content.VERSION = "0.8.18"
 WIDTH, HEIGHT = content.WIDTH, content.HEIGHT
@@ -238,14 +247,28 @@ for tier, level, amount, cost in ((2, 20, 220, 45), (3, 50, 520, 95), (4, 80, 95
     POTIONS[f"health_potion_{tier}"] = {"name": f"Mikstura zdrowia {tier}", "price": cost, "restore": amount, "min_level": level}
 
 dnd_content.configure(content, CLASSES, POTIONS)
+for potion_spec in POTIONS.values():
+    potion_spec.update(min_level=1, action="bonus")
 inventory_rules.configure(ITEMS, POTIONS)
+for potion_id in POTIONS:
+    ITEMS[potion_id]["action"] = "bonus"
 fighter_rules.configure(ITEMS, dnd_content.SPELLS, CLASSES)
 equipment_rules.configure(ITEMS)
+magic_items.configure(ITEMS)
 caster_rules.configure(dnd_content.SPELLS, CLASSES, dnd_content.STATUS_SPECS)
 druid_circles.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 configure_circle_spells(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 rest_rules.configure(dnd_content.SPELLS)
 environment_rules.configure_world()
+continent_world.finalize(content, OBSTACLES)
+MERCHANT['stock'] = list(content.STARTER_MERCHANT_STOCK)
+content.STARTER_MERCHANT = MERCHANT
+# Powerful rings are deliberate rewards; repeatable monster drops remain rare.
+for monster_spec in ENEMY_TYPES.values():
+    for entry in monster_spec.get('loot',{}).get('entries',[]):
+        spec = ITEMS.get(entry.get('template'),{})
+        if spec.get('slot') == 'ring' and spec.get('magic_id'):
+            entry['chance'] = min(entry['chance'], .02 if monster_spec.get('boss') else .003)
 dnd_content.DEFAULT_HOTBARS["knight"] = ["second_wind", "action_surge"]
 dnd_content.STATUS_SPECS.update({
     "sap": dict(name="Osłabienie",icon="⚔",description="Następny rzut ataku z utrudnieniem. Efekt kończy się po tym ataku lub przed kolejną rundą wojownika.",harmful=True),
@@ -294,6 +317,9 @@ class Player:
     bank_gold: int = 0
     depot: list = field(default_factory=list)
     home_city: str = "przystan"
+    world_revision: int = 19
+    magic_items_version: int = 0
+    magic_attunements: list = field(default_factory=list)
     blessed: bool = False
     mastery: dict = field(default_factory=dict)
     primal_order: str = ""
@@ -536,7 +562,7 @@ class Player:
             result.update({"xp": self.xp, "xp_next": xp_next(self.level), "gold": self.gold,
                            "pvp_safety": self.pvp_safety, "unjust_kills": len([t for t in self.unjust_kills if t > now-86400]),
                            "inventory": [inventory_rules.public_item(self, i, ENEMY_TYPES) for i in self.inventory], "equipment": dict(self.equipment),
-                           "potions": dict(self.potions), "potion_slots": dict(self.potion_slots), "known_loot": inventory_rules.known_loot(self, ENEMY_TYPES), "potion_cooldown": max(0, self.potion_cooldown_until-now),
+                           "potions": dict(self.potions), "potion_slots": dict(self.potion_slots), "known_loot": inventory_rules.known_loot(self, ENEMY_TYPES), "potion_cooldown": max(0, self.bonus_cooldown_until-now),
                            "quests": self.quest_entries(), "discoveries": list(self.discoveries)})
             result["depot"] = [inventory_rules.public_item(self, i, ENEMY_TYPES) for i in self.depot]
         return result
@@ -565,6 +591,7 @@ class Player:
     def save_data(self):
         return {key: getattr(self, key) for key in (
             "primal_order", "training_feats", "caster_rules_version", "legacy_medium_grace",
+            "world_revision", "magic_items_version", "magic_attunements",
             "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "exhaustion",
             "fighting_style", "weapon_grip", "fighter_rules_version",
             "level_up_batches", "rules_version", "mana_rules_version", "hp_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
@@ -633,7 +660,7 @@ class Enemy:
                 "attack_until": self.attack_until, "facing": self.facing, "armor_class": spec["armor_class"], "attack_bonus": spec["attack_bonus"], "damage_dice": combat_rules.dice_text(spec["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
 
 
-class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
+class Game(AdventureGame,EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
     def __init__(self, db_path, clock=None):
         self.clock = clock or time.time
         self.rng = random.Random()
@@ -695,6 +722,9 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
 
     def metadata(self):
         return {"version": content.VERSION, "combat_rules": combat_rules.RULES, "regions": content.REGIONS, "cities": content.CITIES, "stairs": content.STAIRS,
+                "world_revision": 19, "landmasses": getattr(content,"LANDMASSES",[]),
+                "ports": getattr(content,"PORTS",[]), "sea_routes": getattr(content,"SEA_ROUTES",[]),
+                "magic_items": magic_items.metadata(),
                 "terrain": content.TERRAIN, "surfaces": content.SURFACES, "premium": content.PREMIUM,
                 "elevations": content.ELEVATIONS, "waterways": content.WATERWAYS, "bridges": content.BRIDGES,
                 "pois": content.POIS, "canyons": content.CANYONS, "rarities": loot_tables.RARITIES,
@@ -736,6 +766,8 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
             self.db.execute("INSERT OR REPLACE INTO shared VALUES(1,?)", (json.dumps(self.flags),))
 
     def save_player(self, p):
+        self.remember_city_visit(p)
+        magic_items.maintain(p, self.now())
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
         self.db.execute("UPDATE accounts SET data=? WHERE id=?", (json.dumps(p.save_data()), p.id))
         self.save_score(p)
@@ -768,6 +800,10 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         for bag in (p.inventory, p.depot):
             for item in bag:
                 item.update(ITEMS.get(item["template"], {}))
+        p.current_wall_time = self.now()
+        magic_items.migrate(p, ITEMS)
+        p.bonus_cooldown_until = max(p.bonus_cooldown_until, p.potion_cooldown_until)
+        p.potion_cooldown_until = 0
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
         self.migrate_fighter(p, make_item)
         self.migrate_caster(p)
@@ -782,10 +818,17 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         if p.hp <= 0 and not p.respawn_until:
             p.respawn_until = self.now() + 4
         # Old relic progression may have saved a character in an invalid tile.
-        if self.blocked(p.x, p.y, floor=p.floor) and p.combat_until <= self.now():
-            p.x, p.y, p.floor = SPAWN["x"], SPAWN["y"], 0
+        stranded = (saved.get("world_revision",18) < 19 and p.floor == 0
+                    and getattr(content.WATER_MAP,"is_ocean",lambda *_:False)(p.x,p.y))
+        if (stranded or self.blocked_for(p,p.x,p.y)) and p.combat_until <= self.now():
+            home = next((c for c in content.CITIES if c["id"] == p.home_city),content.CITIES[0])
+            p.x, p.y, p.floor = home["x"], home["y"], 0
+        # A combat lock may defer relocation; preserve the migration marker so
+        # the next login can still rescue an old position swallowed by the sea.
+        p.world_revision = saved.get("world_revision",18) if stranded and p.combat_until > self.now() else 19
         p.unjust_kills = [t for t in p.unjust_kills if t > self.now()-86400]
         p.aggressors = {k: t for k, t in p.aggressors.items() if t > self.now()}
+        self.remember_city_visit(p)
         return p
 
     async def send(self, ws, message):
@@ -889,6 +932,19 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
 
     def in_safe(self, p):
         return any(near(p, zone) for zone in content.CITIES)
+
+    def remember_city_visit(self, p, save=False):
+        """The last city actually entered by a living player is their respawn city."""
+        if not isinstance(p, Player) or not p.alive:
+            return False
+        city = next((city for city in content.CITIES if near(p, city)), None)
+        if city is None or p.home_city == city["id"]:
+            return False
+        p.home_city = city["id"]
+        if save:
+            with self.db:
+                self.save_player(p)
+        return True
 
     def blocked(self, x, y, radius=RADIUS, floor=0, ignore_water=False, ignore_low=False):
         if x < radius or y < radius or x > WIDTH-radius or y > HEIGHT-radius:
@@ -1086,6 +1142,7 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
             return
         p.rest_state = {}
         summary=rest_rules.finish(p,rest["kind"],self.combat_rng,rest.get("recover",True))
+        attunement_message = magic_items.finish_rest(p, rest)
         self.on_circle_rest(p,rest["kind"])
         p.rest_resources[rest["kind"]+"_ready"]=now+REST_RULES[rest["kind"]+"_cooldown_seconds"]
         p.rest_cooldown_until=0
@@ -1095,6 +1152,7 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         with self.db:
             self.save_player(p)
         self.combat_effect(p, "heal", radius=65, duration=.9)
+        if attunement_message:self.caster_message(p, attunement_message)
         self.caster_message(p, "Długi odpoczynek: pełne zdrowie, mana i użycia zdolności." if rest["kind"]=="long" else f'Krótki odpoczynek: +{summary["hp"]:g} HP ({summary["hit_dice"]} kości), +{summary["mana"]:g} many; odnowiono zdolności krótkiego odpoczynku.')
 
     def begin_action(self, p, bonus=False):
@@ -1311,6 +1369,9 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
                 return await self.notice(p, "Podejdź do kupca poza walką.")
             kind_id = data.get("item")
             spec = ITEMS.get(kind_id) if isinstance(kind_id, str) else None
+            seller = merchant_at(p)
+            if not seller or kind_id not in seller.get("stock", []):
+                return await self.notice(p, "Ten kupiec nie sprzedaje takiego towaru. Sprawdź jego miejscowy asortyment.")
             if spec is None or "price" not in spec or p.level < spec.get("min_level",1) or p.gold < spec["price"]:
                 return await self.notice(p,"Nieznany towar, za niski poziom lub za mało złota.")
             if spec.get("slot") == "potion":
@@ -1325,18 +1386,22 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
                 return
             kind_id = p.potion_slots.get("q", "") if "slot" in data else data.get("item")
             spec = POTIONS.get(kind_id) if isinstance(kind_id, str) else None
-            if spec is None or p.level < spec.get("min_level", 1) or not p.potions.get(kind_id) or self.now() < p.potion_cooldown_until:
+            if spec is None or p.level < spec.get("min_level", 1) or not p.potions.get(kind_id):
                 return
+            if environment_rules.actions_blocked(p,self.now()) or p.casting_channel:
+                return await self.notice(p, "Nie możesz teraz wypić mikstury.")
+            if self.now() < p.bonus_cooldown_until:
+                return await self.notice(p, "Mikstura wymaga wolnej akcji dodatkowej.")
             attr, maximum = "hp", p.max_hp
             if getattr(p, attr) >= maximum:
                 return
-            self.cancel_rest(p)
+            self.begin_action(p, bonus=True)
             inventory_rules.consume(p, kind_id)
             restored = combat_rules.roll_damage(self.combat_rng,spec["dice"]) if "dice" in spec else {"damage":spec["restore"],"damage_dice":str(spec["restore"]),"damage_rolls":[]}
             amount=min(maximum-getattr(p,attr),restored["damage"])
             setattr(p, attr, getattr(p, attr)+amount)
             self.report_roll(p,p,{**restored,"check":"healing","hit":True,"healing":amount,"damage":0},spec["name"],p)
-            p.potion_cooldown_until = self.now()+3
+            p.potion_cooldown_until = 0  # Legacy field; potions now share the bonus action.
         inventory_rules.sync(p, POTIONS)
         self.persist()
 
@@ -1400,6 +1465,10 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         p = next((p for p in self.players.values() if p.ws is ws), None)
         if p is None:
             return await self.error(ws, "Najpierw zaloguj postać.")
+        if kind == "boat":
+            return await self.boat_command(p, data)
+        if kind == "magic_item":
+            return await magic_items.command(self, p, data)
         if kind == "rest":
             return await self.start_rest(p, data.get("kind", "short"),data.get("recover",True) is not False)
         if kind == "rest_cancel":
@@ -1548,10 +1617,18 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         # Rolled combat uses KP for defense; do not subtract the old armor twice.
         def resist(amount, kind):
             amount=max(0,int(amount)-equipment_rules.heavy_armor_reduction(p,kind,is_attack=is_attack))
+            amount=magic_items.reduce_damage(p,amount,kind,self.combat_rng)
             amount=int(amount*combat_rules.resistance_multiplier(p,kind))
             return amount
         # Separate mixed damage (Ice Storm, Meteor Swarm, Hunter's Mark) before resistance.
-        actual=sum(resist(c['damage'],c['type']) for c in damage_components) if damage_components is not None else resist(damage,damage_type)
+        if damage_components is not None:
+            grouped = {}
+            for component in damage_components:
+                kind = component['type']
+                grouped[kind] = grouped.get(kind,0)+component['damage']
+            actual = sum(resist(amount,kind) for kind,amount in grouped.items())
+        else:
+            actual = resist(damage,damage_type)
         if actual<=0:return
         damage_received=actual
         self.cancel_channel(p)
@@ -1573,6 +1650,7 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         self.circle_spell_damage_received(p,damage_received,source or killer)
         if p.alive:
             return
+        magic_items.on_death(p)
         # A monster finishing a recently assaulted victim does not erase the crime.
         # Resolve offline attackers from their latest save if their avatar already died.
         offline_killer = False
@@ -1617,6 +1695,10 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
         self.tick += 1
         self.effects = [effect for effect in self.effects if self.time-effect["time"] <= max(1.5,effect.get("duration",0))]
         now = self.now()
+        # Capture direct teleports before ongoing effects can deal damage.
+        for p in tuple(self.players.values()):
+            magic_items.maintain(p, now)
+            self.remember_city_visit(p, save=True)
         self.tick_dnd(dt)
         for p in tuple(self.players.values()):
             p.current_wall_time = now
@@ -1637,6 +1719,7 @@ class Game(EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, Fighter
                 continue
             if not p.disconnected and self.time-p.input_time <= .35:
                 self.move(p, p.dx*p.speed*dt, p.dy*p.speed*dt)
+            self.remember_city_visit(p, save=True)
             # Health and spell resources recover through the explicit rest rules.
             if not p.disconnected:
                 self.discover_landmarks(p)
@@ -1788,7 +1871,7 @@ def create_app(db_path="world.sqlite3", clock=None):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css")]:
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

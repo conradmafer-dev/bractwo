@@ -1,0 +1,8 @@
+PASS desktop: positive next-upgrade hint at level 19
+PASS desktop: real award renders +1k6 and +20, icon loads
+PASS desktop: resource update neither rewrites receipt nor rearranges shortcuts
+PASS desktop: dismiss works, free basic bolt unchanged, ordered sections retained
+PASS touch-landscape: positive next-upgrade hint at level 19
+PASS touch-landscape: real award renders +1k6 and +20, icon loads
+PASS touch-landscape: resource update neither rewrites receipt nor rearranges shortcuts
+PASS touch-landscape: dismiss works, free basic bolt unchanged, ordered sections retained

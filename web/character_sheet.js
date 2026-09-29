@@ -17,6 +17,34 @@
     if(type==='shortbow'||type==='longbow'||item?.ranged)return 'assets/equipment/bow.svg';
     return `assets/equipment/${!type&&item?.class_ids?.length===1&&item.class_ids[0]==='mage'?'staff':!type&&item?.class_ids?.length===1&&item.class_ids[0]==='druid'?'nature_staff':!type&&item?.class_ids?.length===1&&item.class_ids[0]==='ranger'?'bow':'weapon'}.svg`;
   }
+  // UI_16: a spell belongs to its BASE circle, not to its unlock level or
+  // selected casting power. Build buckets first so late subclass grants never
+  // restart Sztuczki/Krąg I halfway through the book. Do not reorder the hotbar.
+  const circleLabels=['Sztuczki','Krąg I','Krąg II','Krąg III','Krąg IV','Krąg V','Krąg VI','Krąg VII','Krąg VIII','Krąg IX'];
+  const spellNames=new Intl.Collator('pl',{sensitivity:'base',numeric:true});
+  function spellSections(world,player,gate=spec=>root.BractwoRuntime.spellGate(spec,player)){
+    if(!player)return [];
+    const buckets=new Map();
+    for(const [id,base]of Object.entries(world?.spells||{})){
+      // Preserve the existing visibility rules: native class entries (including
+      // locked ones) and server-granted subclass spells. Never leak other classes.
+      if(!base||!(base.class_ids?.includes(player.class_id)||player.spell_profiles?.[id]?.available===true))continue;
+      const spec=root.BractwoRuntime.spellProfile({...base,id},player);
+      const required=gate(spec),unlocked=spec.available??player.level>=required;
+      const rank=Number(base.circle)||0,feature=!!base.feature;
+      const sectionId=feature?'features':'circle-'+rank;
+      if(!buckets.has(sectionId))buckets.set(sectionId,{
+        id:sectionId,rank:feature?Infinity:rank,
+        label:feature?'Zdolności klasy':circleLabels[rank]||`Krąg ${rank}`,entries:[]
+      });
+      buckets.get(sectionId).entries.push({id,spec,gate:required,unlocked});
+    }
+    const sections=[...buckets.values()].sort((a,b)=>a.rank-b.rank);
+    for(const section of sections)section.entries.sort((a,b)=>
+      (section.id==='features'?a.gate-b.gate:0)||
+      spellNames.compare(a.spec.name||a.id,b.spec.name||b.id)||a.id.localeCompare(b.id));
+    return sections;
+  }
   function create(h){
     const panel=document.getElementById('characterPanel'),content=document.getElementById('characterContent'),tabButtons=[...panel.querySelectorAll('[data-character-tab]')];
     let tab='inventory',signature='',bagPage=0,selectedItem='',restoreFocus=null;
@@ -70,15 +98,16 @@
       heading('Odporności');const resistance=node('div','sheet-resistances');for(const r of s.resistances||[]){const c=node('span',r.multiplier<1?'resistant':'',r.name+(r.multiplier===.5?' · połowa obrażeń':r.multiplier===0?' · niewrażliwość':' · zwykłe obrażenia'));resistance.append(c);}content.append(resistance);
       if(s.ward_reduction)content.append(node('p','sheet-hint',`Kamienna osłona: obrażenia od potworów −${s.ward_reduction}%.`));
       heading('Ruch i rozwój');tiles([['Ruch w rundzie',`${s.movement_per_round||0} stóp`],['Zasięg broni',`${Math.round((p.attack_range||0)/6.4)} stóp`],['Kość zdrowia',s.hit_die||'—'],['Złoto',p.gold],['Złoto w banku',p.bank_gold||0],['Dusza',`${p.soul||0} / ${p.max_soul||100}`],['Pokonane potwory',p.kills||0],['Pokonani bossowie',p.boss_kills||0]]);
-      const trained=Object.entries(p.skills||{}).map(([k,v])=>[skillNames[k]||k,`${v.level} · ${v.progress}/${v.next}`]);if(trained.length){heading('Wyszkolenie');tiles(trained);}
       const mastery=Object.entries(p.mastery||{}).filter(([,v])=>v>0).map(([k,v])=>[masteryNames[k]||k,v]);if(mastery.length){heading('Mistrzostwo');tiles(mastery);}
       heading('Aktywne efekty');const effects=node('div','sheet-resistances');for(const e of p.status_effects||[]){const chip=node('span',e.harmful?'harmful':'resistant',`${e.name} · ${root.BractwoRuntime.formatEffectTime(e)}`);chip.title=e.description||'';effects.append(chip);}if(!effects.childNodes.length)effects.append(node('p','sheet-hint','Brak aktywnych efektów.'));content.append(effects);
       if(p.form)content.append(node('p','',`Postać zwierzęca: ${({wolf:'wilk',cat:'kot',black_bear:'niedźwiedź czarny',bear:'niedźwiedź brunatny'}[p.form]||p.form)} · ${p.temp_hp||0} tymczasowych HP`));
       if(p.blessed)content.append(node('p','','Błogosławieństwo aktywne.'));
     }
     function spells(p,w){const bar=root.BractwoRuntime.displayHotbar(p);root.BractwoCasterUI.actions(content,p,h);const info=node('div','sheet-spell-summary');info.append(node('span','',`Krąg ${p.spell_circle||0} · mana ${Math.floor(p.mana)}/${p.max_mana}`),node('span','',`F · ${w.spells?.[p.favorite_spell]?.name||'—'}`));content.append(info);
-      const list=node('div','sheet-spell-list');const available=Object.entries(w.spells||{}).filter(([id,s])=>s.class_ids.includes(p.class_id)||p.spell_profiles?.[id]?.available===true).sort((a,b)=>(h.gate(a[1])-h.gate(b[1]))||(a[1].circle-b[1].circle));let group='';
-      for(const[id,base]of available){const s=root.BractwoRuntime.spellProfile(base,p);const gate=h.gate(s),unlocked=s.available??p.level>=gate,label=s.feature?'Zdolności klasy':s.circle?`Krąg ${s.circle}`:'Sztuczki';if(group!==label){heading(label,list);group=label;}
+      const list=node('div','sheet-spell-list');list.setAttribute('aria-label','Czary według kręgów');
+      for(const section of spellSections(w,p,h.gate)){
+        const title=node('h3','sheet-section-title',section.label);title.dataset.spellSection=section.id;list.append(title);
+        for(const {id,spec:s,gate,unlocked}of section.entries){
         const row=node('article','sheet-spell'+(unlocked?'':' locked'));row.dataset.spell=id;row.append(image(s.icon||`assets/spells/${id}.svg`));const text=node('div','sheet-spell-text');text.append(node('strong','',s.name));
         const parts=[root.BractwoRuntime.spellCostText(s,p),s.action==='bonus'?'Akcja dodatkowa':s.action==='reaction'?'Reakcja':s.action==='extra'?'Dodatkowa akcja':'Akcja'];if(s.gold)parts.push(s.gold+' zł');if(s.ritual)parts.push('Rytuał '+s.ritual_seconds+' s');if(!unlocked)parts.push(p.level<gate?`Od poziomu ${gate}`:'Czar obecnie niedostępny');text.append(node('small','',parts.join(' · ')));
         // Player-facing original summaries; no implementation labels.
@@ -102,6 +131,7 @@
         }
         if(s.recast_active)actions.append(button('Zakończ czar',()=>h.send({type:'stop_concentration'})));
         const select=node('select','slot-picker');select.setAttribute('aria-label',`Skrót: ${s.name}`);select.append(new Option('Przypisz skrót…',''));for(let i=0;i<(bar.length||24);i++)select.append(new Option(`${root.BractwoRuntime.hotbarLabel(i)}${bar[i]===root.BractwoRuntime.hotbarGroupForSpell(id,w)?' ✓':''} · ${w.hotbar_groups?.[bar[i]]?.name||w.spells?.[bar[i]]?.name||'Pusty'}`,String(i)));select.disabled=!unlocked;select.addEventListener('change',()=>{if(select.value!=='')h.send({type:'hotbar',slot:Number(select.value),spell_id:id,grouped:!!p.grouped_hotbar});select.blur();});actions.append(select);row.append(actions);list.append(row);
+        }
       }content.append(list);
     }
     function render(){if(panel.hidden)return;const {player:p,world:w}=h.state();if(!p)return;
@@ -118,5 +148,5 @@
     }
     return {open,close,toggle,render,get visible(){return !panel.hidden;},get tab(){return tab;}};
   }
-  root.BractwoCharacterSheet={create,equipmentIcon};
+  root.BractwoCharacterSheet={create,equipmentIcon,spellSections};
 })(globalThis);

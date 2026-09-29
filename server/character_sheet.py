@@ -15,7 +15,7 @@ def build(p):
         resistances.append(dict(type=key,name=name,multiplier=rules.resistance_multiplier(p,key)))
     gear=rules.gear;caster=rules.caster
     return dict(training=gear.training_sheet(p),caster=caster.sheet(p),ability_modifiers={k:rules.ability_modifier(p,k) for k in rules.attributes(p)},
-        saving_throws={k:rules.save_bonus(p,k) for k in rules.attributes(p)},
+        saving_throws={k:rules.save_bonus(p,k) for k in rules.attributes(p)},magic_items=rules.magic_items.sheet(p),
         proficient_saves=list(p.spec['saves']),spell_attack_bonus=rules.spell_bonus(p),
         attack_ability=rules.attack_ability(p),spell_ability=rules.spell_ability(p),
         damage_type=rules.damage_type(p),damage_name=DAMAGE_NAMES[rules.damage_type(p)],

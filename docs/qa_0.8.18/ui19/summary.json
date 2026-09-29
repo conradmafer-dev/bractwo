@@ -1,0 +1,26 @@
+{
+  "version": "0.8.18",
+  "revision": "UI_19",
+  "based_on": "BRACTWO_0.8.18_UI_18_FULL_SOURCE.zip",
+  "targeted_tests": {"passed": 28, "failed_final": 0, "full_regression_run": false},
+  "suites": [
+    {"report": "continent_results.json", "passed": 3},
+    {"report": "adventure_results.json", "passed": 7},
+    {"report": "magic_items_results.json", "passed": 13},
+    {"report": "integration_results.json", "passed": 5}
+  ],
+  "additional_checks": [
+    "Six edited JavaScript files passed Node syntax validation; changed Python source parsed successfully.",
+    "All 16 new magic item templates are available in thematic merchant inventories; repeated stock refresh is stable.",
+    "Local HTTP server returned 200 and nonempty bodies for all 36 assets referenced by index.html, including the new UI modules.",
+    "A disposable local WebSocket account received the complete UI19 world and character state, including magic item state.",
+    "Final core integration includes deferred migration during an active combat lock and rescue on subsequent login.",
+    "The continent report predates six added dungeon quest-target spawns; the final adventure world checks cover these additions."
+  ],
+  "limitations": [
+    "Visual browser verification unavailable: in-app browser could not attach; Edge automation timed out. No mobile or desktop visual pass is claimed.",
+    "Tests were limited to the changed mechanics and world accessibility, as requested; balance and extended multiplayer playthrough remain manual checks."
+  ],
+  "deployment": "Archives only; no production deployment or GitHub push performed.",
+  "archive_integrity": "tools/package_0818.py generates a separate SHA-256 manifest for each ZIP and reads every archived file back before publishing the output."
+}

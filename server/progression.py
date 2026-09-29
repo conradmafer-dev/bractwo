@@ -33,12 +33,26 @@ def train(p,key,amount=1):
     p.skill_tries[key]=int(p.skill_tries.get(key,0))+int(amount)
 
 
+def merchant_at(p):
+    sellers = [getattr(content, 'STARTER_MERCHANT', None)] + [
+        n for n in content.NPCS if n.get('service') == 'merchant']
+    nearby = [n for n in sellers if n and near(p, n)]
+    return min(nearby, key=lambda n: math.hypot(p.x-n['x'], p.y-n['y']), default=None)
+
+
+def merchant_state(p):
+    seller = merchant_at(p)
+    return ({'id': seller.get('id', 'starter_merchant'), 'name': seller['name'],
+             'stock': list(seller.get('stock', []))} if seller else None)
+
+
 def private_state(p,now):
     return {'site_cooldowns':{key:max(0,round(until-now)) for key,until in p.site_cooldowns.items() if until>now},
       'wind_remaining':max(0,p.wind_until-now), 'ward_remaining':max(0,p.ward_until-now), 'premium_demo':p.premium_demo_until>now,'premium_demo_remaining':max(0,int(p.premium_demo_until-now)),
       'surface':content.SURFACE_MAP.at(p.x,p.y,p.floor), 'floor':p.floor,'promoted':p.promoted,'profession':content.PROMOTIONS[p.class_id] if p.promoted else p.spec['name'],
       'skills':skill_progress(p),'runes':dict(p.runes),'soul':int(p.soul),'max_soul':200 if p.promoted else 100,
       'bank_gold':p.bank_gold,'depot':list(p.depot),'home_city':p.home_city,'blessed':p.blessed,
+      'merchant':merchant_state(p),
       'mastery':dict(p.mastery),'mastery_points':max(0,(p.level-50)//5+1-sum(p.mastery.values())) if p.level>=50 and p.promoted else 0,
       'spell_cooldowns':{key:round(max(0,until-now),1) for key,until in p.spell_cooldowns.items() if until>now},
       'haste_remaining':max(0,p.haste_until-now),'rune_cooldown':max(0,p.rune_ready-now)}
@@ -79,7 +93,37 @@ class ExpansionGame:
         return next((n for n in content.NPCS if n.get('service')==service and near(p,n)),None)
 
     def merchant_near(self,p):
-        return (p.floor==0 and math.hypot(p.x-680,p.y-1180)<=150) or bool(self.near_service(p,'merchant'))
+        return merchant_at(p) is not None
+
+    async def boat_command(self, p, data):
+        if not p.alive or p.combat_until > self.now():
+            return await self.notice(p, 'Rejs jest dostępny poza walką, dla żywej postaci.')
+        route_id = data.get('route_id')
+        route = next((r for r in getattr(content, 'SEA_ROUTES', []) if r['id'] == route_id), None)
+        if route is None:
+            return await self.notice(p, 'Wybierz połączenie z tablicy miejscowego przewoźnika.')
+        source = next((port for port in content.PORTS if port['id'] == route['from_id']), None)
+        destination = next((port for port in content.PORTS if port['id'] == route['to_id']), None)
+        boatman = next((n for n in content.NPCS if source and n['id'] == source.get('npc_id')), None)
+        if not boatman or not near(p, boatman) or route_id not in boatman.get('routes', []):
+            return await self.notice(p, 'Podejdź do przewoźnika obsługującego ten rejs.')
+        if not destination or p.level < route.get('min_level', 1) or p.gold < route['cost']:
+            return await self.notice(p, f"Rejs wymaga poziomu {route.get('min_level', 1)} i {route['cost']} złota.")
+        x, y, floor = destination['x'], destination['y'], destination.get('floor', 0)
+        if self.blocked(x, y, floor=floor):
+            return await self.notice(p, 'Przystań docelowa jest niedostępna.')
+        self.cancel_rest(p);self.cancel_channel(p, '');self.stop_auto(p)
+        self.break_concentration(p);self.companions.pop(p.id, None);self.familiars.pop(p.id, None)
+        p.gold -= route['cost']
+        p.x, p.y, p.floor = x, y, floor
+        p.dx = p.dy = 0
+        p.input_time = -10
+        if any(city['id'] == destination.get('city_id') for city in content.CITIES):
+            p.home_city = destination['city_id']
+        self.remember_city_visit(p)
+        self.discover_landmarks(p)
+        self.persist()
+        await self.notice(p, f"Dopłynąłeś do: {destination['name']}.")
 
     def stairs_near(self,p):
         return sorted((s for s in content.STAIRS if near(p,s)),key=lambda s:math.hypot(p.x-s['x'],p.y-s['y']))
@@ -109,6 +153,13 @@ class ExpansionGame:
             return await self.notice(p,f'{s["name"]} · piętro {p.floor:+d}.')
         if p.combat_until>now:return await self.notice(p,'Najpierw zakończ walkę i odczekaj blokadę.')
         if kind=='travel':
+            if getattr(content, 'SEA_ROUTES', None):
+                # Older clients may request a city; still enforce the local route graph.
+                port = self.near_service(p, 'boat')
+                destination = next((c for c in content.PORTS if c.get('city_id') == data.get('city_id')), None)
+                route = next((r for r in content.SEA_ROUTES if port and destination
+                              and r['id'] in port.get('routes', []) and r['to_id'] == destination['id']), None)
+                return await self.boat_command(p, {'route_id': route['id'] if route else None})
             port=self.near_service(p,'captain')
             target=next((c for c in content.CITIES if c['id']==data.get('city_id')),None)
             if not port:return await self.notice(p,'Podejdź do kapitana w mieście.')

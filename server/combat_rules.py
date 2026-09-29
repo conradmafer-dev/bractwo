@@ -5,13 +5,13 @@ import math
 try:
     from . import world_content as content
     from . import fighter_rules as fighter
-    from . import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment
+    from . import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment, magic_items
     from .dnd_content import circle_for
     from .progression import same_floor
 except ImportError:
     import world_content as content
     import fighter_rules as fighter
-    import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment
+    import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment, magic_items
     from dnd_content import circle_for
     from progression import same_floor
 
@@ -56,7 +56,7 @@ def spell_ability(p): return 'intelligence' if p.class_id=='mage' else 'wisdom'
 def spell_bonus(p): return proficiency(p)+ability_modifier(p,spell_ability(p))+gear.spell_equipment_bonus(p)+caster.spell_path_bonus(p)
 def spell_dc(p): return 8+spell_bonus(p)
 
-def active_buff(p,key): return p.buffs.get(key,{}).get('until',0)>p.current_wall_time
+def active_buff(p,key): return environment.active(p,key)
 
 def attack_ability(p):
     w=equipped_item(p,'weapon')
@@ -92,14 +92,14 @@ def armor_class(p):
     if not p.form:
         ac += fighter.shield_bonus(p)
         if getattr(p,'fighting_style','')=='defense' and fighter.style_active(p):ac+=1
-    return ac+(2 if active_buff(p,'nature_sanctuary') else 0)
+    return ac+magic_items.effect(p,'protection')+(2 if active_buff(p,'nature_sanctuary') else 0)
 
 def save_bonus(p,ability='dexterity'):
     if getattr(p,'is_companion',False):return max(2,p.attack_bonus) if ability in ('strength','dexterity') else 1
     if environment.polymorph(p):return caster.form_spec(p).get('saves',{}).get(ability,ability_modifier(p,ability))
     base=ability_modifier(p,ability)+(proficiency(p) if ability in p.spec['saves'] else 0)
     if p.form:base=max(base,caster.form_spec(p).get('saves',{}).get(ability,base))
-    return base+circles.save_bonus(p,ability)+(2 if ability=='dexterity' and active_buff(p,'nature_sanctuary') else 0)-getattr(p,'exhaustion',0)*2
+    return base+circles.save_bonus(p,ability)+magic_items.effect(p,'protection')+(2 if ability=='dexterity' and active_buff(p,'nature_sanctuary') else 0)-getattr(p,'exhaustion',0)*2
 
 def legacy_max_hp(p):
     """Pre-UI_12 totals, retained for save migration and historical receipts."""
@@ -175,7 +175,7 @@ def damage_type(p):
 
 def resistance_multiplier(p, kind):
     physical=kind in ('bludgeoning','piercing','slashing')
-    gear_resist=not getattr(p,'form','') and any(kind in equipped_item(p,slot).get('resistances',[]) for slot in ('armor','ring'))
+    gear_resist=magic_items.resistance(p,kind) or not getattr(p,'form','') and any(kind in equipped_item(p,slot).get('resistances',[]) for slot in ('armor','ring'))
     return .5 if (circles.resists(p,kind) or kind in caster.form_spec(p).get('resistances',[]) or kind=='radiant' and active_buff(p,'fount_of_moonlight') or gear_resist or physical and active_buff(p,'stoneskin') or kind=='fire' and active_buff(p,'resist_fire')) else 1.0
 
 
@@ -349,7 +349,7 @@ class CombatRounds:
         self.provoke_enemy(enemy,p)
         if result['hit'] or result.get('graze'):
             self.add_hunters_mark(p,enemy,result)
-            result['damage']=self.environment_damage_enemy(enemy,result['damage'],p,result['damage_type'],result.get('damage_components'));self.remember_attacker(enemy,p)
+            result['damage']=self.environment_damage_enemy(enemy,result['damage'],p,result['damage_type'],result.get('damage_components'),critical=result.get('critical',False));self.remember_attacker(enemy,p)
         self.report_roll(p,enemy,result,action,p)
         return result
 

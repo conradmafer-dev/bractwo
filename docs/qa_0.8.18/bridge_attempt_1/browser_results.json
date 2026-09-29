@@ -1,0 +1,27 @@
+{
+  "ok": false,
+  "status": "failed",
+  "transport": "Python WebSocket bridge to isolated aiohttp server; production HTML/CSS/JS and embedded assets at routed bractwo.local origin",
+  "fixtures": [
+    "isolated :memory: database",
+    "controlled server clock",
+    "monster AI paused"
+  ],
+  "checks": [
+    {
+      "name": "Native fullscreen enters/exits from authentication screen",
+      "ok": true
+    }
+  ],
+  "layouts": [],
+  "errors": [
+    "Cannot write to closing transport"
+  ],
+  "limitations": [
+    "OS-level PWA installation is not automated.",
+    "Native localhost page.goto timed out with --no-proxy-server; service-worker/offline integration is not exercised by this bridge run."
+  ],
+  "origin": "http://127.0.0.1:51986",
+  "failure": "Server player missing",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\tools\\browser_0818_smoke.py\", line 147, in main\n    player = await login(page, 'RestMobileQA')\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\tools\\browser_0818_smoke.py\", line 108, in login\n    await eventually(lambda: any(p.name == name for p in game.players.values()), 'Server player missing')\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\tools\\browser_0818_smoke.py\", line 45, in eventually\n    raise AssertionError(message)\nAssertionError: Server player missing\n"
+}

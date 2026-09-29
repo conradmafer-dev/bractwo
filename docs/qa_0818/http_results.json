@@ -1,0 +1,15 @@
+{
+  "status": "passed",
+  "tests": 4,
+  "failures": 0,
+  "elapsed_test_seconds": 22.755,
+  "command": "python -I -S -u tests/test_app_shell_http_0818.py -v",
+  "database": "isolated :memory:",
+  "checks": [
+    "Manifest JSON, standalone display, root scope/start URL, actual PNG dimensions match 192x192 and 512x512",
+    "New shell/rest/offline/icon HTTP routes return correct MIME types and nonempty bodies",
+    "Root-level service worker returns revalidation cache headers",
+    "Index links current shell/rest/manifest/apple icon; health remains JSON"
+  ],
+  "notes": ["aiohttp emitted existing AppKey and slow-task diagnostic warnings; all assertions passed."]
+}

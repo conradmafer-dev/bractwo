@@ -277,6 +277,9 @@ class DruidCircleSpells:
         target=self.players.get(target_id) if target_id else self.enemies.get(enemy_id) if enemy_id else None
         if target is None and s['kind'] not in ('buff',):
             target=self.players.get(p.auto_target_id) if p.auto_target_id else self.enemies.get(p.auto_enemy_id)
+        if target is None and s['kind'] not in ('buff',) and key not in FIELD_KEYS and not s.get('area'):
+            options=[e for e in self.nearby_enemies(p,s['range']) if self._spell_legal(p,e,s['range'],s['kind']=='circle_control') and self.line_clear(p,e)]
+            target=min(options,key=lambda e:distance(p,e)) if options else None
         targets=[];point=None;form=None;friendly=False
         if s['kind']=='buff':
             if s.get('targeting')=='self':

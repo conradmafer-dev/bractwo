@@ -1,0 +1,10 @@
+{
+  "python_passed": [
+    "server/spell_scaling.py",
+    "tests/test_guiding_bolt_growth_ui17.py",
+    "tools/browser_ui17.py",
+    "tools/package_0818.py"
+  ],
+  "javascript_checked": 20,
+  "ok": true
+}

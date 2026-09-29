@@ -1,0 +1,178 @@
+{
+  "ok": true,
+  "status": "passed",
+  "fixture": "Existing index DOM with inline production CSS; only windows.js/mobile.js execute; no gameplay, server or WebSocket.",
+  "limitations": [
+    "about:blank fixture does not verify localStorage persistence."
+  ],
+  "checks": [
+    {
+      "name": "Visible quest landscape: joystick is centred between left edge/spells and bottom rail/viewport",
+      "ok": true,
+      "geometry": {
+        "viewport": {
+          "width": 734,
+          "height": 390
+        },
+        "joystick": {
+          "x": 12,
+          "y": 232,
+          "width": 88,
+          "height": 88,
+          "right": 100,
+          "bottom": 320
+        },
+        "spellbar": {
+          "x": 112,
+          "y": 324,
+          "width": 466,
+          "height": 56,
+          "right": 578,
+          "bottom": 380
+        },
+        "quest": {
+          "x": 8,
+          "y": 117,
+          "width": 216,
+          "height": 44,
+          "right": 224,
+          "bottom": 161
+        },
+        "upperBoundary": 161,
+        "gaps": {
+          "left": 12,
+          "right": 12,
+          "above": 71,
+          "below": 70
+        }
+      }
+    },
+    {
+      "name": "mobile: default lock, real drag after unlock, relock prevents further drag",
+      "ok": true,
+      "pointer": "native CDP touch",
+      "initial": {
+        "x": 8,
+        "y": 8,
+        "width": 216,
+        "height": 68
+      },
+      "moved": {
+        "x": 88,
+        "y": 68,
+        "width": 216,
+        "height": 68
+      },
+      "relocked": {
+        "x": 88,
+        "y": 68,
+        "width": 216,
+        "height": 68
+      }
+    },
+    {
+      "name": "Reset while locked restores the default centred joystick",
+      "ok": true,
+      "geometry": {
+        "viewport": {
+          "width": 734,
+          "height": 390
+        },
+        "joystick": {
+          "x": 12,
+          "y": 232,
+          "width": 88,
+          "height": 88,
+          "right": 100,
+          "bottom": 320
+        },
+        "spellbar": {
+          "x": 112,
+          "y": 324,
+          "width": 466,
+          "height": 56,
+          "right": 578,
+          "bottom": 380
+        },
+        "quest": {
+          "x": 8,
+          "y": 117,
+          "width": 216,
+          "height": 44,
+          "right": 224,
+          "bottom": 161
+        },
+        "upperBoundary": 161,
+        "gaps": {
+          "left": 12,
+          "right": 12,
+          "above": 71,
+          "below": 70
+        }
+      }
+    },
+    {
+      "name": "desktop: default lock, real drag after unlock, relock prevents further drag",
+      "ok": true,
+      "pointer": "native mouse",
+      "initial": {
+        "x": 163.46875,
+        "y": 15,
+        "width": 235,
+        "height": 89
+      },
+      "moved": {
+        "x": 523,
+        "y": 195,
+        "width": 235,
+        "height": 89
+      },
+      "relocked": {
+        "x": 523,
+        "y": 195,
+        "width": 235,
+        "height": 89
+      }
+    }
+  ],
+  "geometry": [
+    {
+      "viewport": {
+        "width": 734,
+        "height": 390
+      },
+      "joystick": {
+        "x": 12,
+        "y": 232,
+        "width": 88,
+        "height": 88,
+        "right": 100,
+        "bottom": 320
+      },
+      "spellbar": {
+        "x": 112,
+        "y": 324,
+        "width": 466,
+        "height": 56,
+        "right": 578,
+        "bottom": 380
+      },
+      "quest": {
+        "x": 8,
+        "y": 117,
+        "width": 216,
+        "height": 44,
+        "right": 224,
+        "bottom": 161
+      },
+      "upperBoundary": 161,
+      "gaps": {
+        "left": 12,
+        "right": 12,
+        "above": 71,
+        "below": 70
+      }
+    }
+  ],
+  "errors": []
+}

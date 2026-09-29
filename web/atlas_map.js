@@ -40,10 +40,11 @@
   function drawTerrain(g,w,b,width,height,floor=0){
     const sx=width/b.w,sy=height/b.h;
     const point=(x,y)=>[(x-b.x)*sx,(y-b.y)*sy];
-    g.fillStyle=floor?'#252831':'#446446';g.fillRect(0,0,width,height);
+    g.fillStyle=floor?'#252831':w.landmasses?.length?'#244f64':'#446446';g.fillRect(0,0,width,height);
     if(floor){
       for(const d of [...(w.dungeons||[]),...(w.elevations||[])])if(d.floor===floor)for(const r of d.rooms||[]){g.fillStyle='#a1937a';g.fillRect((r.x-b.x)*sx,(r.y-b.y)*sy,r.w*sx,r.h*sy);}
     } else {
+      if(w.landmasses?.length){g.save();root.BractwoWorldGeometry.outline(g,w,b,width,height);g.clip();g.fillStyle='#446446';g.fillRect(0,0,width,height);}
       for(const r of w.regions||[]){g.fillStyle=r.color;g.fillRect((r.x-b.x)*sx,(r.y-b.y)*sy,r.w*sx,r.h*sy);g.strokeStyle='#eeeecc25';g.lineWidth=1;g.strokeRect((r.x-b.x)*sx,(r.y-b.y)*sy,r.w*sx,r.h*sy);}
       g.strokeStyle='#d5bd85';g.lineWidth=Math.max(1,64*sx);
       for(const road of w.roads||[]){g.beginPath();road.forEach(([x,y],i)=>{const p=point(x,y);if(i)g.lineTo(...p);else g.moveTo(...p);});g.stroke();}
@@ -51,8 +52,20 @@
       if(b.w<16000){
         for(const o of w.obstacles||[])if(!(o.floor||0)&&(o.type==='house'||o.kind==='house')){g.fillStyle='#ab8a5b';g.fillRect((o.x-b.x)*sx,(o.y-b.y)*sy,o.w*sx,o.h*sy);}
       }
+      if(w.landmasses?.length){
+        g.restore();root.BractwoWorldGeometry.outline(g,w,b,width,height);g.strokeStyle='#bfc39a';g.lineWidth=1.5;g.stroke();
+        g.save();g.setLineDash([4,5]);g.strokeStyle='#a4d3df88';g.lineWidth=1;
+        const drawn=new Set();
+        for(const route of w.sea_routes||[]){const pair=[route.from_id,route.to_id].sort().join('|');if(drawn.has(pair))continue;drawn.add(pair);
+          const from=(w.ports||[]).find(p=>p.id===route.from_id),to=(w.ports||[]).find(p=>p.id===route.to_id);if(!from||!to)continue;
+          g.beginPath();g.moveTo(...point(from.x,from.y));g.lineTo(...point(to.x,to.y));g.stroke();
+        }
+        g.restore();
+        for(const port of w.ports||[]){const [x,y]=point(port.x,port.y);g.fillStyle='#bde8ed';g.fillRect(x-2,y-2,4,4);if(!port.city_id&&b.w<22000){g.font='10px system-ui';g.textAlign='center';g.fillText(port.name,x,y-7);}}
+      }
       for(const r of w.regions||[]){
         if(r.w*sx<85)continue;
+        if(w.landmasses?.length&&!root.BractwoWorldGeometry.landAt(w,r.x+r.w/2,r.y+r.h/2))continue;
         const x=clamp((r.x+r.w/2-b.x)*sx,(r.x-b.x)*sx+55,(r.x+r.w-b.x)*sx-55),y=(r.y+r.h/2-b.y)*sy;
         if(x<0||x>width||y<0||y>height)continue;
         g.font='12px system-ui';g.textAlign='center';g.fillStyle='#f5eccd';g.strokeStyle='#22392d';g.lineWidth=3;g.strokeText(r.name,x,y);g.fillText(r.name,x,y);

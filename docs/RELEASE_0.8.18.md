@@ -1,4 +1,10 @@
-# Bractwo 0.8.18 UI_13 — pogrupowany pasek i jawne celowanie
+# Bractwo 0.8.18 UI_18 — ostatnio odwiedzone miasto odrodzenia
+
+Baza: dostarczona paczka UI_17. Wejście do miasta automatycznie zapisuje je jako miejsce odrodzenia, także przy kolejnej wizycie i podróży kapitanem. Zapis pozostaje po ponownym logowaniu. Ekran śmierci pokazuje nazwę miasta, a panel Usług informuje o automatycznym zapisie.
+
+Szczegóły aktualizacji: [UI_18](UI_18_RESPAWN_CITY.md). Zakres celowanej weryfikacji: `qa_0.8.18/ui_18_results.json`. Poniżej zachowano historię wcześniejszych rewizji; dokumenty UI_14–UI_17 również pozostają w paczce.
+
+## UI_13 — pogrupowany pasek i jawne celowanie
 
 Zbudowano na dostarczonym UI_12. Dwie grupy zastępują osobne pola każdego wariantu przemiany: Dziki kształt i Gwiezdna postać. Aktywny Łucznik używa tego samego miejsca do strzału. Dodano wspólny licznik użyć, opisy efektów i blokadę wydania kolejnego użycia na tę samą aktywną konstelację. Zwykły klik terenu nie włącza już celownika; nowe czary obszarowe najpierw proszą o wskazanie miejsca.
 

@@ -1,0 +1,39 @@
+{
+  "suite": "UI19 continent integration",
+  "checks": {
+    "collision": {
+      "counts": {
+        "npcs": 53,
+        "stair_origins": 144,
+        "stair_destinations": 144,
+        "ports": 14,
+        "new_discoveries": 77,
+        "spawns": 11429
+      },
+      "failures": []
+    },
+    "local_approaches": {
+      "counts": {
+        "npcs": 53,
+        "surface_stairs": 35,
+        "ports": 14,
+        "adventure_anchors": 8
+      },
+      "visited_nodes": 31461,
+      "failures": []
+    },
+    "transport_and_variety": {
+      "ports": 14,
+      "directed_routes": 34,
+      "reachable_ports": 14,
+      "authored_plans": 20,
+      "distinct_actual_road_footprints": 20,
+      "failures": []
+    }
+  },
+  "passed": true,
+  "tests": 3,
+  "seconds": 131.701,
+  "errors": [],
+  "failures": 0
+}

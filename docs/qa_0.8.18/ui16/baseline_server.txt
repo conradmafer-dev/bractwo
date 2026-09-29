@@ -1,0 +1,23 @@
+/mnt/data/bractwo_ui15_baseline/server/server.py:1780: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["game"]=Game(db_path, clock=clock)
+...................................E.........................
+======================================================================
+ERROR: test_every_spell_has_local_original_art_in_both_clients (test_geometry_character_085.Geometry.test_every_spell_has_local_original_art_in_both_clients)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/mnt/data/bractwo_ui15_baseline/tests/test_geometry_character_085.py", line 52, in test_every_spell_has_local_original_art_in_both_clients
+    self.assertTrue(a.is_file(),key);self.assertEqual(a.read_bytes(),b.read_bytes(),key)
+                                                                     ~~~~~~~~~~~~^^
+  File "/usr/lib/python3.13/pathlib/_abc.py", line 625, in read_bytes
+    with self.open(mode='rb') as f:
+         ~~~~~~~~~^^^^^^^^^^^
+  File "/usr/lib/python3.13/pathlib/_local.py", line 539, in open
+    return io.open(self, mode, buffering, encoding, errors, newline)
+           ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/mnt/data/bractwo_ui15_baseline/client/assets/spells/star_arrow.svg'
+
+----------------------------------------------------------------------
+Ran 61 tests in 4.622s
+
+FAILED (errors=1)

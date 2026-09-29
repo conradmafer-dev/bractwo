@@ -1,0 +1,9 @@
+{
+  "scenario": "Disposable localhost WebSocket login and complete world/state serialization",
+  "welcome_bytes": 2948925,
+  "land_polygons": 14,
+  "ports": 14,
+  "routes": 34,
+  "new_monsters": 6,
+  "status": "passed"
+}

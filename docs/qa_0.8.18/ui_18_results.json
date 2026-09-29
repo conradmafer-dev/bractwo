@@ -1,0 +1,31 @@
+{
+  "revision": "UI_18",
+  "base": "BRACTWO_0.8.18_UI_17_FULL_SOURCE.zip",
+  "baseline_verification": {
+    "full_source_files_verified": 1083,
+    "ready_files_matched": 311
+  },
+  "tests": {
+    "run": 6,
+    "failures": 0,
+    "errors": 0,
+    "passed": true,
+    "output": "test_captain_trip_records_destination_before_next_tick (test_respawn_city_ui18.RespawnCityTests.test_captain_trip_records_destination_before_next_tick) ... ok\ntest_login_in_city_updates_legacy_save_but_dead_save_keeps_home (test_respawn_city_ui18.RespawnCityTests.test_login_in_city_updates_legacy_save_but_dead_save_keeps_home) ... ok\ntest_return_to_previously_discovered_city_replaces_last_visit (test_respawn_city_ui18.RespawnCityTests.test_return_to_previously_discovered_city_replaces_last_visit) ... ok\ntest_saved_visit_survives_reload_and_drives_death_respawn (test_respawn_city_ui18.RespawnCityTests.test_saved_visit_survives_reload_and_drives_death_respawn) ... ok\ntest_walking_into_each_city_records_and_commits_once (test_respawn_city_ui18.RespawnCityTests.test_walking_into_each_city_records_and_commits_once) ... ok\ntest_wrong_floor_and_dead_position_do_not_replace_home (test_respawn_city_ui18.RespawnCityTests.test_wrong_floor_and_dead_position_do_not_replace_home) ... ok\n\n----------------------------------------------------------------------\nRan 6 tests in 9.175s\n\nOK\n"
+  },
+  "syntax": {
+    "python": "passed",
+    "javascript": "node --check web/game.js: passed"
+  },
+  "baseline_changed_files": [
+    "docs/RELEASE_0.8.18.md",
+    "server/server.py",
+    "tools/package_0818.py",
+    "web/game.js",
+    "web/index.html"
+  ],
+  "unchanged_baseline_files": 1078,
+  "limitations": [
+    "No full regression suite or interactive browser/phone test.",
+    "Packages prepared locally; production not deployed."
+  ]
+}

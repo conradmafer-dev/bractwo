@@ -1,0 +1,131 @@
+{
+  "scenario": "Druid stars 19 -> 20, all level-19 free bolts spent",
+  "wisdom_before": 3,
+  "wisdom_after": 4,
+  "free_before": 0,
+  "free_after": 1,
+  "before": {
+    "id": "guiding_bolt",
+    "name": "Wiodący pocisk",
+    "english": "Guiding Bolt",
+    "words": "Wiodący pocisk",
+    "circle": 1,
+    "class_ids": [],
+    "class_levels": {},
+    "class_min_levels": {},
+    "min_level": 1,
+    "kind": "attack",
+    "action": "action",
+    "mana": 30,
+    "cooldown": 0,
+    "range": 768.0,
+    "radius": 0,
+    "shape": "circle",
+    "targeting": "enemy",
+    "source": "PHB 2024",
+    "description": "Atak czarem: 4k6 promienistych. Następny atak przeciw celowi przed końcem twojej następnej tury ma ułatwienie.",
+    "icon": "assets/spells/guiding_bolt.svg",
+    "effect": "spell",
+    "visual": {
+      "style": "attack",
+      "theme": "nature",
+      "colors": [
+        "#578879",
+        "#a2d9bd",
+        "#e2fff0"
+      ],
+      "shots": 1
+    },
+    "dice": [
+      5,
+      6,
+      0
+    ],
+    "damage_type": "radiant",
+    "cast_circle": 2,
+    "power_choice": 0,
+    "power_options": [
+      1,
+      2
+    ],
+    "resolved": true,
+    "power_summary": "Rzucanie: krąg 2 · Obrażenia: 5k6"
+  },
+  "after": {
+    "id": "guiding_bolt",
+    "name": "Wiodący pocisk",
+    "english": "Guiding Bolt",
+    "words": "Wiodący pocisk",
+    "circle": 1,
+    "class_ids": [],
+    "class_levels": {},
+    "class_min_levels": {},
+    "min_level": 1,
+    "kind": "attack",
+    "action": "action",
+    "mana": 20,
+    "cooldown": 0,
+    "range": 768.0,
+    "radius": 0,
+    "shape": "circle",
+    "targeting": "enemy",
+    "source": "PHB 2024",
+    "description": "Atak czarem: 4k6 promienistych. Następny atak przeciw celowi przed końcem twojej następnej tury ma ułatwienie.",
+    "icon": "assets/spells/guiding_bolt.svg",
+    "effect": "spell",
+    "visual": {
+      "style": "attack",
+      "theme": "nature",
+      "colors": [
+        "#578879",
+        "#a2d9bd",
+        "#e2fff0"
+      ],
+      "shots": 1
+    },
+    "dice": [
+      4,
+      6,
+      0
+    ],
+    "damage_type": "radiant",
+    "cast_circle": 1,
+    "power_choice": 0,
+    "power_options": [
+      1,
+      2,
+      3
+    ],
+    "resolved": true,
+    "power_summary": "Rzucanie: krąg 1 · Obrażenia: 4k6"
+  },
+  "changes": [
+    {
+      "metric": "damage_dice",
+      "amount": "-1k6",
+      "unit": "do obrażeń"
+    },
+    {
+      "metric": "mana",
+      "amount": -10,
+      "unit": "do kosztu many"
+    }
+  ],
+  "next_upgrade": "Poziom 20: -1k6 do obrażeń",
+  "receipt_rows": [
+    {
+      "id": "spell_damage_dice_guiding_bolt",
+      "label": "Wiodący pocisk",
+      "gain": "-1k6",
+      "unit": "do obrażeń",
+      "icon": "assets/spells/guiding_bolt.svg"
+    },
+    {
+      "id": "spell_mana_guiding_bolt",
+      "label": "Wiodący pocisk",
+      "gain": "-10",
+      "unit": "do kosztu many",
+      "icon": "assets/spells/guiding_bolt.svg"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "suite": "tests/test_magic_items_ui19.py",
+  "status": "passed",
+  "tests_run": 13,
+  "failures": 0,
+  "errors": 0,
+  "duration_seconds": 3.984,
+  "runs": [
+    {"tests": 12, "duration_seconds": 3.740, "status": "passed"},
+    {"tests": 1, "duration_seconds": 0.244, "status": "passed", "case": "test_whole_coin_trade_and_returned_item_do_not_bypass_rest_contact"}
+  ],
+  "source_base": "Bractwo_0.8.18_UI_19 extracted from verified UI_18 archive",
+  "rules_source": "SRD 5.2.1 / revised 2024",
+  "command": "python -m unittest discover -s tests -p test_magic_items_ui19.py -v",
+  "coverage": [
+    "Protection requires attunement and grants AC plus every saving throw",
+    "Resistance is immediate and does not stack multiplicatively",
+    "Free Action distinguishes magical restraints from physical control",
+    "Warmth rolls 2d8, clamps at zero, and affects only Cold",
+    "Swimming gives 40 feet but not underwater breathing",
+    "Adamantine prevents natural-20 and condition-induced critical dice",
+    "Weapon, shield and armor enchantments retain their distinct bonuses",
+    "Mithral removes strength and armor-specific Stealth penalties",
+    "Attunement requires completion of an uninterrupted short rest",
+    "Attunement limits, duplicate copies, death and 24-hour separation",
+    "Legacy ring migration preserves UIDs without granting attunement",
+    "Native monster flight and Polymorph movement replacement",
+    "Integer gold trading preserves exact SRD value; temporary loss of physical contact invalidates attunement"
+  ],
+  "icons": {"count": 16, "copies": ["web", "client"], "xml_validation": "passed"},
+  "integration_note": "Read-only core review confirmed damage grouping before Warmth and the save/load/step/death/rest hooks. Full world and frontend validation belongs to the root agent."
+}

@@ -1,0 +1,1223 @@
+TAP version 13
+# Subtest: fullscreen is requested by a click and browser events synchronize every control
+ok 1 - fullscreen is requested by a click and browser events synchronize every control
+  ---
+  duration_ms: 2.406956
+  type: 'test'
+  ...
+# Subtest: fullscreen denial opens dismissible help, stops movement and permits retry
+ok 2 - fullscreen denial opens dismissible help, stops movement and permits retry
+  ---
+  duration_ms: 2.438472
+  type: 'test'
+  ...
+# Subtest: iPhone without fullscreen receives honest Add to Home Screen instructions
+ok 3 - iPhone without fullscreen receives honest Add to Home Screen instructions
+  ---
+  duration_ms: 0.836058
+  type: 'test'
+  ...
+# Subtest: accepted install prompt does not falsely report completed installation
+ok 4 - accepted install prompt does not falsely report completed installation
+  ---
+  duration_ms: 0.753557
+  type: 'test'
+  ...
+# Subtest: dismissed install consumes the prompt and the next click offers manual help
+ok 5 - dismissed install consumes the prompt and the next click offers manual help
+  ---
+  duration_ms: 0.868656
+  type: 'test'
+  ...
+# Subtest: standalone mode hides install affordances and worker only registers on secure origins
+ok 6 - standalone mode hides install affordances and worker only registers on secure origins
+  ---
+  duration_ms: 1.282394
+  type: 'test'
+  ...
+# Subtest: worker precaches only disconnected page and icons, and preserves unrelated caches
+ok 7 - worker precaches only disconnected page and icons, and preserves unrelated caches
+  ---
+  duration_ms: 1.409851
+  type: 'test'
+  ...
+# Subtest: worker never intercepts game code, API, credential POST or cross-origin requests
+ok 8 - worker never intercepts game code, API, credential POST or cross-origin requests
+  ---
+  duration_ms: 1.569726
+  type: 'test'
+  ...
+# Subtest: navigation loads fresh HTML online and falls back to disconnected page offline
+ok 9 - navigation loads fresh HTML online and falls back to disconnected page offline
+  ---
+  duration_ms: 0.96036
+  type: 'test'
+  ...
+# Subtest: Recovery is ready in combat and during main action cooldown
+not ok 10 - Recovery is ready in combat and during main action cooldown
+  ---
+  duration_ms: 7.217222
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:4:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage()))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:4:72)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: Recovery remains ready while moving
+not ok 11 - Recovery remains ready while moving
+  ---
+  duration_ms: 1.261403
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:5:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage({dx:1,dy:-1})))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:5:48)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: Recovery is also ready outside combat
+not ok 12 - Recovery is also ready outside combat
+  ---
+  duration_ms: 0.443061
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:6:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage({combat_remaining:0,pvp_combat_remaining:0})))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:6:50)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Full mana disables Recovery
+ok 13 - Full mana disables Recovery
+  ---
+  duration_ms: 0.145765
+  type: 'test'
+  ...
+# Subtest: Fractional missing mana enables Recovery
+not ok 14 - Fractional missing mana enables Recovery
+  ---
+  duration_ms: 0.416832
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage({mana:39.5})))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:8:53)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Cooldown and bonus action disable Recovery
+ok 15 - Cooldown and bonus action disable Recovery
+  ---
+  duration_ms: 1.072165
+  type: 'test'
+  ...
+# Subtest: Only living mage in normal form can use Recovery
+ok 16 - Only living mage in normal form can use Recovery
+  ---
+  duration_ms: 0.235646
+  type: 'test'
+  ...
+# Subtest: A ritual in progress must be cancelled first
+ok 17 - A ritual in progress must be cancelled first
+  ---
+  duration_ms: 0.08811
+  type: 'test'
+  ...
+# Subtest: Concentration and armor do not block Recovery
+not ok 18 - Concentration and armor do not block Recovery
+  ---
+  duration_ms: 0.686799
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:12:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage({concentration:'wall_of_fire',character_sheet:{training:{armor_penalty:true},caster:{channel:{}}}})))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:12:58)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Readiness does not mutate client state
+not ok 19 - Readiness does not mutate client state
+  ---
+  duration_ms: 1.165932
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:13:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(p))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_arcane_recovery_0815.cjs:13:98)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: world view fits the entire rectangular world without cropping
+ok 20 - world view fits the entire rectangular world without cropping
+  ---
+  duration_ms: 0.931698
+  type: 'test'
+  ...
+# Subtest: each left/right zoom doubles/halves bounded camera scale
+ok 21 - each left/right zoom doubles/halves bounded camera scale
+  ---
+  duration_ms: 0.347871
+  type: 'test'
+  ...
+# Subtest: zoom preserves cursor location except when camera reaches border
+ok 22 - zoom preserves cursor location except when camera reaches border
+  ---
+  duration_ms: 0.128609
+  type: 'test'
+  ...
+# Subtest: local camera includes player near world edge
+ok 23 - local camera includes player near world edge
+  ---
+  duration_ms: 0.187455
+  type: 'test'
+  ...
+# Subtest: zero coordinates are not mistaken for missing location
+ok 24 - zero coordinates are not mistaken for missing location
+  ---
+  duration_ms: 0.145444
+  type: 'test'
+  ...
+# Subtest: pan is bounded and does not zoom
+ok 25 - pan is bounded and does not zoom
+  ---
+  duration_ms: 0.437933
+  type: 'test'
+  ...
+# Subtest: all resets persistent camera after zoom and pan
+ok 26 - all resets persistent camera after zoom and pan
+  ---
+  duration_ms: 0.157471
+  type: 'test'
+  ...
+# Subtest: original starter river and its bridge are included along with expanded geometry
+ok 27 - original starter river and its bridge are included along with expanded geometry
+  ---
+  duration_ms: 1.171711
+  type: 'test'
+  ...
+# Subtest: all bridges draw after all water segments
+ok 28 - all bridges draw after all water segments
+  ---
+  duration_ms: 0.266582
+  type: 'test'
+  ...
+# Subtest: missing optional river and expanded geometry safely draw nothing
+ok 29 - missing optional river and expanded geometry safely draw nothing
+  ---
+  duration_ms: 0.332759
+  type: 'test'
+  ...
+# Subtest: projection uses same river coordinates in atlas and minimap
+ok 30 - projection uses same river coordinates in atlas and minimap
+  ---
+  duration_ms: 0.382572
+  type: 'test'
+  ...
+# Subtest: thin river remains at least one screen pixel at world zoom
+ok 31 - thin river remains at least one screen pixel at world zoom
+  ---
+  duration_ms: 0.203298
+  type: 'test'
+  ...
+# Subtest: offscreen river segments do not issue drawing calls on local map
+ok 32 - offscreen river segments do not issue drawing calls on local map
+  ---
+  duration_ms: 0.118163
+  type: 'test'
+  ...
+# Subtest: first druid path does not require a master
+ok 33 - first druid path does not require a master
+  ---
+  duration_ms: 1.927962
+  type: 'test'
+  ...
+# Subtest: reselection requires master
+ok 34 - reselection requires master
+  ---
+  duration_ms: 0.108199
+  type: 'test'
+  ...
+# Subtest: dead, combat, transformed and non-druid cannot pick path
+ok 35 - dead, combat, transformed and non-druid cannot pick path
+  ---
+  duration_ms: 0.174426
+  type: 'test'
+  ...
+# Subtest: simple and martial labels; no third/exotic fallback
+ok 36 - simple and martial labels; no third/exotic fallback
+  ---
+  duration_ms: 0.25166
+  type: 'test'
+  ...
+# Subtest: proficient weapon has no redundant affirmative proficiency row
+ok 37 - proficient weapon has no redundant affirmative proficiency row
+  ---
+  duration_ms: 0.113727
+  type: 'test'
+  ...
+# Subtest: missing weapon training shown once, does not subtract from actual attack twice
+ok 38 - missing weapon training shown once, does not subtract from actual attack twice
+  ---
+  duration_ms: 0.100187
+  type: 'test'
+  ...
+# Subtest: personalized zero spell bonus overrides staff nominal focus bonus for noncasters
+ok 39 - personalized zero spell bonus overrides staff nominal focus bonus for noncasters
+  ---
+  duration_ms: 0.088641
+  type: 'test'
+  ...
+# Subtest: mastery lock independent of proficiency
+ok 40 - mastery lock independent of proficiency
+  ---
+  duration_ms: 0.088801
+  type: 'test'
+  ...
+# Subtest: armor shows actual wearer AC and warns about missing training
+ok 41 - armor shows actual wearer AC and warns about missing training
+  ---
+  duration_ms: 0.287452
+  type: 'test'
+  ...
+# Subtest: untrained shield explicitly denies AC bonus
+ok 42 - untrained shield explicitly denies AC bonus
+  ---
+  duration_ms: 0.287392
+  type: 'test'
+  ...
+# Subtest: tooltip text remains text not injected HTML
+ok 43 - tooltip text remains text not injected HTML
+  ---
+  duration_ms: 0.422361
+  type: 'test'
+  ...
+# Subtest: shared staff and bow artwork follows type rather than former class restriction
+ok 44 - shared staff and bow artwork follows type rather than former class restriction
+  ---
+  duration_ms: 0.153054
+  type: 'test'
+  ...
+# Subtest: untrained armor warning renders the message, not its CSS class
+ok 45 - untrained armor warning renders the message, not its CSS class
+  ---
+  duration_ms: 0.171812
+  type: 'test'
+  ...
+# Subtest: spatial queries preserve every visible object at boundaries and across floors
+ok 46 - spatial queries preserve every visible object at boundaries and across floors
+  ---
+  duration_ms: 25.696534
+  type: 'test'
+  ...
+# Subtest: FPS measures actual frame timestamps, including slow frames and reset
+ok 47 - FPS measures actual frame timestamps, including slow frames and reset
+  ---
+  duration_ms: 0.290157
+  type: 'test'
+  ...
+# Subtest: motion interpolates evenly and snaps on floor change or distant travel
+ok 48 - motion interpolates evenly and snaps on floor change or distant travel
+  ---
+  duration_ms: 0.223779
+  type: 'test'
+  ...
+# Subtest: picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+ok 49 - picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+  ---
+  duration_ms: 0.457432
+  type: 'test'
+  ...
+# Subtest: owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+ok 50 - owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+  ---
+  duration_ms: 0.233093
+  type: 'test'
+  ...
+# Subtest: surface index gives trails priority, curved segments, ellipse edges and floor stone
+ok 51 - surface index gives trails priority, curved segments, ellipse edges and floor stone
+  ---
+  duration_ms: 0.441899
+  type: 'test'
+  ...
+# Subtest: large monster picking follows species size and ignores other floors
+ok 52 - large monster picking follows species size and ignores other floors
+  ---
+  duration_ms: 0.18372
+  type: 'test'
+  ...
+# Subtest: combat readout explains lower d20, misses, criticals and saving throws
+ok 53 - combat readout explains lower d20, misses, criticals and saving throws
+  ---
+  duration_ms: 0.271099
+  type: 'test'
+  ...
+# Subtest: companion cannot be accidentally selected as a hostile monster
+ok 54 - companion cannot be accidentally selected as a hostile monster
+  ---
+  duration_ms: 0.259931
+  type: 'test'
+  ...
+# Subtest: combat summary exposes actual damage dice and zero save damage
+ok 55 - combat summary exposes actual damage dice and zero save damage
+  ---
+  duration_ms: 0.366248
+  type: 'test'
+  ...
+# Subtest: paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+ok 56 - paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+  ---
+  duration_ms: 0.524791
+  type: 'test'
+  ...
+# Subtest: hotbar pages handle empty lists and exact twenty-four-slot boundaries
+ok 57 - hotbar pages handle empty lists and exact twenty-four-slot boundaries
+  ---
+  duration_ms: 0.109041
+  type: 'test'
+  ...
+# Subtest: status timer distinguishes six hundred rounds from real-world duration
+ok 58 - status timer distinguishes six hundred rounds from real-world duration
+  ---
+  duration_ms: 0.130491
+  type: 'test'
+  ...
+# Subtest: mana budget UI names mixed slot distribution and flexible pool
+ok 59 - mana budget UI names mixed slot distribution and flexible pool
+  ---
+  duration_ms: 0.155649
+  type: 'test'
+  ...
+# Subtest: spell profile overlays owner scaling without mutating the shared catalogue
+ok 60 - spell profile overlays owner scaling without mutating the shared catalogue
+  ---
+  duration_ms: 0.214986
+  type: 'test'
+  ...
+# Subtest: hotbar mana uses selected casting rank, never static base spell cost
+ok 61 - hotbar mana uses selected casting rank, never static base spell cost
+  ---
+  duration_ms: 0.111835
+  type: 'test'
+  ...
+# Subtest: repeating active concentration is free, other spell costs remain payable
+ok 62 - repeating active concentration is free, other spell costs remain payable
+  ---
+  duration_ms: 0.092786
+  type: 'test'
+  ...
+# Subtest: missing locked spell profile falls back to a safe base and empty slots stay empty
+ok 63 - missing locked spell profile falls back to a safe base and empty slots stay empty
+  ---
+  duration_ms: 0.142519
+  type: 'test'
+  ...
+# Subtest: owner delta replaces spell profiles completely and never leaks them across accounts
+ok 64 - owner delta replaces spell profiles completely and never leaks them across accounts
+  ---
+  duration_ms: 0.096522
+  type: 'test'
+  ...
+# Subtest: Initial warrior choice needs no master or points
+ok 65 - Initial warrior choice needs no master or points
+  ---
+  duration_ms: 0.862808
+  type: 'test'
+  ...
+# Subtest: Changing a chosen style requires the master
+ok 66 - Changing a chosen style requires the master
+  ---
+  duration_ms: 0.137502
+  type: 'test'
+  ...
+# Subtest: Dead warriors and active combat cannot change style
+ok 67 - Dead warriors and active combat cannot change style
+  ---
+  duration_ms: 0.127517
+  type: 'test'
+  ...
+# Subtest: No other class receives warrior-style choice
+ok 68 - No other class receives warrior-style choice
+  ---
+  duration_ms: 0.996845
+  type: 'test'
+  ...
+# Subtest: Four mastery/surge effects draw finite commands and balance the canvas stack
+ok 69 - Four mastery/surge effects draw finite commands and balance the canvas stack
+  ---
+  duration_ms: 0.975664
+  type: 'test'
+  ...
+# Subtest: Expired effects do not leave any marks on the canvas
+ok 70 - Expired effects do not leave any marks on the canvas
+  ---
+  duration_ms: 0.208657
+  type: 'test'
+  ...
+# Subtest: Old spell effects remain handled by their original renderer
+ok 71 - Old spell effects remain handled by their original renderer
+  ---
+  duration_ms: 0.19738
+  type: 'test'
+  ...
+# Subtest: Sap and prone overlays are visible only while authoritative status exists
+ok 72 - Sap and prone overlays are visible only while authoritative status exists
+  ---
+  duration_ms: 0.250117
+  type: 'test'
+  ...
+# Subtest: Graze is displayed as miss damage rather than a hit or harmless miss
+ok 73 - Graze is displayed as miss damage rather than a hit or harmless miss
+  ---
+  duration_ms: 0.527575
+  type: 'test'
+  ...
+# Subtest: second-finger swipe keeps joystick movement and survives child capture loss
+ok 74 - second-finger swipe keeps joystick movement and survives child capture loss
+  ---
+  duration_ms: 3.865258
+  type: 'test'
+  ...
+# Subtest: swiping never casts or ghost-clicks; the next tap, mouse and keyboard still cast
+ok 75 - swiping never casts or ghost-clicks; the next tap, mouse and keyboard still cast
+  ---
+  duration_ms: 1.240762
+  type: 'test'
+  ...
+# Subtest: gaps and disabled-slot hit targets scroll; pointer IDs, cancellation and edges stay independent
+ok 76 - gaps and disabled-slot hit targets scroll; pointer IDs, cancellation and edges stay independent
+  ---
+  duration_ms: 0.571589
+  type: 'test'
+  ...
+# Subtest: desktop, mouse and non-overflow rows are not taken over by touch scrolling
+ok 77 - desktop, mouse and non-overflow rows are not taken over by touch scrolling
+  ---
+  duration_ms: 0.298819
+  type: 'test'
+  ...
+# Subtest: grouped projection and book refer to the same slot
+ok 78 - grouped projection and book refer to the same slot
+  ---
+  duration_ms: 1.440556
+  type: 'test'
+  ...
+# Subtest: exhausted transformations are disabled, zero-cost arrow and switch remain valid
+ok 79 - exhausted transformations are disabled, zero-cost arrow and switch remain valid
+  ---
+  duration_ms: 0.576977
+  type: 'test'
+  ...
+# Subtest: archer main button is an arrow, not another activation
+ok 80 - archer main button is an arrow, not another activation
+  ---
+  duration_ms: 0.656224
+  type: 'test'
+  ...
+# Subtest: resource cost text is distinct from zero mana
+ok 81 - resource cost text is distinct from zero mana
+  ---
+  duration_ms: 0.256556
+  type: 'test'
+  ...
+# Subtest: compact potion includes strength and quantity, no zero weapon stats
+ok 82 - compact potion includes strength and quantity, no zero weapon stats
+  ---
+  duration_ms: 0.929385
+  type: 'test'
+  ...
+# Subtest: weapon shows actual personalized rolls without repeating enchantment
+ok 83 - weapon shows actual personalized rolls without repeating enchantment
+  ---
+  duration_ms: 0.20437
+  type: 'test'
+  ...
+# Subtest: armor and resistance use compact concrete descriptions
+ok 84 - armor and resistance use compact concrete descriptions
+  ---
+  duration_ms: 0.114958
+  type: 'test'
+  ...
+# Subtest: requirements display meaningful level but no class wall of text
+ok 85 - requirements display meaningful level but no class wall of text
+  ---
+  duration_ms: 0.111584
+  type: 'test'
+  ...
+# Subtest: all-class supplies need no class wall of text
+ok 86 - all-class supplies need no class wall of text
+  ---
+  duration_ms: 0.198551
+  type: 'test'
+  ...
+# Subtest: no source row until server provides owner-discovered sources
+ok 87 - no source row until server provides owner-discovered sources
+  ---
+  duration_ms: 0.132194
+  type: 'test'
+  ...
+# Subtest: negative window position remains on screen
+ok 88 - negative window position remains on screen
+  ---
+  duration_ms: 0.856959
+  type: 'test'
+  ...
+# Subtest: offscreen close header is clamped to viewport
+ok 89 - offscreen close header is clamped to viewport
+  ---
+  duration_ms: 0.174387
+  type: 'test'
+  ...
+# Subtest: oversized saved window remains reachable on mobile
+ok 90 - oversized saved window remains reachable on mobile
+  ---
+  duration_ms: 0.306991
+  type: 'test'
+  ...
+# Subtest: single line only contains name and the gained HP
+ok 91 - single line only contains name and the gained HP
+  ---
+  duration_ms: 0.68082
+  type: 'test'
+  ...
+# Subtest: each saving throw can be shown independently
+ok 92 - each saving throw can be shown independently
+  ---
+  duration_ms: 0.098514
+  type: 'test'
+  ...
+# Subtest: movement delta retains its units and decimal comma
+ok 93 - movement delta retains its units and decimal comma
+  ---
+  duration_ms: 0.120527
+  type: 'test'
+  ...
+# Subtest: spell unlock is a gain, not before and after
+ok 94 - spell unlock is a gain, not before and after
+  ---
+  duration_ms: 0.090222
+  type: 'test'
+  ...
+# Subtest: compact owner state preserves pending receipts until changed
+ok 95 - compact owner state preserves pending receipts until changed
+  ---
+  duration_ms: 0.363885
+  type: 'test'
+  ...
+# Subtest: authoritative empty queue clears receipt history
+ok 96 - authoritative empty queue clears receipt history
+  ---
+  duration_ms: 0.325778
+  type: 'test'
+  ...
+# Subtest: Polish drop chance percentages
+ok 97 - Polish drop chance percentages
+  ---
+  duration_ms: 12.624025
+  type: 'test'
+  ...
+# Subtest: Loot preview uses canonical item and unconditional chance
+ok 98 - Loot preview uses canonical item and unconditional chance
+  ---
+  duration_ms: 0.296716
+  type: 'test'
+  ...
+# Subtest: Potion previews use potion catalog
+ok 99 - Potion previews use potion catalog
+  ---
+  duration_ms: 0.113707
+  type: 'test'
+  ...
+# Subtest: Unknown species has no invented drops
+ok 100 - Unknown species has no invented drops
+  ---
+  duration_ms: 0.542357
+  type: 'test'
+  ...
+# Subtest: Atlas frame is always bounded for normal movement
+ok 101 - Atlas frame is always bounded for normal movement
+  ---
+  duration_ms: 5.610372
+  type: 'test'
+  ...
+# Subtest: Atlas idle and invalid movement safe default
+ok 102 - Atlas idle and invalid movement safe default
+  ---
+  duration_ms: 0.112405
+  type: 'test'
+  ...
+# Subtest: Atlas four walking frames loop in order
+ok 103 - Atlas four walking frames loop in order
+  ---
+  duration_ms: 0.237779
+  type: 'test'
+  ...
+# Subtest: intermediate pool tooltip does not equate smooth mana with old slots
+ok 104 - intermediate pool tooltip does not equate smooth mana with old slots
+  ---
+  duration_ms: 0.849749
+  type: 'test'
+  ...
+# Subtest: focus remains a separate bonus in the mana tooltip
+ok 105 - focus remains a separate bonus in the mana tooltip
+  ---
+  duration_ms: 0.107328
+  type: 'test'
+  ...
+# Subtest: knight tooltip has real pool and no imaginary next gain
+ok 106 - knight tooltip has real pool and no imaginary next gain
+  ---
+  duration_ms: 0.137352
+  type: 'test'
+  ...
+# Subtest: end cap tooltip does not promise further mana
+ok 107 - end cap tooltip does not promise further mana
+  ---
+  duration_ms: 0.094018
+  type: 'test'
+  ...
+# Subtest: award lines show only each earned delta
+ok 108 - award lines show only each earned delta
+  ---
+  duration_ms: 0.134337
+  type: 'test'
+  ...
+# Subtest: hotbar spell profile uses the server intermediate recovery amount
+ok 109 - hotbar spell profile uses the server intermediate recovery amount
+  ---
+  duration_ms: 0.158934
+  type: 'test'
+  ...
+# Subtest: second-finger touch casts on release without click and ignores its compatibility click
+ok 110 - second-finger touch casts on release without click and ignores its compatibility click
+  ---
+  duration_ms: 1.534855
+  type: 'test'
+  ...
+# Subtest: horizontal swipe, changed scroll position and canceled gestures never cast
+ok 111 - horizontal swipe, changed scroll position and canceled gestures never cast
+  ---
+  duration_ms: 0.483911
+  type: 'test'
+  ...
+# Subtest: release outside the button or a newly disabled button does not cast
+ok 112 - release outside the button or a newly disabled button does not cast
+  ---
+  duration_ms: 0.151663
+  type: 'test'
+  ...
+# Subtest: mouse and keyboard clicks still work immediately after a touch
+ok 113 - mouse and keyboard clicks still work immediately after a touch
+  ---
+  duration_ms: 0.962554
+  type: 'test'
+  ...
+# Subtest: touches are independent: canceling one pointer does not discard another tap
+ok 114 - touches are independent: canceling one pointer does not discard another tap
+  ---
+  duration_ms: 0.268104
+  type: 'test'
+  ...
+# Subtest: actual game release handler preserves the joystick when another finger is released
+ok 115 - actual game release handler preserves the joystick when another finger is released
+  ---
+  duration_ms: 1.714449
+  type: 'test'
+  ...
+# Subtest: new layouts start locked; pointer and keyboard cannot move panels
+ok 116 - new layouts start locked; pointer and keyboard cannot move panels
+  ---
+  duration_ms: 12.360426
+  type: 'test'
+  ...
+# Subtest: legacy saved positions and visibility survive default-lock migration
+ok 117 - legacy saved positions and visibility survive default-lock migration
+  ---
+  duration_ms: 13.419302
+  type: 'test'
+  ...
+# Subtest: explicit unlock permits drag and arrow movement, and locking preserves placement
+ok 118 - explicit unlock permits drag and arrow movement, and locking preserves placement
+  ---
+  duration_ms: 4.764278
+  type: 'test'
+  ...
+# Subtest: locking mid-drag releases capture and restores the last committed position
+ok 119 - locking mid-drag releases capture and restores the last committed position
+  ---
+  duration_ms: 2.864568
+  type: 'test'
+  ...
+# Subtest: reset preserves current lock state while clearing positions and hidden panels
+ok 120 - reset preserves current lock state while clearing positions and hidden panels
+  ---
+  duration_ms: 4.442506
+  type: 'test'
+  ...
+# Subtest: mobile unlock permits moving panels and relock preserves separate saved placement
+ok 121 - mobile unlock permits moving panels and relock preserves separate saved placement
+  ---
+  duration_ms: 5.505968
+  type: 'test'
+  ...
+# Subtest: only an explicit boolean false unlocks a stored profile
+ok 122 - only an explicit boolean false unlocks a stored profile
+  ---
+  duration_ms: 13.147047
+  type: 'test'
+  ...
+# Subtest: manual quest replaces atlas navigation and persists separately for myId
+ok 123 - manual quest replaces atlas navigation and persists separately for myId
+  ---
+  duration_ms: 3.690821
+  type: 'test'
+  ...
+# Subtest: another ready quest does not replace an explicitly selected active quest
+ok 124 - another ready quest does not replace an explicitly selected active quest
+  ---
+  duration_ms: 0.813665
+  type: 'test'
+  ...
+# Subtest: first unfinished objective advances to the next and then NPC, preserving fallback coordinates and floors
+ok 125 - first unfinished objective advances to the next and then NPC, preserving fallback coordinates and floors
+  ---
+  duration_ms: 2.027138
+  type: 'test'
+  ...
+# Subtest: claiming the tracked quest ends tracking instead of switching to another quest or landmark
+ok 126 - claiming the tracked quest ends tracking instead of switching to another quest or landmark
+  ---
+  duration_ms: 0.823059
+  type: 'test'
+  ...
+# Subtest: explicit off survives reload and locked or claimed quests cannot be selected
+ok 127 - explicit off survives reload and locked or claimed quests cannot be selected
+  ---
+  duration_ms: 1.385375
+  type: 'test'
+  ...
+# Subtest: Ranger uses per-class authoritative unlocks, including level-five Longstrider
+ok 128 - Ranger uses per-class authoritative unlocks, including level-five Longstrider
+  ---
+  duration_ms: 0.969474
+  type: 'test'
+  ...
+# Subtest: Concentration warning distinguishes preparation from immediate replacement
+ok 129 - Concentration warning distinguishes preparation from immediate replacement
+  ---
+  duration_ms: 0.240614
+  type: 'test'
+  ...
+# Subtest: Live ranger overlays are balanced and finite at all actor scales
+ok 130 - Live ranger overlays are balanced and finite at all actor scales
+  ---
+  duration_ms: 3.440274
+  type: 'test'
+  ...
+# Subtest: Caster concentration and armed intent never draw target overlays on caster
+ok 131 - Caster concentration and armed intent never draw target overlays on caster
+  ---
+  duration_ms: 0.259101
+  type: 'test'
+  ...
+# Subtest: Same target with multiple marks renders one readable symbol
+ok 132 - Same target with multiple marks renders one readable symbol
+  ---
+  duration_ms: 0.205322
+  type: 'test'
+  ...
+# Subtest: No live conditions means no lingering graphic
+ok 133 - No live conditions means no lingering graphic
+  ---
+  duration_ms: 0.163601
+  type: 'test'
+  ...
+# Subtest: New spell uses the same distinct vector icon in both clients
+ok 134 - New spell uses the same distinct vector icon in both clients
+  ---
+  duration_ms: 0.521285
+  type: 'test'
+  ...
+# Subtest: rest UI uses the server gate rather than the twenty-second combat tag
+ok 135 - rest UI uses the server gate rather than the twenty-second combat tag
+  ---
+  duration_ms: 0.877209
+  type: 'test'
+  ...
+# Subtest: rest UI keeps PvP and the last fractional second blocked
+ok 136 - rest UI keeps PvP and the last fractional second blocked
+  ---
+  duration_ms: 0.26566
+  type: 'test'
+  ...
+# Subtest: both rests work in the field unless the server explicitly restricts long rest
+ok 137 - both rests work in the field unless the server explicitly restricts long rest
+  ---
+  duration_ms: 0.256006
+  type: 'test'
+  ...
+# Subtest: active rest exposes progress and suppresses duplicate starts
+ok 138 - active rest exposes progress and suppresses duplicate starts
+  ---
+  duration_ms: 0.171202
+  type: 'test'
+  ...
+# Subtest: rest descriptions follow published server settings
+ok 139 - rest descriptions follow published server settings
+  ---
+  duration_ms: 0.679749
+  type: 'test'
+  ...
+# Subtest: short and long cooldowns are independent and include the last fractional second
+ok 140 - short and long cooldowns are independent and include the last fractional second
+  ---
+  duration_ms: 0.216067
+  type: 'test'
+  ...
+# Subtest: physical row one uses digits 1..0, Minus and Equal
+ok 141 - physical row one uses digits 1..0, Minus and Equal
+  ---
+  duration_ms: 0.858972
+  type: 'test'
+  ...
+# Subtest: F1..F12 occupy row two while adaptive F is not a slot
+ok 142 - F1..F12 occupy row two while adaptive F is not a slot
+  ---
+  duration_ms: 0.109972
+  type: 'test'
+  ...
+# Subtest: labels remain correct for second row and overflow bank
+ok 143 - labels remain correct for second row and overflow bank
+  ---
+  duration_ms: 0.302244
+  type: 'test'
+  ...
+# Subtest: all rendered shapes agree with Python geometry at sampled boundaries
+ok 144 - all rendered shapes agree with Python geometry at sampled boundaries
+  ---
+  duration_ms: 11.01086
+  type: 'test'
+  ...
+# Subtest: three missiles take distinct curved paths and converge at one target
+ok 145 - three missiles take distinct curved paths and converge at one target
+  ---
+  duration_ms: 1.482207
+  type: 'test'
+  ...
+# Subtest: missiles do not produce NaN when actor positions coincide
+ok 146 - missiles do not produce NaN when actor positions coincide
+  ---
+  duration_ms: 0.239632
+  type: 'test'
+  ...
+# Subtest: every current spell draws valid canvas commands and balances save/restore
+ok 147 - every current spell draws valid canvas commands and balances save/restore
+  ---
+  duration_ms: 14.435184
+  type: 'test'
+  ...
+# Subtest: legacy effects remain with the existing renderer
+ok 148 - legacy effects remain with the existing renderer
+  ---
+  duration_ms: 0.110993
+  type: 'test'
+  ...
+# Subtest: all upcast magic missiles have separate curves and converge on the target
+ok 149 - all upcast magic missiles have separate curves and converge on the target
+  ---
+  duration_ms: 0.712066
+  type: 'test'
+  ...
+# Subtest: eleven coincident-origin missiles remain finite at all animation phases
+ok 150 - eleven coincident-origin missiles remain finite at all animation phases
+  ---
+  duration_ms: 0.345257
+  type: 'test'
+  ...
+# Subtest: scaled missile volleys and scorching rays draw all animation phases without canvas imbalance
+ok 151 - scaled missile volleys and scorching rays draw all animation phases without canvas imbalance
+  ---
+  duration_ms: 5.522282
+  type: 'test'
+  ...
+# Subtest: status controls let noncasters escape hazards and wake allies without spell access
+ok 152 - status controls let noncasters escape hazards and wake allies without spell access
+  ---
+  duration_ms: 3.960928
+  type: 'test'
+  ...
+# Subtest: druid 15 can confirm after combat expires while the stat selector retains focus
+not ok 153 - druid 15 can confirm after combat expires while the stat selector retains focus
+  ---
+  duration_ms: 5.728865
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:41:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'length')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    Object.feats (caster_ui.js:166:26)
+    render (character_sheet.js:116:137)
+    Object.open (character_sheet.js:24:120)
+    fixture (/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:35:7)
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:42:11)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: spent points and a feat removed from the latest snapshot disable the focused form
+not ok 154 - spent points and a feat removed from the latest snapshot disable the focused form
+  ---
+  duration_ms: 3.017913
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:49:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'length')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    Object.feats (caster_ui.js:166:26)
+    render (character_sheet.js:116:137)
+    Object.open (character_sheet.js:24:120)
+    fixture (/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:35:7)
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:50:11)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+  ...
+# Subtest: missing or no-longer-eligible stat never enables confirmation
+not ok 155 - missing or no-longer-eligible stat never enables confirmation
+  ---
+  duration_ms: 1.360508
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:56:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'length')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    Object.feats (caster_ui.js:166:26)
+    render (character_sheet.js:116:137)
+    Object.open (character_sheet.js:24:120)
+    fixture (/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:35:7)
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:57:11)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+  ...
+# Subtest: fresh death, transformation and combat gates remain authoritative without reconnecting
+not ok 156 - fresh death, transformation and combat gates remain authoritative without reconnecting
+  ---
+  duration_ms: 1.829718
+  type: 'test'
+  location: '/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:63:1'
+  failureType: 'testCodeFailure'
+  error: "Cannot read properties of undefined (reading 'length')"
+  code: 'ERR_TEST_FAILURE'
+  name: 'TypeError'
+  stack: |-
+    Object.feats (caster_ui.js:166:26)
+    render (character_sheet.js:116:137)
+    Object.open (character_sheet.js:24:120)
+    fixture (/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:35:7)
+    TestContext.<anonymous> (/mnt/data/bractwo_ui15_baseline/tests/test_training_refresh_ui08.cjs:64:11)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+  ...
+# Subtest: owner form overrides stale visuals; explicit empty never resurrects cached form
+ok 157 - owner form overrides stale visuals; explicit empty never resurrects cached form
+  ---
+  duration_ms: 0.988942
+  type: 'test'
+  ...
+# Subtest: legacy fallback uses visuals, then sheet; empty visual overrides older sheet
+ok 158 - legacy fallback uses visuals, then sheet; empty visual overrides older sheet
+  ---
+  duration_ms: 0.192613
+  type: 'test'
+  ...
+# Subtest: active archer has short distinct label, icon and zero-cost arrow action
+ok 159 - active archer has short distinct label, icon and zero-cost arrow action
+  ---
+  duration_ms: 1.714909
+  type: 'test'
+  ...
+# Subtest: bonus cooldown disables arrow without disabling resource-free dismissal
+ok 160 - bonus cooldown disables arrow without disabling resource-free dismissal
+  ---
+  duration_ms: 0.218662
+  type: 'test'
+  ...
+# Subtest: Kielich and Smok main action is dismissal, not another paid activation
+ok 161 - Kielich and Smok main action is dismissal, not another paid activation
+  ---
+  duration_ms: 0.151132
+  type: 'test'
+  ...
+# Subtest: blocked and dead states do not offer dismissal
+ok 162 - blocked and dead states do not offer dismissal
+  ---
+  duration_ms: 0.10162
+  type: 'test'
+  ...
+# Subtest: compact scale is identical before/after fullscreen at a fixed visual viewport scale
+ok 163 - compact scale is identical before/after fullscreen at a fixed visual viewport scale
+  ---
+  duration_ms: 1.168797
+  type: 'test'
+  ...
+# Subtest: browser shrink reset is compensated once for HUD and world
+ok 164 - browser shrink reset is compensated once for HUD and world
+  ---
+  duration_ms: 0.631598
+  type: 'test'
+  ...
+# Subtest: portrait profile is stable; user zoom above 1 remains available
+ok 165 - portrait profile is stable; user zoom above 1 remains available
+  ---
+  duration_ms: 0.863818
+  type: 'test'
+  ...
+# Subtest: only the server-acknowledged pending spell gets a queue caption
+ok 166 - only the server-acknowledged pending spell gets a queue caption
+  ---
+  duration_ms: 0.703193
+  type: 'test'
+  ...
+# Subtest: ready pending command remains visible until the server executes it
+ok 167 - ready pending command remains visible until the server executes it
+  ---
+  duration_ms: 0.14332
+  type: 'test'
+  ...
+# Subtest: no empty slot or absent player can show a phantom pending spell
+ok 168 - no empty slot or absent player can show a phantom pending spell
+  ---
+  duration_ms: 0.092906
+  type: 'test'
+  ...
+# Subtest: queue label disappears after completion or cancellation
+ok 169 - queue label disappears after completion or cancellation
+  ---
+  duration_ms: 0.126937
+  type: 'test'
+  ...
+# Subtest: hotbar, F and book share the same queue formatter
+ok 170 - hotbar, F and book share the same queue formatter
+  ---
+  duration_ms: 1.413467
+  type: 'test'
+  ...
+# Subtest: wand instruction is determined by actual weapon and mentions manual Space
+ok 171 - wand instruction is determined by actual weapon and mentions manual Space
+  ---
+  duration_ms: 0.536839
+  type: 'test'
+  ...
+# Subtest: native client mirrors the queue and actual weapon instruction
+ok 172 - native client mirrors the queue and actual weapon instruction
+  ---
+  duration_ms: 0.461087
+  type: 'test'
+  ...
+1..172
+# tests 172
+# suites 0
+# pass 162
+# fail 10
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1039.345066

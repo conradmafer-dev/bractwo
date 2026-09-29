@@ -18,14 +18,14 @@ class Supplies(unittest.IsolatedAsyncioTestCase):
  def tearDown(self):self.g.db.close()
  async def cmd(self,kind,**data):await self.g.inventory_command(self.p,kind,data)
  def test_starter_supplies_are_owned_stacks(self):
-  self.assertEqual(len(self.p.inventory),4)
-  self.assertEqual(inv.count(self.p,'health_potion'),3);self.assertEqual(inv.count(self.p,'mana_potion'),3)
+  self.assertEqual(len(self.p.inventory),3)
+  self.assertEqual(inv.count(self.p,'health_potion'),3);self.assertEqual(self.p.potion_slots,{'q':'health_potion'})
  def test_migration_full_bag_preserves_and_is_idempotent(self):
-  p=Player('old','Old',WS());p.inventory=[make_item('loot_trophy_rat') for _ in range(40)];p.potions={'mana_potion':110,'health_potion':2}
+  p=Player('old','Old',WS());p.inventory=[make_item('loot_trophy_rat') for _ in range(40)];p.potions={'mana_potion':110,'health_potion':110}
   inv.ensure(p,ITEMS,POTIONS,make_item);uids=[i['uid'] for i in p.inventory]
-  self.assertEqual(len(p.inventory),43);self.assertEqual(inv.count(p,'mana_potion'),110)
+  self.assertEqual(len(p.inventory),42);self.assertEqual(inv.count(p,'health_potion'),110);self.assertEqual(inv.count(p,'mana_potion'),0)
   inv.ensure(p,ITEMS,POTIONS,make_item);self.assertEqual([i['uid'] for i in p.inventory],uids)
-  self.assertTrue(inv.add(p,'health_potion',1,make_item,40));self.assertFalse(inv.add(p,'mana_potion_2',1,make_item,40))
+  self.assertTrue(inv.add(p,'health_potion',1,make_item,40));self.assertFalse(inv.add(p,'health_potion_2',1,make_item,40))
  def test_stacks_fill_then_add_new_cell(self):
   self.assertTrue(inv.add(self.p,'health_potion',101,make_item,40))
   self.assertEqual([i['quantity'] for i in self.p.inventory if i['template']=='health_potion'],[99,5])
@@ -33,53 +33,54 @@ class Supplies(unittest.IsolatedAsyncioTestCase):
   stack=next(i for i in self.p.inventory if i['template']=='health_potion');stack['quantity']=98
   self.p.inventory += [make_item('loot_trophy_rat') for _ in range(40-len(self.p.inventory))]
   self.assertFalse(inv.add(self.p,'health_potion',2,make_item,40));self.assertEqual(stack['quantity'],98)
- async def test_q_and_r_accept_exact_owned_kind(self):
-  inv.add(self.p,'mana_potion_2',2,make_item,40)
-  await self.cmd('potion_bind',slot='q',item='mana_potion_2');self.assertEqual(self.p.potion_slots['q'],'mana_potion_2')
-  self.p.mana=0;await self.cmd('potion',slot='q');self.assertEqual(self.p.mana,35)
-  self.assertEqual(inv.count(self.p,'mana_potion_2'),1);self.assertEqual(inv.count(self.p,'mana_potion'),3)
+ async def test_q_accepts_exact_owned_health_kind(self):
+  inv.add(self.p,'health_potion_2',2,make_item,40)
+  await self.cmd('potion_bind',slot='q',item='health_potion_2');self.assertEqual(self.p.potion_slots['q'],'health_potion_2')
+  self.p.hp=1;await self.cmd('potion',slot='q');self.assertEqual(self.p.hp,17)
+  self.assertEqual(inv.count(self.p,'health_potion_2'),1);self.assertEqual(inv.count(self.p,'health_potion'),3)
  async def test_no_automatic_stronger_selection(self):
-  inv.add(self.p,'mana_potion_3',2,make_item,40);self.p.mana=0
-  await self.cmd('potion',slot='r');self.assertEqual(self.p.mana,18);self.assertEqual(inv.count(self.p,'mana_potion_3'),2)
+  inv.add(self.p,'health_potion_3',2,make_item,40);self.p.hp=1
+  await self.cmd('potion',slot='q');self.assertEqual(self.p.hp,9);self.assertEqual(inv.count(self.p,'health_potion_3'),2)
  async def test_empty_binding_cannot_consume_other_potions(self):
   self.p.potion_slots['q']='';self.p.hp=1;await self.cmd('potion',slot='q');self.assertEqual(self.p.hp,1)
  async def test_unowned_or_level_locked_bind_is_rejected(self):
-  await self.cmd('potion_bind',slot='q',item='mana_potion_2');self.assertEqual(self.p.potion_slots['q'],'health_potion')
-  inv.add(self.p,'mana_potion_4',1,make_item,40);await self.cmd('potion_bind',slot='q',item='mana_potion_4');self.assertEqual(self.p.potion_slots['q'],'health_potion')
+  await self.cmd('potion_bind',slot='q',item='health_potion_2');self.assertEqual(self.p.potion_slots['q'],'health_potion')
+  inv.add(self.p,'health_potion_4',1,make_item,40);await self.cmd('potion_bind',slot='q',item='health_potion_4');self.assertEqual(self.p.potion_slots['q'],'health_potion')
  async def test_forged_legacy_count_is_not_owned_inventory(self):
-  self.p.inventory=[i for i in self.p.inventory if i['template']!='mana_potion'];self.p.potions['mana_potion']=999;self.p.mana=0
-  await self.cmd('potion',slot='r');self.assertEqual(self.p.mana,0);self.assertEqual(self.p.potions['mana_potion'],0)
+  self.p.inventory=[i for i in self.p.inventory if i['template']!='health_potion'];self.p.potions['health_potion']=999;self.p.hp=1
+  await self.cmd('potion',slot='q');self.assertEqual(self.p.hp,1);self.assertEqual(self.p.potions['health_potion'],0)
  async def test_full_resource_does_not_consume(self):
-  await self.cmd('potion',slot='r');self.assertEqual(inv.count(self.p,'mana_potion'),3);self.assertEqual(self.p.potion_cooldown_until,0)
+  await self.cmd('potion',slot='q');self.assertEqual(inv.count(self.p,'health_potion'),3);self.assertEqual(self.p.potion_cooldown_until,0)
  async def test_shared_cooldown(self):
-  self.p.hp=1;self.p.mana=0;await self.cmd('potion',slot='q');await self.cmd('potion',slot='r');self.assertEqual(self.p.mana,0)
-  self.clock.advance(3.01);await self.cmd('potion',slot='r');self.assertEqual(self.p.mana,18)
+  inv.add(self.p,'health_potion_2',2,make_item,40);self.p.hp=1;await self.cmd('potion',slot='q')
+  await self.cmd('potion_bind',slot='q',item='health_potion_2');await self.cmd('potion',slot='q');self.assertEqual(self.p.hp,9)
+  self.clock.advance(3.01);await self.cmd('potion',slot='q');self.assertEqual(self.p.hp,25);self.assertEqual(inv.count(self.p,'health_potion_2'),1)
  async def test_last_potion_removes_stack_but_keeps_binding(self):
-  inv.consume(self.p,'mana_potion',2);self.p.mana=0;await self.cmd('potion',slot='r')
-  self.assertEqual(inv.count(self.p,'mana_potion'),0);self.assertEqual(self.p.potion_slots['r'],'mana_potion')
+  inv.consume(self.p,'health_potion',2);self.p.hp=1;await self.cmd('potion',slot='q')
+  self.assertEqual(inv.count(self.p,'health_potion'),0);self.assertEqual(self.p.potion_slots['q'],'health_potion')
  async def test_buy_charges_and_stacks(self):
-  before=len(self.p.inventory);await self.cmd('buy',item='mana_potion');self.assertEqual(len(self.p.inventory),before)
-  self.assertEqual(self.p.gold,1000-POTIONS['mana_potion']['price']);self.assertEqual(inv.count(self.p,'mana_potion'),4)
+  before=len(self.p.inventory);await self.cmd('buy',item='health_potion');self.assertEqual(len(self.p.inventory),before)
+  self.assertEqual(self.p.gold,1000-POTIONS['health_potion']['price']);self.assertEqual(inv.count(self.p,'health_potion'),4)
  async def test_buy_full_bag_does_not_charge(self):
   self.p.inventory += [make_item('loot_trophy_rat') for _ in range(40-len(self.p.inventory))]
-  await self.cmd('buy',item='mana_potion_2');self.assertEqual(self.p.gold,1000)
+  await self.cmd('buy',item='health_potion_2');self.assertEqual(self.p.gold,1000)
  async def test_sell_stack_pays_per_unit(self):
-  item=next(i for i in self.p.inventory if i['template']=='mana_potion');await self.cmd('sell',uid=item['uid'],quantity=3)
-  self.assertEqual(self.p.gold,1000+3*ITEMS['mana_potion']['value']);self.assertEqual(inv.count(self.p,'mana_potion'),0)
+  item=next(i for i in self.p.inventory if i['template']=='health_potion');await self.cmd('sell',uid=item['uid'],quantity=3)
+  self.assertEqual(self.p.gold,1000+3*ITEMS['health_potion']['value']);self.assertEqual(inv.count(self.p,'health_potion'),0)
  async def test_invalid_sell_quantity_never_changes_state(self):
-  item=next(i for i in self.p.inventory if i['template']=='mana_potion')
+  item=next(i for i in self.p.inventory if i['template']=='health_potion')
   for n in [-1,0,4,True,1.5,'3']:
-   await self.cmd('sell',uid=item['uid'],quantity=n);self.assertEqual(self.p.gold,1000);self.assertEqual(inv.count(self.p,'mana_potion'),3)
+   await self.cmd('sell',uid=item['uid'],quantity=n);self.assertEqual(self.p.gold,1000);self.assertEqual(inv.count(self.p,'health_potion'),3)
  async def test_trading_in_combat_is_blocked(self):
-  self.p.combat_until=self.clock()+50;await self.cmd('buy',item='mana_potion');self.assertEqual(self.p.gold,1000)
-  item=next(i for i in self.p.inventory if i['template']=='mana_potion');await self.cmd('sell',uid=item['uid']);self.assertEqual(inv.count(self.p,'mana_potion'),3)
+  self.p.combat_until=self.clock()+50;await self.cmd('buy',item='health_potion');self.assertEqual(self.p.gold,1000)
+  item=next(i for i in self.p.inventory if i['template']=='health_potion');await self.cmd('sell',uid=item['uid']);self.assertEqual(inv.count(self.p,'health_potion'),3)
  async def test_cannot_equip_potion_as_weapon(self):
-  before=copy.deepcopy(self.p.equipment);item=next(i for i in self.p.inventory if i['template']=='mana_potion');await self.cmd('equip',uid=item['uid']);self.assertEqual(before,self.p.equipment)
+  before=copy.deepcopy(self.p.equipment);item=next(i for i in self.p.inventory if i['template']=='health_potion');await self.cmd('equip',uid=item['uid']);self.assertEqual(before,self.p.equipment)
  def test_depot_is_not_available_to_shortcut(self):
-  item=next(i for i in self.p.inventory if i['template']=='mana_potion');self.p.inventory.remove(item);self.p.depot.append(item)
-  inv.ensure(self.p,ITEMS,POTIONS,make_item);self.assertEqual(self.p.potions['mana_potion'],0)
+  item=next(i for i in self.p.inventory if i['template']=='health_potion');self.p.inventory.remove(item);self.p.depot.append(item)
+  inv.ensure(self.p,ITEMS,POTIONS,make_item);self.assertEqual(self.p.potions['health_potion'],0)
  def test_save_load_preserves_stack_and_binding(self):
-  self.p.potion_slots['q']='mana_potion';loaded=self.g.load_player(self.p.id,self.p.name,WS(),self.p.save_data())
+  inv.add(self.p,'health_potion_2',2,make_item,40);self.p.potion_slots['q']='health_potion_2';loaded=self.g.load_player(self.p.id,self.p.name,WS(),self.p.save_data())
   self.assertEqual(loaded.inventory,self.p.inventory);self.assertEqual(loaded.potion_slots,self.p.potion_slots)
  def test_metadata_does_not_spoil_sources(self):
   meta=self.g.metadata();self.assertTrue(all('sources' not in i for i in meta['items'].values()))
@@ -147,7 +148,7 @@ class NewAssets(unittest.IsolatedAsyncioTestCase):
  async def test_windows_inventory_and_potion_assets_are_served(self):
   c=TestClient(TestServer(create_app(':memory:')));await c.start_server()
   try:
-   for path in ['/windows.js','/windows.css','/inventory_ui.js','/assets/equipment/mana_potion_2.svg','/assets/equipment/health_potion_4.svg']:
+   for path in ['/windows.js','/windows.css','/inventory_ui.js','/assets/equipment/health_potion_2.svg','/assets/equipment/health_potion_4.svg']:
     r=await c.get(path);self.assertEqual(r.status,200,path);self.assertTrue(await r.read())
   finally:await c.close()
 if __name__=='__main__':unittest.main()

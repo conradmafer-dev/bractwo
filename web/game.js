@@ -26,7 +26,7 @@
   let groundChunks=new Map(), expansionTab='growth', expansionSignature='', selectedRune='fire', atlasMode='nearby', navigationGoal=null;
   let hotbarPage=0, hotbarMenu=null, pendingPointTarget=null;
   let atlasView=null, atlasController=null;
-  let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null, mobileHud=null, restUI=null, appShell=null;
+  let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null, mobileHud=null, restUI=null, appShell=null, adventurePanel=null;
   let effects = new Map(), seenEffects = new Map(), floatingTexts = [];
   const touches = matchMedia("(pointer: coarse)").matches;
   const TAU = Math.PI * 2;
@@ -126,7 +126,7 @@
         selectedTarget = null; selectedEnemy = null; selectedWorldPoint = null; battleRows.clear(); ui.battleEnemies.replaceChildren(); pendingInvite = null; legacyPrompted = false; expansionSignature = ""; navigationGoal = null;
         trackedQuestId = readTrackedQuest();
         levelUpPanels?.reset(); atlasView=null; atlasController=null;
-        inventorySignature = ""; playersSignature = ""; ui.sidePanel.hidden = true; characterSheet?.close(); lootPanel?.close(); merchantPanel?.close(); restUI?.close(); ui.helpPanel.hidden = true;
+        adventurePanel?.close(); inventorySignature = ""; playersSignature = ""; ui.sidePanel.hidden = true; characterSheet?.close(); lootPanel?.close(); merchantPanel?.close(); restUI?.close(); ui.helpPanel.hidden = true;
         ui.legacyClassPanel.hidden = true; ui.partyInvite.hidden = true; ui.chatForm.hidden = true; ui.chatInput.blur(); ui.chatInput.value = ""; questSignature = "";
         ui.minimapCard.hidden = viewport.w < 560;
         updateRules();
@@ -296,7 +296,7 @@
     ui.interactName.textContent=nearby?.name||"Mieszkańcy Przystani";
     ui.interactPrompt.querySelector("small").textContent=nearby?.to_floor!==undefined?"SCHODY · E":nearby?.action?"UŻYJ · E":nearby?.service?"USŁUGI MIEJSKIE":nearby?.id?"ROZMOWA I ZLECENIA":"HANDEL I ODPOCZYNEK";
     ui.deathPanel.hidden=me.hp>0;
-    if(me.hp<=0){resetControls();ui.deathText.textContent=`Powrót do osady${me.respawn_in?` za ${Math.ceil(me.respawn_in)} s`:"…"}`;}
+    if(me.hp<=0){resetControls();const city=(world.cities||[]).find(c=>c.id===me.home_city)?.name||'Przystań';ui.deathText.textContent=`Miejsce odrodzenia: ${city}${me.respawn_in?` — powrót za ${Math.ceil(me.respawn_in)} s`:" — powrót…"}`;}
     ui.chooseClassButton.hidden=me.class_chosen!==false;
     if(me.class_chosen===false&&!legacyPrompted&&safe){legacyPrompted=true;resetControls();ui.legacyClassPanel.hidden=false;}
     if(me.class_chosen!==false)ui.legacyClassPanel.hidden=true;
@@ -306,7 +306,7 @@
     updateEffects(target);
     updatePotionButtons();
     updateQuestTracker(); updateBattleList();
-    characterSheet?.render();merchantPanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();
+    characterSheet?.render();merchantPanel?.render();adventurePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();
     if(!ui.sidePanel.hidden){if(panelMode==="inventory")renderInventory();else if(panelMode==="journal")renderJournal();else if(panelMode==="progression")renderExpansion();else renderPlayers();}
   }
   function nearestNpc(){
@@ -510,7 +510,7 @@
       const target=actionButton("Cel PvP",()=>selectTarget(String(player.id)),false,"target-button");target.dataset.target=player.id;target.dataset.action="target";target.dataset.playerId=player.id;actions.append(invite,target);row.append(actions);ui.playersList.append(row);
     }
   }
-  function setPanel(mode){merchantPanel?.close();characterSheet?.close();panelMode=mode;ui.sidePanel.hidden=false;ui.inventoryView.hidden=mode!=="inventory";ui.playersView.hidden=mode!=="players";ui.journalView.hidden=mode!=="journal";ui.progressionView.hidden=mode!=="progression";ui.progressionTab.classList.toggle("active",mode==="progression");ui.journalTab.classList.toggle("active",mode==="journal");ui.inventoryTab.classList.toggle("active",mode==="inventory");ui.playersTab.classList.toggle("active",mode==="players");ui.minimapCard.hidden=true;updateHUD();}
+  function setPanel(mode){adventurePanel?.close();merchantPanel?.close();characterSheet?.close();panelMode=mode;ui.sidePanel.hidden=false;ui.inventoryView.hidden=mode!=="inventory";ui.playersView.hidden=mode!=="players";ui.journalView.hidden=mode!=="journal";ui.progressionView.hidden=mode!=="progression";ui.progressionTab.classList.toggle("active",mode==="progression");ui.journalTab.classList.toggle("active",mode==="journal");ui.inventoryTab.classList.toggle("active",mode==="inventory");ui.playersTab.classList.toggle("active",mode==="players");ui.minimapCard.hidden=true;updateHUD();}
   function togglePanel(mode){if(!ui.sidePanel.hidden&&panelMode===mode){ui.sidePanel.hidden=true;updateHUD();}else setPanel(mode);}
   function selectTarget(id){selectedWorldPoint=null;selectedEnemy=null;selectedTarget=id;send({type:"select_target",target_id:id});playersSignature="";ui.sidePanel.hidden=true;updateHUD();notice("Cel: gracz. Po odblokowaniu PvP działają ataki, czary i wilk. Czary wsparcia działają na drużynę.");}
   function selectEnemy(id){
@@ -534,7 +534,8 @@
     ui.joystickKnob.style.transform = ""; ui.attackButton.classList.remove("held");
     if (playing) send({ type: "input", x: 0, y: 0 });
   }
-  function interact(){if(!canControl())return;if(merchantPanel?.visible){merchantPanel.close();return;}if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}const nature=(world.nature_sites||[]).find(s=>sameFloor(me,s)&&distance(me,s)<=110);if(nature){send({type:'nature_interact',id:nature.id});return;}const stair=nearestStair();if(stair){send({type:'descend'});return;}if(nearestSite()){send({type:'interact'});return;}const npc=nearestNpc();if(npc?.service==='merchant'){merchantPanel.open();return;}if(npc?.service){openExpansion(npc.service==='master'?'growth':'services');return;}if(npc){setPanel('journal');const quest=Array.from(ui.questList.children).find(row=>row.dataset.npcId===npc.id);quest?.scrollIntoView({block:'nearest'});}else if(merchantNear()){merchantPanel.open();}else openExpansion('atlas');}
+  function talkTo(npc){if(npc.dialogue||npc.service==='boat'){adventurePanel.open(npc);return;}if(npc.service==='merchant'){merchantPanel.open();return;}if(npc.service){openExpansion(npc.service==='master'?'growth':'services');return;}adventurePanel.open(npc);}
+  function interact(){if(!canControl())return;if(adventurePanel?.visible){adventurePanel.close();return;}if(merchantPanel?.visible){merchantPanel.close();return;}if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}const nature=(world.nature_sites||[]).find(s=>sameFloor(me,s)&&distance(me,s)<=110);if(nature){send({type:'nature_interact',id:nature.id});return;}const stair=nearestStair();if(stair){send({type:'descend'});return;}if(nearestSite()){send({type:'interact'});return;}const npc=nearestNpc();if(npc){talkTo(npc);}else if(merchantNear()){merchantPanel.open();}else openExpansion('atlas');}
   function ability(){if(canControl())cast(me.favorite_spell||world.classes?.[me.class_id]?.default_ability);}
   function potion(item){if(playing&&me?.hp>0)send({type:"potion",item});}
   function toggleHelp(){merchantPanel?.close();characterSheet?.close();ui.helpPanel.hidden=!ui.helpPanel.hidden;}
@@ -585,7 +586,7 @@
     if(nearest){if(nearest.kind==='e')selectEnemy(String(nearest.entity.id));else selectTarget(String(nearest.entity.id));}
     else {
       const npc=(world.npcs||[]).find(n=>sameFloor(me,n)&&Math.hypot(n.x-x,n.y-20-y)<36);
-      if(npc?.service==="merchant"){merchantPanel.open();}else if(npc?.service){openExpansion(npc.service==="master"?"growth":"services");}else if(npc){setPanel("journal");const row=Array.from(ui.questList.children).find(q=>q.dataset.npcId===npc.id);row?.scrollIntoView({block:"nearest"});}
+      if(npc)talkTo(npc);
       // Empty terrain does not arm a crosshair or remove the selected enemy.
     }
   });
@@ -600,6 +601,8 @@
     if(!playing||mobileHud?.blocksControls()||restUI?.blocksControls()||appShell?.blocksControls())return;
     if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton, #hotbarGroupMenu button, .hotbar-group-toggle'))return;
     if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
+    if(event.target.closest?.('#adventurePanel button')&&['Enter','Space'].includes(event.code))return;
+    if(adventurePanel?.visible&&event.code==='Escape'){event.preventDefault();adventurePanel.close();return;}
     if(merchantPanel?.visible&&event.code==='Escape'){event.preventDefault();merchantPanel.close();return;}
     if(lootPanel?.visible&&event.code==='Escape'){event.preventDefault();lootPanel.close();return;}
     if(event.ctrlKey||event.metaKey||event.altKey)return;
@@ -762,7 +765,7 @@
   }
   function renderExpansion(){
     if(!me)return;
-    const services=['captain','bank','master','merchant'].map(s=>!!nearbyService(s));services[3]=merchantNear();
+    const services=['boat','bank','master','merchant'].map(s=>!!nearbyService(s));services[3]=merchantNear();
     const affordable=[...Object.values(world.spells||{}),...Object.values(world.runes||{})].map(s=>me.mana>=spellMana(s));
     if(expansionTab==='atlas')atlasController?.update(me,navigationGoal);
     const signature=JSON.stringify(expansionTab==='atlas'?[expansionTab,atlasMode,me.class_id,me.level,me.discoveries,me.floor]:[expansionTab,me.hotbar,me.form,me.concentration,me.shield_armed,me.bonus_remaining>0,me.action_remaining>0,me.level,me.promoted,me.skills,me.gold,me.bank_gold,me.depot,me.inventory,me.equipment,me.mastery,me.blessed,me.runes,affordable,me.soul,me.potions,me.home_city,me.hp>0,services,me.floor,Math.floor(me.x/64),Math.floor(me.y/64),Math.ceil(me.combat_remaining),Math.ceil(me.rune_cooldown),Object.entries(me.spell_cooldowns||{}).map(([k,v])=>[k,Math.ceil(v)]),me.discoveries,atlasMode,me.premium_demo,Math.ceil((me.premium_demo_remaining||0)/86400)]);
@@ -773,12 +776,6 @@
     if(expansionTab==='growth'){
       guideRow(root,`KP ${me.armor_class} · ${me.damage_dice} · ${me.attacks_per_round} atak/akcję`,`Biegłość +${me.proficiency} · ST czarów ${me.save_dc} · krąg ${me.spell_circle}. `+Object.entries(me.attributes||{}).map(([a,v])=>`${({strength:'SIŁ',dexterity:'ZRĘ',constitution:'KON',intelligence:'INT',wisdom:'MĄD',charisma:'CHA'})[a]} ${v}`).join(' · '));
       root.append(element('p','panel-tip','Twoje statystyki i rzuty znajdziesz w C → Statystyki. Poniżej rozwój wyłącznie Twojej klasy.'));
-      root.append(element('div','section-label','TRENING · HISTORIA UŻYWANIA'));
-      root.append(element('p','muted','Liczniki treningu nie zwiększają premii trafienia, KP ani ST czarów.'));
-      for(const[key,labelText]of Object.entries({melee:'Walka wręcz',distance:'Walka dystansowa',magic:'Używanie magii',shielding:'Obrona'})){
-        const v=me.skills?.[key]||{level:10,progress:0,next:30},row=guideRow(root,`${labelText} · ${v.level}`,`${v.progress} / ${v.next} do następnego poziomu`);
-        const track=element('div','skill-track'),bar=element('i');bar.style.width=`${Math.min(100,v.progress/v.next*100)}%`;track.append(bar);row.append(track);
-      }
       root.append(element('div','section-label','KOLEJNE MOŻLIWOŚCI'));
       for(const m of world.class_progression?.[me.class_id]||[])guideRow(root,`${me.level>=m.level?'✓':'◇'} Poziom ${m.level} · ${m.name}`,m.description);
       const can=!!nearbyService('master')&&!me.combat_remaining;
@@ -809,23 +806,24 @@
       guideRow(root,me.premium_demo?'Testowe premium aktywne':'Wypróbuj szybki marsz',me.premium_demo?`Pozostało ${Math.ceil(me.premium_demo_remaining/86400)} dni. Bonus łączy się z podłożem i czarem przyspieszenia.`:'Włącz na 30 dni; możesz w każdej chwili wyłączyć.',[actionButton(me.premium_demo?'Wyłącz symulację':'Włącz bezpłatną symulację',()=>send({type:'premium_demo',enabled:!me.premium_demo}))]);
       guideRow(root,'Podłoże ma znaczenie','Ścieżka +18% · kamień +25% · trawa normalnie · ściółka −6% · piasek −14% · śnieg −12% · błoto −28%. Podłoże wpływa również na potwory.');
     }else{
-      const safe=me.hp>0&&!me.combat_remaining,bank=nearbyService('bank'),master=nearbyService('master'),captain=nearbyService('captain');
+      const safe=me.hp>0&&!me.combat_remaining,bank=nearbyService('bank'),master=nearbyService('master'),captain=nearbyService('boat');
       root.append(element('p','panel-tip',me.combat_remaining>0?'Trwa blokada po walce. Zaczekaj przed usługami.':'Usługi wymagają rozmowy z odpowiednim mieszkańcem. Atlas pokazuje miasta.'));
       const city=(world.cities||[]).filter(c=>sameFloor(me,c)).sort((a,b)=>distance(me,a)-distance(me,b))[0];
-      for(const[service,labelText]of[['captain','Kapitan — podróże'],['bank','Bankier — depozyt i odrodzenie'],['master','Mistrz — promocja i błogosławieństwo'],['merchant','Kupiec — zapasy']]){
+      for(const[service,labelText]of[['boat','Przewoźnik — miejscowe przeprawy'],['bank','Bankier — depozyt'],['master','Mistrz — promocja i błogosławieństwo'],['merchant','Kupiec — zapasy']]){
         const n=service==='merchant'?nearestMerchant():(world.npcs||[]).filter(n=>n.service===service).sort((a,b)=>distance(me,a)-distance(me,b))[0];
         if(n)root.append(actionButton(`${labelText} · ${directionTo(n)}`,()=>navigateTo(n,n.name)));
       }
-      root.append(element('div','section-label','STATKI · OD POZIOMU 8'));
-      for(const c of world.cities||[]){
-        const cost=40+Math.floor(distance(me,c)/1000)*8;
-        guideRow(root,c.name,`Rejs: ${cost} złota${captain?'':' · podejdź do kapitana'}`,[actionButton('Wypłyń',()=>send({type:'travel',city_id:c.id}),!captain||!safe||me.level<8||me.gold<cost||captain?.city_id===c.id)]);
+      root.append(element('div','section-label','MIEJSCOWE PRZEPRAWY'));
+      if(!captain)root.append(element('p','muted','Podejdź do przewoźnika, aby zobaczyć połączenia z tego portu. Porty i szlaki znajdziesz w Atlasie.'));
+      for(const route of (world.sea_routes||[]).filter(r=>captain?.routes?.includes(r.id))){
+        const port=(world.ports||[]).find(p=>p.id===route.to_id);if(!port)continue;
+        guideRow(root,port.name,`${route.cost?route.cost+' złota':'Przeprawa bezpłatna'} · poziom ${route.min_level||1}`,[actionButton('Wypłyń',()=>send({type:'boat',route_id:route.id}),!safe||me.level<(route.min_level||1)||me.gold<route.cost)]);
       }
       guideRow(root,`Bank · ${formatNumber(me.bank_gold)} złota`,'Złoto w banku i przedmioty w depozycie nie przepadają przy śmierci.',[
         actionButton('Wpłać wszystko',()=>send({type:'bank_deposit',amount:'all'}),!bank||!safe||me.gold<1),
         actionButton('Wypłać 100',()=>send({type:'bank_withdraw',amount:100}),!bank||!safe||me.bank_gold<100),
         actionButton('Wypłać wszystko',()=>send({type:'bank_withdraw',amount:'all'}),!bank||!safe||me.bank_gold<1)]);
-      guideRow(root,'Miejsce odrodzenia',(world.cities||[]).find(c=>c.id===me.home_city)?.name||'Przystań',[actionButton('Przenieś odrodzenie tutaj',()=>send({type:'bind_city'}),!bank||!safe||bank?.city_id===me.home_city)]);
+      guideRow(root,'Miejsce odrodzenia',`${(world.cities||[]).find(c=>c.id===me.home_city)?.name||'Przystań'} · Miasto zapisuje się automatycznie po odwiedzeniu.`,[]);
       guideRow(root,'Błogosławieństwo',me.blessed?'Aktywne do następnej śmierci. Czerwona czaszka wyłącza ochronę.':'Poz. 40 · 500 zł · połowa zwykłej kary złota i PD przy następnej śmierci.',[actionButton('Kup błogosławieństwo',()=>send({type:'bless'}),!master||!safe||me.level<40||me.gold<500||me.blessed)]);
       root.append(element('div','section-label',`DEPOZYT · ${(me.depot||[]).length}/120`));
       for(const item of me.inventory||[])if(!Object.values(me.equipment||{}).includes(item.uid))guideRow(root,item.name,'W plecaku',[actionButton('Odłóż do depozytu',()=>send({type:'depot_store',uid:item.uid}),!bank||!safe||(me.depot||[]).length>=120)]);
@@ -833,7 +831,7 @@
       root.append(element('div','section-label','MIKSTURY NA DALSZE WYPRAWY'));
       for(const[id,s]of Object.entries(world.potions||{})){
         const count=me.potions?.[id]||0;
-        guideRow(root,`${s.name} · ${count}`,`Poz. ${s.min_level||1} · odnawia ${s.restore} · ${s.price} złota. Mikstury przypisujesz do Q/R w plecaku.`,[actionButton('Kup',()=>send({type:'buy',item:id}),!merchantNear()||!safe||me.level<(s.min_level||1)||me.gold<s.price||count>=99)]);
+        guideRow(root,`${s.name} · ${count}`,`${world.items?.[id]?.effect_summary||'Mikstura leczenia'} · akcja dodatkowa · ${s.price} złota. Skrót Q ustawisz w plecaku.`,[actionButton('Kup',()=>send({type:'buy',item:id}),!me.merchant?.stock?.includes(id)||!safe||me.gold<s.price||count>=99)]);
       }
     }
   }
@@ -892,9 +890,15 @@
         block(g,xx,yy,32,32,room?(noise>.5?'#8c8278':'#837a73'):'#282b32');
         if(room){block(g,xx+1,yy+1,30,1,'#b2a18b');block(g,xx+2,yy+31,29,1,'#5a5554');if(noise>.8)line(g,[[xx+5,yy+4],[xx+14,yy+13],[xx+12,yy+23]],'#605c59',1);}else{block(g,xx+2,yy+2,28,20,'#34373e');block(g,xx+2,yy+2,28,2,'#45464d');}continue;
       }
+      if(floor===0&&!globalThis.BractwoWorldGeometry.landAt(world,x+16,y+16)){
+        const shore=[[64,0],[-64,0],[0,64],[0,-64]].some(([dx,dy])=>globalThis.BractwoWorldGeometry.landAt(world,x+16+dx,y+16+dy));
+        block(g,xx,yy,32,32,shore?'#4b9fa8':noise>.5?'#2f718c':'#326f87');
+        if(noise>.65)line(g,[[xx+5,yy+17],[xx+15,yy+17],[xx+20,yy+14]],shore?'#a6d9c4':'#6ea7b7',1);
+        continue;
+      }
       block(g,xx,yy,32,32,palette[Math.floor(noise*palette.length)]);
       const raised=floor>0&&rooms.some(r=>x+16>=r.x&&x+16<=r.x+r.w&&y+16>=r.y&&y+16<=r.y+r.h);
-      const surface=raised?'stone':surfaceMap?.at(x+16,y+16)||'grass',road=surface==='path',city=(world.cities||[]).some(c=>Math.hypot(x-c.x,y-c.y)<205);
+      const surface=raised?'stone':surfaceMap?.at(x+16,y+16)||'grass',road=surface==='path',city=(world.cities||[]).some(c=>Math.hypot(x-c.x,y-c.y)<(c.paving_radius||205));
       if(road||city){block(g,xx,yy,32,32,city?'#aaa78e':'#b5a174');for(let k=0;k<3;k++){block(g,xx+2+k*10,yy+2,8,13,'#c5b58a');block(g,xx+2+k*10,yy+18,8,12,'#c1b286');}}
       else {
         const base=world.surfaces?.[surface]?.color;if(base&&surface!=='grass')block(g,xx,yy,32,32,base);
@@ -909,12 +913,12 @@
     chunkLimit=Math.max(32,(x1-x0+3)*(y1-y0+3));protectedChunks=new Set();
     for(let cy=y0;cy<=y1;cy++)for(let cx=x0;cx<=x1;cx++)protectedChunks.add(`${floor}:${cx}:${cy}`);
     for(let cy=y0;cy<=y1;cy++)for(let cx=x0;cx<=x1;cx++){
-      if(floor===0&&(cx+1)*512<=3200&&(cy+1)*512<=2304)continue;
+      if(!world.landmasses?.length&&floor===0&&(cx+1)*512<=3200&&(cy+1)*512<=2304)continue;
       const key=`${floor}:${cx}:${cy}`;let chunk=groundChunks.get(key);if(!chunk){chunk=makeGroundChunk(cx,cy,floor);groundChunks.set(key,chunk);}else{groundChunks.delete(key);groundChunks.set(key,chunk);}
       ctx.drawImage(chunk,cx*512,cy*512);
     }
     trimChunks();prepareGroundAhead(x0,y0,x1,y1,floor);
-    if(!floor&&ground&&camera.x-viewport.w/camera.scale/2<3200&&camera.y-viewport.h/camera.scale/2<2304)ctx.drawImage(ground,0,0);
+    if(!world.landmasses?.length&&!floor&&ground&&camera.x-viewport.w/camera.scale/2<3200&&camera.y-viewport.h/camera.scale/2<2304)ctx.drawImage(ground,0,0);
     if(floor>0)for(const entry of nearbyDrawables())if(entry.kind==='elevation')drawCliff(entry.data,true);
     if(floor<0){for(const d of world.dungeons||[])if(d.floor===floor&&inView(d.x+d.w/2,d.y+d.h/2,d.w)){for(const r of d.rooms){ctx.strokeStyle='#d0b88a55';ctx.lineWidth=2;ctx.strokeRect(r.x,r.y,r.w,r.h);}}}
   }
@@ -963,6 +967,7 @@
   let roads=[[[560,1180],[620,900],[650,640],[900,580],[1210,580],[1305,340]],[[560,1180],[1000,1180],[1490,1150],[1700,1150],[2060,1120],[2300,900],[2550,500],[2590,370]],[[560,1180],[600,1350],[820,1490]],[[560,1180],[450,1460],[340,1640]],[[2050,1120],[2050,1460],[1870,1710]],[[2080,1140],[2500,1340],[2530,1630],[2530,1930]],[[430,1130],[740,1180],[740,1260]]];
   function buildGround(){
     groundChunks.clear();warmQueue=[];warmStamp="";
+    if(world.landmasses?.length){ground=null;return;}
     ground=document.createElement("canvas");ground.width=3200;ground.height=2304;
     const g=ground.getContext("2d"),random=seeded(933742),tile=32,starterZones=[...(world.zones||[])].reverse();
     for(let y=0;y<2304;y+=tile)for(let x=0;x<3200;x+=tile){
@@ -1207,6 +1212,13 @@
   }
   function drawNPC(npc,t){
     if(!inView(npc.x,npc.y))return;
+    if(npc.service==='boat'){
+      ctx.save();ctx.translate(npc.x+49,npc.y+12);
+      ellipse(ctx,0,2,42,12,'#82bcb855');ctx.fillStyle='#705332';
+      ctx.beginPath();ctx.moveTo(-40,-9);ctx.lineTo(43,-9);ctx.lineTo(25,10);ctx.lineTo(-25,10);ctx.closePath();ctx.fill();
+      for(const dx of[-23,-8,7,22])block(ctx,dx,-8,5,14,'#c39a58');
+      line(ctx,[[-5,-8],[-5,-64]],'#b79c65',3);ctx.fillStyle='#e7d9b0';ctx.beginPath();ctx.moveTo(-3,-62);ctx.lineTo(26,-19);ctx.lineTo(-3,-19);ctx.fill();ctx.restore();
+    }
     ellipse(ctx,npc.x,npc.y+6,16,7,"#35452d66");
     const type=npc.id==="strazniczka"?"knight":npc.id==="kartograf"?"mage":"ranger";
     humanoid(npc.x,npc.y,type,[0,1],0,false);
@@ -1238,9 +1250,31 @@
     }else if(l.id==="old_bridge"){
       block(ctx,x+18,y-30,4,38,"#825f38");block(ctx,x+3,y-35,36,15,"#cba265");line(ctx,[[x+10,y-28],[x+29,y-28]],"#775939",2);
     }
-    if(l.id.startsWith('land_')||l.id.startsWith('wild_')){for(let i=0;i<6;i++){const a=i/6*TAU;block(ctx,x+Math.cos(a)*37-5,y+Math.sin(a)*22-9,10,19,'#9e9d88');block(ctx,x+Math.cos(a)*37-4,y+Math.sin(a)*22-10,8,4,'#d2c7a0');}if(l.id.startsWith('land_'))fire(x,y,t,.6);}
+    if(l.adventure||l.id.startsWith('land_')||l.id.startsWith('wild_'))drawDiscoveryProp(l,t);
     const near=me&&distance(me,l)<190;
     if(near||!playing)label(`${found?"✓ ":"◇ "}${l.name}`,x,y-92,found?"#e3edb8":"#fff0bd",11);
+  }
+  function drawDiscoveryProp(l,t){
+    const{x,y}=l,key=(l.id+' '+l.name).toLowerCase();
+    if(/archive|ksiąg|kronik|rejestr/.test(key)){
+      block(ctx,x-31,y-46,62,48,'#604d3c');for(let row=0;row<2;row++)for(let i=0;i<8;i++)block(ctx,x-27+i*7,y-42+row*22,5,18,['#829771','#a87655','#647f9a'][i%3]);
+      block(ctx,x-34,y-22,68,4,'#ba9d64');block(ctx,x-34,y,68,5,'#ba9d64');
+    }else if(/catacomb|krypt|sarkofag|grobo|ossuary/.test(key)){
+      block(ctx,x-34,y-24,68,34,'#656e69');block(ctx,x-37,y-33,74,12,'#b1b29b');block(ctx,x-27,y-32,54,3,'#d6cbaa');
+      line(ctx,[[x-12,y-24],[x+12,y-24]],'#7e8477',4);for(const dx of[-47,45]){block(ctx,x+dx,y-16,5,23,'#b1a77e');fire(x+dx+2,y-18,t,.25);}
+    }else if(/observ|hill|wzgórz|watch|latar|połud|kamiennego/.test(key)){
+      ellipse(ctx,x,y+4,42,23,'#939684');line(ctx,[[x,y-29],[x-20,y+8]],'#645a44',5);line(ctx,[[x,y-29],[x+19,y+8]],'#645a44',5);
+      line(ctx,[[x-19,y-36],[x+26,y-55]],'#c2ab71',12);ellipse(ctx,x+29,y-57,7,9,'#91ced0');
+    }else if(/frost|lod|ice|cave|jask|kryształ|kopal|mine/.test(key)){
+      for(const [dx,dy,z]of[[-26,0,29],[0,-10,45],[27,8,24]]){ctx.fillStyle=/frost|lod|ice/.test(key)?'#9fd8df':'#89b8b3';ctx.beginPath();ctx.moveTo(x+dx-12,y+dy);ctx.lineTo(x+dx-7,y+dy-z);ctx.lineTo(x+dx+6,y+dy-z-8);ctx.lineTo(x+dx+13,y+dy-3);ctx.closePath();ctx.fill();line(ctx,[[x+dx,y+dy-z],[x+dx+3,y+dy-5]],'#daedd9',2);}
+    }else if(/bell|dzwon|shrine|kaplic|źród|spring/.test(key)){
+      for(const dx of[-30,26])block(ctx,x+dx,y-62,7,68,'#8b8267');block(ctx,x-34,y-63,71,8,'#c9b887');
+      line(ctx,[[x,y-60],[x,y-45]],'#c0b58d',3);block(ctx,x-13,y-45,26,23,'#c8a75c');block(ctx,x-18,y-24,36,5,'#e0c37b');ellipse(ctx,x,y-15,5,6,'#82733f');
+    }else{
+      const seed=[...key].reduce((a,c)=>a+c.charCodeAt(0),0),count=3+seed%4;
+      for(let i=0;i<count;i++){const a=i/count*TAU,h=17+(seed+i*13)%35,xx=x+Math.cos(a)*32,yy=y+Math.sin(a)*18;block(ctx,xx-7,yy-h,14,h,'#929b88');block(ctx,xx-6,yy-h,12,4,'#d3cda9');}
+      if(seed%2)fire(x,y,t,.45);else ellipse(ctx,x,y,16,8,'#80b6b2');
+    }
   }
   function drawRestAura(x,y,t){
     const pulse=1+Math.sin(t*2.4)*.05;
@@ -1482,7 +1516,7 @@
   }
   document.addEventListener("visibilitychange",()=>fpsMeter.reset());
 
-  const spellIcons={longstrider:'»',mage_armor:'◇',burning_hands:'♨',healing_word:'♥',starry_wisp:'✧',shocking_grasp:'ϟ',fire_bolt:'✹',ray_of_frost:'❄',acid_splash:'◉',magic_missile:'✦',shield:'⬡',scorching_ray:'☄',fireball:'☀',misty_step:'»',shillelagh:'♧',thorn_whip:'⌁',produce_flame:'♨',cure_wounds:'♥',entangle:'♜',moonbeam:'☾',wild_shape_wolf:'♞',wild_shape_bear:'♟',animal_companion:'♞',hunters_mark:'⌖',ensnaring_strike:'⌁',second_wind:'♥'};
+  const spellIcons={longstrider:'»',mage_armor:'◇',burning_hands:'♨',healing_word:'♥',starry_wisp:'✧',shocking_grasp:'ϟ',fire_bolt:'✹',ray_of_frost:'❄',acid_splash:'◉',magic_missile:'✦',shield:'⬡',scorching_ray:'☄',fireball:'☀',misty_step:'»',shillelagh:'♧',thorn_whip:'⌁',produce_flame:'♨',cure_wounds:'♥',entangle:'♜',moonbeam:'☾',wild_shape_wolf:'♞',wild_shape_bear:'♟',animal_companion:'♞',hunters_mark:'⌖',ensnaring_strike:'⌁',second_wind:'♥',guidance:'✣',guiding_bolt:'✦'};
   Runtime.bindTouchScroll(ui.hotbarSlots.closest('.hotbar-viewport'),()=>ui.gameUI.classList.contains('mobile-hud'));
   const hotbarButtons=Array.from({length:24},(_,slot)=>{
     const cell=document.createElement('div');cell.className='hotbar-cell';
@@ -1492,12 +1526,42 @@
     toggle.setAttribute('aria-label','Wybierz postać');toggle.setAttribute('aria-haspopup','dialog');toggle.setAttribute('aria-controls','hotbarGroupMenu');
     Runtime.bindTouchTap(button,()=>{if(canControl())activateHotbarSlot(slot);},()=>button.closest('.hotbar-viewport'));
     Runtime.bindTouchTap(toggle,()=>{if(canControl())hotbarMenu.open(Runtime.hotbarKey(Runtime.displayHotbar(me),hotbarPage,slot),toggle);},()=>toggle.closest('.hotbar-viewport'));
-    button.addEventListener('contextmenu',event=>{event.preventDefault();const id=Runtime.hotbarKey(Runtime.displayHotbar(me),hotbarPage,slot);if(world.hotbar_groups?.[id])hotbarMenu.open(id,toggle);else openExpansion('spells');});
+    button.addEventListener('contextmenu',event=>{event.preventDefault();if(canControl())hotbarDetail.open(button,slot);});
     button.groupToggle=toggle;cell.append(button,toggle);
     (slot<12?ui.hotbarSlots:ui.hotbarFunctionSlots).append(cell);return button;
   });
   hotbarMenu=globalThis.BractwoHotbarUI.create({parent:ui.gameUI,state:()=>({player:me,world}),cast,send});
-  ui.hotbarSlots.closest('.hotbar-viewport').addEventListener('scroll',()=>hotbarMenu.close(),{passive:true});
+  const hotbarDetail=(()=>{
+    const panel=document.createElement('section');panel.className='hotbar-spell-detail';panel.hidden=true;
+    const title=document.createElement('strong'),meta=document.createElement('div'),summary=document.createElement('p'),description=document.createElement('p');
+    meta.className='muted';summary.className='hotbar-spell-detail-summary';description.className='hotbar-spell-detail-description';
+    panel.append(title,meta,summary,description);ui.gameUI.append(panel);
+    let anchor=null;
+    function close(){panel.hidden=true;anchor=null;}
+    function position(){if(panel.hidden||!anchor)return;const rect=anchor.getBoundingClientRect(),width=Math.min(420,innerWidth-20);panel.style.width=width+'px';panel.style.left=Math.max(10,Math.min(innerWidth-width-10,rect.left+rect.width/2-width/2))+'px';panel.style.top=Math.max(12,rect.top-panel.offsetHeight-10)+'px';}
+    function open(button,slot){
+      if(!me)return;anchor=button;
+      const bar=Runtime.displayHotbar(me),id=Runtime.hotbarKey(bar,hotbarPage,slot),group=globalThis.BractwoHotbarUI.groupState(id,me,world);
+      if(group){
+        title.textContent=group.group.name;
+        meta.textContent=`Dziki kształt ${group.pool.remaining}/${group.pool.maximum}`+(group.active?` · aktywne: ${group.label}`:'');
+        summary.textContent=group.primary?.power_summary||group.primary?.description||'Wybierz wariant z przycisku ▾. Dotknięcie głównego przycisku używa aktywnego wariantu.';
+        description.textContent=group.active?'Dotknij głównego przycisku, aby użyć aktywnej postaci lub zakończyć ją, jeśli to możliwe. Przycisk ▾ otwiera wybór wariantów.':'Dotknij głównego przycisku, aby użyć domyślnego wariantu. Przycisk ▾ otwiera wybór wariantów.';
+      }else{
+        const s=Runtime.spellProfile(world.spells?.[id],me);
+        if(!s){close();return;}
+        title.textContent=s.name;
+        meta.textContent=`${s.feature?'Zdolność':s.circle?`Krąg ${s.circle}`:'Sztuczka'} · poz. ${spellGate(s)} · ${Runtime.spellCostText(s,me)}`;
+        summary.textContent=s.power_summary||'';
+        description.textContent=[s.description,Runtime.concentrationWarning(s,me,world.spells)].filter(Boolean).join(' ');
+      }
+      panel.hidden=false;position();
+    }
+    document.addEventListener('pointerdown',event=>{if(!panel.hidden&&!panel.contains(event.target)&&!event.target.closest?.('.hotbar-cell'))close();},true);
+    addEventListener('resize',position);
+    return {open,close,position,get visible(){return !panel.hidden;}};
+  })();
+  ui.hotbarSlots.closest('.hotbar-viewport').addEventListener('scroll',()=>{hotbarMenu.close();hotbarDetail.close();},{passive:true});
   function activateHotbarSlot(slot){
     const id=Runtime.hotbarKey(Runtime.displayHotbar(me),hotbarPage,slot);
     const group=globalThis.BractwoHotbarUI.groupState(id,me,world);
@@ -1547,7 +1611,7 @@
   }
   function changeHotbarPage(delta){
     if(!me)return;
-    hotbarMenu.close();
+    hotbarMenu.close();hotbarDetail.close();
     hotbarPage=(hotbarPage+delta+Runtime.hotbarPageCount(Runtime.displayHotbar(me)))%Runtime.hotbarPageCount(Runtime.displayHotbar(me));
     ui.hotbarSlots.closest('.hotbar-viewport').scrollLeft=0;
     updateHotbar();
@@ -1565,18 +1629,22 @@
     beginPointAction,
     studyTarget:()=>selectedEnemy?{enemy_id:selectedEnemy}:selectedTarget?{target_id:selectedTarget}:null,
     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
-    prepare:()=>{merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
+    prepare:()=>{adventurePanel?.close();merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
     changed:()=>{if(me)updateHUD();}
   });
   merchantPanel=globalThis.BractwoInventoryUI.createMerchant({state:()=>({player:me,world}),send,rest:()=>restUI.open(),
     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
-    prepare:()=>{characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+    prepare:()=>{adventurePanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+  adventurePanel=globalThis.BractwoAdventureUI.create({state:()=>({player:me,world}),send,
+    trade:()=>merchantPanel.open(),services:s=>openExpansion(s==='master'?'growth':'services'),
+    track:id=>{saveTrackedQuest(id);navigationGoal=null;updateHUD();},
+    prepare:()=>{resetControls();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   hudWindows=globalThis.BractwoWindows.create({stop:resetControls,levelLayout:()=>levelUpPanels?.layout()});
   fighterPrompt=globalThis.BractwoFighterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
   casterPrompt=globalThis.BractwoCasterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
   mobileHud=globalThis.BractwoMobile.create({stop:resetControls,closeChat});
   restUI=globalThis.BractwoRestUI.create({state:()=>({player:me,world}),send,notice,stop:resetControls,clearTarget,
-    prepare:()=>{closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+    prepare:()=>{adventurePanel?.close();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   appShell=globalThis.BractwoAppShell.create({stop:()=>{resetControls();closeChat();restUI.close();}});
   ui.closeEffectDetail.addEventListener('click',()=>{ui.effectDetail.hidden=true;});
   let selectedEffectId='',effectActionPacket=null;

@@ -1,0 +1,93 @@
+{
+  "ok": false,
+  "status": "failed",
+  "fixture": "Existing index DOM with inline production CSS; only windows.js/mobile.js execute; no gameplay, server or WebSocket.",
+  "limitations": [
+    "about:blank fixture does not verify localStorage persistence."
+  ],
+  "checks": [
+    {
+      "name": "Visible quest landscape: joystick is centred between left edge/spells and bottom rail/viewport",
+      "ok": true,
+      "geometry": {
+        "viewport": {
+          "width": 734,
+          "height": 390
+        },
+        "joystick": {
+          "x": 12,
+          "y": 232,
+          "width": 88,
+          "height": 88,
+          "right": 100,
+          "bottom": 320
+        },
+        "spellbar": {
+          "x": 112,
+          "y": 324,
+          "width": 466,
+          "height": 56,
+          "right": 578,
+          "bottom": 380
+        },
+        "quest": {
+          "x": 8,
+          "y": 117,
+          "width": 216,
+          "height": 44,
+          "right": 224,
+          "bottom": 161
+        },
+        "upperBoundary": 161,
+        "gaps": {
+          "left": 12,
+          "right": 12,
+          "above": 71,
+          "below": 70
+        }
+      }
+    }
+  ],
+  "geometry": [
+    {
+      "viewport": {
+        "width": 734,
+        "height": 390
+      },
+      "joystick": {
+        "x": 12,
+        "y": 232,
+        "width": 88,
+        "height": 88,
+        "right": 100,
+        "bottom": 320
+      },
+      "spellbar": {
+        "x": 112,
+        "y": 324,
+        "width": 466,
+        "height": 56,
+        "right": 578,
+        "bottom": 380
+      },
+      "quest": {
+        "x": 8,
+        "y": 117,
+        "width": 216,
+        "height": 44,
+        "right": 224,
+        "bottom": 161
+      },
+      "upperBoundary": 161,
+      "gaps": {
+        "left": 12,
+        "right": 12,
+        "above": 71,
+        "below": 70
+      }
+    }
+  ],
+  "errors": [],
+  "failure": "TimeoutError: locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#mobileMenuClose')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" id=\"mobileMenuClose\" class=\"mobile-control\" aria-label=\"Zamknij menu gry\">×</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button type=\"button\" aria-disabled=\"false\" aria-label=\"Przesuń: visibility\" class=\"window-grip window-handle\" title=\"Przeciągnij, aby przesunąć panel. Strzałki po zaznaczeniu też przesuwają.\">⋮⋮</button> from <div id=\"hudVisibility\" class=\"hud-visibility\" data-movable=\"visibility\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button type=\"button\" aria-disabled=\"false\" aria-label=\"Przesuń: visibility\" class=\"window-grip window-handle\" title=\"Przeciągnij, aby przesunąć panel. Strzałki po zaznaczeniu też przesuwają.\">⋮⋮</button> from <div id=\"hudVisibility\" class=\"hud-visibility\" data-movable=\"visibility\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    104 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m        - element is visible, enabled and stable\u001b[22m\n\u001b[2m        - scrolling into view if needed\u001b[22m\n\u001b[2m        - done scrolling\u001b[22m\n\u001b[2m        - <button type=\"button\" aria-disabled=\"false\" aria-label=\"Przesuń: visibility\" class=\"window-grip window-handle\" title=\"Przeciągnij, aby przesunąć panel. Strzałki po zaznaczeniu też przesuwają.\">⋮⋮</button> from <div id=\"hudVisibility\" class=\"hud-visibility\" data-movable=\"visibility\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m      - retrying click action\u001b[22m\n\u001b[2m        - waiting 500ms\u001b[22m\n",
+  "stack": "locator.click: Timeout 60000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#mobileMenuClose')\u001b[22m\n\u001b[2m    - locator resolved to <button type=\"button\" id=\"mobileMenuClose\" class=\"mobile-control\" aria-label=\"Zamknij menu gry\">×</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button type=\"button\" aria-disabled=\"false\" aria-label=\"Przesuń: visibility\" class=\"window-grip window-handle\" title=\"Przeciągnij, aby przesunąć panel. Strzałki po zaznaczeniu też przesuwają.\">⋮⋮</button> from <div id=\"hudVisibility\" class=\"hud-visibility\" data-movable=\"visibility\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button type=\"button\" aria-disabled=\"false\" aria-label=\"Przesuń: visibility\" class=\"window-grip window-handle\" title=\"Przeciągnij, aby przesunąć panel. Strzałki po zaznaczeniu też przesuwają.\">⋮⋮</button> from <div id=\"hudVisibility\" class=\"hud-visibility\" data-movable=\"visibility\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    104 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m        - element is visible, enabled and stable\u001b[22m\n\u001b[2m        - scrolling into view if needed\u001b[22m\n\u001b[2m        - done scrolling\u001b[22m\n\u001b[2m        - <button type=\"button\" aria-disabled=\"false\" aria-label=\"Przesuń: visibility\" class=\"window-grip window-handle\" title=\"Przeciągnij, aby przesunąć panel. Strzałki po zaznaczeniu też przesuwają.\">⋮⋮</button> from <div id=\"hudVisibility\" class=\"hud-visibility\" data-movable=\"visibility\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m      - retrying click action\u001b[22m\n\u001b[2m        - waiting 500ms\u001b[22m\n\n    at toggle (C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\tools\\browser_0818_dom.cjs:38:51)\n    at async lockTest (C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\tools\\browser_0818_dom.cjs:62:3)\n    at async C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\tools\\browser_0818_dom.cjs:105:7"
+}

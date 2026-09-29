@@ -1,0 +1,74 @@
+{
+  "syntax_files": [
+    "combat_rules.py",
+    "dnd_game.py",
+    "druid_circle_game.py",
+    "environment_rules.py",
+    "continent_world.py"
+  ],
+  "syntax": "passed",
+  "magic_catalog_count": 16,
+  "reachable_in_merchant_stock": 16,
+  "repeated_refresh": "stable",
+  "merchant_ids": {
+    "ring_protection": [
+      "merchant_zloty_port",
+      "merchant_popielny_port"
+    ],
+    "ring_swimming": [
+      "merchant_solna_przystan",
+      "merchant_przelom_rzeki"
+    ],
+    "ring_free_action": [
+      "merchant_brzezina",
+      "merchant_przystan_cieni"
+    ],
+    "ring_warmth": [
+      "merchant_mrozna_przystan"
+    ],
+    "ring_resistance_fire": [
+      "merchant_popielny_port",
+      "merchant_zarowe_nabrzeze"
+    ],
+    "ring_resistance_cold": [
+      "merchant_mrozna_przystan"
+    ],
+    "ring_resistance_poison": [
+      "merchant_brzezina",
+      "merchant_przystan_cieni"
+    ],
+    "ring_resistance_lightning": [
+      "merchant_solna_przystan"
+    ],
+    "ring_resistance_necrotic": [
+      "merchant_przystan_cieni"
+    ],
+    "magic_longsword_1": [
+      "merchant_zloty_port"
+    ],
+    "magic_longbow_1": [
+      "merchant_brzezina"
+    ],
+    "magic_quarterstaff_1": [
+      "merchant_brzezina",
+      "merchant_przelom_rzeki"
+    ],
+    "magic_shield_1": [
+      "merchant_zloty_port",
+      "merchant_bazaltowa_straznica"
+    ],
+    "magic_chain_mail_1": [
+      "merchant_zloty_port",
+      "merchant_bazaltowa_straznica"
+    ],
+    "adamantine_chain_mail": [
+      "merchant_zarowe_nabrzeze",
+      "merchant_bazaltowa_straznica"
+    ],
+    "mithral_chain_mail": [
+      "merchant_mrozna_przystan",
+      "merchant_bazaltowa_straznica"
+    ]
+  },
+  "verification_scope": "Isolated refresh_shops with authored merchant IDs, not whole-world initialization."
+}

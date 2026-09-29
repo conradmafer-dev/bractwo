@@ -1,0 +1,191 @@
+{
+  "base": "http://127.0.0.1:8819",
+  "assets": [
+    {
+      "path": "/manifest.webmanifest",
+      "status": 200,
+      "bytes": 542
+    },
+    {
+      "path": "/icons/apple-touch-icon.png",
+      "status": 200,
+      "bytes": 5381
+    },
+    {
+      "path": "style.css",
+      "status": 200,
+      "bytes": 46955
+    },
+    {
+      "path": "character_sheet.css",
+      "status": 200,
+      "bytes": 15018
+    },
+    {
+      "path": "level_up.css",
+      "status": 200,
+      "bytes": 4392
+    },
+    {
+      "path": "loot_ui.css",
+      "status": 200,
+      "bytes": 2919
+    },
+    {
+      "path": "hud_layout.css",
+      "status": 200,
+      "bytes": 9230
+    },
+    {
+      "path": "windows.css",
+      "status": 200,
+      "bytes": 16265
+    },
+    {
+      "path": "fighter.css",
+      "status": 200,
+      "bytes": 2498
+    },
+    {
+      "path": "caster.css",
+      "status": 200,
+      "bytes": 6907
+    },
+    {
+      "path": "mobile.css",
+      "status": 200,
+      "bytes": 23363
+    },
+    {
+      "path": "rest_ui.css",
+      "status": 200,
+      "bytes": 2093
+    },
+    {
+      "path": "app_shell.css",
+      "status": 200,
+      "bytes": 2488
+    },
+    {
+      "path": "hotbar_ui.css",
+      "status": 200,
+      "bytes": 3802
+    },
+    {
+      "path": "adventure_ui.css",
+      "status": 200,
+      "bytes": 1814
+    },
+    {
+      "path": "runtime.js",
+      "status": 200,
+      "bytes": 18349
+    },
+    {
+      "path": "world_geometry.js",
+      "status": 200,
+      "bytes": 1047
+    },
+    {
+      "path": "atlas_map.js",
+      "status": 200,
+      "bytes": 10714
+    },
+    {
+      "path": "spell_vfx.js",
+      "status": 200,
+      "bytes": 10034
+    },
+    {
+      "path": "inventory_ui.js",
+      "status": 200,
+      "bytes": 12107
+    },
+    {
+      "path": "fighter_ui.js",
+      "status": 200,
+      "bytes": 5325
+    },
+    {
+      "path": "fighter_vfx.js",
+      "status": 200,
+      "bytes": 1942
+    },
+    {
+      "path": "caster_ui.js",
+      "status": 200,
+      "bytes": 22189
+    },
+    {
+      "path": "caster_vfx.js",
+      "status": 200,
+      "bytes": 4674
+    },
+    {
+      "path": "circle_spell_ui.js",
+      "status": 200,
+      "bytes": 3701
+    },
+    {
+      "path": "circle_vfx.js",
+      "status": 200,
+      "bytes": 7042
+    },
+    {
+      "path": "character_sheet.js",
+      "status": 200,
+      "bytes": 18901
+    },
+    {
+      "path": "level_up.js",
+      "status": 200,
+      "bytes": 6320
+    },
+    {
+      "path": "loot_ui.js",
+      "status": 200,
+      "bytes": 4305
+    },
+    {
+      "path": "mobile.js",
+      "status": 200,
+      "bytes": 8678
+    },
+    {
+      "path": "windows.js",
+      "status": 200,
+      "bytes": 14912
+    },
+    {
+      "path": "rest_ui.js",
+      "status": 200,
+      "bytes": 9038
+    },
+    {
+      "path": "app_shell.js",
+      "status": 200,
+      "bytes": 9303
+    },
+    {
+      "path": "hotbar_ui.js",
+      "status": 200,
+      "bytes": 8877
+    },
+    {
+      "path": "adventure_ui.js",
+      "status": 200,
+      "bytes": 5372
+    },
+    {
+      "path": "game.js",
+      "status": 200,
+      "bytes": 162483
+    }
+  ],
+  "visual_check": "Unavailable: in-app browser failed to attach; Edge control timed out. No screenshots claimed.",
+  "health": {
+    "ok": true,
+    "players": 0,
+    "version": "0.8.18"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "revision": "UI_17",
+  "base": "BRACTWO_0.8.18_UI_16_FULL_SOURCE.zip",
+  "targeted_server": {
+    "tests": 16,
+    "passed": 16
+  },
+  "existing_server_regression": {
+    "tests": 184,
+    "passed": 181,
+    "failures": 2,
+    "errors": 1,
+    "unchanged_from_ui16": true,
+    "existing_issues": [
+      "test_leveling_does_not_clear_paid_recovery_cooldown (test_mana_growth_0816.LiveGrowth.test_leveling_does_not_clear_paid_recovery_cooldown)",
+      "test_in_combat_recovery_at_intermediate_levels_is_real (test_mana_growth_0816.LiveGrowth.test_in_combat_recovery_at_intermediate_levels_is_real)",
+      "test_recovery_stays_capped_at_missing_mana (test_mana_growth_0816.LiveGrowth.test_recovery_stays_capped_at_missing_mana)"
+    ]
+  },
+  "javascript_regression": {
+    "tests": 124,
+    "passed": 124
+  },
+  "browser": {
+    "checks": 8,
+    "passed": 8,
+    "javascript_errors": 0
+  },
+  "changed_runtime_files": [
+    "server/spell_scaling.py",
+    "web/index.html"
+  ],
+  "unchanged_runtime_file_count": 265,
+  "limitations": [
+    "No physical Android test.",
+    "No live Railway deployment or account data used.",
+    "Not a full game regression; preexisting recovery tests remain failing.",
+    "Browser uses production embedded client with an isolated server via Python WS bridge."
+  ]
+}

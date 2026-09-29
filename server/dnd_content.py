@@ -138,7 +138,7 @@ add('scorching_ray','Palący promień','Scorching Ray',2,'mage','attack','Trzy n
 add('misty_step','Mglisty krok','Misty Step',2,'mage','teleport','Akcja dodatkowa: teleport do widocznego, wolnego punktu przed postacią, maks. 192 jednostki.')
 add('moonbeam','Promień księżyca','Moonbeam',2,'druid','field','Pole na wskazanym celu: 2k10 promienistych co rundę; obrona KON daje połowę. Koncentracja do 30 s.',dice=[2,10,0],damage_type='radiant',save='constitution',save_half=True,concentration=True,duration=30,area=True)
 add('barkskin','Dębowa skóra','Barkskin',2,'druid ranger','buff','Akcja dodatkowa: KP nie mniejsza niż 17 przez 60 s.',buff='barkskin',duration=60)
-add('spike_growth','Kolczasty wzrost','Spike Growth',2,'druid ranger','field','Kolce: 2k4 kłutych za każde 32 jednostki ruchu w polu. Brak rzutu obronnego. Koncentracja do 30 s.',dice=[2,4,0],damage_type='piercing',movement_damage=True,concentration=True,duration=30,area=True)
+add('spike_growth','Kolczasty wzrost','Spike Growth',2,'druid ranger','field','Kolce: 2k4 kłutych za każde 64 jednostki ruchu w polu, maksymalnie 4 razy na 3 s. Brak rzutu obronnego. Koncentracja do 30 s.',dice=[2,4,0],damage_type='piercing',movement_damage=True,movement_step=64,movement_tick_cap=4,concentration=True,duration=30,area=True)
 
 add('fireball','Kula ognia','Fireball',3,'mage','save','Eksplozja w miejscu celu: 8k6 ognia; obrona ZRĘ daje połowę.',dice=[8,6,0],damage_type='fire',save='dexterity',save_half=True,area=True)
 add('lightning_bolt','Błyskawica','Lightning Bolt',3,'mage','save','Linia od postaci przez wskazany cel: 8k6 błyskawic; obrona ZRĘ daje połowę.',dice=[8,6,0],damage_type='lightning',save='dexterity',save_half=True,area=True,shape='line')

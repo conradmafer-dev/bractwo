@@ -1,0 +1,282 @@
+{
+  "ok": false,
+  "status": "failed",
+  "transport": "Python WebSocket bridge to isolated aiohttp server; production HTML/CSS/JS and embedded assets at routed bractwo.local origin",
+  "fixtures": [
+    "isolated :memory: database",
+    "controlled server clock",
+    "monster AI paused"
+  ],
+  "checks": [
+    {
+      "name": "Native fullscreen enters/exits from authentication screen",
+      "ok": true
+    },
+    {
+      "name": "Registration and gameplay use the actual server through the documented WebSocket bridge",
+      "ok": true
+    },
+    {
+      "name": "Rest menu/dialog accessible at 734x260",
+      "ok": true
+    },
+    {
+      "name": "Rest menu/dialog accessible at 390x844",
+      "ok": true
+    },
+    {
+      "name": "Native fullscreen enters/exits from mobile game control",
+      "ok": true
+    }
+  ],
+  "layouts": [
+    {
+      "viewport": {
+        "width": 734,
+        "height": 260
+      },
+      "boxes": {
+        ".player-card": {
+          "x": 8,
+          "y": 8,
+          "width": 216,
+          "height": 68
+        },
+        ".world-status": {
+          "x": 8,
+          "y": 85,
+          "width": 216,
+          "height": 24
+        },
+        "#minimapCard": {
+          "x": 574,
+          "y": 8,
+          "width": 100,
+          "height": 74.28125
+        },
+        "#actionDock": {
+          "x": 112,
+          "y": 194,
+          "width": 466,
+          "height": 56
+        },
+        "#spellbar": {
+          "x": 112,
+          "y": 194,
+          "width": 466,
+          "height": 56
+        },
+        "#joystick": {
+          "x": 12,
+          "y": 143,
+          "width": 88,
+          "height": 88
+        },
+        "#attackButton": {
+          "x": 650,
+          "y": 174,
+          "width": 76,
+          "height": 76
+        },
+        "#interactButton": {
+          "x": 590,
+          "y": 198,
+          "width": 52,
+          "height": 52
+        },
+        "#healthPotion": {
+          "x": 112,
+          "y": 142,
+          "width": 44,
+          "height": 44
+        },
+        "#manaPotion": {
+          "x": 160,
+          "y": 142,
+          "width": 44,
+          "height": 44
+        },
+        "#bookSpell": {
+          "x": 478,
+          "y": 142,
+          "width": 44,
+          "height": 44
+        },
+        "#abilityButton": {
+          "x": 526,
+          "y": 142,
+          "width": 52,
+          "height": 44
+        },
+        "#chatButton": {
+          "x": 682,
+          "y": 60,
+          "width": 44,
+          "height": 44
+        },
+        "#mobileMenuButton": {
+          "x": 682,
+          "y": 8,
+          "width": 44,
+          "height": 44
+        },
+        "#mobileFullscreenButton": {
+          "x": 682,
+          "y": 112,
+          "width": 44,
+          "height": 44
+        }
+      },
+      "issues": [],
+      "screenshot": "game-734x260.png"
+    },
+    {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "boxes": {
+        ".player-card": {
+          "x": 8,
+          "y": 8,
+          "width": 206,
+          "height": 68
+        },
+        ".world-status": {
+          "x": 8,
+          "y": 85,
+          "width": 206,
+          "height": 24
+        },
+        "#minimapCard": {
+          "x": 230,
+          "y": 8,
+          "width": 100,
+          "height": 74.28125
+        },
+        "#questTracker": {
+          "x": 8,
+          "y": 117,
+          "width": 206,
+          "height": 44
+        },
+        "#actionDock": {
+          "x": 8,
+          "y": 662,
+          "width": 374,
+          "height": 56
+        },
+        "#spellbar": {
+          "x": 8,
+          "y": 662,
+          "width": 374,
+          "height": 56
+        },
+        "#joystick": {
+          "x": 69,
+          "y": 735,
+          "width": 100,
+          "height": 100
+        },
+        "#attackButton": {
+          "x": 298,
+          "y": 750,
+          "width": 84,
+          "height": 84
+        },
+        "#interactButton": {
+          "x": 238,
+          "y": 782,
+          "width": 52,
+          "height": 52
+        },
+        "#healthPotion": {
+          "x": 8,
+          "y": 610,
+          "width": 44,
+          "height": 44
+        },
+        "#manaPotion": {
+          "x": 56,
+          "y": 610,
+          "width": 44,
+          "height": 44
+        },
+        "#bookSpell": {
+          "x": 282,
+          "y": 610,
+          "width": 44,
+          "height": 44
+        },
+        "#abilityButton": {
+          "x": 330,
+          "y": 610,
+          "width": 52,
+          "height": 44
+        },
+        "#chatButton": {
+          "x": 338,
+          "y": 60,
+          "width": 44,
+          "height": 44
+        },
+        "#mobileMenuButton": {
+          "x": 338,
+          "y": 8,
+          "width": 44,
+          "height": 44
+        },
+        "#mobileFullscreenButton": {
+          "x": 338,
+          "y": 112,
+          "width": 44,
+          "height": 44
+        }
+      },
+      "issues": [],
+      "screenshot": "game-390x844.png"
+    }
+  ],
+  "errors": [],
+  "limitations": [
+    "OS-level PWA installation is not automated.",
+    "Native localhost page.goto timed out with --no-proxy-server; service-worker/offline integration is not exercised by this bridge run."
+  ],
+  "origin": "http://127.0.0.1:52272",
+  "source_sha256": {
+    "web/app_shell.css": "24f9c0b849b686f44cd88f4da9d9136a11a6eae91ff1719d1b52661dec350019",
+    "web/app_shell.js": "1ec050b3cc7945061d896c5cf3f567af695d6543084e6e8991ef89235ad23c86",
+    "web/atlas_map.js": "b1be0d55dc736487802b5cd084cc798cf5c2cd3143e7b2782162da0a376ec0f5",
+    "web/caster.css": "32c94c542e5ca87e01a4462776e59d6d4059c13468b0e19e00c42a78ca515057",
+    "web/caster_ui.js": "65ab8ff702cc70e8cc3ea7d52bb3a1d020a92bc068435f8dc9a0b3a465a09626",
+    "web/caster_vfx.js": "b8b3c5335032835320d9c1d7977decaf6f53ffc1695bfe5abccc322d55400bc5",
+    "web/character_sheet.css": "3975f51b7e8975a30f15648fdf0b083fd6a91fe86d30a46da3b3459269fc8a7b",
+    "web/character_sheet.js": "1d8bb1debab79b94b8471ae63cd482de115336a7612ca9d97cc3bbdf86627486",
+    "web/fighter.css": "036078b08efff6d2228869823a28898c751d61133629761f54edf5761505689e",
+    "web/fighter_ui.js": "921dada318326e5e363e458b9dcdce0e2c9ccfd5a5ce9fa19226938747607f89",
+    "web/fighter_vfx.js": "9ba063b1c30be79c4f83f362ba11fd181759250eb5f52024068289d8bfe02027",
+    "web/game.js": "2b9f00fd837804d418ca4ad2fedc3aaaf17984aafcdbfb0e74bc8567acd3f334",
+    "web/hud_layout.css": "e82c19f2f7496c9d5656c58015b310f8954af5e75ffa25831753395e0a67b579",
+    "web/index.html": "369f5f7096afd225e7e46c05f891a2b43552865a14fe827099c7cf58fbdb1903",
+    "web/inventory_ui.js": "383d0fe80b0bb722e31b7e537c5907c175b15062e18e11d676494f2167363f27",
+    "web/level_up.css": "2850267e083f193e47e4ab76fa1fae46e54c041f1c9e52004bd8afd9e5f3aecd",
+    "web/level_up.js": "17b449417a71abd65440bafafa26e7d2500230cd4bab243cdeca900bf9c8d956",
+    "web/loot_ui.css": "dafb4e30eac1cd2c4eb7333940b2d3fe037a8c68f5bd4ef337892f305ba9b938",
+    "web/loot_ui.js": "f13d5bd2eb4d7f74518af8386368719d1e2da0385f241567f56b8b8607198cbc",
+    "web/manifest.webmanifest": "0169894233b13d2086a87383377606ae4dddb8c9f9a29e74edcf66456fe84679",
+    "web/mobile.css": "895fdf461ac1296d094c3c6130cc5529f425d0cffce9c15fef6ba45b53599406",
+    "web/mobile.js": "949692485452efd0ee4c5795258eef4db4e328b0e6456071be644a90827b23ca",
+    "web/offline.html": "2cc34c8ea4d3c3acb8bb755ef2244003df99ca1f8dbd52bf699b18377dc30625",
+    "web/rest_ui.css": "e04b0863d17d9a86526098159c12da0c3c2df0dae42427b14be9cfce7ec85cdb",
+    "web/rest_ui.js": "f0891b58d2427097521f877a6c6d7602a0365601692e5ed7b6c6a931ca9f4ef2",
+    "web/runtime.js": "de1b7a421d1c2c2e207bc856a3722848fd02469c4c4d0a93411ed8b903f3a091",
+    "web/spell_vfx.js": "17480a9f0283919135fa1d9d0bebbe9504c73b5d5bee9ab00936ca2773710369",
+    "web/style.css": "909df21d0d3c045b533bacc8a8f028f06f73dc80de1fff0bdaa3f3a990e6b7c2",
+    "web/sw.js": "723ed97bc8e2cb947360fb9d1df5bdd7011fd738cd22892b84448802df0c15ad",
+    "web/windows.css": "6c6ee0b4a422a6f522f48fb68d4354c577e4c49ff016901152cb2d20189ccc4c",
+    "web/windows.js": "a3e555d247471f94596bc8d35b9b0f7d7a0d82df20ef7fb678fb4e02a5040d7c"
+  },
+  "failure": "Page.wait_for_function: Timeout 60000ms exceeded.",
+  "traceback": "Traceback (most recent call last):\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\tools\\browser_0818_smoke.py\", line 186, in main\n    await wait_enabled(page, '#shortRestButton', False)\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\tools\\browser_0818_smoke.py\", line 123, in wait_enabled\n    await page.wait_for_function('(arg)=>document.querySelector(arg[0]).disabled!==arg[1]', arg=[selector, enabled])\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\.qa-python\\playwright\\async_api\\_generated.py\", line 12739, in wait_for_function\n    await self._impl_obj.wait_for_function(\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\.qa-python\\playwright\\_impl\\_page.py\", line 1153, in wait_for_function\n    return await self._main_frame.wait_for_function(**locals_to_params(locals()))\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\.qa-python\\playwright\\_impl\\_frame.py\", line 941, in wait_for_function\n    await self._channel.send(\"waitForFunction\", self._timeout, params)\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\.qa-python\\playwright\\_impl\\_connection.py\", line 76, in send\n    return await self._connection.wrap_api_call(\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\Lenovo\\Documents\\ChatGPT\\bractwo krain\\Bractwo_0.8.17\\.qa-python\\playwright\\_impl\\_connection.py\", line 632, in wrap_api_call\n    raise rewrite_error(error, f\"{parsed_st['apiName']}: {error}\") from None\nplaywright._impl._errors.TimeoutError: Page.wait_for_function: Timeout 60000ms exceeded.\n",
+  "bridge_max_queued_messages": 153
+}

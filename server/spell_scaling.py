@@ -78,7 +78,13 @@ def choose_circle(p, key, rank):
 
 
 def resolve(p, key, *, automatic=False, active=True):
-    """Return independent complete casting data. All use-sites share this path."""
+    """Return independent complete casting data. All use-sites share this path.
+
+    automatic=True is a permanent-progression projection, NOT live Auto casting:
+    compare the highest useful paid circle, ignoring preferences, remaining free
+    uses and armed discounts. Otherwise a Wisdom increase that restores a free
+    base-rank Guiding Bolt can falsely appear as a damage loss on level-up.
+    """
     s = copy.deepcopy(dnd.SPELLS[key])
     options = circle_options(p, key)
     selected = getattr(p, 'spell_circle_choices', {}).get(key, 0)
@@ -87,7 +93,7 @@ def resolve(p, key, *, automatic=False, active=True):
     except ImportError:import druid_circles as dc
     free_base=(key=='guiding_bolt' and dc.circle(p)=='stars' and dc.feature_remaining(p,'guiding_bolt') and dc.state(p).get('map_equipped',True)
         or dc.circle(p)=='land' and p.level>=25 and dc.state(p).get('natural_free_armed') and not dc.spent(p,'natural_free') and key in dc.bonus_spells(p) and s.get('circle',0)>0)
-    if free_base and not selected:rank=s['circle']
+    if not automatic and free_base and not selected:rank=s['circle']
     s.update(cast_circle=rank, power_choice=0 if automatic or selected not in options else selected,
              power_options=options, resolved=True)
     if options:
