@@ -1,9 +1,24 @@
 /* Phone HUD: existing game controls, separate presentation and no combat rules. */
 (function (root) {
   'use strict';
-  const query = '(max-width: 700px), (max-width: 1100px) and (max-height: 600px)';
+  const query = '(max-width: 700px), (max-width: 1100px) and (max-height: 600px), (pointer: coarse) and (max-width: 1400px) and (max-height: 900px)';
   const media = root.matchMedia(query);
   const active = () => media.matches;
+  const COMPACT_SCALE = 0.74;
+  function uiScale(visualScale = root.visualViewport?.scale || 1) {
+    // Some Android browsers shrink the normal viewport then reset it in
+    // fullscreen. Compensate that shrink once, never a user's zoom above 1.
+    const visual = Math.max(0.5, Math.min(1, Number(visualScale) || 1));
+    return COMPACT_SCALE / visual;
+  }
+  function worldScale(width, height, visualScale) {
+    // Orientation is a profile; browser bars/fullscreen height are not.
+    return (width > height ? 0.95 : 1) * 0.85 * uiScale(visualScale);
+  }
+  function refreshViewport() {
+    document.getElementById('gameUI')?.style.setProperty('--mobile-unit', uiScale()+'px');
+  }
+  refreshViewport();
 
   function create({ stop = () => {}, closeChat = () => {} } = {}) {
     const ui = document.getElementById('gameUI');
@@ -67,6 +82,7 @@
     }, true);
 
     function visualSize() {
+      refreshViewport();
       const view = root.visualViewport;
       ui.style.setProperty('--mobile-visual-height', (view?.height || innerHeight) + 'px');
       ui.style.setProperty('--mobile-visual-top', (view?.offsetTop || 0) + 'px');
@@ -135,9 +151,11 @@
     media.addEventListener('change', sync);
     root.addEventListener('resize', () => { stop(); visualSize(); });
     root.visualViewport?.addEventListener('resize', visualSize);
+    document.addEventListener('fullscreenchange', visualSize);
+    document.addEventListener('webkitfullscreenchange', visualSize);
     root.visualViewport?.addEventListener('scroll', visualSize);
     sync();
     return { blocksControls: () => active() && !menu.hidden };
   }
-  root.BractwoMobile = { active, create };
+  root.BractwoMobile = { active, create, uiScale, worldScale, refreshViewport };
 })(globalThis);

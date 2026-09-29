@@ -1,12 +1,23 @@
-# Bractwo 0.8.18 UI_13 — pogrupowany pasek druida
+# Bractwo 0.8.18 UI_14 — Strzała, powrót do druida i mniejszy pełny ekran
 
-Przemiany zwierzęce są pod jednym przyciskiem, a gwiezdne postacie pod drugim. Po włączeniu Łucznika główny przycisk służy do Gwiezdnej strzały. Druid Kręgu Gwiazd na poziomie 15 zajmuje 17 pól zamiast 21. Automatyczne odblokowania, księga K, kolejne zestawy skrótów i przewijanie na telefonie są zachowane.
+Aktywny Łucznik ma na mobilnym pasku przycisk **Strzała**, własną ikonę i licznik
+odnowienia. **▾ → Powrót do druida** jest na górze menu, zawsze poza przewijaną
+listą. Działa także przy 0/2 użyć. Kielich i Smok pozwalają wrócić również głównym
+przyciskiem. Serwer przekazuje aktualny stan przemiany w każdym pakiecie właściciela.
 
-Poprawiono pokazywanie użyć Dzikiego kształtu, blokadę ponownego włączenia tej samej konstelacji i celowanie: kliknięcie pustego terenu nie zostawia celownika. Czary wymagające miejsca najpierw włączają wskazywanie.
+Mobilny HUD i oddalenie świata pozostają kompaktowe również po wejściu w pełny
+ekran. Nie zmieniono układu desktopowego, zasad walki ani interpolacji ruchu.
+Zachowano grupy przemian, księgę K, dodatkowe zestawy i przewijanie drugim palcem.
 
-[Opis UI_13, obsługa, zakres testów i ograniczenia](docs/HOTBAR_0.8.18_UI_13.md). Celowane testy: 47 serwerowych, 54 JavaScript i 12 kontroli Chromium. To nie jest deklaracja pełnej regresji historycznych testów ani test produkcyjnego wdrożenia.
+[Obsługa, wdrożenie, szczegóły i ograniczenia testów UI_14](docs/UI_14_DRUID_FULLSCREEN.md).
+Przeszło 56 celowanych testów serwera, 63 testy JavaScript i 28 kontroli Chromium.
+Pełny ekran sprawdzono w przeglądarce testowej z kontrolowaną zmianą viewportu,
+nie na fizycznym Androidzie. To nie jest pełna regresja wszystkich historycznych testów.
 
-Aktualizacja klienta przeglądarkowego wymaga nowych plików serwera i `web`. Reset postaci nie jest potrzebny. Natywny klient Godota nie otrzymał nowego menu wizualnego.
+Wgrywaj razem **server + web**. Reset postaci nie jest potrzebny. Na ekranie
+logowania sprawdź **UI_14**. Paczka nie została wdrożona automatycznie na Railway.
+Natywny interfejs Godota jest niezmieniony. Archiwalny opis UI_13 zachowano
+w `docs/HOTBAR_0.8.18_UI_13.md`.
 
 ## Historia wcześniejszych zmian
 

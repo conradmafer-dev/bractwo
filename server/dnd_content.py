@@ -458,7 +458,19 @@ def status_effects(conditions, now, player=None):
         remaining=max(0,value.get('until',0)-now)
         if remaining<=0:continue
         info=STATUS_SPECS.get(key,dict(name=key,icon='✦',description='',harmful=bool(value.get('hostile'))))
-        if value.get('spell_id')=='hunters_mark':
+        if key == 'starry_form':
+            try:
+                from . import druid_circles as circles
+            except ImportError:
+                import druid_circles as circles
+            form = circles.starry_form(player) if player is not None else value.get('form', '')
+            label, description = {
+                'archer': ('Łucznik', 'Przycisk Strzała wystrzeliwuje gwiezdny pocisk bez many i kolejnych użyć przemiany. Powrót do druida: ▾ przy tym przycisku.'),
+                'chalice': ('Kielich', 'Czary leczące za manę uruchamiają dodatkowe leczenie. Powrót do druida: przycisk Kielich albo ▾.'),
+                'dragon': ('Smok', 'Stabilizuje koncentrację oraz testy Inteligencji i Mądrości. Powrót do druida: przycisk Smok albo ▾.'),
+            }.get(form, ('Gwiezdna postać', 'Powrót do druida: ▾ w grupie gwiezdnych postaci.'))
+            info = dict(name='Gwiezdna postać · '+label, icon='✧', description=description, harmful=False)
+        elif value.get('spell_id')=='hunters_mark':
             info=dict(name='Znak łowcy',icon='⌖',description='Trafienia oznaczającego łowcy zadają dodatkowe 1k6 mocy. Zniknie po utracie jego koncentracji.',harmful=True)
         elif value.get('spell_id')=='ensnaring_strike':
             dice=value.get('profile',{}).get('dice',[1,6,0])

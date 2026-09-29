@@ -13,11 +13,11 @@
 #appHelpClose { flex: 0 0 44px; padding: 0; font-size: 25px; }
 #appHelpBody { font: 14px/1.55 system-ui, sans-serif; }
 #appHelpBody p { margin: 12px 0 0; }
-@media (max-width: 700px), (max-width: 1100px) and (max-height: 600px) {
+@media (max-width: 700px), (max-width: 1100px) and (max-height: 600px), (pointer: coarse) and (max-width: 1400px) and (max-height: 900px) {
   #gameUI.mobile-hud #mobileFullscreenButton {
     display: flex; align-items: center; justify-content: center; position: absolute;
-    right: var(--mobile-right); top: calc(var(--mobile-top) + 104px); z-index: 30;
-    width: 44px; height: 44px; padding: 0; font: 25px/1 system-ui, sans-serif;
+    right: var(--mobile-right); top: calc(var(--mobile-top) + calc(104 * var(--mobile-unit, 1px))); z-index: 30;
+    width: calc(44 * var(--mobile-unit, 1px)); height: calc(44 * var(--mobile-unit, 1px)); padding: 0; font: calc(25 * var(--mobile-unit, 1px))/1 system-ui, sans-serif;
   }
   /* The always-visible phone control already supplies this menu action. */
   #gameUI.mobile-hud #mobileMenu #fullscreenButton { display: none; }

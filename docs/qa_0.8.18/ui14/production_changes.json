@@ -1,0 +1,67 @@
+[
+  {
+    "path": "web/mobile.js",
+    "status": "modified",
+    "sha256": "f0b400cbc3669a80ac0ccbf007620b4347af4eb9e782707b5259bf83f91fcbb6"
+  },
+  {
+    "path": "web/mobile.css",
+    "status": "modified",
+    "sha256": "c1020b75a20ee408d665f991ccda23e8edf0bdc5769c6f11afa2bad6c249342f"
+  },
+  {
+    "path": "web/game.js",
+    "status": "modified",
+    "sha256": "9478ba1c11d1a28be13400fa3460a55cb16b54ec5b051937c86fe661f4f13152"
+  },
+  {
+    "path": "web/hotbar_ui.css",
+    "status": "modified",
+    "sha256": "9851c3ba5ec9be9afbf1ed729dafa68ffd58871724f8ac195938bea896c98bdb"
+  },
+  {
+    "path": "web/rest_ui.css",
+    "status": "modified",
+    "sha256": "824f9acf50dbd9587a51fc496a698c6b394cea2b19494753c90e9404f885bc47"
+  },
+  {
+    "path": "web/index.html",
+    "status": "modified",
+    "sha256": "7c9410e0375ec2b66fb6a178cbeba7eb382ff2fcd33cc47ea0c5e54517ff9c94"
+  },
+  {
+    "path": "web/hotbar_ui.js",
+    "status": "modified",
+    "sha256": "e32737a6009840b0fb3389b22f5c7658c6502d0dd5cbed43e7f2dfdbae0f0299"
+  },
+  {
+    "path": "web/app_shell.css",
+    "status": "modified",
+    "sha256": "045a7374a959e7404afc6dad067184ba683649d9d3587842c14a4cbdb610bdb3"
+  },
+  {
+    "path": "web/assets/spells/star_arrow.svg",
+    "status": "added",
+    "sha256": "e13056dc96cdefbae61f822887f3278a9e8b81912d6f508ee1afbf6bfe6762ae"
+  },
+  {
+    "path": "server/druid_circles.py",
+    "status": "modified",
+    "sha256": "02901c1c6890f7284cc52f290acbcc2b18310e461052500dd740467ab1a247a2"
+  },
+  {
+    "path": "server/server.py",
+    "status": "modified",
+    "sha256": "05d9c470de060e5aeef34ab16192ea6941313d4485487d06598120c54e793774"
+  },
+  {
+    "path": "server/druid_circle_game.py",
+    "status": "modified",
+    "sha256": "6c4cbb81426e5afa9183277371a23636ab507992552b269393fdde34fda0f78b"
+  },
+  {
+    "path": "server/dnd_content.py",
+    "status": "modified",
+    "sha256": "19e862e13b09f78bf7c42e6c300c320003e23d8f5402f93c5457c260745418da"
+  }
+]

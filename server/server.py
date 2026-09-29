@@ -494,6 +494,7 @@ class Player:
             'sanctuary':sanctuary if sanctuary and sanctuary.get('until',0)>now else None,
             'flight':environment_rules.flying(self),'submerged':self.submerged}
         if private:
+            result['druid_forms'] = druid_circles.owner_forms(self, now)
             inventory_rules.ensure(self, ITEMS, POTIONS, make_item)
             try:
                 from .character_sheet import build as sheet_data

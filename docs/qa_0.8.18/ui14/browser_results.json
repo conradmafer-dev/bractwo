@@ -1,0 +1,294 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Compact mobile HUD and actual render zoom",
+      "metrics": {
+        "w": 760,
+        "h": 340,
+        "visualScale": 1,
+        "dpr": 2,
+        "full": false,
+        "mobile": true,
+        "unit": 0.74,
+        "camera": 0.59755,
+        "slot": {
+          "x": 82.875,
+          "y": 291.171875,
+          "w": 39.953125,
+          "h": 41.4375
+        },
+        "bar": {
+          "x": 82.875,
+          "y": 291.171875,
+          "w": 561.6875,
+          "h": 44.390625
+        },
+        "card": {
+          "x": 5.90625,
+          "y": 5.90625,
+          "w": 159.828125,
+          "h": 50.78125
+        },
+        "ui": {
+          "x": 0,
+          "y": 0,
+          "w": 760,
+          "h": 340
+        },
+        "fullyVisibleSlots": 13,
+        "docWidth": 760
+      }
+    },
+    {
+      "name": "Touch activation shows Strzała, loaded distinct icon, named status and cooldown"
+    },
+    {
+      "name": "Main touch sends Star Arrow, never another transformation"
+    },
+    {
+      "name": "Powrót do druida stays visible and enabled at 0/2, 760×340",
+      "bounds": {
+        "x": 110.859375,
+        "y": 106.59375,
+        "width": 372,
+        "height": 66
+      }
+    },
+    {
+      "name": "Powrót do druida stays visible and enabled at 0/2, 734×260",
+      "bounds": {
+        "x": 110.859375,
+        "y": 106.59375,
+        "width": 372,
+        "height": 66
+      }
+    },
+    {
+      "name": "Powrót do druida stays visible and enabled at 0/2, 390×844",
+      "bounds": {
+        "x": 19,
+        "y": 229.921875,
+        "width": 352,
+        "height": 66
+      }
+    },
+    {
+      "name": "Touch dismissal works with no uses and during bonus cooldown; no refund"
+    },
+    {
+      "name": "Kielich main shortcut returns to druid without a second activation"
+    },
+    {
+      "name": "Last-use Archer continues shooting with pool 0/2"
+    },
+    {
+      "name": "Fullscreen keeps compact HUD/world scale when drawable area grows",
+      "metrics": {
+        "w": 800,
+        "h": 400,
+        "visualScale": 1,
+        "dpr": 2,
+        "full": true,
+        "mobile": true,
+        "unit": 0.74,
+        "camera": 0.59755,
+        "slot": {
+          "x": 82.875,
+          "y": 351.171875,
+          "w": 39.953125,
+          "h": 41.4375
+        },
+        "bar": {
+          "x": 82.875,
+          "y": 351.171875,
+          "w": 601.6875,
+          "h": 44.390625
+        },
+        "card": {
+          "x": 5.90625,
+          "y": 5.90625,
+          "w": 159.828125,
+          "h": 50.78125
+        },
+        "ui": {
+          "x": 0,
+          "y": 0,
+          "w": 800,
+          "h": 400
+        },
+        "fullyVisibleSlots": 14,
+        "docWidth": 800
+      }
+    },
+    {
+      "name": "Druid dismissal also works in fullscreen"
+    },
+    {
+      "name": "Leaving fullscreen restores available area, not a larger HUD or camera"
+    },
+    {
+      "name": "Touch profile and world zoom survive former height/breakpoint transition"
+    },
+    {
+      "name": "Controlled browser shrink-to-1 reset is compensated exactly once",
+      "shrunk": {
+        "w": 760,
+        "h": 340,
+        "visualScale": 0.73,
+        "dpr": 2,
+        "full": false,
+        "mobile": true,
+        "unit": 1.0136986301369864,
+        "camera": 0.8185616438356165,
+        "slot": {
+          "x": 113.53125,
+          "y": 273.109375,
+          "w": 54.734375,
+          "h": 56.765625
+        },
+        "bar": {
+          "x": 113.53125,
+          "y": 273.109375,
+          "w": 488.34375,
+          "h": 60.8125
+        },
+        "card": {
+          "x": 8.109375,
+          "y": 8.109375,
+          "w": 218.953125,
+          "h": 68.8125
+        },
+        "ui": {
+          "x": 0,
+          "y": 0,
+          "w": 760,
+          "h": 340
+        },
+        "fullyVisibleSlots": 8,
+        "docWidth": 760
+      },
+      "restored": {
+        "w": 760,
+        "h": 340,
+        "visualScale": 1,
+        "dpr": 2,
+        "full": false,
+        "mobile": true,
+        "unit": 0.74,
+        "camera": 0.59755,
+        "slot": {
+          "x": 82.875,
+          "y": 291.171875,
+          "w": 39.953125,
+          "h": 41.4375
+        },
+        "bar": {
+          "x": 82.875,
+          "y": 291.171875,
+          "w": 561.6875,
+          "h": 44.390625
+        },
+        "card": {
+          "x": 5.90625,
+          "y": 5.90625,
+          "w": 159.828125,
+          "h": 50.78125
+        },
+        "ui": {
+          "x": 0,
+          "y": 0,
+          "w": 760,
+          "h": 340
+        },
+        "fullyVisibleSlots": 13,
+        "docWidth": 760
+      }
+    },
+    {
+      "name": "Desktop retains its own layout and camera profile",
+      "metrics": {
+        "w": 1649,
+        "h": 850,
+        "visualScale": 1,
+        "dpr": 1,
+        "full": false,
+        "mobile": false,
+        "unit": 0.74,
+        "camera": 1.2,
+        "slot": {
+          "x": 304,
+          "y": 706,
+          "w": 81.5,
+          "h": 60
+        },
+        "bar": {
+          "x": 304,
+          "y": 706,
+          "w": 1022,
+          "h": 124
+        },
+        "card": {
+          "x": 167.6875,
+          "y": 15,
+          "w": 235,
+          "h": 91
+        },
+        "ui": {
+          "x": 0,
+          "y": 0,
+          "w": 1649,
+          "h": 850
+        },
+        "fullyVisibleSlots": 17,
+        "docWidth": 1649
+      }
+    },
+    {
+      "name": "No browser JavaScript errors"
+    }
+  ],
+  "errors": [],
+  "transport": "Embedded production HTML/CSS/JS, Chromium with actual in-memory Python server over existing WS bridge",
+  "limitations": [
+    "Navigation blocked in container: about:blank/set_content, in-memory localStorage shim and Python WS bridge; no native HTTP navigation, persistent browser storage or service-worker lifecycle test.",
+    "Fullscreen API invoked by real touch. Android OS bar changes are modeled by controlled viewport resizing; browser shrink modeled by overriding VisualViewport.scale and emitting resize. This is not a physical-phone test."
+  ],
+  "source_hashes": {
+    "web/caster_vfx.js": "b8b3c5335032835320d9c1d7977decaf6f53ffc1695bfe5abccc322d55400bc5",
+    "web/app_shell.js": "1ec050b3cc7945061d896c5cf3f567af695d6543084e6e8991ef89235ad23c86",
+    "web/character_sheet.js": "0211283458e46823632b8ae1756cd1c97574285df5e45cd72da04c213a43296e",
+    "web/caster.css": "705db2da139ef9d7799826e7f3b7f215387bb5ab317900f2baaffb98c9e49319",
+    "web/windows.css": "6c6ee0b4a422a6f522f48fb68d4354c577e4c49ff016901152cb2d20189ccc4c",
+    "web/sw.js": "723ed97bc8e2cb947360fb9d1df5bdd7011fd738cd22892b84448802df0c15ad",
+    "web/mobile.js": "f0b400cbc3669a80ac0ccbf007620b4347af4eb9e782707b5259bf83f91fcbb6",
+    "web/level_up.js": "17b449417a71abd65440bafafa26e7d2500230cd4bab243cdeca900bf9c8d956",
+    "web/mobile.css": "c1020b75a20ee408d665f991ccda23e8edf0bdc5769c6f11afa2bad6c249342f",
+    "web/game.js": "9478ba1c11d1a28be13400fa3460a55cb16b54ec5b051937c86fe661f4f13152",
+    "web/hotbar_ui.css": "9851c3ba5ec9be9afbf1ed729dafa68ffd58871724f8ac195938bea896c98bdb",
+    "web/loot_ui.js": "f13d5bd2eb4d7f74518af8386368719d1e2da0385f241567f56b8b8607198cbc",
+    "web/character_sheet.css": "3975f51b7e8975a30f15648fdf0b083fd6a91fe86d30a46da3b3459269fc8a7b",
+    "web/windows.js": "100bf86758c8c455cd1ac0e7da947a512ec5041379612d327b119dd9926c741d",
+    "web/spell_vfx.js": "17480a9f0283919135fa1d9d0bebbe9504c73b5d5bee9ab00936ca2773710369",
+    "web/inventory_ui.js": "89ee1017746b057d266c22da3d6e6c3ae3af90aaca74c434f5a7d9a48f88d449",
+    "web/rest_ui.css": "824f9acf50dbd9587a51fc496a698c6b394cea2b19494753c90e9404f885bc47",
+    "web/runtime.js": "c9ea5d5dc1beb56d56f5e08d09e7a8874cec2fc7ebd32150a29274f0779df7b9",
+    "web/style.css": "9abe3f1487fb7cab3d1a6821b16bff74b553ea2d839428771fd487c025705bfc",
+    "web/index.html": "7c9410e0375ec2b66fb6a178cbeba7eb382ff2fcd33cc47ea0c5e54517ff9c94",
+    "web/offline.html": "2cc34c8ea4d3c3acb8bb755ef2244003df99ca1f8dbd52bf699b18377dc30625",
+    "web/circle_vfx.js": "0e07c3e28351848a988d1b030d30db937544a4f1ad0ac6f3303610fa2a2869bf",
+    "web/fighter_vfx.js": "9ba063b1c30be79c4f83f362ba11fd181759250eb5f52024068289d8bfe02027",
+    "web/hotbar_ui.js": "e32737a6009840b0fb3389b22f5c7658c6502d0dd5cbed43e7f2dfdbae0f0299",
+    "web/fighter_ui.js": "921dada318326e5e363e458b9dcdce0e2c9ccfd5a5ce9fa19226938747607f89",
+    "web/caster_ui.js": "bffa450ab32aa600dca5eed601f26a0ce9cd216b83791db50c7e750547b553e2",
+    "web/circle_spell_ui.js": "f3b12dc535bd344fb1998d3d679907ac4806dc8ab1b985bd687aff0af4c68046",
+    "web/fighter.css": "036078b08efff6d2228869823a28898c751d61133629761f54edf5761505689e",
+    "web/loot_ui.css": "dafb4e30eac1cd2c4eb7333940b2d3fe037a8c68f5bd4ef337892f305ba9b938",
+    "web/level_up.css": "2850267e083f193e47e4ab76fa1fae46e54c041f1c9e52004bd8afd9e5f3aecd",
+    "web/manifest.webmanifest": "0169894233b13d2086a87383377606ae4dddb8c9f9a29e74edcf66456fe84679",
+    "web/hud_layout.css": "e82c19f2f7496c9d5656c58015b310f8954af5e75ffa25831753395e0a67b579",
+    "web/rest_ui.js": "90279738a2987db9f03cc2e141df17b11ae2bdd794ae0d5fd9b60186d142aaa4",
+    "web/atlas_map.js": "b1be0d55dc736487802b5cd084cc798cf5c2cd3143e7b2782162da0a376ec0f5",
+    "web/app_shell.css": "045a7374a959e7404afc6dad067184ba683649d9d3587842c14a4cbdb610bdb3"
+  }
+}

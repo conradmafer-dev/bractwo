@@ -1,0 +1,66 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Level-15 Stars: 17 occupied slots instead of 21",
+      "occupied": 17
+    },
+    {
+      "name": "Archer main shortcut shoots without another transformation use"
+    },
+    {
+      "name": "Zero uses blocks new forms, not the active Archer arrow"
+    },
+    {
+      "name": "Empty-ground click neither clears a target nor opens a crosshair"
+    },
+    {
+      "name": "Book assignment moves the whole group and keeps real-spell save data"
+    },
+    {
+      "name": "High-level spells remain on extra pages, navigable by mouse and keyboard",
+      "pages": 2
+    },
+    {
+      "name": "Ground spell arms targeting first; cancel is free; confirmation sends an explicit point"
+    },
+    {
+      "name": "Touch menu fits 844×390",
+      "bounds": {
+        "x": 101.859375,
+        "y": 12,
+        "width": 390,
+        "height": 366
+      }
+    },
+    {
+      "name": "Touch menu fits 390×844",
+      "bounds": {
+        "x": 10,
+        "y": 329.328125,
+        "width": 370,
+        "height": 372.921875
+      }
+    },
+    {
+      "name": "Touch menu fits 734×260",
+      "bounds": {
+        "x": 101.859375,
+        "y": 12,
+        "width": 390,
+        "height": 236
+      }
+    },
+    {
+      "name": "Second-finger hotbar swipe scrolls grouped slots, casts nothing and keeps joystick movement"
+    },
+    {
+      "name": "No browser JavaScript errors"
+    }
+  ],
+  "errors": [],
+  "transport": "production HTML/CSS/JS in Chromium; Python WebSocket bridge to isolated in-memory server",
+  "limitations": [
+    "Browser navigation is blocked by container policy: production client is rendered with set_content in about:blank, an in-memory localStorage shim and the existing Python WebSocket bridge. Native hosting, browser persistence and service workers are not covered."
+  ]
+}

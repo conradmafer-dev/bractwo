@@ -29,13 +29,23 @@
   padding: 7px 9px 7px 12px; font-size: 12px; display: flex; align-items: center; gap: 10px;
 }
 .ground-target-hint button { flex: 0 0 32px; width: 32px; height: 30px; padding: 0; font-size: 20px; }
-#gameUI.mobile-hud .hotbar-cell { flex: 0 0 54px; width: 54px; min-width: 54px; height: 56px; }
+#gameUI.mobile-hud .hotbar-cell { flex: 0 0 calc(54 * var(--mobile-unit, 1px)); width: calc(54 * var(--mobile-unit, 1px)); min-width: calc(54 * var(--mobile-unit, 1px)); height: calc(56 * var(--mobile-unit, 1px)); }
 #gameUI.mobile-hud .hotbar-cell.empty { display: none; }
-#gameUI.mobile-hud .hotbar-cell .hotbar-group-toggle { width: 27px; height: 27px; line-height: 25px; }
-#gameUI.mobile-hud .ground-target-hint { bottom: 142px; font-size: 11px; }
+#gameUI.mobile-hud .hotbar-cell .hotbar-group-toggle { width: calc(27 * var(--mobile-unit, 1px)); height: calc(27 * var(--mobile-unit, 1px)); line-height: calc(25 * var(--mobile-unit, 1px)); }
+#gameUI.mobile-hud .ground-target-hint { bottom: calc(142 * var(--mobile-unit, 1px)); font-size: calc(11 * var(--mobile-unit, 1px)); }
 #gameUI.mobile-hud .hotbar-group-menu { padding: 8px; }
 #gameUI.mobile-hud .hotbar-group-option { min-height: 66px; }
 
 .hotbar-group-menu button { background: #294b38; border: 1px solid #8b9e6f; border-radius: 4px; color: #eee5c9; cursor: pointer; }
 .hotbar-group-menu button:not(:disabled):hover { background: #385e44; }
 .hotbar-group-menu button:disabled { background: #203b2e; cursor: default; }
+
+/* UI_14: dismissal never scrolls out of sight, even with zero uses. */
+.hotbar-group-menu { display: flex; flex-direction: column; overflow: hidden; }
+.hotbar-group-menu[hidden] { display: none; }
+.hotbar-group-menu > header, .hotbar-group-resource, .hotbar-group-current { flex: 0 0 auto; }
+.hotbar-group-options { min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.hotbar-group-current:empty { display: none; }
+.hotbar-group-current .hotbar-group-option { min-height: 42px; margin-bottom: 8px; border-color: #e5ca7c; }
+.hotbar-group-current .hotbar-group-option strong { margin: 0; }
+.hotbar-group-current .hotbar-group-option em { margin-top: 2px; }

@@ -1,0 +1,18 @@
+{
+  "revision": "UI_14",
+  "based_on": "BRACTWO_0.8.18_UI_13_FULL_SOURCE.zip",
+  "focused_server_tests": 56,
+  "javascript_tests": 63,
+  "browser_checks_new": 16,
+  "browser_checks_previous_scenarios": 12,
+  "all_selected_checks_passed": true,
+  "physical_android_tested": false,
+  "deployed_to_railway": false,
+  "native_godot_ui_changed": false,
+  "save_reset_required": false,
+  "limitations": [
+    "Navigation blocked in container: about:blank/set_content, in-memory localStorage shim and Python WS bridge; no native HTTP navigation, persistent browser storage or service-worker lifecycle test.",
+    "Fullscreen API invoked by real touch. Android OS bar changes are modeled by controlled viewport resizing; browser shrink modeled by overriding VisualViewport.scale and emitting resize. This is not a physical-phone test.",
+    "Selected regression suites only, not every historical test in this repository."
+  ]
+}

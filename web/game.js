@@ -1023,11 +1023,15 @@
     viewport={w:innerWidth,h:innerHeight,dpr:Math.min(devicePixelRatio||1,2)};
     canvas.width=Math.round(viewport.w*viewport.dpr);canvas.height=Math.round(viewport.h*viewport.dpr);
     const baseScale=viewport.w<560?1:viewport.h<620?.95:1.2;
-    // Share the HUD's mobile breakpoints; zoom only the world, keeping controls readable.
-    camera.scale=baseScale*(globalThis.BractwoMobile.active() ? 0.85 : 1);
+    globalThis.BractwoMobile.refreshViewport();
+    camera.scale=globalThis.BractwoMobile.active()?globalThis.BractwoMobile.worldScale(viewport.w,viewport.h):baseScale;
     ctx.imageSmoothingEnabled=false;
   }
-  addEventListener("resize",resize);resize();buildGround();
+  addEventListener("resize",resize);
+  globalThis.visualViewport?.addEventListener('resize',resize);
+  document.addEventListener('fullscreenchange',resize);
+  document.addEventListener('webkitfullscreenchange',resize);
+  resize();buildGround();
   function inView(x,y,margin=100){return Math.abs(x-camera.x)<viewport.w/camera.scale/2+margin&&Math.abs(y-camera.y)<viewport.h/camera.scale/2+margin;}
   function glow(x,y,radius,color,strength=.2){ctx.save();ctx.globalAlpha=strength;const gradient=ctx.createRadialGradient(x,y,0,x,y,radius);gradient.addColorStop(0,color);gradient.addColorStop(1,"transparent");ctx.fillStyle=gradient;ctx.fillRect(x-radius,y-radius,radius*2,radius*2);ctx.restore();}
   function label(text,x,y,color="#f7efc8",size=11){ctx.font=`600 ${size}px system-ui,sans-serif`;ctx.textAlign="center";ctx.textBaseline="middle";ctx.lineWidth=3;ctx.strokeStyle="#253323e8";ctx.lineJoin="round";ctx.strokeText(text,x,y);ctx.fillStyle=color;ctx.fillText(text,x,y);}
@@ -1498,7 +1502,9 @@
     const id=Runtime.hotbarKey(Runtime.displayHotbar(me),hotbarPage,slot);
     const group=globalThis.BractwoHotbarUI.groupState(id,me,world);
     if(group){
-      if(group.primary){hotbarMenu.close();cast(group.primary.id);}
+      if(group.disabled)return;
+      if(group.command){hotbarMenu.close();send({type:'circle_command',action:group.command});}
+      else if(group.primary){hotbarMenu.close();cast(group.primary.id);}
       else hotbarMenu.open(id,hotbarButtons[slot].groupToggle);
     }else{hotbarMenu.close();cast(id);}
   }
@@ -1514,16 +1520,18 @@
       b.groupToggle.hidden=!group;b.parentElement.classList.toggle('empty',!id);
       b.dataset.spell=id||'';
       if(group){
-        const span=b.querySelector('span');if(span.dataset.spell!==id){span.dataset.spell=id;span.replaceChildren();const img=document.createElement('img');img.src=group.group.icon;img.className='spell-icon';img.alt='';span.append(img);}
+        const span=b.querySelector('span'),iconKey=id+':'+group.icon;if(span.dataset.spell!==iconKey){span.dataset.spell=iconKey;span.replaceChildren();const img=document.createElement('img');img.src=group.icon;img.className='spell-icon';img.alt='';span.append(img);}
         b.classList.remove('empty','locked','queued');b.classList.toggle('active-spell',group.active);
-        b.querySelector('small').textContent=group.label;
-        b.querySelector('b').textContent=group.primary?(group.star==='archer'?'Koszt: 0 użyć':'Powrót'):`${group.pool.remaining}/${group.pool.maximum} użyć`;
-        b.disabled=!me.alive||!!(group.primary&&!Runtime.spellUsable(group.primary,me));b.groupToggle.disabled=!me.alive;
+        b.querySelector('small').textContent=globalThis.BractwoMobile.active()?group.shortLabel:group.label;
+        b.querySelector('b').textContent=group.readyIn>0?Math.ceil(group.readyIn)+' s':group.command?'Powrót':group.primary?(group.star==='archer'?'0 MP':'Powrót'):`${group.pool.remaining}/${group.pool.maximum} użyć`;
+        b.disabled=group.disabled;b.groupToggle.disabled=!me.alive;
         b.groupToggle.title=`${group.group.name} · wspólna pula ${group.pool.remaining}/${group.pool.maximum}`;
-        b.groupToggle.setAttribute('aria-label','Wybierz: '+group.group.name);
+        b.groupToggle.setAttribute('aria-label',group.active?'Wybór postaci i powrót do druida':'Wybierz: '+group.group.name);
+        b.setAttribute('aria-label',group.label+(group.star==='archer'?' — strzel bez many i użyć przemiany':group.command?' — powrót do druida':''));
         b.title=`${group.group.name} · Dziki kształt ${group.pool.remaining}/${group.pool.maximum}\n`+(group.primary?`${group.primary.power_summary||group.primary.description}\n`:'Wybierz postać z rozwijanego menu.\n')+'Przycisk ▾ otwiera wybór postaci. K otwiera pełną księgę.';
         continue;
       }
+      b.removeAttribute('aria-label');
       const s=Runtime.spellProfile(world.spells?.[id],me),available=s&&spellAvailable(s);
       const revert=s?.kind==='shape'&&me.form,cd=me.spell_cooldowns?.[id]||0;
       b.classList.toggle('empty',!s);

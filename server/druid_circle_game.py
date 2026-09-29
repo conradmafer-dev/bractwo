@@ -434,19 +434,25 @@ class DruidCircleGame:
                 if rt.get('star_switch_ready', 0) > now: return
                 rt['star_switch_ready'] = now+rules.ROUND_SECONDS
                 rt['starry_form'] = form
+                p.buffs['starry_form'].update(form=form, spell_id=key)
                 self.spell_effect(p, key, p)
                 return  # Switching at turn start uses neither a bonus action nor a Wild Shape.
             if not circles.spend_shape(p): return await self.notice(p, 'Brak użyć Dzikiego kształtu.')
             p.form = ''; p.form_until = 0
-            p.buffs['starry_form'] = dict(until=now+300, spell_id=key)
+            p.buffs['starry_form'] = dict(until=now+300, spell_id=key, form=form)
             rt.update(starry_form=form, star_switch_ready=now+rules.ROUND_SECONDS)
+            if form == 'archer':
+                await self.notice(p, 'Łucznik aktywny: strzelaj przyciskiem Strzała. Powrót do druida znajdziesz pod ▾.')
             self.begin_action(p, True); self.spell_effect(p, key, p)
             if form != 'archer': return
         elif current != 'archer': return
         else: self.begin_action(p, True)
         spec = dict(dnd.SPELLS[key], range=384, area=False)
         targets = [] if self.in_safe(p) else self.spell_targets(p, spec, enemy_id or p.auto_enemy_id or None, target_id or p.auto_target_id or None)
-        if not targets: return
+        if not targets:
+            if key == 'circle_star_arrow':
+                await self.notice(p, 'W bezpiecznej osadzie nie można strzelać.' if self.in_safe(p) else 'Brak przeciwnika w zasięgu Gwiezdnej strzały.')
+            return
         target = targets[0]
         self._circle_damage(p, target, key, (2 if p.level >= 45 else 1, 8, circles.wisdom(p)), 'radiant', attack=True)
         self.tag(p); await self._circle_kills([target])

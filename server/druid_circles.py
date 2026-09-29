@@ -130,7 +130,26 @@ def active(p, key): return getattr(p, 'buffs', {}).get(key, {}).get('until', 0) 
 
 
 def starry_form(p):
-    return runtime(p).get('starry_form', '') if not active(p, 'polymorph') and circle(p) == 'stars' and active(p, 'starry_form') else ''
+    # The active effect is authoritative; runtime is retained for older in-memory
+    # actors. Do not reconstruct a form from a spent resource or an expired buff.
+    if not getattr(p, 'alive', False) or active(p, 'polymorph') or circle(p) != 'stars' or not active(p, 'starry_form'):
+        return ''
+    effect = p.buffs['starry_form']
+    form = effect.get('form') or runtime(p).get('starry_form') or effect.get('spell_id', '').removeprefix('circle_star_')
+    return form if form in ('archer', 'chalice', 'dragon') else ''
+
+
+def owner_forms(p, now):
+    """Small uncached owner snapshot, separate from decorative circle visuals."""
+    form = starry_form(p)
+    blocked = not getattr(p, 'alive', False) or any(active(p, key) for key in (
+        'incapacitated', 'paralyzed', 'unconscious', 'stunned', 'sleep_pending', 'stinking_poison', 'polymorph'))
+    return dict(starry_form=form,
+                starry_remaining=round(max(0, p.buffs.get('starry_form', {}).get('until', 0)-now), 2) if form else 0,
+                shape_remaining=shape_remaining(p), shape_maximum=shape_max(p),
+                can_dismiss_star=bool(form and not blocked),
+                can_shoot=bool(form == 'archer' and not blocked),
+                arrow_ready_in=round(max(0, getattr(p, 'bonus_cooldown_until', 0)-now), 3))
 
 
 def roll_floor(p, ability, kind):
@@ -208,7 +227,7 @@ def configure(spells, statuses):
     for key, (subclass, level, name, action) in SPELL_FEATURES.items():
         spells[key] = dict(id=key, name=name, english=name, words=name, circle=0, class_ids=['druid'], class_levels={'druid': level}, class_min_levels={'druid': level}, min_level=level,
             kind='druid_circle', action=action, mana=0, cooldown=0, range=768, radius=0, shape='single', targeting='self', feature=True,
-            source='Player’s Handbook 2024 · poziomy ×5', description=name, icon='assets/spells/starry_wisp.svg', effect='spell',
+            source='Player’s Handbook 2024 · poziomy ×5', description=name, icon='assets/spells/star_arrow.svg' if key == 'circle_star_arrow' else 'assets/spells/starry_wisp.svg', effect='spell',
             visual=dict(style='buff', theme='nature', colors=['#619da2', '#b3dcf0', '#edffff'], shots=1))
     descriptions = {
         'circle_star_archer': 'Włącz Łucznika za 1 użycie Dzikiego kształtu. Kolejne ataki wykonuj Gwiezdną strzałą: nie zużywa many ani użyć przemiany.',
