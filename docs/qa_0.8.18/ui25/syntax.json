@@ -1,0 +1,206 @@
+{
+  "status": "PASS",
+  "files": 40,
+  "checks": [
+    {
+      "path": "run.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "server/continent_world.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "server/google_accounts.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "server/progression.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "server/server.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "server/town_services.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/smoke_railway.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_app_shell.cjs",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_app_shell_http_0818.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_google_account_constraints_ui22.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_google_auth_ui22.cjs",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_google_security_ui22.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_railway.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_respawn_city_ui18.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_town_services_ui25.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_transport_ui20.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tests/test_ui19_core_integration.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tools/browser_ui25.cjs",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tools/browser_ui25_run.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tools/browser_ui25_server.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "tools/package_0818.py",
+      "check": "Python syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "web/adventure_ui.js",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "web/app_shell.js",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/atlas.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/character.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/fullscreen.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/help.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/install.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/inventory.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/journal.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/logout.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/minimap.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/assets/ui/party.svg",
+      "check": "SVG XML",
+      "status": "PASS"
+    },
+    {
+      "path": "web/game.js",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "web/google_auth.js",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "web/hud_icons.js",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "web/inventory_ui.js",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "web/service_ui.js",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "web/sw.js",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    },
+    {
+      "path": "web/windows.js",
+      "check": "JavaScript syntax",
+      "status": "PASS"
+    }
+  ]
+}

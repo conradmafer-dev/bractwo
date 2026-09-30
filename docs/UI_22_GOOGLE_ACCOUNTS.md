@@ -1,20 +1,20 @@
-# UI_22 — obowiązkowe Google i maksymalnie cztery postacie
+# Google i maksymalnie cztery postacie — aktualne zasady UI_25
 
 ## Zmiana dla gracza
 
 1. Otwórz stronę gry i wybierz oficjalny przycisk Google.
 2. Po potwierdzeniu konta wybierz jedną ze swoich postaci albo stwórz nową.
 3. Nowa postać wymaga nazwy i klasy. Nie otrzymuje osobnego hasła.
-4. Aby zachować wcześniejszą postać, wybierz „Dodaj dotychczasową postać”
-   i podaj jej nazwę oraz stare hasło. Przypisanie zachowuje cały zapis.
+4. Dawne przypisywanie postaci przez stare hasło zostało usunięte w UI_25.
+   Postacie już wcześniej powiązane z Google pozostają dostępne na swoim koncie.
 
 Jedno konto Google ma najwyżej 4 postacie łącznie. Postacie offline i przypisane
 stare postacie zajmują miejsca w tym samym limicie. Po wykorzystaniu wszystkich
 miejsc nadal można grać istniejącymi postaciami. Serwer odrzuca piąte utworzenie
-lub przypisanie również po ręcznej zmianie komunikatu w przeglądarce.
+również po ręcznej zmianie komunikatu w przeglądarce.
 
 Stare logowanie nazwą i hasłem oraz anonimowa rejestracja są wyłączone.
-Stare hasło służy tylko jednorazowemu przypisaniu postaci po potwierdzeniu Google.
+Stare hasło nie służy już do przypisywania postaci.
 Postaci już przypisanej nie można przejąć drugim kontem Google, nawet znając
 dawne hasło. Nie dodano funkcji usuwania ani przenoszenia postaci między kontami.
 Aktywna postać nie może być równocześnie otwarta w dwóch sesjach.
@@ -26,7 +26,7 @@ nie zmienia ustawień Google Cloud ani Railway i nie została wdrożona.
 
 ### 1. Google Cloud
 
-W projekcie Google Cloud skonfiguruj aplikację logowania: nazwę Bractwo,
+W projekcie Google Cloud skonfiguruj aplikację logowania: nazwę Bractwo Krain,
 adres kontaktowy oraz odbiorców aplikacji. Utwórz identyfikator klienta OAuth
 typu **Web application**. W **Authorized JavaScript origins** wpisz dokładny
 publiczny origin gry, np.:
@@ -73,11 +73,11 @@ origin został poprawnie dodany po stronie Google.
 
 ### 3. Kontrola po wdrożeniu
 
-- `/health` ma zwracać `ui_revision: UI_22`, `world_revision: 20`.
+- `/health` ma zwracać `ui_revision: UI_25`, `world_revision: 20`.
 - Na stronie ma być przycisk Google i informacja o maksymalnie 4 postaciach.
 - Zaloguj się rzeczywistym kontem Google, stwórz postać i sprawdź ponowne wejście.
-- Dotychczasowy gracz powinien przypisać własną postać starym hasłem i sprawdzić
-  zachowanie postępu. Nie resetuj bazy graczy.
+- Dotychczasowy gracz wybiera postać wcześniej powiązaną z jego kontem Google.
+  Nie resetuj bazy graczy; nie ma już opcji przypisywania starym hasłem.
 - W razie błędu origin sprawdź zgodność adresu w pasku przeglądarki,
   `GOOGLE_AUTH_ORIGIN` oraz **Authorized JavaScript origins** w Google Cloud.
 
@@ -89,8 +89,8 @@ Powiązanie postaci używa stałego identyfikatora Google `sub`, a nie adresu e-
 Nie zapisujemy tokenów Google, e-maili, zdjęć ani nazw profilu Google w bazie gry.
 Do rankingu i komunikatów świata trafia wybrana nazwa postaci.
 
-Migracja nie przypisuje starych postaci automatycznie. Wymaga zalogowanego konta
-Google i poprawnego hasła konkretnej starej postaci. Istniejąca kopia startowa
+Migracja nie przypisuje starych postaci automatycznie. UI_25 nie udostępnia już
+samodzielnego przypisywania niepowiązanych zapisów. Istniejąca kopia startowa
 w `run.py` obejmuje całą bazę przed migracją, w tym późniejsze powiązania kont.
 Nowe postacie nie mają działającego hasła do dawnego logowania.
 
@@ -105,7 +105,7 @@ Nowe postacie nie mają działającego hasła do dawnego logowania.
 - Limit 4 jest sprawdzany w logice gry oraz przez ograniczenia SQLite.
   Tworzenie postaci i przypisanie właściciela stanowią jedną transakcję.
 - Ograniczamy częstotliwość prób HTTP i WebSocket oraz równoległe kosztowne
-  sprawdzanie tokenów i starych haseł. Rotacja ciasteczka nie omija limitu
+  sprawdzanie tokenów. Rotacja ciasteczka nie omija limitu
   połączeń HTTP liczonego według adresu bezpośredniego nadawcy.
 - Nie ufamy dowolnym nagłówkom `X-Forwarded-For`. Za proxy limity dla adresu
   nadawcy mogą obejmować więcej graczy, zależnie od topologii hostingu.
@@ -114,9 +114,10 @@ Nowe postacie nie mają działającego hasła do dawnego logowania.
 
 ## Testy i odtwarzanie
 
-W `docs/qa_0.8.18/ui22/summary.json` znajdują się bieżące wyniki i ograniczenia.
+W `docs/qa_0.8.18/ui25/summary.json` znajdują się bieżące wyniki i ograniczenia.
+Raport UI_22 pozostaje historycznym zapisem wcześniejszej wersji.
 Pakiet testowy obejmuje prawdziwe sprawdzanie lokalnie podpisanych tokenów przez
-bibliotekę Google, ataki na protokół, równoległe tworzenie/przypisywanie oraz
+bibliotekę Google, ataki na protokół, równoległe tworzenie postaci i odrzucanie wyłączonego przypisywania oraz
 pełną drogę przeglądarka → HTTP → WebSocket → baza danych.
 
 Testy przeglądarki zastępują tylko dostawcę Google kontrolowanym testowym

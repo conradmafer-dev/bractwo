@@ -10,10 +10,12 @@ try:
     from . import druid_circles as circles, combat_rules as rules, caster_rules as caster, dnd_content as dnd
     from . import world_content as content
     from .progression import same_floor
+    from .profession_rules import PROMOTION_LEVEL
 except ImportError:
     import druid_circles as circles, combat_rules as rules, caster_rules as caster, dnd_content as dnd
     import world_content as content
     from progression import same_floor
+    from profession_rules import PROMOTION_LEVEL
 
 
 def distance(a, b): return math.hypot(a.x-b.x, a.y-b.y)
@@ -44,10 +46,12 @@ class DruidCircleGame:
         return getattr(self, 'environment_can_see', self.line_clear)(source, target)
 
     async def select_druid_circle(self, p, key, land='arid'):
-        if not isinstance(key, str) or key not in circles.CIRCLES or p.class_id != 'druid' or p.level < 10:
-            return await self.notice(p, 'Wybór kręgu druida jest dostępny od poziomu 10.')
+        if not isinstance(key, str) or key not in circles.CIRCLES or p.class_id != 'druid' or p.level < PROMOTION_LEVEL:
+            return await self.notice(p, f'Wybór kręgu druida jest dostępny od poziomu {PROMOTION_LEVEL}.')
         if getattr(p, 'druid_circle', ''):
             return await self.notice(p, 'Krąg druida został już wybrany.')
+        if not p.promoted:
+            return await self.notice(p, 'Najpierw kup promocję u mistrza profesji w mieście, aby wybrać krąg druida.')
         if not self._circle_available(p) or p.form or p.combat_until > self.now():
             return await self.notice(p, 'Wybierz krąg poza walką i przemianą.')
         if key == 'land' and (not isinstance(land, str) or land not in circles.LANDS):
@@ -317,8 +321,8 @@ class DruidCircleGame:
         if dc is None: return self.spell_damage(p, target, spec)
         # A transferred sea aura retains its creator's spell DC, even on a noncaster.
         roll = rules.roll_damage(self.combat_rng, dice)
-        result = self.target_save(target, save, dc, roll, half)
-        result['damage_type'] = kind
+        result = self.spell_target_save(p, target, save, dc, roll, half)
+        result['damage_type'] = kind; result['is_spell'] = True
         if self.is_player_target(target):
             unjust = self.begin_pvp_hostility(p, target)
             self.resolve_player_hit(p, target, result, spec['name'], owner=p, unjust=unjust)

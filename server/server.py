@@ -35,6 +35,9 @@ try:
     from .fighter_rules import FighterGame
     from . import equipment_rules, caster_rules, magic_items, loot_economy
     from .caster_game import CasterGame
+    from . import wizard_schools
+    from . import town_services
+    from .wizard_school_game import WizardSchoolGame
     from . import rest_rules, druid_circles, environment_rules
     from .environment_rules import EnvironmentGame
     from .druid_circle_game import DruidCircleGame
@@ -56,6 +59,9 @@ except ImportError:
     from fighter_rules import FighterGame
     import equipment_rules, caster_rules, magic_items, loot_economy
     from caster_game import CasterGame
+    import wizard_schools
+    import town_services
+    from wizard_school_game import WizardSchoolGame
     import rest_rules, druid_circles, environment_rules
     from environment_rules import EnvironmentGame
     from druid_circle_game import DruidCircleGame
@@ -242,6 +248,7 @@ hunt_content.place(content, OBSTACLES, LANDMARKS)
 continent_world.configure(content, OBSTACLES, LANDMARKS, ZONES, NPCS, QUESTS, ENEMY_TYPES)
 adventure_content.configure(content, OBSTACLES, LANDMARKS, ZONES, ENEMY_TYPES, NPCS, QUESTS)
 expedition_content.configure(content, OBSTACLES, LANDMARKS, ZONES, ENEMY_TYPES, NPCS, QUESTS)
+town_services.configure(content, NPCS)
 for monster_id, monster_spec in ENEMY_TYPES.items():
     monster_spec['respawn'] = max(180 if monster_spec.get('boss') or monster_id=='boss' else 45,
                                   round(monster_spec.get('respawn',35)*1.75))
@@ -265,6 +272,7 @@ caster_rules.configure(dnd_content.SPELLS, CLASSES, dnd_content.STATUS_SPECS)
 druid_circles.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 configure_circle_spells(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 rest_rules.configure(dnd_content.SPELLS)
+wizard_schools.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 environment_rules.configure_world()
 continent_world.finalize(content, OBSTACLES)
 MERCHANT['stock'] = list(content.STARTER_MERCHANT_STOCK)
@@ -330,6 +338,9 @@ class Player:
     mastery: dict = field(default_factory=dict)
     primal_order: str = ""
     training_feats: dict = field(default_factory=dict)
+    wizard_school: str = ""
+    wizard_school_state: dict = field(default_factory=dict)
+    wizard_school_runtime: dict = field(default_factory=dict)
     druid_circle: str = ""
     druid_circle_state: dict = field(default_factory=dict)
     druid_circle_runtime: dict = field(default_factory=dict)
@@ -525,6 +536,7 @@ class Player:
             'sea_radius':(64 if aura.get('level',0)>=25 else 32) if aura.get('until',0)>now else 0,
             'sanctuary':sanctuary if sanctuary and sanctuary.get('until',0)>now else None,
             'flight':environment_rules.flying(self),'submerged':self.submerged}
+        result['wizard_visual']=wizard_schools.public_visual(self,now)
         if private:
             result['druid_forms'] = druid_circles.owner_forms(self, now)
             inventory_rules.ensure(self, ITEMS, POTIONS, make_item)
@@ -546,7 +558,7 @@ class Player:
                            "rest_short_remaining": round(max(0,self.rest_resources.get("short_ready",0)-now),3),
                            "rest_long_remaining": round(max(0,self.rest_resources.get("long_ready",0)-now),3),
                            "rest_resources": rest_rules.sheet(self),
-                           "rest_safe": any(near(self, zone) for zone in content.CITIES)})
+                           "rest_safe": any(near(self, zone) for zone in content.SAFE_ZONES)})
             result.update({"action_remaining": round(max(0, self.attack_cooldown_until-now), 3),
                            "action_duration": combat_rules.ROUND_SECONDS,
                            "damage_dice": combat_rules.dice_text(combat_rules.weapon_dice(self)),
@@ -598,7 +610,7 @@ class Player:
         return {key: getattr(self, key) for key in (
             "primal_order", "training_feats", "caster_rules_version", "legacy_medium_grace",
             "world_revision", "magic_items_version", "magic_attunements",
-            "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "exhaustion",
+            "wizard_school", "wizard_school_state", "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "exhaustion",
             "fighting_style", "weapon_grip", "fighter_rules_version",
             "level_up_batches", "rules_version", "mana_rules_version", "hp_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
             "site_cooldowns", "wind_until", "ward_until", "premium_demo_until", "floor", "skill_tries", "promoted", "soul", "runes", "bank_gold", "depot", "home_city", "blessed", "mastery", "spell_cooldowns", "spell_ready", "rune_ready", "haste_until", "transition_ready",
@@ -666,7 +678,7 @@ class Enemy:
                 "attack_until": self.attack_until, "facing": self.facing, "armor_class": spec["armor_class"], "attack_bonus": spec["attack_bonus"], "damage_dice": combat_rules.dice_text(spec["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
 
 
-class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
+class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,WizardSchoolGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
     def __init__(self, db_path, clock=None):
         self.clock = clock or time.time
         self.rng = random.Random()
@@ -737,7 +749,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
                 "elevations": content.ELEVATIONS, "waterways": content.WATERWAYS, "bridges": content.BRIDGES,
                 "pois": content.POIS, "canyons": content.CANYONS, "rarities": loot_tables.RARITIES,
                 "environment_trees": self.environment_trees(),
-                "dungeons": content.DUNGEONS, "hunting_grounds": content.HUNTING_GROUNDS, "roads": content.ROADS, "safe_zones": content.CITIES,
+                "dungeons": content.DUNGEONS, "hunting_grounds": content.HUNTING_GROUNDS, "roads": content.ROADS, "safe_zones": content.SAFE_ZONES, "binding_stones": content.BINDING_STONES,
                 "spells": content.SPELLS, "class_progression": progression_guide.catalog(), "default_hotbars": dnd_content.DEFAULT_HOTBARS, "hotbar_groups": dnd_content.hotbar_group_catalog(), "status_catalog": dnd_content.STATUS_SPECS, "runes": content.RUNES, "milestones": [{"level":v[0], "name":v[1], "description":v[2]} for v in content.MILESTONES],
                 "width": WIDTH, "height": HEIGHT, "sites": [], "chests": [], "obstacles": OBSTACLES,
                 "zones": ZONES, "npcs": NPCS, "landmarks": LANDMARKS, "quests": QUESTS,
@@ -774,7 +786,6 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
             self.db.execute("INSERT OR REPLACE INTO shared VALUES(1,?)", (json.dumps(self.flags),))
 
     def save_player(self, p):
-        self.remember_city_visit(p)
         magic_items.maintain(p, self.now())
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
         self.db.execute("UPDATE accounts SET data=? WHERE id=?", (json.dumps(p.save_data()), p.id))
@@ -788,6 +799,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
         self.migrate_fighter(p, make_item)
         self.migrate_caster(p)
         self.migrate_druid_circle(p)
+        self.migrate_wizard_school(p)
         rest_rules.migrate(p,self.now())
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
 
@@ -816,6 +828,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
         self.migrate_fighter(p, make_item)
         self.migrate_caster(p)
         self.migrate_druid_circle(p)
+        self.migrate_wizard_school(p)
         rest_rules.migrate(p,self.now())
         refunded=combat_rules.migrate_hp(p)
         if refunded:self.caster_message(p,f'Przeliczono HP według klasy i Kondycji. Zwrócono punkty Witalności: {refunded}.')
@@ -829,14 +842,12 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
         stranded = (saved.get("world_revision",18) < getattr(content,"WORLD_REVISION",20) and p.floor == 0
                     and getattr(content.WATER_MAP,"is_ocean",lambda *_:False)(p.x,p.y))
         if (stranded or self.blocked_for(p,p.x,p.y)) and p.combat_until <= self.now():
-            home = next((c for c in content.CITIES if c["id"] == p.home_city),content.CITIES[0])
-            p.x, p.y, p.floor = home["x"], home["y"], 0
+            p.x, p.y, p.floor = town_services.respawn_position(content, p.home_city)
         # A combat lock may defer relocation; preserve the migration marker so
         # the next login can still rescue an old position swallowed by the sea.
         p.world_revision = saved.get("world_revision",18) if stranded and p.combat_until > self.now() else getattr(content,"WORLD_REVISION",20)
         p.unjust_kills = [t for t in p.unjust_kills if t > self.now()-86400]
         p.aggressors = {k: t for k, t in p.aggressors.items() if t > self.now()}
-        self.remember_city_visit(p)
         return p
 
     async def send(self, ws, message):
@@ -907,20 +918,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
         await self.notice(p, "Witaj w Przystani! Strażniczka Mira przy placu ma pierwsze zadanie: szczury na łące. Podejdź i otwórz dziennik (J / E).")
 
     def in_safe(self, p):
-        return any(near(p, zone) for zone in content.CITIES)
-
-    def remember_city_visit(self, p, save=False):
-        """The last city actually entered by a living player is their respawn city."""
-        if not isinstance(p, Player) or not p.alive:
-            return False
-        city = next((city for city in content.CITIES if near(p, city)), None)
-        if city is None or p.home_city == city["id"]:
-            return False
-        p.home_city = city["id"]
-        if save:
-            with self.db:
-                self.save_player(p)
-        return True
+        return any(near(p, zone) for zone in content.SAFE_ZONES)
 
     def blocked(self, x, y, radius=RADIUS, floor=0, ignore_water=False, ignore_low=False):
         if x < radius or y < radius or x > WIDTH-radius or y > HEIGHT-radius:
@@ -953,11 +951,11 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
             if self.blocked_for(obj,x,y):
                 return False
             if (isinstance(obj, Player) or getattr(obj, "is_companion", False)) and obj.pvp_combat_until > self.now():
-                for zone in content.CITIES:
+                for zone in content.SAFE_ZONES:
                     new_distance = math.hypot(x-zone["x"], y-zone["y"])
                     if obj.floor == 0 and new_distance <= zone["radius"] and new_distance < point_distance(obj, zone):
                         return False
-            if isinstance(obj, Enemy) and obj.floor == 0 and any(math.hypot(x-zone["x"],y-zone["y"]) <= zone["radius"] for zone in content.CITIES):
+            if isinstance(obj, Enemy) and obj.floor == 0 and any(math.hypot(x-zone["x"],y-zone["y"]) <= zone["radius"] for zone in content.SAFE_ZONES):
                 return False
             return True
         for _ in range(parts):
@@ -1120,6 +1118,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
         summary=rest_rules.finish(p,rest["kind"],self.combat_rng,rest.get("recover",True))
         attunement_message = magic_items.finish_rest(p, rest)
         self.on_circle_rest(p,rest["kind"])
+        self.wizard_school_rest(p,rest["kind"])
         p.rest_resources[rest["kind"]+"_ready"]=now+REST_RULES[rest["kind"]+"_cooldown_seconds"]
         p.rest_cooldown_until=0
         if rest["kind"]=="long":
@@ -1330,7 +1329,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
             p.equipment[slot] = ""
             if slot=="weapon":p.buffs.pop("shillelagh",None)
         elif kind == "sell":
-            if not self.merchant_near(p) or p.combat_until > self.now():
+            if not merchant_at(p, data.get("npc_id")) or p.combat_until > self.now():
                 return await self.notice(p, "Sprzedaż jest dostępna przy kupcu, poza walką.")
             if item is None or uid in p.equipment.values():
                 return await self.notice(p, "Sprzedawać można tylko posiadany, niezałożony sprzęt.")
@@ -1341,11 +1340,11 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
             else:item["quantity"] -= quantity
             p.gold += ITEMS[item["template"]]["value"] * quantity
         elif kind == "buy":
-            if not self.merchant_near(p) or p.combat_until > self.now():
+            if not merchant_at(p, data.get("npc_id")) or p.combat_until > self.now():
                 return await self.notice(p, "Podejdź do kupca poza walką.")
             kind_id = data.get("item")
             spec = ITEMS.get(kind_id) if isinstance(kind_id, str) else None
-            seller = merchant_at(p)
+            seller = merchant_at(p, data.get("npc_id"))
             if not seller or kind_id not in seller.get("stock", []):
                 return await self.notice(p, "Ten kupiec nie sprzedaje takiego towaru. Sprawdź jego miejscowy asortyment.")
             if spec is None or "price" not in spec or p.level < spec.get("min_level",1) or p.gold < spec["price"]:
@@ -1459,6 +1458,8 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
             return await self.cast_circle_spell(p,data.get("spell"),data.get("enemy_id"),data.get("target_id"),data.get("options"))
         if kind == "circle_spell_action":return await self.circle_spell_action(p,data.get("action"),data)
         if kind == "environment_action":return await self.environment_action(p,data.get("action"),data.get("enabled"),data.get("enemy_id"),data.get("target_id"))
+        if kind == "wizard_school":return await self.select_wizard_school(p,data.get("school"))
+        if kind == "wizard_school_action":return await self.wizard_school_command(p,data)
         if kind == "druid_circle":return await self.select_druid_circle(p,data.get("circle"),data.get("land","arid"))
         if kind == "circle_command":return await self.circle_command(p,data.get("action"),data.get("value"))
         if kind == "primal_order":return await self.select_primal_order(p,data.get("order"))
@@ -1582,7 +1583,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
         else:
             await self.error(ws, "Nieznana komenda.")
 
-    def damage_player(self, p, damage, killer=None, unjust=False, rolled=False, damage_type="bludgeoning", damage_components=None, is_attack=False, source=None):
+    def damage_player(self, p, damage, killer=None, unjust=False, rolled=False, damage_type="bludgeoning", damage_components=None, is_attack=False, source=None, is_spell=False, unavoidable=False):
         if not p.alive:
             return
         now = self.now()
@@ -1597,7 +1598,9 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
             amount=int(amount*combat_rules.resistance_multiplier(p,kind))
             return amount
         # Separate mixed damage (Ice Storm, Meteor Swarm, Hunter's Mark) before resistance.
-        if damage_components is not None:
+        if unavoidable:
+            actual = max(0, int(damage))
+        elif damage_components is not None:
             grouped = {}
             for component in damage_components:
                 kind = component['type']
@@ -1605,16 +1608,23 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
             actual = sum(resist(amount,kind) for kind,amount in grouped.items())
         else:
             actual = resist(damage,damage_type)
+        if is_spell and not unavoidable and self.wizard_spell_resistance(p):actual//=2
+        if actual>0:
+            self.tag(p,killer is not None)
+            if killer is not None:
+                p.last_pvp_attacker=killer.id;p.last_pvp_unjust=bool(unjust)
+                p.last_pvp_hit_until=now+PVP_RULES["combat_seconds"]
+        if not unavoidable:actual=self.wizard_absorb_damage(p,actual,source or killer)
         if actual<=0:return
         damage_received=actual
         self.cancel_channel(p)
         self.concentration_damage(p,actual)
-        if p.temp_hp>0:
+        if not unavoidable and p.temp_hp>0:
             absorbed=min(p.temp_hp,actual);p.temp_hp-=absorbed;actual-=absorbed
             # Losing temporary HP does not end a 2024 Wild Shape.
-        if p.bulwark_until > now:
+        if not unavoidable and p.bulwark_until > now:
             actual *= .5
-        if killer is None and p.ward_until > now:
+        if not unavoidable and killer is None and p.ward_until > now:
             actual *= .88
         self.tag(p, killer is not None)
         if killer is not None:
@@ -1671,18 +1681,18 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
         self.tick += 1
         self.effects = [effect for effect in self.effects if self.time-effect["time"] <= max(1.5,effect.get("duration",0))]
         now = self.now()
-        # Capture direct teleports before ongoing effects can deal damage.
+        # Maintain equipment effects before ongoing combat effects.
         for p in tuple(self.players.values()):
             magic_items.maintain(p, now)
-            self.remember_city_visit(p, save=True)
         self.tick_dnd(dt)
+        self.wizard_defense_tick()
         for p in tuple(self.players.values()):
             p.current_wall_time = now
             if not p.alive:
                 self.cancel_rest(p, "")
                 if now >= p.respawn_until:
-                    home = next((c for c in content.CITIES if c["id"] == p.home_city), content.CITIES[0])
-                    p.x, p.y, p.floor, p.hp, p.mana = home["x"], home["y"], 0, p.max_hp, p.max_mana
+                    p.x, p.y, p.floor = town_services.respawn_position(content, p.home_city)
+                    p.hp, p.mana = p.max_hp, p.max_mana
                     p.input_time, p.respawn_until = -10, 0
                 elif p.disconnected:
                     # Dead avatars no longer fight, but retain death timer in the save.
@@ -1695,7 +1705,6 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,Dru
                 continue
             if not p.disconnected and self.time-p.input_time <= .35:
                 self.move(p, p.dx*p.speed*dt, p.dy*p.speed*dt)
-            self.remember_city_visit(p, save=True)
             # Health and spell resources recover through the explicit rest rules.
             if not p.disconnected:
                 self.discover_landmarks(p)
@@ -1851,14 +1860,14 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_22","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_25","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

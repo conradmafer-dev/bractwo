@@ -121,10 +121,10 @@ def feature_rows(p):
 
 
 def sheet(p):
-    try: from . import rest_rules
-    except ImportError: import rest_rules
+    try: from . import rest_rules, wizard_schools
+    except ImportError: import rest_rules, wizard_schools
     return dict(order=getattr(p,'primal_order',''),order_pending=p.class_id=='druid' and not getattr(p,'primal_order',''),
         orders=[dict(id=k,**v) for k,v in ORDERS.items()] if p.class_id=='druid' else [],
         features=feature_rows(p),forms=[dict(id=k,**v,unlocked=circles.form_allowed(p,k),temp_hp=circles.form_temp_hp(p)) for k,v in FORMS.items()] if p.class_id=='druid' else [],
-        circle=circles.sheet(p),arcane_recovery_remaining=rest_rules.remaining(p,'arcane_recovery'),
+        school=wizard_schools.sheet(p),circle=circles.sheet(p),arcane_recovery_remaining=rest_rules.remaining(p,'arcane_recovery'),
         familiar=getattr(p,'familiar_state',{}),channel=({k:v for k,v in getattr(p,'casting_channel',{}).items() if k in ('key','name','total','ritual')}|dict(remaining=round(max(0,getattr(p,'casting_channel',{}).get('until',0)-p.current_wall_time),1))) if getattr(p,'casting_channel',{}) else {},legacy_medium_grace=bool(getattr(p,'legacy_medium_grace',False)),recovery_amount=recovery_amount(p) if p.class_id=='mage' else 0)

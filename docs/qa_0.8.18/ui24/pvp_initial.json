@@ -1,0 +1,225 @@
+{
+  "suite": "UI_24 targeted existing PvP combat regressions",
+  "source": "tests/test_pvp_magic.py",
+  "command": "PYTHONPATH=tests:. python -m unittest -v test_pvp_magic.PVPMagic.test_area_hits_enemies_and_eligible_players_but_not_party_or_novices test_pvp_magic.PVPMagic.test_safe_zone_boundary_protects_from_monster_targeted_explosion test_pvp_magic.PVPMagic.test_locked_area_on_monster_does_not_harm_players test_pvp_magic.PVPMagic.test_explicit_bad_player_target_never_falls_back_to_monster test_pvp_magic.PVPMagic.test_no_explicit_selection_never_acquires_random_player test_pvp_magic.PVPMagic.test_malformed_player_ids_and_ambiguous_targets_cost_nothing test_pvp_magic.PVPMagic.test_queued_spell_rechecks_safety_and_target_floor test_pvp_magic.PVPMagic.test_relocking_cancels_queued_player_spell test_pvp_magic.PVPMagic.test_spell_kill_awards_single_crime_no_monster_loot test_pvp_magic.PVPMagic.test_defensive_spell_retaliation_is_not_unjust test_pvp_magic.PVPMagic.test_three_magic_kills_preserve_red_skull_rule test_pvp_magic.PVPMagic.test_missed_attack_still_tags_both_players test_pvp_magic.PVPMagic.test_magic_missile_shield_reaction_once_per_volley test_pvp_magic.PVPMagic.test_active_shield_blocks_missiles_even_without_available_reaction test_pvp_magic.PVPMagic.test_no_reactions_prevents_new_shield test_pvp_magic.PVPMagic.test_shield_stops_attack_roll_spells_not_saving_throw_spells test_pvp_magic.PVPMagic.test_ice_storm_resists_only_physical_component test_pvp_magic.PVPMagic.test_meteor_resistances_and_single_damage_event test_pvp_magic.PVPMagic.test_foresight_advantage_on_player_saves test_pvp_magic.PVPMagic.test_entangle_stops_player_then_retries_save test_pvp_magic.PVPMagic.test_target_breaking_own_concentration_does_not_remove_hostile_root test_pvp_magic.PVPMagic.test_spell_damage_breaks_targets_concentration test_pvp_magic.PVPMagic.test_relocking_removes_hostile_control_but_not_crime_or_timer test_pvp_magic.PVPMagic.test_control_then_monster_finisher_counts_as_pvp_crime test_pvp_magic.PVPMagic.test_thorn_whip_pulls_player test_pvp_magic.PVPMagic.test_blinded_player_has_disadvantage_attacking test_pvp_magic.PVPMagic.test_field_ticks_on_players_once_per_round test_pvp_magic.PVPMagic.test_plant_growth_slows_player_to_one_quarter test_pvp_magic.PVPMagic.test_periodic_damage_kill_attributed_to_caster test_pvp_magic.PVPMagic.test_fields_recheck_lock_party_safe_zone_level_and_floor test_pvp_magic.PVPMagic.test_field_acquires_eligible_player_who_enters_after_cast test_pvp_magic.PVPMagic.test_companion_attacks_selected_player_and_owner_gets_crime test_pvp_magic.PVPMagic.test_companion_never_attacks_unselected_player test_pvp_magic.PVPMagic.test_companion_respects_relocking_and_party test_pvp_magic.PVPMagic.test_companion_bite_uses_player_shield_reaction test_pvp_magic.PVPMagic.test_player_spell_damage_consumes_shape_temp_hp_then_base_hp test_pvp_magic.PVPMagic.test_cannot_support_pvp_from_safe_zone_or_with_safety_lock test_pvp_magic.PVPMagic.test_pet_cannot_attack_from_safe_zone_entered_during_movement test_pvp_magic.PVPMagic.test_pet_with_pvp_timer_cannot_walk_into_safe_zone",
+  "timestamp": "2026-09-30T01:36:34.961520+00:00",
+  "test_names": [
+    "test_pvp_magic.PVPMagic.test_area_hits_enemies_and_eligible_players_but_not_party_or_novices",
+    "test_pvp_magic.PVPMagic.test_safe_zone_boundary_protects_from_monster_targeted_explosion",
+    "test_pvp_magic.PVPMagic.test_locked_area_on_monster_does_not_harm_players",
+    "test_pvp_magic.PVPMagic.test_explicit_bad_player_target_never_falls_back_to_monster",
+    "test_pvp_magic.PVPMagic.test_no_explicit_selection_never_acquires_random_player",
+    "test_pvp_magic.PVPMagic.test_malformed_player_ids_and_ambiguous_targets_cost_nothing",
+    "test_pvp_magic.PVPMagic.test_queued_spell_rechecks_safety_and_target_floor",
+    "test_pvp_magic.PVPMagic.test_relocking_cancels_queued_player_spell",
+    "test_pvp_magic.PVPMagic.test_spell_kill_awards_single_crime_no_monster_loot",
+    "test_pvp_magic.PVPMagic.test_defensive_spell_retaliation_is_not_unjust",
+    "test_pvp_magic.PVPMagic.test_three_magic_kills_preserve_red_skull_rule",
+    "test_pvp_magic.PVPMagic.test_missed_attack_still_tags_both_players",
+    "test_pvp_magic.PVPMagic.test_magic_missile_shield_reaction_once_per_volley",
+    "test_pvp_magic.PVPMagic.test_active_shield_blocks_missiles_even_without_available_reaction",
+    "test_pvp_magic.PVPMagic.test_no_reactions_prevents_new_shield",
+    "test_pvp_magic.PVPMagic.test_shield_stops_attack_roll_spells_not_saving_throw_spells",
+    "test_pvp_magic.PVPMagic.test_ice_storm_resists_only_physical_component",
+    "test_pvp_magic.PVPMagic.test_meteor_resistances_and_single_damage_event",
+    "test_pvp_magic.PVPMagic.test_foresight_advantage_on_player_saves",
+    "test_pvp_magic.PVPMagic.test_entangle_stops_player_then_retries_save",
+    "test_pvp_magic.PVPMagic.test_target_breaking_own_concentration_does_not_remove_hostile_root",
+    "test_pvp_magic.PVPMagic.test_spell_damage_breaks_targets_concentration",
+    "test_pvp_magic.PVPMagic.test_relocking_removes_hostile_control_but_not_crime_or_timer",
+    "test_pvp_magic.PVPMagic.test_control_then_monster_finisher_counts_as_pvp_crime",
+    "test_pvp_magic.PVPMagic.test_thorn_whip_pulls_player",
+    "test_pvp_magic.PVPMagic.test_blinded_player_has_disadvantage_attacking",
+    "test_pvp_magic.PVPMagic.test_field_ticks_on_players_once_per_round",
+    "test_pvp_magic.PVPMagic.test_plant_growth_slows_player_to_one_quarter",
+    "test_pvp_magic.PVPMagic.test_periodic_damage_kill_attributed_to_caster",
+    "test_pvp_magic.PVPMagic.test_fields_recheck_lock_party_safe_zone_level_and_floor",
+    "test_pvp_magic.PVPMagic.test_field_acquires_eligible_player_who_enters_after_cast",
+    "test_pvp_magic.PVPMagic.test_companion_attacks_selected_player_and_owner_gets_crime",
+    "test_pvp_magic.PVPMagic.test_companion_never_attacks_unselected_player",
+    "test_pvp_magic.PVPMagic.test_companion_respects_relocking_and_party",
+    "test_pvp_magic.PVPMagic.test_companion_bite_uses_player_shield_reaction",
+    "test_pvp_magic.PVPMagic.test_player_spell_damage_consumes_shape_temp_hp_then_base_hp",
+    "test_pvp_magic.PVPMagic.test_cannot_support_pvp_from_safe_zone_or_with_safety_lock",
+    "test_pvp_magic.PVPMagic.test_pet_cannot_attack_from_safe_zone_entered_during_movement",
+    "test_pvp_magic.PVPMagic.test_pet_with_pvp_timer_cannot_walk_into_safe_zone"
+  ],
+  "selected_count": 39,
+  "tests_run": 39,
+  "failures": 1,
+  "errors": 0,
+  "skipped": 0,
+  "passed": 38,
+  "successful": false,
+  "duration_seconds": 5.089,
+  "results": [
+    {
+      "test": "test_pvp_magic.PVPMagic.test_area_hits_enemies_and_eligible_players_but_not_party_or_novices",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_safe_zone_boundary_protects_from_monster_targeted_explosion",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_locked_area_on_monster_does_not_harm_players",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_explicit_bad_player_target_never_falls_back_to_monster",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_no_explicit_selection_never_acquires_random_player",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_malformed_player_ids_and_ambiguous_targets_cost_nothing",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_queued_spell_rechecks_safety_and_target_floor",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_relocking_cancels_queued_player_spell",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_spell_kill_awards_single_crime_no_monster_loot",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_defensive_spell_retaliation_is_not_unjust",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_three_magic_kills_preserve_red_skull_rule",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_missed_attack_still_tags_both_players",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_magic_missile_shield_reaction_once_per_volley",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_active_shield_blocks_missiles_even_without_available_reaction",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_no_reactions_prevents_new_shield",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_shield_stops_attack_roll_spells_not_saving_throw_spells",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_ice_storm_resists_only_physical_component",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_meteor_resistances_and_single_damage_event",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_foresight_advantage_on_player_saves",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_entangle_stops_player_then_retries_save",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_target_breaking_own_concentration_does_not_remove_hostile_root",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_spell_damage_breaks_targets_concentration",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_relocking_removes_hostile_control_but_not_crime_or_timer",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_control_then_monster_finisher_counts_as_pvp_crime",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_thorn_whip_pulls_player",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_blinded_player_has_disadvantage_attacking",
+      "status": "failed",
+      "traceback": "Traceback (most recent call last):\n  File \"/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py\", line 118, in run\n    return self._loop.run_until_complete(task)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py\", line 691, in run_until_complete\n    return future.result()\n           ^^^^^^^^^^^^^^^\n  File \"/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_pvp_magic.py\", line 277, in test_blinded_player_has_disadvantage_attacking\n    self.assertTrue(q.last_roll['disadvantage'])\nAssertionError: False is not true\n"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_field_ticks_on_players_once_per_round",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_plant_growth_slows_player_to_one_quarter",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_periodic_damage_kill_attributed_to_caster",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_fields_recheck_lock_party_safe_zone_level_and_floor",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_field_acquires_eligible_player_who_enters_after_cast",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_companion_attacks_selected_player_and_owner_gets_crime",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_companion_never_attacks_unselected_player",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_companion_respects_relocking_and_party",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_companion_bite_uses_player_shield_reaction",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_player_spell_damage_consumes_shape_temp_hp_then_base_hp",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_cannot_support_pvp_from_safe_zone_or_with_safety_lock",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_pet_cannot_attack_from_safe_zone_entered_during_movement",
+      "status": "passed"
+    },
+    {
+      "test": "test_pvp_magic.PVPMagic.test_pet_with_pvp_timer_cannot_walk_into_safe_zone",
+      "status": "passed"
+    }
+  ],
+  "excluded_notes": [
+    "No obsolete all-catalogue class_ids[0] enumeration or generated catalogue tests were run.",
+    "PVPWebSocket password-login tests were excluded: current build requires Google authentication.",
+    "Legacy spike_growth 35-unit movement assertion was excluded: current spell explicitly requires 64 units per damage step. Modern movement coverage is in the separately run circle/spell suites."
+  ],
+  "analysis": {
+    "classification": "Pre-existing visibility bug confirmed in UI_23 source archive; not a stale assertion.",
+    "cause": "environment_can_see applied the blinded target state as visual obstruction to observers, cancelling attack disadvantage with unseen-attacker advantage.",
+    "baseline_archive": "BRACTWO_0.8.18_UI_23_RAILWAY_GITHUB_READY.zip",
+    "fix_authorized": true
+  }
+}

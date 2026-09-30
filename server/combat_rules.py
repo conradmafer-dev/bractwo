@@ -92,14 +92,14 @@ def armor_class(p):
     if not p.form:
         ac += fighter.shield_bonus(p)
         if getattr(p,'fighting_style','')=='defense' and fighter.style_active(p):ac+=1
-    return ac+magic_items.effect(p,'protection')+(2 if active_buff(p,'nature_sanctuary') else 0)
+    return ac+magic_items.effect(p,'protection')+(2 if active_buff(p,'nature_sanctuary') or active_buff(p,'wizard_shelter') else 0)
 
 def save_bonus(p,ability='dexterity'):
     if getattr(p,'is_companion',False):return max(2,p.attack_bonus) if ability in ('strength','dexterity') else 1
     if environment.polymorph(p):return caster.form_spec(p).get('saves',{}).get(ability,ability_modifier(p,ability))
     base=ability_modifier(p,ability)+(proficiency(p) if ability in p.spec['saves'] else 0)
     if p.form:base=max(base,caster.form_spec(p).get('saves',{}).get(ability,base))
-    return base+circles.save_bonus(p,ability)+magic_items.effect(p,'protection')+(2 if ability=='dexterity' and active_buff(p,'nature_sanctuary') else 0)-getattr(p,'exhaustion',0)*2
+    return base+circles.save_bonus(p,ability)+magic_items.effect(p,'protection')+(2 if ability=='dexterity' and (active_buff(p,'nature_sanctuary') or active_buff(p,'wizard_shelter')) else 0)-getattr(p,'exhaustion',0)*2
 
 def legacy_max_hp(p):
     """Pre-UI_12 totals, retained for save migration and historical receipts."""
@@ -189,9 +189,9 @@ def dice_text(dice):
     n,s,m=dice
     return str(m) if n==0 else f'{n}k{s}'+(f'{m:+d}' if m else '')
 
-def roll_damage(rng,dice,critical=False):
+def roll_damage(rng,dice,critical=False,maximize=False):
     n,s,m=dice
-    rolls=[rng.randint(1,s) for _ in range(n*(2 if critical else 1))]
+    rolls=[s if maximize else rng.randint(1,s) for _ in range(n*(2 if critical else 1))]
     return {'damage':max(0,sum(rolls)+m),'damage_dice':dice_text(dice),'damage_rolls':rolls,'damage_modifier':m}
 
 
@@ -220,22 +220,23 @@ def savage_attacker_damage(p,result,rng,now):
                   damage_rolls=chosen,damage=max(0,sum(chosen)+result.get('damage_modifier',modifier)))
     p._savage_attack_used=True
 
-def roll_attack(rng,bonus,ac,dice,disadvantage=False,advantage=False):
+def roll_attack(rng,bonus,ac,dice,disadvantage=False,advantage=False,fixed_roll=None,maximize=False):
     disadvantage,advantage=bool(disadvantage and not advantage),bool(advantage and not disadvantage)
-    rolls=[rng.randint(1,20) for _ in range(2 if disadvantage or advantage else 1)]
+    rolls=[fixed_roll] if fixed_roll is not None else [rng.randint(1,20) for _ in range(2 if disadvantage or advantage else 1)]
     roll=min(rolls) if disadvantage else max(rolls)
     crit=roll==20;hit=crit or (roll!=1 and roll+bonus>=ac)
     result={'check':'attack','rolls':rolls,'roll':roll,'bonus':bonus,'total':roll+bonus,'defense':ac,'hit':hit,'critical':crit,
         'disadvantage':disadvantage,'advantage':advantage,'damage':0,'damage_dice':dice_text(dice),'damage_rolls':[],'damage_modifier':dice[2]}
-    if hit:result.update(roll_damage(rng,dice,crit))
+    if hit:result.update(roll_damage(rng,dice,crit,maximize=maximize))
+    if fixed_roll is not None:result['portent']=True
     return result
 
-def roll_save(rng,bonus,dc,damage,half=True,advantage=False,disadvantage=False):
+def roll_save(rng,bonus,dc,damage,half=True,advantage=False,disadvantage=False,fixed_roll=None):
     advantage,disadvantage=bool(advantage and not disadvantage),bool(disadvantage and not advantage)
-    rolls=[rng.randint(1,20) for _ in range(2 if advantage or disadvantage else 1)]
+    rolls=[fixed_roll] if fixed_roll is not None else [rng.randint(1,20) for _ in range(2 if advantage or disadvantage else 1)]
     roll=min(rolls) if disadvantage else max(rolls);saved=roll+bonus>=dc
     return {'check':'save','rolls':rolls,'roll':roll,'bonus':bonus,'total':roll+bonus,'defense':dc,'saved':saved,
-            'save_half':half,'hit':True,'critical':False,'advantage':advantage,'disadvantage':disadvantage,**damage,
+            'save_half':half,'hit':True,'critical':False,'advantage':advantage,'disadvantage':disadvantage,'portent':fixed_roll is not None,**damage,
             'damage':damage['damage']//2 if saved and half else 0 if saved else damage['damage']}
 
 def configure(items,enemies):
@@ -338,16 +339,18 @@ class CombatRounds:
         fdis,fadv=self.fighter_roll_flags(p,enemy)
         edis,eadv=self.environment_attack_flags(p,enemy)
         bonus=(spell_bonus(p) if spell else attack_bonus(p))+self.circle_roll_adjustment(p,'attack',target=enemy)-getattr(p,'exhaustion',0)*2
-        result=roll_attack(self.combat_rng,bonus,spec['armor_class'],dice,disadvantage or fdis or edis or (not spell and gear.weapon_disadvantage(p)),advantage or fadv or eadv or self.caster_attack_advantage(p,enemy))
+        result=roll_attack(self.combat_rng,bonus,spec['armor_class'],dice,disadvantage or fdis or edis or (not spell and gear.weapon_disadvantage(p)),advantage or fadv or eadv or self.caster_attack_advantage(p,enemy),
+            fixed_roll=self.wizard_take_portent(p,'attack'),maximize=spell and self.wizard_maximize_spell(p,getattr(p,'_wizard_damage_spec',{})))
         result['damage_type']=damage_kind or damage_type(p)
         self.environment_adjust_damage(p,enemy,result,dice,melee)
         if not spell:
             savage_attacker_damage(p,result,self.combat_rng,self.now())
             self.fighter_adjust_damage(p,result)
+        if spell:self.wizard_adjust_spell_attack(p,enemy,result,dice)
         self.circle_adjust_damage(p,enemy,result,weapon=not spell)
         self.environment_attack_riders(p,enemy,result,melee)
         self.provoke_enemy(enemy,p)
-        if result['hit'] or result.get('graze'):
+        if result['hit'] or result.get('graze') or result.get('potent_cantrip'):
             self.add_hunters_mark(p,enemy,result)
             result['damage']=self.environment_damage_enemy(enemy,result['damage'],p,result['damage_type'],result.get('damage_components'),critical=result.get('critical',False));self.remember_attacker(enemy,p)
         self.report_roll(p,enemy,result,action,p)
@@ -363,11 +366,11 @@ class CombatRounds:
     def resolve_player_hit(self, source, target, result, action, owner=None, unjust=False):
         """One damage path for weapon hits, spells and pets: resistance, forms, death and crimes."""
         self.tag(target,owner is not None)
-        if result.get('hit') or result.get('graze'):
+        if result.get('hit') or result.get('graze') or result.get('potent_cantrip'):
             before=target.hp+getattr(target,'temp_hp',0)
             self.damage_player(target,result['damage'],killer=owner,unjust=unjust,rolled=True,
                 damage_type=result.get('damage_type','bludgeoning'),damage_components=result.get('damage_components'),
-                is_attack=result.get('check')=='attack' and bool(result.get('hit')),source=source)
+                is_attack=result.get('check')=='attack' and bool(result.get('hit')),source=source,is_spell=result.get('is_spell',False))
             result['damage']=round(before-target.hp-getattr(target,'temp_hp',0),1)
         self.report_roll(source,target,result,action,owner)
         return result
@@ -399,14 +402,22 @@ class CombatRounds:
             fdis,fadv=self.fighter_roll_flags(source,target)
             edis,eadv=self.environment_attack_flags(source,target)
             bonus+=self.circle_roll_adjustment(source,'attack',target=target)-getattr(source,'exhaustion',0)*2
-            result=roll_attack(self.combat_rng,bonus,armor_class(target),chosen,dis or edis or active_buff(target,'foresight') or fdis,adv or fadv or eadv)
+            decoy_dis=self.wizard_attack_disadvantage(target)
+            dis=bool(dis or decoy_dis)
+            result=roll_attack(self.combat_rng,bonus,armor_class(target),chosen,dis or edis or active_buff(target,'foresight') or fdis,adv or fadv or eadv,
+                fixed_roll=self.wizard_take_portent(source,'attack') if pvp else None,
+                maximize=spell and self.wizard_maximize_spell(source,getattr(source,'_wizard_damage_spec',{})))
             result['damage_type']=kind
             self.environment_adjust_damage(source,target,result,chosen,melee if melee is not None else (gear.melee(source) if pvp else not spec.get('projectile')))
-            if not getattr(target,'is_companion',False):self.shield_reaction(target,result)
+            if not getattr(target,'is_companion',False):
+                self.wizard_attack_reaction(target,result)
+                self.shield_reaction(target,result)
+            if spell:self.wizard_adjust_spell_attack(source,target,result,chosen)
             if pvp and not spell:
                 savage_attacker_damage(source,result,self.combat_rng,self.now())
                 self.fighter_adjust_damage(source,result)
         result['damage_type']=kind
+        result['is_spell']=bool(spell)
         if pvp:self.circle_adjust_damage(source,target,result,weapon=not spell)
         if not area:self.environment_attack_riders(source,target,result,melee if melee is not None else (gear.melee(source) if pvp else not spec.get('projectile')))
         if pvp:self.add_hunters_mark(source,target,result)

@@ -29,6 +29,7 @@
       // Preserve the existing visibility rules: native class entries (including
       // locked ones) and server-granted subclass spells. Never leak other classes.
       if(!base||!(base.class_ids?.includes(player.class_id)||player.spell_profiles?.[id]?.available===true))continue;
+      if(base.kind==='wizard_feature'&&(!base.wizard_school||base.wizard_school!==player.character_sheet?.caster?.school?.id))continue;
       const spec=root.BractwoRuntime.spellProfile({...base,id},player);
       const required=gate(spec),unlocked=spec.available??player.level>=required;
       const rank=Number(base.circle)||0,feature=!!base.feature;
@@ -91,6 +92,7 @@
       tiles([['Zdrowie',`${Math.ceil(p.hp)} / ${p.max_hp}`],['Mana',`${Math.floor(p.mana)} / ${p.max_mana}`],['Klasa Pancerza',p.armor_class],['Doświadczenie',`${p.xp} / ${p.xp_next}`]]);
       if(s.caster?.order)tiles([['Ścieżka',s.caster.orders?.find(o=>o.id===s.caster.order)?.name||'']]);if(s.training?.armor_penalty)content.append(node('p','caster-status-warning','Brak wyszkolenia w pancerzu: czary zablokowane; utrudnienie Siły/Zręczności.'));
       if(s.caster?.circle?.id)tiles([['Krąg druida',s.caster.circle.name||'']]);
+      if(s.caster?.school?.id)tiles([['Szkoła czarodzieja',s.caster.school.name||'']]);
       if(s.fighter?.style)tiles([['Styl walki',s.fighter.style_name+(s.fighter.style_active?'':' · nieaktywny')],['Mistrzostwo broni',s.fighter.masteries?.find(m=>m.active)?.effect_name||'—']]);
       heading('Walka');tiles([['Atak bronią',dice(p.attack_bonus)],['Obrażenia',`${p.damage_dice} · ${s.damage_name||''}`],['Ataki na rundę',p.attacks_per_round],['Atak czarem',dice(s.spell_attack_bonus||0)],['ST obrony przed czarami',p.save_dc],['Premia z biegłości',signed(p.proficiency)],['Krąg czarów',p.spell_circle||'—'],['Trafienie krytyczne','20 na k20']]);
       heading('Cechy i rzuty obronne');const grid=node('div','sheet-abilities');

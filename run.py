@@ -1,4 +1,4 @@
-"""Railway launcher for Bractwo 0.8.14. Does not alter game balance or saves.
+"""Railway launcher for Bractwo Krain 0.8.18. Does not alter game balance or saves.
 
 One simulation process, one SQLite database, one persistent volume.
 """
@@ -162,7 +162,7 @@ def main() -> int:
             app = create_app(str(config.database))
             app.middlewares.append(readiness)
             app.on_shutdown.append(graceful_shutdown)
-            LOG.info("Bractwo %s | 0.0.0.0:%d | baza: %s", VERSION, config.port, config.database)
+            LOG.info("Bractwo Krain %s | 0.0.0.0:%d | baza: %s", VERSION, config.port, config.database)
             web.run_app(app, host="0.0.0.0", port=config.port, access_log=None,
                         shutdown_timeout=5)
     except (StartupError, OSError) as exc:

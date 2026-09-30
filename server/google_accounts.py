@@ -1,13 +1,10 @@
 """Google principals own up to four game characters, including offline saves.
 
-The legacy six-column ``accounts`` table remains the character/save table. Its
-names and old passwords never identify a Google account: a verified provider
-subject and an explicit password-proven claim are required to link an old save.
+Existing Google ownership is retained. New characters are created directly
+under a verified account; claiming unlinked legacy saves is no longer offered.
 """
 from __future__ import annotations
 
-import asyncio
-import hmac
 import json
 import re
 import secrets
@@ -20,7 +17,6 @@ except ImportError:
     from google_auth import AuthError
 
 MAX_CHARACTERS = 4
-MAX_LEGACY_HASH_WORKERS = 2
 _NAME = re.compile(r"[\w -]{3,20}", re.UNICODE)
 
 
@@ -38,8 +34,6 @@ def _game_types():
 
 class GoogleAccountGame:
     def init_google_accounts(self):
-        if not hasattr(self, "_google_claim_workers"):
-            self._google_claim_workers = set()
         self.db.execute("PRAGMA foreign_keys=ON")
         self.db.executescript("""
           CREATE TABLE IF NOT EXISTS google_accounts(
@@ -124,12 +118,7 @@ class GoogleAccountGame:
         return None
 
     async def hello_google(self, ws, data, service, browser_binding, origin):
-        """Redeem one browser-bound ticket for select/create/legacy claim.
-
-        Scrypt yields to a worker thread. Every ownership/session check is made
-        again afterwards; ticket consumption, mutation and login binding have no
-        await gap. The database itself enforces the persisted four-save limit.
-        """
+        """Redeem a single-use, browser-bound ticket for select/create only."""
         if ws.closed:
             return
         if not isinstance(data, dict):
@@ -143,7 +132,7 @@ class GoogleAccountGame:
             return await self._google_error(ws, "Logowanie wygasło. Wybierz Google ponownie.", "google_retry")
         Player, classes, max_players = _game_types()
         mode = data.get("mode")
-        if mode not in ("select", "create", "claim"):
+        if mode not in ("select", "create"):
             return await self._google_error(ws, "Wybierz lub utwórz postać.")
         account_id = self._google_account_id(identity.sub)
         row = None
@@ -165,59 +154,11 @@ class GoogleAccountGame:
             name = data.get("name")
             if not isinstance(name, str) or not _NAME.fullmatch(name) or name != name.strip():
                 return await self._google_error(ws, "Nazwa postaci: 3–20 liter, cyfr, spacji lub znaków - i _.")
-            if mode == "create":
-                class_id = data.get("class_id")
-                if not isinstance(class_id, str) or class_id not in classes:
-                    return await self._google_error(ws, "Wybierz jedną z czterech klas.")
-                if self.db.execute("SELECT 1 FROM accounts WHERE name_key=?", (name.casefold(),)).fetchone():
-                    return await self._google_error(ws, "Ta nazwa postaci jest zajęta.")
-            else:
-                password = data.get("password")
-                if not isinstance(password, str) or not 8 <= len(password) <= 128:
-                    return await self._google_error(ws, "Nieprawidłowa nazwa lub stare hasło postaci.")
-                proof = self.db.execute(
-                    "SELECT id,name,salt,password_hash FROM accounts WHERE name_key=?", (name.casefold(),)
-                ).fetchone()
-                # Unknown names follow the same expensive password path. New
-                # Google-only characters have an empty legacy hash and cannot be claimed.
-                salt = proof[2] if proof else bytes(16)
-                err = self._google_session_error(ws, proof[0] if proof else None, max_players)
-                if err:
-                    if err != "closed":
-                        await self._google_error(ws, err)
-                    return
-                if len(self._google_claim_workers) >= MAX_LEGACY_HASH_WORKERS:
-                    return await self._google_error(ws, "Przypisywanie postaci jest zajęte. Spróbuj za chwilę.", "auth_busy")
-                worker = asyncio.create_task(asyncio.to_thread(self.password_hash, password, salt))
-                self._google_claim_workers.add(worker)
-
-                def hash_finished(task):
-                    self._google_claim_workers.discard(task)
-                    # A cancelled websocket may no longer await this worker.
-                    if not task.cancelled():
-                        task.exception()
-
-                worker.add_done_callback(hash_finished)
-                # Cancellation of the request cannot free a slot while the
-                # memory-expensive scrypt thread is still running.
-                hashed = await asyncio.shield(worker)
-                if ws.closed:
-                    return
-                try:
-                    service.peek_ticket(ticket, browser_binding)
-                except AuthError:
-                    return await self._google_error(ws, "Logowanie wygasło. Wybierz Google ponownie.", "google_retry")
-                fresh = self.db.execute(
-                    "SELECT id,name,salt,password_hash,data FROM accounts WHERE name_key=?", (name.casefold(),)
-                ).fetchone()
-                if (not proof or not fresh or fresh[0] != proof[0] or fresh[2] != proof[2]
-                        or fresh[3] != proof[3] or not hmac.compare_digest(hashed, fresh[3])):
-                    return await self._google_error(ws, "Nieprawidłowa nazwa lub stare hasło postaci.")
-                row = (fresh[0], fresh[1], fresh[4])
-                if self.db.execute("SELECT 1 FROM google_characters WHERE character_id=?", (row[0],)).fetchone():
-                    return await self._google_error(ws, "Nie można przypisać tej postaci do konta Google.")
-                if self._google_character_count(account_id) >= MAX_CHARACTERS:
-                    return await self._google_error(ws, "Na koncie mogą być najwyżej 4 postacie.", "character_limit")
+            class_id = data.get("class_id")
+            if not isinstance(class_id, str) or class_id not in classes:
+                return await self._google_error(ws, "Wybierz jedną z czterech klas.")
+            if self.db.execute("SELECT 1 FROM accounts WHERE name_key=?", (name.casefold(),)).fetchone():
+                return await self._google_error(ws, "Ta nazwa postaci jest zajęta.")
 
         err = self._google_session_error(ws, row[0] if row else None, max_players)
         if err:
@@ -237,7 +178,7 @@ class GoogleAccountGame:
             # No awaits below until complete_login has bound p.ws/self.players.
             # A second request cannot redeem this ticket on another websocket.
             service.consume_ticket(ticket, browser_binding)
-            if mode in ("create", "claim"):
+            if mode == "create":
                 with self.db:
                     if mode == "create":
                         cur = self.db.execute(
@@ -254,5 +195,5 @@ class GoogleAccountGame:
         except sqlite3.IntegrityError:
             # A database-level race/cap rejection rolls back the new character
             # as well as its mapping. The consumed ticket cannot be replayed.
-            return await self._google_error(ws, "Nie udało się przypisać postaci. Wybierz Google ponownie.", "google_retry")
+            return await self._google_error(ws, "Nie udało się utworzyć postaci. Wybierz Google ponownie.", "google_retry")
         await self.complete_login(ws, p, data)

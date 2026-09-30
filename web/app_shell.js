@@ -9,7 +9,7 @@
   root.addEventListener('appinstalled', () => {
     installPrompt = null; installed = true;
     instance?.refresh();
-    instance?.announce('Bractwo zostało dodane do aplikacji. Uruchomisz je z jego ikony.');
+    instance?.announce('Bractwo Krain zostało dodane do aplikacji. Uruchomisz je z jego ikony.');
   });
 
   function create({ stop = () => {} } = {}) {
@@ -77,11 +77,11 @@
     }
     function installationHelp() {
       if (isStandalone() || installed) {
-        help('Bractwo jako aplikacja', ['Gra jest już otwarta jako aplikacja lub została dodana do aplikacji na tym urządzeniu.', 'Do gry wieloosobowej potrzebujesz połączenia z internetem.']);
+        help('Bractwo Krain jako aplikacja', ['Gra jest już otwarta jako aplikacja lub została dodana do aplikacji na tym urządzeniu.', 'Do gry wieloosobowej potrzebujesz połączenia z internetem.']);
       } else if (isAppleMobile()) {
-        help('Dodaj Bractwo do ekranu początkowego', ['Otwórz tę stronę w Safari. Wybierz Udostępnij → Dodaj do ekranu początkowego, a następnie Dodaj. Jeśli widzisz opcję „Otwórz jako aplikację internetową”, pozostaw ją włączoną.', 'Następnym razem uruchomisz grę z ikony Bractwa. Gra wieloosobowa wymaga internetu.']);
+        help('Dodaj Bractwo Krain do ekranu początkowego', ['Otwórz tę stronę w Safari. Wybierz Udostępnij → Dodaj do ekranu początkowego, a następnie Dodaj. Jeśli widzisz opcję „Otwórz jako aplikację internetową”, pozostaw ją włączoną.', 'Następnym razem uruchomisz grę z ikony Bractwa Krain. Gra wieloosobowa wymaga internetu.']);
       } else {
-        help('Zainstaluj Bractwo', ['W menu przeglądarki poszukaj „Zainstaluj aplikację”, „Zainstaluj tę stronę jako aplikację” lub „Dodaj do ekranu głównego”. Nazwa opcji zależy od przeglądarki.', 'Jeśli tej opcji nie ma, otwórz stronę w Chrome lub Edge albo dodaj ją do zakładek. Instalacja przez przeglądarkę wymaga bezpiecznego adresu HTTPS.', 'Po dodaniu aplikacji uruchomisz grę z jej ikony. Gra wieloosobowa wymaga internetu.']);
+        help('Zainstaluj Bractwo Krain', ['W menu przeglądarki poszukaj „Zainstaluj aplikację”, „Zainstaluj tę stronę jako aplikację” lub „Dodaj do ekranu głównego”. Nazwa opcji zależy od przeglądarki.', 'Jeśli tej opcji nie ma, otwórz stronę w Chrome lub Edge albo dodaj ją do zakładek. Instalacja przez przeglądarkę wymaga bezpiecznego adresu HTTPS.', 'Po dodaniu aplikacji uruchomisz grę z jej ikony. Gra wieloosobowa wymaga internetu.']);
       }
     }
     function refresh() {
@@ -105,7 +105,7 @@
           const request = doc.documentElement.requestFullscreen || doc.documentElement.webkitRequestFullscreen;
           if (!request) {
             help('Pełny ekran w tej przeglądarce', isAppleMobile()
-              ? ['Ta przeglądarka nie udostępnia pełnego ekranu dla gry. W Safari wybierz Udostępnij → Dodaj do ekranu początkowego, a potem otwórz Bractwo z jego ikony.', 'Aplikacja otworzy się bez zwykłego paska adresu. Do gry nadal potrzebujesz internetu.']
+              ? ['Ta przeglądarka nie udostępnia pełnego ekranu dla gry. W Safari wybierz Udostępnij → Dodaj do ekranu początkowego, a potem otwórz Bractwo Krain z jego ikony.', 'Aplikacja otworzy się bez zwykłego paska adresu. Do gry nadal potrzebujesz internetu.']
               : ['Ta przeglądarka nie udostępnia pełnego ekranu dla gry. Na komputerze możesz użyć klawisza F11 lub opcji pełnego ekranu w menu przeglądarki.']);
             return;
           }

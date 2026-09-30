@@ -1,0 +1,310 @@
+{
+  "baseline": "BRACTWO_0.8.18_UI_23_FULL_SOURCE.zip",
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "sha256": "e50dedf7c2d52678290182e300d5971e88cc14e287a3cf3cd24cc9261420cb57"
+    },
+    {
+      "path": "client/assets/feats/wizard_abjuration.svg",
+      "kind": "added",
+      "sha256": "8569364db9e17c1bedc518a63495a82fa77d55112411dcf0421c4a064c96dbfd"
+    },
+    {
+      "path": "client/assets/feats/wizard_divination.svg",
+      "kind": "added",
+      "sha256": "1185b31ce991e7d09388673299086e5b81dc89726c01efce20eb2eaef2aec39b"
+    },
+    {
+      "path": "client/assets/feats/wizard_evocation.svg",
+      "kind": "added",
+      "sha256": "7ce47ccdea7ec0b60aaeebd626776948d10c1af8a838e7732205f740ff4f7213"
+    },
+    {
+      "path": "client/assets/feats/wizard_illusion.svg",
+      "kind": "added",
+      "sha256": "b8990453c795f3960028fd7b2c7176a69c69d967aa77384e89a99b8ad5da5ef0"
+    },
+    {
+      "path": "client/assets/spells/wizard_decoy.svg",
+      "kind": "added",
+      "sha256": "d6e3cbb02b5c9700fb1a2e6be76d6cd3edbd17c0800ab951695b03f91208211b"
+    },
+    {
+      "path": "client/assets/spells/wizard_phantasm.svg",
+      "kind": "added",
+      "sha256": "7442aa4d376d72c429793c61856ab71d56fc810e34af9b952dfed9ffab2ae408"
+    },
+    {
+      "path": "client/assets/spells/wizard_self_restore.svg",
+      "kind": "added",
+      "sha256": "e9c3f863f028c6a5f6de971461d00719124c5f546dff6bbb75a23c7022cef9a8"
+    },
+    {
+      "path": "client/assets/spells/wizard_shelter.svg",
+      "kind": "added",
+      "sha256": "46f69e1e9e16336505edca3085a512aacdfd0d1b6964b42abed7aa10164b181b"
+    },
+    {
+      "path": "client/assets/spells/wizard_third_eye.svg",
+      "kind": "added",
+      "sha256": "2c88bca686bbccbc622eaa1c0650cd9d2deb62f76795aee81ef80c465501521c"
+    },
+    {
+      "path": "client/assets/spells/wizard_ward_recharge.svg",
+      "kind": "added",
+      "sha256": "9af2ac52d3ba64415aed7e94b571efdc91fde2bdd8814152fec723acb83299b5"
+    },
+    {
+      "path": "docs/UI_24_WIZARD_SCHOOLS.md",
+      "kind": "added",
+      "sha256": "6f68074a9ce9324cbcd95b6cd2e9a4552bae1f1989f598db1f9a812aa7431a21"
+    },
+    {
+      "path": "server/caster_rules.py",
+      "kind": "modified",
+      "sha256": "a65bb9ffba5e02fcd590d22ae36e82b7f9be905482c23121ba0f177692977f90"
+    },
+    {
+      "path": "server/combat_rules.py",
+      "kind": "modified",
+      "sha256": "c5438c8cab05cc66a275c99d060dafd319c1594b29d7a5b790d70f88d4f37771"
+    },
+    {
+      "path": "server/dnd_content.py",
+      "kind": "modified",
+      "sha256": "87b00af271cdd12f9b135d96a862e0d0588ee8ce411b70e03b3067663e846b66"
+    },
+    {
+      "path": "server/dnd_game.py",
+      "kind": "modified",
+      "sha256": "7f98d63a73068c25b1ddfa6412ec7f165bbc68e786d499ef924a22c14fca77d7"
+    },
+    {
+      "path": "server/druid_circle_game.py",
+      "kind": "modified",
+      "sha256": "be636a59e325563ee32b129f4cbc37c228497b409f37bb57315074af1f34a990"
+    },
+    {
+      "path": "server/druid_circle_spells.py",
+      "kind": "modified",
+      "sha256": "5c78590b8587fddb66b609eb1986cc482a392c706504ab39c8e4f6d25d5378d1"
+    },
+    {
+      "path": "server/environment_rules.py",
+      "kind": "modified",
+      "sha256": "aa87737606298d822028968363fb7eb51c0557b514321f73967c0858d551b97d"
+    },
+    {
+      "path": "server/equipment_rules.py",
+      "kind": "modified",
+      "sha256": "03fe42257825e9c816d7cf431e3dcb4862859180771de6e02d0783e70df7dfb1"
+    },
+    {
+      "path": "server/level_up.py",
+      "kind": "modified",
+      "sha256": "f9922826471c6b0df9351dc90d7662ad8bd0cf65642a1ef228ba18afcde7b646"
+    },
+    {
+      "path": "server/progression_guide.py",
+      "kind": "modified",
+      "sha256": "c5eda50c6c629e62c968ea8f0717f1aea08960a4d48aa3f6123c439d82b53f9a"
+    },
+    {
+      "path": "server/server.py",
+      "kind": "modified",
+      "sha256": "4fc2bdc7bc547bdd1b17e02406f4135b5c3618ff57cbff42060a8d52fc55575c"
+    },
+    {
+      "path": "server/spell_scaling.py",
+      "kind": "modified",
+      "sha256": "2c03e82cab591482811f1b15daca0d86bd205dce37c1850e955431dbd8312a2c"
+    },
+    {
+      "path": "server/wizard_defense.py",
+      "kind": "added",
+      "sha256": "dde0ae9ba4245b62120b4e7cc913755d65cd540c9b42a60eeb0b5e5ce4de8a42"
+    },
+    {
+      "path": "server/wizard_offense.py",
+      "kind": "added",
+      "sha256": "9a09068ba902a9364ea34d9a07a2ce1455a501114c5c3cd3dbce33fde164f4a2"
+    },
+    {
+      "path": "server/wizard_school_game.py",
+      "kind": "added",
+      "sha256": "9b877c3aa0fd6756010dde8c708eebff844ed9960029c3e61b2b306b92c1dfe3"
+    },
+    {
+      "path": "server/wizard_schools.py",
+      "kind": "added",
+      "sha256": "6f40d3b4734e73597a50f1a40c99b58f0c91c8213e861af1f452a4425d040daf"
+    },
+    {
+      "path": "tests/smoke_railway.py",
+      "kind": "modified",
+      "sha256": "741c0aa1033c437104b8e0c27428072429ef03bc9e2a3af516b0b7f47b18cff5"
+    },
+    {
+      "path": "tests/test_app_shell.cjs",
+      "kind": "modified",
+      "sha256": "75928c5d6877504994210da614cbde732102db1dd604aa68ce56f677228618e5"
+    },
+    {
+      "path": "tests/test_app_shell_http_0818.py",
+      "kind": "modified",
+      "sha256": "1d5ce042bc6ff377ab2aea5228e6c19427df1cebbcb9643baf137795f85f0512"
+    },
+    {
+      "path": "tests/test_railway.py",
+      "kind": "modified",
+      "sha256": "d9ff615ebd189c7b40c8753737a10edb763519668520c4b9a05f9b086d6cb376"
+    },
+    {
+      "path": "tests/test_spellbook_ui16.cjs",
+      "kind": "modified",
+      "sha256": "6241ef59ae663cff9ae28b49ed99711dc78563fde2bb2d89b2a6af453595ca84"
+    },
+    {
+      "path": "tests/test_training_refresh_ui08.cjs",
+      "kind": "modified",
+      "sha256": "b8f539b4681c3080632baab4ba84f659e5bbfc52065157b6600350ec38002381"
+    },
+    {
+      "path": "tests/test_wizard_defense_ui24.py",
+      "kind": "added",
+      "sha256": "624f826e7477baf8897be525211ce39655eeb089678262dd48c3f459af4390d6"
+    },
+    {
+      "path": "tests/test_wizard_offense_ui24.py",
+      "kind": "added",
+      "sha256": "6c0df19491b22d339929d06a487ad29eb0f78c9f904f8b9cfcfc5a0ae2a93cf2"
+    },
+    {
+      "path": "tests/test_wizard_schools_ui24.cjs",
+      "kind": "added",
+      "sha256": "72fdb9441fdd91a418406d92afc2e6d63bbee52049b360a5c4b12273f2b63ec6"
+    },
+    {
+      "path": "tests/test_wizard_schools_ui24.py",
+      "kind": "added",
+      "sha256": "b5aa9a16a1573c3f88dbd8ba2ff2a018f982ab544ba8302b9e0da3347d9d6e32"
+    },
+    {
+      "path": "tests/test_wizard_vfx_ui24.cjs",
+      "kind": "added",
+      "sha256": "988529d00b45185456664f225310766c40e6b1fdf7d77fb7e9e9067cffd9a077"
+    },
+    {
+      "path": "tools/browser_ui24.cjs",
+      "kind": "added",
+      "sha256": "5c8dea30c3bd6ac8f1b99c50e972654645f684eb4b0f2051422b7bd9ab5c12f1"
+    },
+    {
+      "path": "tools/browser_ui24_run.py",
+      "kind": "added",
+      "sha256": "8cc24975dd459f03c125861c2e987b5e13d8479c64c5ffc90f129deaae2e00bf"
+    },
+    {
+      "path": "tools/browser_ui24_server.py",
+      "kind": "added",
+      "sha256": "1138a3df97a65b7aeb35fe2297965ba65da6c2928cca8fcdb8c8fcfc837e6790"
+    },
+    {
+      "path": "tools/package_0818.py",
+      "kind": "modified",
+      "sha256": "06f4937d2ac56671e854280ecb6f4c46c84b2931a0779a1da534104fe02af614"
+    },
+    {
+      "path": "web/assets/feats/wizard_abjuration.svg",
+      "kind": "added",
+      "sha256": "8569364db9e17c1bedc518a63495a82fa77d55112411dcf0421c4a064c96dbfd"
+    },
+    {
+      "path": "web/assets/feats/wizard_divination.svg",
+      "kind": "added",
+      "sha256": "1185b31ce991e7d09388673299086e5b81dc89726c01efce20eb2eaef2aec39b"
+    },
+    {
+      "path": "web/assets/feats/wizard_evocation.svg",
+      "kind": "added",
+      "sha256": "7ce47ccdea7ec0b60aaeebd626776948d10c1af8a838e7732205f740ff4f7213"
+    },
+    {
+      "path": "web/assets/feats/wizard_illusion.svg",
+      "kind": "added",
+      "sha256": "b8990453c795f3960028fd7b2c7176a69c69d967aa77384e89a99b8ad5da5ef0"
+    },
+    {
+      "path": "web/assets/spells/wizard_decoy.svg",
+      "kind": "added",
+      "sha256": "d6e3cbb02b5c9700fb1a2e6be76d6cd3edbd17c0800ab951695b03f91208211b"
+    },
+    {
+      "path": "web/assets/spells/wizard_phantasm.svg",
+      "kind": "added",
+      "sha256": "7442aa4d376d72c429793c61856ab71d56fc810e34af9b952dfed9ffab2ae408"
+    },
+    {
+      "path": "web/assets/spells/wizard_self_restore.svg",
+      "kind": "added",
+      "sha256": "e9c3f863f028c6a5f6de971461d00719124c5f546dff6bbb75a23c7022cef9a8"
+    },
+    {
+      "path": "web/assets/spells/wizard_shelter.svg",
+      "kind": "added",
+      "sha256": "46f69e1e9e16336505edca3085a512aacdfd0d1b6964b42abed7aa10164b181b"
+    },
+    {
+      "path": "web/assets/spells/wizard_third_eye.svg",
+      "kind": "added",
+      "sha256": "2c88bca686bbccbc622eaa1c0650cd9d2deb62f76795aee81ef80c465501521c"
+    },
+    {
+      "path": "web/assets/spells/wizard_ward_recharge.svg",
+      "kind": "added",
+      "sha256": "9af2ac52d3ba64415aed7e94b571efdc91fde2bdd8814152fec723acb83299b5"
+    },
+    {
+      "path": "web/caster.css",
+      "kind": "modified",
+      "sha256": "f47f36ec1cb621e22abda035bb29c5630f0e409182677149764b8172fd7ddbce"
+    },
+    {
+      "path": "web/caster_ui.js",
+      "kind": "modified",
+      "sha256": "ddbdc3bfbd08e14d9c9d3966056ac4f0d39cb03030c28a0f043129130d5aef17"
+    },
+    {
+      "path": "web/character_sheet.js",
+      "kind": "modified",
+      "sha256": "9a851a7a3872f774c1b351b4af7fe76aaa3d186ff88db3489a08da4eb2dd4716"
+    },
+    {
+      "path": "web/game.js",
+      "kind": "modified",
+      "sha256": "b247879f77b338c5a6d1e3160e50910558496d94cc14acf673fb2ac06adeb024"
+    },
+    {
+      "path": "web/index.html",
+      "kind": "modified",
+      "sha256": "939f830719887ab823594bfc95a04f458c1124a7714d18f08c8f1fdcef526f2c"
+    },
+    {
+      "path": "web/runtime.js",
+      "kind": "modified",
+      "sha256": "95bdadaf063c62ae3dc0c26780c448d8aefad22b395bbe6a01902adde4313a14"
+    },
+    {
+      "path": "web/sw.js",
+      "kind": "modified",
+      "sha256": "ab9ac47d96a0bde4f9f55f728a9c52d5b16dd8cb7f2493dacf9ab2b074f907d4"
+    },
+    {
+      "path": "web/wizard_vfx.js",
+      "kind": "added",
+      "sha256": "a7e613da3495b71c6d94d60f3b4bc023712748f7037851b6f806608edbc0b567"
+    }
+  ]
+}

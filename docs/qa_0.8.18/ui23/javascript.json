@@ -1,0 +1,13 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "tests/test_casters_0814.cjs",
+    "tests/test_app_shell.cjs"
+  ],
+  "pythonpath": "tests and repository root",
+  "tests": 22,
+  "exit_code": 0,
+  "seconds": 0.15,
+  "report": "javascript.txt"
+}

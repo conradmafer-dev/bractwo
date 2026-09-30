@@ -1,0 +1,45 @@
+{
+  "version": "0.8.18",
+  "ui_revision": "UI_25",
+  "name": "Bractwo Krain",
+  "based_on": "BRACTWO_0.8.18_UI_24_FULL_SOURCE.zip",
+  "finished_at_utc": "2026-09-30T02:25:35.280639+00:00",
+  "status": "PASS — selected release checks",
+  "features": [
+    "Bractwo Krain branding in browser/PWA, offline screen and historical native source.",
+    "Authored HUD pictograms; dedicated right-side selected-NPC services, individual master/bank tabs and local merchant binding.",
+    "All20 ports and complete piers protected with existing PvE/PvP zone rules; monster spawns excluded.",
+    "One binding stone in each of10 cities; explicit free binding and respawn near chosen stone; visits, travel and login never overwrite it.",
+    "Legacy Google claim UI and server mode removed; existing Google ownership, four-character cap and saved progress retained.",
+    "UI24 wizard schools and earlier promotion/demon/content fixes retained."
+  ],
+  "results": {
+    "python_tests": 146,
+    "javascript_tests": 166,
+    "browser_checks": 15,
+    "browser_javascript_exceptions": 0,
+    "syntax_and_svg_files": 40,
+    "binding_stones": 10,
+    "protected_ports": 20
+  },
+  "reports": [
+    "browser_initial.txt",
+    "browser_qa.md",
+    "browser_results.json",
+    "browser_setup_correction.txt",
+    "javascript.json",
+    "javascript.txt",
+    "python.json",
+    "python.txt",
+    "source_changes.json",
+    "syntax.json"
+  ],
+  "limits": [
+    "Only listed release suites are claimed passing, not the entire historical repository test suite.",
+    "Browser uses explicit fixture-granted levels/positions and a fake Google provider with isolated database; no production Google sign-in or Railway deployment.",
+    "Touch emulation430px, not a physical phone test.",
+    "Historical Godot sources retain no Google login integration and were not runtime-tested; no new APK.",
+    "Unlinked old character saves remain in the database but can no longer be self-claimed; previously linked characters remain playable.",
+    "External Google OAuth project branding is not changed by code package."
+  ]
+}

@@ -4,7 +4,7 @@
  const button=(label,fn,disabled=false)=>{const b=node('button',label);b.type='button';b.disabled=disabled;b.onclick=fn;return b;};
  const image=path=>{const i=node('img');i.src=path;i.alt='';i.width=i.height=42;return i;};
  const abilityNames={strength:'Siła',dexterity:'Zręczność',constitution:'Kondycja',intelligence:'Inteligencja',wisdom:'Mądrość',charisma:'Charyzma'};
- const candidates=new Map(),circleCandidates=new Map(),trainingChoices=new Map();
+ const candidates=new Map(),circleCandidates=new Map(),schoolCandidates=new Map(),trainingChoices=new Map();
  function canRecover(p){return !!p&&p.class_id==='mage'&&!!p.alive&&!p.form&&!p.character_sheet?.caster?.channel?.key&&p.mana<p.max_mana&&p.character_sheet?.caster?.arcane_recovery_remaining>0&&!(p.rest?.remaining>0)&&!(p.rest_short_remaining>0)&&!(p.rest_block_remaining>0)&&!p.rest_block_reason;}
  function hasShapeUse(p){const resource=p?.character_sheet?.caster?.circle?.resources?.find(r=>r.id==='shape');return !resource||resource.remaining>0;}
  function canChoose(p,nearMaster){return p.class_id==='druid'&&!!p.alive&&!p.form&&!(p.combat_remaining>0)&&(!p.character_sheet?.caster?.order||!!nearMaster);}
@@ -44,6 +44,7 @@
   if(p.form)return 'Krąg wybierzesz po zakończeniu przemiany.';
   if(p.combat_remaining>0)return 'Krąg wybierzesz po zakończeniu walki.';
   if(p.level<(c?.required_level||10))return 'Wybór od poziomu '+(c?.required_level||10)+'.';
+  if(c?.required_promotion&&!(c.promotion_met??p.promoted))return `Najpierw kup promocję u mistrza profesji w mieście: ${p.promotion?.cost??2000} złota.`;
   return c?.pending?'':'Wybór kręgu jest teraz niedostępny.';
  }
  const circleToggleValue=(circle,id)=>!!circle?.[id==='star_map'?'map_equipped':id];
@@ -67,6 +68,7 @@
   for(const hint of parent.querySelectorAll('[data-breath]'))hint.textContent=p?.environment?.submerged&&Number.isFinite(p.environment.breath_remaining)?`Pozostały oddech: ${Math.ceil(p.environment.breath_remaining)} s`:'';
   for(const b of parent.querySelectorAll('[data-study]'))b.disabled=!p?.alive||p.action_remaining>0||!h?.studyTarget?.();
   for(const b of parent.querySelectorAll('[data-search]'))b.disabled=!p?.alive||p.action_remaining>0;
+  syncSchool(parent,p,h);
  }
  function circlePanel(parent,p,h){
   const c=p.character_sheet?.caster?.circle;if(!c)return;
@@ -74,7 +76,7 @@
   box.append(node('h3','Krąg druida'));
   if(!c.id){
    const choice=circleCandidates.get(String(p.id))||{},candidate=choice.id||'',cards=node('div',undefined,'caster-order-grid');
-   box.append(node('small','Wybierz jeden krąg od poziomu '+(c.required_level||10)+'. Wybór jest stały.'));
+   box.append(node('small','Wybierz jeden krąg od poziomu '+(c.required_level||10)+(c.required_promotion?' po uzyskaniu promocji.':'.')+' Wybór jest stały.'));
    for(const option of c.options||[]){
     const b=button('',()=>{circleCandidates.set(String(p.id),{...choice,id:option.id});parent.replaceChildren();feats(parent,current(),h);});b.className='caster-order'+(candidate===option.id?' candidate':'');b.dataset.circle=option.id;b.setAttribute('aria-pressed',String(candidate===option.id));
     b.append(image(option.icon||circleIcons[option.id]),node('strong',option.name),node('small',option.description));cards.append(b);
@@ -116,12 +118,119 @@
   }
   parent.append(box);syncCircle(parent,p,h);
  }
+ const schoolIcons=Object.fromEntries(['evocation','abjuration','divination','illusion'].map(id=>[id,'assets/feats/wizard_'+id+'.svg']));
+ const portentModes={attack:'Mój atak',enemy_save:'Obrona wroga',self_save:'Moja obrona'};
+ function schoolReason(p){
+  const s=p?.character_sheet?.caster?.school;
+  if(p?.class_id!=='mage')return 'Szkoły są dostępne dla czarodzieja.';
+  if(s?.id)return 'Szkoła została już wybrana.';
+  if(!p?.alive)return 'Szkołę wybierzesz po odrodzeniu.';
+  if(p.form)return 'Szkołę wybierzesz po zakończeniu przemiany.';
+  if(p.combat_remaining>0)return 'Szkołę wybierzesz po zakończeniu walki.';
+  if(p.level<(s?.required_level||10))return `Wybór od poziomu ${s?.required_level||10}. Promocja u mistrza profesji w mieście: ${p.promotion?.cost??2000} złota.`;
+  if(!(s?.promotion_met??p.promoted))return `Najpierw kup promocję u mistrza profesji w mieście: ${p.promotion?.cost??2000} złota.`;
+  return s?.pending&&s.eligible!==false?'':'Wybór szkoły jest teraz niedostępny.';
+ }
+ const schoolState=p=>p?.character_sheet?.caster?.school||{};
+ function schoolActionValue(s,a){return !!(a?.value??s?.[a?.id]);}
+ function schoolActionLabel(s,a){return a.name+(a.kind==='toggle'?(schoolActionValue(s,a)?' · włączone':' · wyłączone'):'');}
+ function schoolActionAvailable(p,s,a,h){
+  if(!p?.alive||p.form||s.active===false||!a?.enabled)return false;
+  if(a.kind!=='spell')return true;
+  const id=a.spell_id||a.id,base=h?.state?.().world?.spells?.[id],runtime=root.BractwoRuntime;
+  return !base||!runtime?.spellUsable||runtime.spellUsable(runtime.spellProfile({...base,id},p),p);
+ }
+ function schoolTargetAllowed(p,ally){return !!p?.alive&&!!ally&&ally.hp>0&&String(ally.id)!==String(p.id)&&(ally.floor||0)===(p.floor||0)&&Math.hypot(ally.x-p.x,ally.y-p.y)<=192;}
+ function portentAvailable(p,index,value){
+  const s=schoolState(p),die=s.portents?.find(d=>Number(d.index)===Number(index));
+  const action=s.actions?.find(a=>a.id==='arm_portent');
+  return !!p?.alive&&!p.form&&s.active!==false&&s.id==='divination'&&!!die&&!die.spent&&Number(die.value)===Number(value)&&action?.enabled!==false;
+ }
+ function syncSchool(parent,p,h){
+  const s=schoolState(p),choice=schoolCandidates.get(String(p?.id));
+  for(const hint of parent.querySelectorAll('.school-choice-reason'))hint.textContent=schoolReason(p);
+  for(const b of parent.querySelectorAll('[data-school-confirm]')){const reason=schoolReason(p)||(!choice?.confirmed?'Potwierdź, że wybór szkoły jest stały.':'');b.disabled=!!reason;b.title=reason;}
+  for(const b of parent.querySelectorAll('[data-school-action]')){
+   const a=s.actions?.find(a=>a.id===b.dataset.schoolAction);b.disabled=!schoolActionAvailable(p,s,a,h);
+   if(a){b.textContent=schoolActionLabel(s,a);if(a.kind==='toggle')b.setAttribute('aria-pressed',String(schoolActionValue(s,a)));}
+  }
+  for(const chip of parent.querySelectorAll('[data-school-resource]')){const r=s.resources?.find(r=>r.id===chip.dataset.schoolResource);chip.textContent=r?`${r.name}: ${r.remaining}/${r.maximum}`:'';}
+  for(const chip of parent.querySelectorAll('[data-school-ward]'))chip.textContent=`Magiczna osłona: ${s.ward?.hp||0}/${s.ward?.maximum||0} HP`;
+  for(const b of parent.querySelectorAll('[data-portent-index]')){
+   b.disabled=!portentAvailable(p,b.dataset.portentIndex,b.dataset.portentValue);
+   b.setAttribute('aria-pressed',String(Number(s.armed_portent?.index)===Number(b.dataset.portentIndex)&&s.armed_portent?.mode===b.dataset.portentMode));
+  }
+  for(const row of parent.querySelectorAll('[data-portent-row]')){const die=s.portents?.find(d=>Number(d.index)===Number(row.dataset.portentRow));row.querySelector('.portent-die').textContent=die&&!die.spent?String(die.value):'—';row.querySelector('.portent-status').textContent=die&&!die.spent?'Wynik k20':'Zużyty wynik';row.classList.toggle('spent',!die||!!die.spent);}
+  for(const hint of parent.querySelectorAll('[data-armed-portent]')){const die=s.portents?.find(d=>Number(d.index)===Number(s.armed_portent?.index));hint.textContent=s.armed_portent&&die?`Przygotowane: ${die.value} · ${portentModes[s.armed_portent.mode]||''}. Wynik zastąpi następny pasujący rzut k20.`:'Wybierz wynik i rodzaj następnego rzutu k20, który ma zastąpić.';}
+  for(const b of parent.querySelectorAll('[data-portent-clear]'))b.disabled=!p?.alive||!s.armed_portent;
+  for(const hint of parent.querySelectorAll('[data-school-target-state]')){const ally=h?.selectedAlly?.(),id=s.projected_ward_target;hint.textContent=id?(String(ally?.id)===String(id)?'Osłaniasz: '+(ally.name||'członka drużyny')+'.':'Osłona przygotowana na członka drużyny.'):'Osłona chroni ciebie.';}
+  for(const b of parent.querySelectorAll('[data-school-target]')){const a=s.actions?.find(a=>a.id==='projected_ward');b.disabled=!p?.alive||!a?.enabled||(b.dataset.schoolTarget==='selected'&&!schoolTargetAllowed(p,h?.selectedAlly?.()));}
+ }
+ function schoolPanel(parent,p,h){
+  const s=p.character_sheet?.caster?.school;if(p.class_id!=='mage'||!s)return;
+  const box=node('section',undefined,'caster-schools'),current=()=>h.state?.().player||p;
+  box.append(node('h3','Szkoła czarodzieja'));
+  if(!s.id){
+   const choice=schoolCandidates.get(String(p.id))||{},cards=node('div',undefined,'caster-order-grid wizard-school-grid');
+   box.append(node('small','Jedna szkoła od poziomu '+(s.required_level||10)+', po uzyskaniu promocji na Arcymaga. Możesz wcześniej poznać wszystkie zdolności.'));
+   for(const option of s.options||[]){
+    const b=button('',()=>{const old=schoolCandidates.get(String(p.id));schoolCandidates.set(String(p.id),{id:option.id,confirmed:old?.id===option.id&&!!old.confirmed});parent.replaceChildren();feats(parent,current(),h);});
+    b.className='caster-order wizard-school'+(choice.id===option.id?' candidate':'');b.dataset.school=option.id;b.setAttribute('aria-pressed',String(choice.id===option.id));
+    b.append(image(option.icon||schoolIcons[option.id]),node('strong',option.name),node('small',option.description));cards.append(b);
+   }box.append(cards);
+   const selected=s.options?.find(o=>o.id===choice.id);
+   if(selected){
+    const preview=node('div',undefined,'school-preview');preview.append(node('h4',selected.name));
+    for(const f of selected.features||[])preview.append(node('p',`Poziom ${f.level}: ${f.name} — ${f.description}`,'circle-feature-preview'));
+    const label=node('label',undefined,'school-permanent-confirm'),check=node('input');check.type='checkbox';check.checked=!!choice.confirmed;check.dataset.schoolAcknowledge=selected.id;
+    check.addEventListener('change',()=>{const picked=schoolCandidates.get(String(p.id));if(picked?.id===selected.id)schoolCandidates.set(String(p.id),{...picked,confirmed:check.checked});syncSchool(parent,current(),h);});
+    label.append(check,node('span','Rozumiem, że wybór szkoły jest stały.'));preview.append(label);
+    const confirm=button('Potwierdź wybór: '+selected.name,()=>{const latest=current(),picked=schoolCandidates.get(String(p.id));if(!schoolReason(latest)&&picked?.confirmed&&picked.id===selected.id&&schoolState(latest).options?.some(o=>o.id===picked.id))h.send({type:'wizard_school',school:picked.id});});confirm.dataset.schoolConfirm=selected.id;preview.append(confirm);box.append(preview);
+   }
+   box.append(node('small',schoolReason(p),'school-choice-reason'));
+  }else{
+   const selected=s.options?.find(o=>o.id===s.id),title=node('div',undefined,'school-current');title.append(image(s.icon||selected?.icon||schoolIcons[s.id]),node('strong',s.name||selected?.name||s.id));box.append(title);
+   if(s.description||selected?.description)box.append(node('p',s.description||selected.description));
+   for(const f of s.features||[]){const row=node('article',undefined,'circle-feature'+(f.unlocked?'':' locked'));row.append(node('strong',f.name),node('small',f.description),node('small',f.unlocked?'Dostępne':'Od poziomu '+f.level));box.append(row);}
+  }parent.append(box);syncSchool(parent,p,h);
+ }
+ function schoolActions(parent,p,h){
+  const s=schoolState(p);if(p.class_id!=='mage'||!s.id)return;
+  const box=node('section',undefined,'wizard-school-actions'),current=()=>h.state?.().player||p;box.append(node('h3',s.name||'Zdolności szkoły'));
+  const resources=node('div',undefined,'circle-resources');
+  for(const r of s.resources||[]){const chip=node('span',`${r.name}: ${r.remaining}/${r.maximum}`);chip.dataset.schoolResource=r.id;resources.append(chip);}
+  if(s.id==='abjuration'&&s.ward){const chip=node('span');chip.dataset.schoolWard='';resources.append(chip);}if(resources.childNodes.length)box.append(resources);
+  const buttons=node('div',undefined,'circle-action-buttons');
+  for(const action of s.actions||[]){
+   if(['arm_portent','clear_portent','projected_ward'].includes(action.id))continue;
+   const b=button(schoolActionLabel(s,action),()=>{const latest=current(),school=schoolState(latest),a=school.actions?.find(a=>a.id===action.id);if(!schoolActionAvailable(latest,school,a,h))return;if(a.kind==='spell')h.cast(a.spell_id||a.id);else h.send({type:'wizard_school_action',action:a.id,...(a.kind==='toggle'?{value:!schoolActionValue(school,a)}:{})});});
+   b.dataset.schoolAction=action.id;if(action.description)b.title=action.description;buttons.append(b);
+  }if(buttons.childNodes.length)box.append(buttons);
+  if(s.id==='divination'){
+   const portents=node('div',undefined,'wizard-portents');portents.append(node('strong','Przepowiednie'));
+   for(const die of s.portents||[]){
+    const row=node('div',undefined,'wizard-portent'+(die.spent?' spent':''));row.dataset.portentRow=String(die.index);row.append(node('strong',die.spent?'—':String(die.value),'portent-die'),node('small',die.spent?'Zużyty wynik':'Wynik k20','portent-status'));
+    const controls=node('div',undefined,'portent-controls');
+    for(const [mode,label] of Object.entries(portentModes)){
+     const b=button(label,()=>{const latest=current();if(portentAvailable(latest,die.index,die.value))h.send({type:'wizard_school_action',action:'arm_portent',index:Number(die.index),mode});});b.dataset.portentIndex=String(die.index);b.dataset.portentValue=String(die.value);b.dataset.portentMode=mode;controls.append(b);
+    }row.append(controls);portents.append(row);
+   }
+   const hint=node('small');hint.dataset.armedPortent='';portents.append(hint);
+   const clear=button('Anuluj przygotowaną przepowiednię',()=>{const latest=current();if(latest.alive&&schoolState(latest).armed_portent)h.send({type:'wizard_school_action',action:'clear_portent'});});clear.dataset.portentClear='';portents.append(clear,node('small','Wyniki odnawiają się po długim odpoczynku. Przygotowanie przepowiedni nie zużywa jej; zużywa ją dopiero pasujący rzut.'));box.append(portents);
+  }
+  if(s.actions?.some(a=>a.id==='projected_ward')){
+   const targets=node('div',undefined,'circle-target-controls');targets.append(node('small','Przeniesiona osłona · zaznacz członka drużyny w zasięgu 30 stóp, widocznego na tym samym piętrze.'));
+   const choose=button('Osłaniaj zaznaczonego sojusznika',()=>{const latest=current(),ally=h.selectedAlly?.();if(schoolState(latest).actions?.find(a=>a.id==='projected_ward')?.enabled&&schoolTargetAllowed(latest,ally))h.send({type:'wizard_school_action',action:'projected_ward',target_id:String(ally.id)});});choose.dataset.schoolTarget='selected';
+   const clear=button('Osłaniaj siebie',()=>{const latest=current();if(latest.alive&&schoolState(latest).actions?.find(a=>a.id==='projected_ward')?.enabled)h.send({type:'wizard_school_action',action:'projected_ward',target_id:''});});clear.dataset.schoolTarget='self';const hint=node('small');hint.dataset.schoolTargetState='';targets.append(choose,clear,hint);box.append(targets);
+  }
+  parent.append(box);syncSchool(parent,p,h);
+ }
  function actions(parent,p,h){
   const c=p.character_sheet?.caster||{};
   if(c.channel?.key){const row=node('div',undefined,'caster-channel');row.append(node('strong',c.channel.name),node('small','Pozostało '+Math.max(0,Math.ceil(c.channel.remaining||0))+' s'),button('Przerwij',()=>h.send({type:'channel_cancel'})));parent.append(row);}
   if(c.familiar?.max_hp>0){const row=node('section',undefined,'caster-familiar');row.append(image('assets/spells/find_familiar.svg'),node('strong','Chowaniec · '+(c.familiar.mode==='help'?'Pomaga':'Podąża')));
    for(const [mode,label] of [['follow','Za mną'],['help','Pomagaj'],['scout','Zwiad'],['dismiss','Odeślij']])row.append(button(label,()=>h.send({type:'familiar_command',mode}),!p.alive));parent.append(row);}
-  circleActions(parent,p,h);
+  circleActions(parent,p,h);schoolActions(parent,p,h);
   if(p.environment?.in_water){const box=node('section',undefined,'caster-water');box.append(node('strong','W wodzie'));const b=button(p.environment.submerged?'Wynurz się':'Zanurkuj',()=>{const latest=h.state?.().player||p;if(latest.alive&&latest.environment?.in_water)h.send({type:'environment_action',action:'dive',enabled:!latest.environment.submerged});},!p.alive);b.dataset.dive='';const breath=node('small',p.environment.submerged&&Number.isFinite(p.environment.breath_remaining)?`Pozostały oddech: ${Math.ceil(p.environment.breath_remaining)} s`:'');breath.dataset.breath='';box.append(b,breath);parent.append(box);}
   const exploration=node('section',undefined,'caster-exploration'),study=button('Zbadaj zaznaczony cel',()=>{const latest=h.state?.().player||p,target=h.studyTarget?.();if(latest.alive&&!(latest.action_remaining>0)&&target)h.send({type:'environment_action',action:'study',...target});},!p.alive||p.action_remaining>0||!h.studyTarget?.()),search=button('Rozejrzyj się',()=>{const latest=h.state?.().player||p;if(latest.alive&&!(latest.action_remaining>0))h.send({type:'environment_action',action:'search'});},!p.alive||p.action_remaining>0);study.dataset.study='';search.dataset.search='';exploration.append(study,search,node('small','Badanie i rozglądanie zużywają akcję. Wskazówki pomagają w teście wybranej umiejętności.'));parent.append(exploration);
  }
@@ -141,6 +250,7 @@
    parent.append(box);
    circlePanel(parent,p,h);
   }
+  if(p.class_id==='mage')schoolPanel(parent,p,h);
   if(c.features?.length){const box=node('section',undefined,'caster-features');box.append(node('h3','Zdolności klasy'));
    for(const f of c.features){const row=node('article',undefined,'caster-feature');row.append(image(f.icon));const text=node('div');text.append(node('strong',f.name),node('small',f.description));row.append(text);if(f.id==='arcane_recovery'){const b=button('Odpocznij i odzyskaj',()=>h.cast(f.id),!canRecover(p));b.dataset.arcaneRecovery='';row.append(b);}box.append(row);}parent.append(box);}
   actions(parent,p,h);
@@ -172,11 +282,11 @@
  function createPrompt(h){const p=node('section',undefined,'fighter-choice caster-choice');p.id='casterChoice';p.hidden=true;
   const head=node('header'),title=node('strong'),description=node('p'),choose=button('Wybierz',()=>h.open('feats'));head.append(title,button('×',close));p.append(head,description,choose);
   (document.getElementById('hudLeftRail')||document.getElementById('gameUI')).append(p);const closed=new Set();
-  function pending(x){const c=x?.character_sheet?.caster;return c?.circle?.pending?'circle':c?.order_pending?'order':'';}
-  function key(x){return pending(x)==='circle'?'bractwo-druid-circle-choice-v1:'+x.id:'bractwo-druid-choice-v1:'+x.id;}
+  function pending(x){const c=x?.character_sheet?.caster;return c?.school?.pending&&(c.school.promotion_met??x.promoted)&&x.level>=(c.school.required_level||10)?'school':c?.circle?.pending?'circle':c?.order_pending?'order':'';}
+  function key(x){return pending(x)==='school'?'bractwo-wizard-school-choice-v1:'+x.id:pending(x)==='circle'?'bractwo-druid-circle-choice-v1:'+x.id:'bractwo-druid-choice-v1:'+x.id;}
   function close(){const x=h.player();if(x){closed.add(key(x));try{localStorage.setItem(key(x),'1');}catch{}}sync();}
-  function sync(){const x=h.player(),kind=pending(x);let hidden=!kind;if(x){hidden=hidden||closed.has(key(x));try{hidden=hidden||localStorage.getItem(key(x))==='1';}catch{}}p.hidden=hidden;title.textContent=kind==='circle'?'Krąg druida':'Ścieżka druida';description.textContent=kind==='circle'?'Wybierz krąg Ziemi, Księżyca, Morza lub Gwiazd.':'Strażnik czy Mistyk natury?';choose.textContent=kind==='circle'?'Wybierz krąg':'Wybierz ścieżkę';}
+  function sync(){const x=h.player(),kind=pending(x);let hidden=!kind;if(x){hidden=hidden||closed.has(key(x));try{hidden=hidden||localStorage.getItem(key(x))==='1';}catch{}}p.hidden=hidden;title.textContent=kind==='school'?'Szkoła czarodzieja':kind==='circle'?'Krąg druida':'Ścieżka druida';description.textContent=kind==='school'?'Promocja odblokowała wybór szkoły magii. Poznaj cztery szkoły i wybierz jedną.':kind==='circle'?'Wybierz krąg Ziemi, Księżyca, Morza lub Gwiazd.':'Strażnik czy Mistyk natury?';choose.textContent=kind==='school'?'Wybierz szkołę':kind==='circle'?'Wybierz krąg':'Wybierz ścieżkę';}
   return{sync};
  }
- root.BractwoCasterUI={feats,actions,createPrompt,canChoose,canRecover,hasShapeUse,syncTraining,syncCircle};if(typeof module!=='undefined')module.exports={canChoose,canRecover,hasShapeUse,trainingReason,trainingSummary,circleReason};
+ root.BractwoCasterUI={feats,actions,createPrompt,canChoose,canRecover,hasShapeUse,syncTraining,syncCircle,syncSchool};if(typeof module!=='undefined')module.exports={canChoose,canRecover,hasShapeUse,trainingReason,trainingSummary,circleReason,schoolReason,schoolTargetAllowed,portentAvailable};
 })(globalThis);

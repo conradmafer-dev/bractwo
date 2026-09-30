@@ -1,0 +1,51 @@
+PASS Bractwo Krain branding and Google-only creation without legacy claim/password controls
+PASS Ten recognizable HUD pictograms load, with existing accessible control labels
+PASS Character pictogram opens the character sheet
+PASS Dedicated master promotion panel obeys level gate and buys promotion for2000
+PASS Master tabs show only the selected service; blessing uses real server rules
+PASS Bank panel performs deposit and withdrawal without travel or master content
+PASS Depot separates putting in and taking out; actual inventory transfers succeed
+PASS Open NPC service disables actions immediately after walking out of reach
+PASS Visiting city preserves old binding; stone confirmation explicitly binds Brzezina
+PASS Dedicated ferry panel sails with exact fare; arrival is in safe zone and retains binding
+PASS Merchant buy/sell panel is docked on the right and names the selected vendor
+locator.click: Timeout 12000ms exceeded.
+Call log:
+[2m  - waiting for locator('#mobileMenuButton')[22m
+[2m    - locator resolved to <button type="button" aria-expanded="true" id="mobileMenuButton" class="mobile-control" aria-controls="mobileMenu" aria-label="Zamknij menu gry">☰</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not visible[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is not visible[22m
+[2m    - retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m    22 × waiting for element to be visible, enabled and stable[22m
+[2m       - element is not visible[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+
+    at main (/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tools/browser_ui25.cjs:42:222) {
+  log: [
+    "  - waiting for locator('#mobileMenuButton')",
+    '    - locator resolved to <button type="button" aria-expanded="true" id="mobileMenuButton" class="mobile-control" aria-controls="mobileMenu" aria-label="Zamknij menu gry">☰</button>',
+    '  - attempting click action',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is not visible',
+    '    - retrying click action',
+    '    - waiting 20ms',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is not visible',
+    '    - retrying click action',
+    '      - waiting 100ms',
+    '    22 × waiting for element to be visible, enabled and stable',
+    '       - element is not visible',
+    '     - retrying click action',
+    '       - waiting 500ms'
+  ],
+  name: 'TimeoutError'
+}
+======== Running on http://127.0.0.1:8771 ========
+(Press CTRL+C to quit)

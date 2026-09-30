@@ -95,8 +95,8 @@
    for(const [grip,label] of [['one','Jednorącz'],['two','Oburącz']])actions.append(button((p.character_sheet?.training?.grip===grip?'✓ ':'')+label,()=>h.send({type:'weapon_grip',grip}),!p.alive||!!p.form||p.combat_remaining>0));
   }
   if(h.canTrade?.()&&!worn){
-   actions.append(button('Sprzedaj'+(item.slot==='potion'?' 1':'')+' · '+(item.value||0)+' zł',()=>h.send({type:'sell',uid:item.uid}),!p.alive));
-   if((item.quantity||1)>1)actions.append(button('Stos · '+(item.value||0)*item.quantity+' zł',()=>h.send({type:'sell',uid:item.uid,quantity:item.quantity}),!p.alive));
+   actions.append(button('Sprzedaj'+(item.slot==='potion'?' 1':'')+' · '+(item.value||0)+' zł',()=>h.send({type:'sell',uid:item.uid,npc_id:merchantId}),!p.alive));
+   if((item.quantity||1)>1)actions.append(button('Stos · '+(item.value||0)*item.quantity+' zł',()=>h.send({type:'sell',uid:item.uid,quantity:item.quantity,npc_id:merchantId}),!p.alive));
   }
   head.after(actions);return pane;
  }
@@ -104,26 +104,26 @@
   const panel=node('section',undefined,'merchant-panel');panel.hidden=true;panel.id='merchantPanel';panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Kupiec');
   const header=node('header',undefined,'merchant-header');header.append(node('h2','Kupiec'),button('×',close));header.lastChild.setAttribute('aria-label','Zamknij handel');panel.append(header);
   const tabs=node('nav',undefined,'merchant-tabs');tabs.setAttribute('aria-label','Handel');tabs.setAttribute('role','tablist');
-  let tab='buy',signature='',focus;
+  let tab='buy',signature='',focus,merchantId='';
   for(const [key,label] of [['buy','Kupuj'],['sell','Sprzedaj']]){const b=button(label,()=>{tab=key;signature='';render();});b.dataset.tradeTab=key;b.setAttribute('role','tab');tabs.append(b);}panel.append(tabs);
   const summary=node('p',undefined,'merchant-summary'),body=node('div',undefined,'merchant-content');panel.append(summary,body);
   const foot=node('footer',undefined,'item-actions');foot.append(button('Odpoczynek',()=>h.rest?h.rest():h.send({type:'interact'})),button('Zamknij',close));panel.append(foot);document.getElementById('gameUI').append(panel);
   function close(){panel.hidden=true;hide();if(focus?.isConnected&&focus.getClientRects().length)focus.focus({preventScroll:true});}
-  function open(){focus=document.activeElement;h.prepare?.();panel.hidden=false;signature='';render();tabs.firstChild.focus({preventScroll:true});}
-  function render(){if(panel.hidden)return;const {player:p,world:w}=h.state();if(!p)return;const trade=h.canTrade();
-    const key=JSON.stringify([tab,p.inventory,p.equipment,p.gold,p.level,p.alive,trade,p.item_previews,p.merchant]);if(key===signature)return;signature=key;
-    header.firstChild.textContent=p.merchant?.name||'Kupiec';
+  function open(npc){focus=document.activeElement;merchantId=npc?.id||(npc?'starter_merchant':h.state().player?.merchant?.id)||'';tab='buy';h.prepare?.();panel.hidden=false;signature='';render();tabs.firstChild.focus({preventScroll:true});}
+  function render(){if(panel.hidden)return;const {player:p,world:w}=h.state();if(!p)return;const seller=merchantId==='starter_merchant'?w.merchant:(w.npcs||[]).find(n=>n.id===merchantId);const trade=!!seller&&p.hp>0&&!(p.combat_remaining>0)&&(p.floor||0)===(seller.floor||0)&&Math.hypot(p.x-seller.x,p.y-seller.y)<=(seller.radius||150);
+    const key=JSON.stringify([tab,p.inventory,p.equipment,p.gold,p.level,p.alive,trade,p.item_previews,merchantId]);if(key===signature)return;signature=key;
+    header.firstChild.textContent=seller?.name||'Kupiec';
    summary.textContent=`Złoto: ${p.gold} · `+(trade?'Wybierz przedmiot.':'Handel tylko przy kupcu, poza walką.');foot.firstChild.disabled=!p.alive;
    for(const b of tabs.children){b.classList.toggle('active',b.dataset.tradeTab===tab);b.setAttribute('aria-selected',String(b.dataset.tradeTab===tab));}
    const scroll=body.scrollTop;body.replaceChildren();
-    let items=tab==='buy'?Object.entries(w.items||{}).filter(([key,spec])=>Number.isFinite(spec.price)&&p.merchant?.stock?.includes(key)).map(([key,spec])=>({...spec,template:key,preview:p.item_previews?.[key]})):p.inventory.filter(i=>!Object.values(p.equipment||{}).includes(i.uid));
+    let items=tab==='buy'?Object.entries(w.items||{}).filter(([key,spec])=>Number.isFinite(spec.price)&&seller?.stock?.includes(key)).map(([key,spec])=>({...spec,template:key,preview:p.item_previews?.[key]})):p.inventory.filter(i=>!Object.values(p.equipment||{}).includes(i.uid));
    items=items.filter(item=>item.slot!=='potion'||item.potion_kind==='health');
    for(const item of items){const row=node('article',undefined,'merchant-item');row.dataset.template=item.template;
     const img=node('img');img.src=item.icon||'assets/equipment/empty.svg';img.alt='';row.append(img);
     const text=node('div',undefined,'merchant-item-text');text.append(node('strong',item.name+(item.quantity>1?' ×'+item.quantity:'')),node('small',(item.effect_summary||item.armor_summary||item.damage_dice||(item.slot==='ring'?item.description:'')||'')+(item.min_level>1?' · Poziom '+item.min_level:'')));row.append(text);
     const actions=node('div',undefined,'merchant-item-actions');const price=tab==='buy'?item.price:item.value;actions.append(node('span',`${price} zł / szt.`));
-    if(tab==='buy')actions.append(button('Kup',()=>h.send({type:'buy',item:item.template}),!trade||p.gold<price||p.level<(item.min_level||1)));
-    else{actions.append(button('Sprzedaj'+(item.quantity>1?' 1':''),()=>h.send({type:'sell',uid:item.uid}),!trade));if(item.quantity>1)actions.append(button('Cały stos',()=>h.send({type:'sell',uid:item.uid,quantity:item.quantity}),!trade));}
+    if(tab==='buy')actions.append(button('Kup',()=>h.send({type:'buy',item:item.template,npc_id:merchantId}),!trade||p.gold<price||p.level<(item.min_level||1)));
+    else{actions.append(button('Sprzedaj'+(item.quantity>1?' 1':''),()=>h.send({type:'sell',uid:item.uid,npc_id:merchantId}),!trade));if(item.quantity>1)actions.append(button('Cały stos',()=>h.send({type:'sell',uid:item.uid,quantity:item.quantity,npc_id:merchantId}),!trade));}
     row.append(actions);bind(row,item,w);body.append(row);
    }
     if(!items.length)body.append(node('p',tab==='buy'?'Podejdź do miejscowego kupca, aby zobaczyć jego towary.':'Nie masz przedmiotów do sprzedaży. Założone wyposażenie pozostaje chronione.','sheet-hint'));

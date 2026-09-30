@@ -770,7 +770,7 @@ def _repair_access(c,obstacles):
     def clear(x,y,enemy=False):
         if not 25<x<c.WIDTH-25 or not 25<y<c.HEIGHT-25 or c.WATER_MAP.blocked(x,y,22):return False
         if x+22>1500 and x-22<1680 and y-22<2304 and (y-22<1080 or y+22>1230):return False
-        if enemy and any(math.hypot(x-city['x'],y-city['y'])<city['radius']+100 for city in c.CITIES):return False
+        if enemy and any(math.hypot(x-city['x'],y-city['y'])<city['radius']+100 for city in getattr(c,'SAFE_ZONES',c.CITIES)):return False
         return not any(o['x']-22<x<o['x']+o['w']+22 and o['y']-22<y<o['y']+o['h']+22 for o in cells.get((int(x//512),int(y//512)),()))
     def place(x,y,enemy=False):
         if clear(x,y,enemy):return x,y

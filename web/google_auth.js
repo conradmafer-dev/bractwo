@@ -14,31 +14,24 @@
     } catch (_) { return false; }
   }
 
-  function profilePacket(ticket, mode, name, password, classId) {
-    if (!ticket || !['create', 'claim'].includes(mode)) throw new Error('Wybierz ponownie konto Google.');
+  function profilePacket(ticket, mode, name, classId) {
+    if (!ticket || mode !== 'create') throw new Error('Wybierz ponownie konto Google.');
     name = String(name || '').trim();
     if (name.length < 3 || name.length > 20) throw new Error('Imię postaci musi mieć od 3 do 20 znaków.');
-    const packet = {type:'hello_google', ticket, mode, name, compact_state:true};
-    if (mode === 'claim') {
-      if (typeof password !== 'string' || password.length < 8 || password.length > 128) throw new Error('Podaj obecne hasło do swojej postaci.');
-      packet.password = password;
-    } else {
-      if (!CLASSES.has(classId)) throw new Error('Wybierz klasę postaci.');
-      packet.class_id = classId;
-    }
-    return packet;
+    if (!CLASSES.has(classId)) throw new Error('Wybierz klasę postaci.');
+    return {type:'hello_google', ticket, mode:'create', name, class_id:classId, compact_state:true};
   }
 
   function mount(options) {
     const doc = options.document || root.document, loc = options.location || root.location;
     const fetcher = options.fetch || root.fetch.bind(root);
     const ids = ['googleSignIn','googleButton','googleStatus','googleRetry','googleAccount','googleCharacters',
-      'googleCharacterCount','googleAccountHint','googleNewCharacter','googleClaimCharacter','googleProfile',
-      'googleProfileTitle','googleName','googlePassword','googlePasswordRow','googleClassPicker','googleContinue',
+      'googleCharacterCount','googleAccountHint','googleNewCharacter','googleProfile',
+      'googleProfileTitle','googleName','googleClassPicker','googleContinue',
       'googleProfileBack','googleCancel','googleIntro','authError'];
     const ui = Object.fromEntries(ids.map(id => [id, doc.getElementById(id)]));
     if (Object.values(ui).some(value => !value)) return null;
-    let config = null, ticket = '', challenge = '', mode = 'create', classId = 'knight', account = null;
+    let config = null, ticket = '', challenge = '', classId = 'knight', account = null;
     let generation = 0, timer = null, pending = false, externalBusy = false, scriptPromise = null, preparing = false;
     const eligible = () => sameOriginServer(options.server, loc);
     const allowed = () => eligible() && (!options.canStart || options.canStart());
@@ -58,26 +51,21 @@
       ui.googleButton.setAttribute('aria-disabled', String(disabled));
       for (const input of ui.googleAccount.querySelectorAll('input,button')) input.disabled = disabled;
       ui.googleNewCharacter.disabled = disabled || atLimit();
-      ui.googleClaimCharacter.disabled = disabled || atLimit();
       ui.googleRetry.disabled = disabled;
       ui.googleCancel.disabled = value;
     }
-    function chooseMode(next) {
+    function createProfile() {
       if (atLimit()) return;
-      mode = next;
-      const create = mode === 'create';
       ui.googleProfile.hidden = false;
-      ui.googleProfileTitle.textContent = create ? 'Nowa postać' : 'Dodaj dotychczasową postać';
-      ui.googlePasswordRow.hidden = create; ui.googlePassword.required = !create;
-      ui.googleName.autocomplete = create ? 'off' : 'username';
-      ui.googleName.value = ''; ui.googlePassword.value = ''; ui.googleClassPicker.hidden = !create;
-      ui.googleContinue.replaceChildren(doc.createTextNode(create ? 'Stwórz postać i wyrusz' : 'Dodaj postać i wejdź do gry'));
-      const arrow = doc.createElement('span'); arrow.textContent = '↗'; ui.googleContinue.append(arrow);
+      ui.googleProfileTitle.textContent = 'Nowa postać';
+      ui.googleName.autocomplete = 'off'; ui.googleName.value = '';
+      ui.googleClassPicker.hidden = false;
+      ui.googleContinue.textContent = 'Stwórz postać i wyrusz';
       ui.googleName.focus();
     }
     function clearSecrets() {
       ++generation; clearTimeout(timer); timer = null; ticket = ''; challenge = ''; pending = false; preparing = false;
-      account = null; ui.googleName.value = ''; ui.googlePassword.value = '';
+      account = null; ui.googleName.value = '';
       googleApi()?.cancel();
       setBusy(externalBusy);
     }
@@ -143,9 +131,9 @@
       }
       ui.googleCharacterCount.textContent = `${account.characters.length} / 4`;
       ui.googleAccountHint.textContent = atLimit() ? 'Masz już 4 postacie. Wybierz jedną, aby wejść do gry.' :
-        account.characters.length ? 'Wybierz postać albo wykorzystaj wolne miejsce na kolejną.' : 'Stwórz pierwszą postać lub dodaj swoją dotychczasową.';
+        account.characters.length ? 'Wybierz postać albo wykorzystaj wolne miejsce na kolejną.' : 'Stwórz pierwszą postać i rozpocznij wyprawę.';
       setBusy(externalBusy); status('Konto Google potwierdzone.');
-      if (!account.characters.length) chooseMode('create');
+      if (!account.characters.length) createProfile();
       else ui.googleCharacters.querySelector('button')?.focus();
     }
     async function receiveCredential(response, serial) {
@@ -209,17 +197,16 @@
         item.setAttribute('aria-pressed', String(item.dataset.class === classId));
       }
     });
-    ui.googleNewCharacter.addEventListener('click', () => chooseMode('create'));
-    ui.googleClaimCharacter.addEventListener('click', () => chooseMode('claim'));
-    ui.googleProfileBack.addEventListener('click', () => { ui.googleProfile.hidden = true; ui.googlePassword.value = ''; });
+    ui.googleNewCharacter.addEventListener('click', () => createProfile());
+    ui.googleProfileBack.addEventListener('click', () => { ui.googleProfile.hidden = true; });
     ui.googleRetry.addEventListener('click', () => { config = null; void prepare(); });
     ui.googleCancel.addEventListener('click', () => reset({logout:true}));
     ui.googleProfile.addEventListener('submit', event => {
       event.preventDefault(); if (!allowed() || pending || externalBusy || atLimit()) return;
       try {
-        const packet = profilePacket(ticket, mode, ui.googleName.value, ui.googlePassword.value, classId);
-        ui.googlePassword.value = ''; ui.authError.textContent = '';
-        status(mode === 'create' ? 'Tworzenie postaci…' : 'Dodawanie dotychczasowej postaci…');
+        const packet = profilePacket(ticket, 'create', ui.googleName.value, classId);
+        ui.authError.textContent = '';
+        status('Tworzenie postaci…');
         options.connect(packet);
       } catch (error) { status(error.message, true); }
     });
@@ -237,7 +224,7 @@
           reset({refresh:false}); status(`${message} Wybierz ponownie konto Google.`, true);
         } else {
           status(message, true);
-          if (!ui.googleProfile.hidden && mode === 'claim') ui.googlePassword.focus();
+          if (!ui.googleProfile.hidden) ui.googleName.focus();
         }
       }
     };

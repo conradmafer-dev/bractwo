@@ -321,7 +321,7 @@ def public_item(p,item):
 
 
 def _preview_signature(p):
-    return (p.class_id,p.level,getattr(p,'primal_order',''),tuple(sorted(getattr(p,'training_feats',{}).items())),
+    return (p.class_id,p.level,getattr(p,'promoted',False),getattr(p,'wizard_school',''),getattr(p,'primal_order',''),tuple(sorted(getattr(p,'training_feats',{}).items())),
         getattr(p,'weapon_grip','one'),getattr(p,'fighting_style',''),p.form,
         tuple(sorted(p.mastery.items())),tuple(sorted(p.equipment.items())),tuple(v.get('uid','') for v in getattr(p,'magic_attunements',[]) if isinstance(v,dict)),
         tuple((i.get('uid'),i.get('template')) for i in p.inventory if i.get('uid') in p.equipment.values()),

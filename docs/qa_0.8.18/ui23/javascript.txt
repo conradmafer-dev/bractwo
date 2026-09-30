@@ -1,0 +1,30 @@
+✔ fullscreen is requested by a click and browser events synchronize every control (2.819779ms)
+✔ fullscreen denial opens dismissible help, stops movement and permits retry (1.050451ms)
+✔ iPhone without fullscreen receives honest Add to Home Screen instructions (0.800318ms)
+✔ accepted install prompt does not falsely report completed installation (0.798496ms)
+✔ dismissed install consumes the prompt and the next click offers manual help (0.872756ms)
+✔ standalone mode hides install affordances and worker only registers on secure origins (0.999585ms)
+✔ worker precaches only disconnected page and icons, and preserves unrelated caches (1.632345ms)
+✔ worker never intercepts game code, API, credential POST or cross-origin requests (0.847138ms)
+✔ navigation loads fresh HTML online and falls back to disconnected page offline (1.775938ms)
+✔ first druid path does not require a master (0.822221ms)
+✔ reselection requires master (0.120189ms)
+✔ dead, combat, transformed and non-druid cannot pick path (0.118917ms)
+✔ simple and martial labels; no third/exotic fallback (0.300716ms)
+✔ proficient weapon has no redundant affirmative proficiency row (0.159517ms)
+✔ missing weapon training shown once, does not subtract from actual attack twice (0.113108ms)
+✔ personalized zero spell bonus overrides staff nominal focus bonus for noncasters (0.128611ms)
+✔ mastery lock independent of proficiency (0.129312ms)
+✔ armor shows actual wearer AC and warns about missing training (0.209722ms)
+✔ untrained shield explicitly denies AC bonus (0.198605ms)
+✔ tooltip text remains text not injected HTML (0.29613ms)
+✔ shared staff and bow artwork follows type rather than former class restriction (0.158606ms)
+✔ untrained armor warning renders the message, not its CSS class (0.206486ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 88.688954

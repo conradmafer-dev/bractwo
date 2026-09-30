@@ -5,6 +5,10 @@ The Moon, Sea and Stars entries use the same licensed PHB 2024 compendium.
 Persistent expenditures live in druid_circle_state; active effects never survive login.
 """
 from math import floor
+try:
+    from .profession_rules import PROMOTION_LEVEL
+except ImportError:
+    from profession_rules import PROMOTION_LEVEL
 
 GATE = {3: 10, 5: 20, 6: 25, 7: 30, 9: 40, 10: 45, 14: 65}
 CIRCLES = {
@@ -243,6 +247,9 @@ def configure(spells, statuses):
 def sheet(p):
     if p.class_id != 'druid': return {}
     key = circle(p); data = state(p)
+    level_met = p.level >= PROMOTION_LEVEL
+    promotion_met = bool(getattr(p, 'promoted', False))
+    eligible = level_met and promotion_met and not key
     def feature_rows(subclass):
         return [dict(id=id_, level=level, name=name, description=description, unlocked=p.level >= level) for id_, level, name, description in FEATURES[subclass]]
     options = [dict(id=id_, **spec, features=feature_rows(id_)) for id_, spec in CIRCLES.items()]
@@ -259,7 +266,8 @@ def sheet(p):
     if starry_form(p): actions.append(dict(id='dismiss_star_form', name='Zakończ gwiezdną postać', level=10, kind='command', enabled=enabled))
     if active(p, 'wrath_of_sea'): actions.append(dict(id='dismiss_sea', name='Zakończ Gniew morza', level=10, kind='command', enabled=enabled))
     if runtime(p).get('grapples'): actions.append(dict(id='release_grapples', name='Zwolnij chwyt', level=1, kind='command', enabled=enabled))
-    return dict(id=key, name=CIRCLES.get(key, {}).get('name', ''), pending=p.level >= 10 and not key, required_level=10,
+    return dict(id=key, name=CIRCLES.get(key, {}).get('name', ''), pending=eligible, eligible=eligible,
+        required_level=PROMOTION_LEVEL, required_promotion=True, promotion_met=promotion_met, level_met=level_met,
         options=options, features=feature_rows(key) if key else [], land=land(p), lands=[dict(id=id_, **s) for id_, s in LANDS.items()], land_change_ready=data.get('land_change_ready', True),
         starry_form=starry_form(p), lunar_radiant=data.get('lunar_radiant', True), omen=data.get('omen', 'weal'), omen_armed=data.get('omen_armed', False),
         map_equipped=data.get('map_equipped', True), natural_free=data.get('natural_free_armed', False),

@@ -1,0 +1,71 @@
+EEEE/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/server/server.py:1848: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["game"]=Game(db_path, clock=clock)
+/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/server/server.py:1849: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["google_auth"]=google_auth_service if google_auth_service is not None else GoogleAuthService.from_env()
+.Executing <Task pending name='Task-14' coro=<AppShellHTTPTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_app_shell_http_0818.py:22> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.119 seconds
+.Executing <Task pending name='Task-28' coro=<AppShellHTTPTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_app_shell_http_0818.py:22> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.138 seconds
+.Executing <Task pending name='Task-40' coro=<AppShellHTTPTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_app_shell_http_0818.py:22> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.113 seconds
+.Executing <Task pending name='Task-61' coro=<AppShellHTTPTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_app_shell_http_0818.py:22> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.148 seconds
+...............Executing <Task pending name='Task-74' coro=<RuntimeTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_railway.py:133> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.121 seconds
+.Executing <Task pending name='Task-88' coro=<RuntimeTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_railway.py:133> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.158 seconds
+.Executing <Task pending name='Task-112' coro=<RuntimeTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_railway.py:133> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.211 seconds
+.Executing <Task pending name='Task-124' coro=<RuntimeTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_railway.py:133> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.217 seconds
+.
+======================================================================
+ERROR: test_promotion_ui23 (unittest.loader._FailedTest.test_promotion_ui23)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_promotion_ui23
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_promotion_ui23.py", line 5, in <module>
+    from test_ui19_core_integration import Clock, WS
+ModuleNotFoundError: No module named 'test_ui19_core_integration'
+
+
+======================================================================
+ERROR: test_druid_circles_0818 (unittest.loader._FailedTest.test_druid_circles_0818)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_druid_circles_0818
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_druid_circles_0818.py", line 3, in <module>
+    import test_dnd as base
+ModuleNotFoundError: No module named 'test_dnd'
+
+
+======================================================================
+ERROR: test_druid_circle_spells_0818 (unittest.loader._FailedTest.test_druid_circle_spells_0818)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_druid_circle_spells_0818
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_druid_circle_spells_0818.py", line 3, in <module>
+    import test_dnd as base
+ModuleNotFoundError: No module named 'test_dnd'
+
+
+======================================================================
+ERROR: test_level_up_086 (unittest.loader._FailedTest.test_level_up_086)
+----------------------------------------------------------------------
+ImportError: Failed to import test module: test_level_up_086
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/unittest/loader.py", line 137, in loadTestsFromName
+    module = __import__(module_name)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_level_up_086.py", line 11, in <module>
+    from test_dnd import Clock,WS
+ModuleNotFoundError: No module named 'test_dnd'
+
+
+----------------------------------------------------------------------
+Ran 27 tests in 1.715s
+
+FAILED (errors=4)

@@ -174,6 +174,7 @@
   function spellUsable(spec,player) {
     const s=spellProfile(spec,player);
     if(!s||!player||player.hp<=0||player.alive===false||s.available===false||s.already_active)return false;
+    if(s.kind==='wizard_feature'&&(s.action==='bonus'?player.bonus_remaining>0:player.action_remaining>0))return false;
     if(s.kind==='shape'&&player.form||s.kind==='reaction'||s.kind==='weapon_trigger'&&player.ensnaring_armed)return true;
     if(player.form&&!s.cast_in_form&&!['druid_circle','beast_action'].includes(s.kind))return false;
     return !(player.spell_cooldowns?.[s.id]>0)&&player.mana>=spellMana(s,player)&&(s.resource_cost===0||s.uses_remaining===undefined||s.uses_remaining>=(s.resource_cost||1));

@@ -1,0 +1,55 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "All four schools preview four milestones; promotion blocks confirmation and direct WS selection"
+    },
+    {
+      "name": "Even a promoted level-9 wizard cannot select a school"
+    },
+    {
+      "name": "Explicit permanent-choice checkbox selects Illusion at level 10; changing school is rejected"
+    },
+    {
+      "name": "Illusion owns its spellbook features; real action and assigned hotbar each consume one decoy use and zero uses disables hotbar"
+    },
+    {
+      "name": "Illusion selection and spent charges persist across reconnect, with 430px layout fitting",
+      "width": 430,
+      "scrollWidth": 430,
+      "panelWidth": 418.1875,
+      "panelRight": 424.09375
+    },
+    {
+      "name": "Level-65 Illusion shows all four milestones and casts the new shelter through the action UI"
+    },
+    {
+      "name": "Divination displays two real k20 values; index/mode preparation and cancellation consume no dice"
+    },
+    {
+      "name": "A production cantrip attack consumes the armed die and updates the spent/disabled state"
+    },
+    {
+      "name": "Divination keeps remaining and spent results after reconnect; mobile controls fit"
+    },
+    {
+      "name": "Abjuration creates and displays a real ward after a paid Mage Armor cast"
+    },
+    {
+      "name": "Evocation exposes level-10 passive and level-65 overchannel toggle with authoritative state"
+    },
+    {
+      "name": "Legacy unpromoted druid still sees its existing circle without wizard school UI"
+    },
+    {
+      "name": "Captured real decoy packet renders through the production Canvas spell renderer"
+    }
+  ],
+  "errors": [],
+  "limits": [
+    "Production HTTP/native WebSocket on isolated in-memory SQLite; fixtures grant levels/promotion and move actors, with monster AI paused.",
+    "Google SDK and signature verifier are explicit test-only replacements; real Google login and Railway deployment are not covered.",
+    "Headless Chromium 1440px desktop and 430px touch viewport, not a physical phone.",
+    "Browser covers selection, resource UI, representative casts, persistence and rendering. Full combat behavior is verified in separate Python tests."
+  ]
+}

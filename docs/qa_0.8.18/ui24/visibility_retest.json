@@ -1,0 +1,9 @@
+{
+  "command": "PYTHONPATH=tests:. python -m unittest -v test_wizard_offense_ui24 test_environment_0818",
+  "tests_run": 25,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "successful": true,
+  "notes": "Final targeted recheck after visibility fix; includes Third Eye blind observer and wall regression."
+}

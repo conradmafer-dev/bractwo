@@ -174,8 +174,8 @@ class EnvironmentGame:
                         if math.hypot(x-field['x'],y-field['y'])>math.hypot(actor.x-field['x'],actor.y-field['y'])+.001:return True
         return self.blocked(x,y,radius,floor=actor.floor,ignore_water=True,ignore_low=flying(actor))
 
-    def environment_obscured(self,actor):
-        if active(actor,'blind',self.now()):return True
+    def environment_obscured(self,actor,include_blind=True):
+        if include_blind and active(actor,'blind',self.now()):return True
         for field in self.environment_fields():
             if field.get('until',0)<=self.now() or field.get('floor',0)!=actor.floor:continue
             spec=field.get('profile',{})
@@ -187,7 +187,11 @@ class EnvironmentGame:
         spec=enemy_spec(a) if not hasattr(a,'class_id') else caster.form_spec(a)
         reach=float(spec.get('blindsight',0))*6.4
         if reach and math.hypot(a.x-b.x,a.y-b.y)<=reach:return True
-        if self.environment_obscured(a) or self.environment_obscured(b):return False
+        # Blindness belongs to the observer; it does not hide that observer
+        # from other creatures. Third Eye pierces magical cover, not blindness.
+        if active(a,'blind',self.now()):return False
+        if self.wizard_third_eye(a):return True
+        if self.environment_obscured(a,False) or self.environment_obscured(b,False):return False
         for field in self.environment_fields():
             if field.get('until',0)<=self.now() or field.get('floor',0)!=a.floor:continue
             if field.get('profile',{}).get('obscure') or field.get('key') in ('fog_cloud','sleet_storm','stinking_cloud'):
@@ -199,7 +203,7 @@ class EnvironmentGame:
         dis=not see or any(active(source,k,now) for k in ('poisoned','web_restrained','elemental_restrained','stinking_poison'))
         adv=not seen or any(active(target,k,now) for k in ('paralyzed','unconscious','web_restrained','elemental_restrained'))
         spec=enemy_spec(source) if not hasattr(source,'class_id') else caster.form_spec(source)
-        if active(target,'blur',now) and not spec.get('blindsight') and not spec.get('truesight'):dis=True
+        if active(target,'blur',now) and not spec.get('blindsight') and not spec.get('truesight') and not self.wizard_third_eye(source):dis=True
         bolt=conditions(target).pop('guiding_bolt',{})
         adv=adv or bolt.get('until',0)>now
         return dis,adv
@@ -211,7 +215,7 @@ class EnvironmentGame:
         except ImportError:
             import combat_rules as rules
         if not result.get('critical') and math.hypot(source.x-target.x,source.y-target.y)<=32 and any(active(target,k,self.now()) for k in ('paralyzed','unconscious')):
-            result.update(rules.roll_damage(self.combat_rng,dice,True),critical=True)
+            result.update(rules.roll_damage(self.combat_rng,dice,True,maximize=self.wizard_maximize_spell(source,getattr(source,'_wizard_damage_spec',None) or {})),critical=True)
         magic_items.prevent_critical(target,result)
     def environment_attack_riders(self,source,target,result,melee=False):
         if not result.get('hit'):return
@@ -257,7 +261,8 @@ class EnvironmentGame:
         dis=dis or ability=='constitution' and getattr(target,'_shatter_save_disadvantage',False)
         if self.is_player_target(target) and ability in ('strength','dexterity'):dis=dis or rules.gear.armor_penalty(target)
         advantage=active(target,'foresight',self.now()) or ability=='strength' and active(target,'conjure_animals_strength',self.now())
-        return rules.roll_save(self.combat_rng,bonus,dc,damage,half,advantage=advantage,disadvantage=dis)
+        if getattr(self,'_wizard_spell_source',None) is not None:advantage=advantage or self.wizard_spell_save_advantage(target)
+        return rules.roll_save(self.combat_rng,bonus,dc,damage,half,advantage=advantage,disadvantage=dis,fixed_roll=self.wizard_save_portent(target))
 
     def environment_ability_check(self,actor,ability,dc,skill=''):
         try:
@@ -355,4 +360,3 @@ class EnvironmentGame:
                 p.exhaustion=min(6,getattr(p,'exhaustion',0)+1)
                 if p.exhaustion>=6:self.damage_player(p,p.hp+p.temp_hp+10000,damage_type='suffocation')
                 self.caster_message(p,f'Brak powietrza! Wyczerpanie {p.exhaustion}/6. Wynurz się.')
-

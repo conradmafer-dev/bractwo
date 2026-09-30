@@ -26,7 +26,7 @@
   let groundChunks=new Map(), expansionTab='growth', expansionSignature='', selectedRune='fire', atlasMode='nearby', navigationGoal=null;
   let hotbarPage=0, hotbarMenu=null, pendingPointTarget=null;
   let atlasView=null, atlasController=null;
-  let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null, mobileHud=null, restUI=null, appShell=null, adventurePanel=null;
+  let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null, mobileHud=null, restUI=null, appShell=null, adventurePanel=null, servicePanel=null;
   let effects = new Map(), seenEffects = new Map(), floatingTexts = [];
   const touches = matchMedia("(pointer: coarse)").matches;
   const TAU = Math.PI * 2;
@@ -92,7 +92,7 @@
         selectedTarget = null; selectedEnemy = null; selectedWorldPoint = null; battleRows.clear(); ui.battleEnemies.replaceChildren(); pendingInvite = null; legacyPrompted = false; expansionSignature = ""; navigationGoal = null;
         trackedQuestId = readTrackedQuest();
         levelUpPanels?.reset(); atlasView=null; atlasController=null;
-        adventurePanel?.close(); inventorySignature = ""; playersSignature = ""; ui.sidePanel.hidden = true; characterSheet?.close(); lootPanel?.close(); merchantPanel?.close(); restUI?.close(); ui.helpPanel.hidden = true;
+        adventurePanel?.close();servicePanel?.close(); inventorySignature = ""; playersSignature = ""; ui.sidePanel.hidden = true; characterSheet?.close(); lootPanel?.close(); merchantPanel?.close(); restUI?.close(); ui.helpPanel.hidden = true;
         ui.legacyClassPanel.hidden = true; ui.partyInvite.hidden = true; ui.chatForm.hidden = true; ui.chatInput.blur(); ui.chatInput.value = ""; questSignature = "";
         ui.minimapCard.hidden = viewport.w < 560;
         updateRules();
@@ -252,10 +252,10 @@
     ui.movementStatus.textContent=`${world.surfaces?.[me.surface]?.name||'Trawa'} · ${Number(me.speed||100).toFixed(0)}${me.premium_demo?' · Premium test':''}${me.wind_remaining>0?' · Wiatr +15%':''}${me.ward_remaining>0?' · Osłona PvE':''}`;
     ui.regionName.textContent=(zone?.name||"Dzikie Pogranicze")+(me.floor?` · piętro ${me.floor>0?'+':''}${me.floor}`:"");
     const safe=inSafeZone(me), protectedLevel=me.level<(world.pvp_rules?.min_level||8);
-    ui.zoneStatus.textContent=safe?"Bezpieczna osada":protectedLevel?`Ochrona PvP do ${world.pvp_rules?.min_level||8}. poziomu`:"Teren otwarty · PvP z karami";
+    ui.zoneStatus.textContent=safe?((world.safe_zones||[]).some(z=>z.kind==='harbour'&&sameFloor(me,z)&&distance(me,z)<=z.radius)?'Bezpieczna przystań':'Bezpieczna osada'):protectedLevel?`Ochrona PvP do ${world.pvp_rules?.min_level||8}. poziomu`:"Teren otwarty · PvP z karami";
     const combat=Math.max(0,Number(me.combat_remaining)||0);
     ui.combatStatus.hidden=combat<=0;
-    ui.combatStatus.textContent=me.pvp_combat_remaining>0?`PvP: ${Math.ceil(me.pvp_combat_remaining)} s · wejście do osady zablokowane`:`Walka: ${Math.ceil(combat)} s · poczekaj z handlem i wylogowaniem`;
+    ui.combatStatus.textContent=me.pvp_combat_remaining>0?`PvP: ${Math.ceil(me.pvp_combat_remaining)} s · wejście do strefy ochrony zablokowane`:`Walka: ${Math.ceil(combat)} s · poczekaj z handlem i wylogowaniem`;
     ui.safetyButton.classList.toggle("danger",!safety); ui.safetyButton.setAttribute("aria-pressed",String(safety));
     ui.safetyButton.textContent=safety?"PvP: blokada ataku":"PvP: ataki włączone";
     ui.safetyButton.title=safety?"Wyłącz blokadę własnych ataków PvP":"Włącz blokadę własnych ataków PvP";
@@ -271,10 +271,10 @@
     ui.attackButton.title=(me.weapon_auto_attack===false?"Iskra różdżki tylko na Spację lub przycisk ataku. Zaznaczenie wybiera cel dla czarów i nie uruchamia Iskry. ":"Zaznaczenie uruchamia autoatak bronią. ")+`Atak [Spacja] · gotowość co ${me.action_duration||3} s · trafienie +${me.attack_bonus} · ${me.damage_dice} · KP ${me.armor_class}. Bez zaznaczania: najbliższy potwór w zasięgu. Oczekujący czar ma pierwszeństwo przed następnym atakiem.`;
     ui.combatRoll.hidden=!me.last_roll?.id;
     ui.combatRoll.textContent=Runtime.combatSummary(me.last_roll);
-    nearby=nearestStair() || nearestSite() || nearestNpc() || (merchantNear()?nearestMerchant():null); ui.interactPrompt.hidden=!nearby || !ui.sidePanel.hidden;
+    nearby=nearestStair() || nearestNpc() || nearestSite() || (merchantNear()?nearestMerchant():null); ui.interactPrompt.hidden=!nearby || !ui.sidePanel.hidden;
     ui.interactButton.classList.toggle("available",!!nearby);
     ui.interactName.textContent=nearby?.name||"Mieszkańcy Przystani";
-    ui.interactPrompt.querySelector("small").textContent=nearby?.to_floor!==undefined?"SCHODY · E":nearby?.action?"UŻYJ · E":nearby?.service?"USŁUGI MIEJSKIE":nearby?.id?"ROZMOWA I ZLECENIA":"HANDEL I ODPOCZYNEK";
+    ui.interactPrompt.querySelector("small").textContent=nearby?.to_floor!==undefined?"SCHODY · E":nearby?.action?"UŻYJ · E":nearby?.service==='binding_stone'?"PRZYPISANIE ODRADZANIA · E":nearby?.service?"USŁUGI · E":nearby?.id?"ROZMOWA I ZLECENIA":"HANDEL I ODPOCZYNEK";
     ui.deathPanel.hidden=me.hp>0;
     if(me.hp<=0){resetControls();const city=(world.cities||[]).find(c=>c.id===me.home_city)?.name||'Przystań';ui.deathText.textContent=`Miejsce odrodzenia: ${city}${me.respawn_in?` — powrót za ${Math.ceil(me.respawn_in)} s`:" — powrót…"}`;}
     ui.chooseClassButton.hidden=me.class_chosen!==false;
@@ -286,7 +286,7 @@
     updateEffects(target);
     updatePotionButtons();
     updateQuestTracker(); updateBattleList();
-    characterSheet?.render();merchantPanel?.render();adventurePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();
+    characterSheet?.render();merchantPanel?.render();adventurePanel?.render();servicePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();
     if(!ui.sidePanel.hidden){if(panelMode==="inventory")renderInventory();else if(panelMode==="journal")renderJournal();else if(panelMode==="progression")renderExpansion();else renderPlayers();}
   }
   function nearestNpc(){
@@ -490,7 +490,7 @@
       const target=actionButton("Cel PvP",()=>selectTarget(String(player.id)),false,"target-button");target.dataset.target=player.id;target.dataset.action="target";target.dataset.playerId=player.id;actions.append(invite,target);row.append(actions);ui.playersList.append(row);
     }
   }
-  function setPanel(mode){adventurePanel?.close();merchantPanel?.close();characterSheet?.close();panelMode=mode;ui.sidePanel.hidden=false;ui.inventoryView.hidden=mode!=="inventory";ui.playersView.hidden=mode!=="players";ui.journalView.hidden=mode!=="journal";ui.progressionView.hidden=mode!=="progression";ui.progressionTab.classList.toggle("active",mode==="progression");ui.journalTab.classList.toggle("active",mode==="journal");ui.inventoryTab.classList.toggle("active",mode==="inventory");ui.playersTab.classList.toggle("active",mode==="players");ui.minimapCard.hidden=true;updateHUD();}
+  function setPanel(mode){adventurePanel?.close();servicePanel?.close();merchantPanel?.close();characterSheet?.close();panelMode=mode;ui.sidePanel.hidden=false;ui.inventoryView.hidden=mode!=="inventory";ui.playersView.hidden=mode!=="players";ui.journalView.hidden=mode!=="journal";ui.progressionView.hidden=mode!=="progression";ui.progressionTab.classList.toggle("active",mode==="progression");ui.journalTab.classList.toggle("active",mode==="journal");ui.inventoryTab.classList.toggle("active",mode==="inventory");ui.playersTab.classList.toggle("active",mode==="players");ui.minimapCard.hidden=true;updateHUD();}
   function togglePanel(mode){if(!ui.sidePanel.hidden&&panelMode===mode){ui.sidePanel.hidden=true;updateHUD();}else setPanel(mode);}
   function selectTarget(id){selectedWorldPoint=null;selectedEnemy=null;selectedTarget=id;send({type:"select_target",target_id:id});playersSignature="";ui.sidePanel.hidden=true;updateHUD();notice("Cel: gracz. Po odblokowaniu PvP działają ataki, czary i wilk. Czary wsparcia działają na drużynę.");}
   function selectEnemy(id){
@@ -514,11 +514,27 @@
     ui.joystickKnob.style.transform = ""; ui.attackButton.classList.remove("held");
     if (playing) send({ type: "input", x: 0, y: 0 });
   }
-  function talkTo(npc){if(npc.dialogue||npc.service==='boat'){adventurePanel.open(npc);return;}if(npc.service==='merchant'){merchantPanel.open();return;}if(npc.service){openExpansion(npc.service==='master'?'growth':'services');return;}adventurePanel.open(npc);}
-  function interact(){if(!canControl())return;if(adventurePanel?.visible){adventurePanel.close();return;}if(merchantPanel?.visible){merchantPanel.close();return;}if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}const nature=(world.nature_sites||[]).find(s=>sameFloor(me,s)&&distance(me,s)<=110);if(nature){send({type:'nature_interact',id:nature.id});return;}const stair=nearestStair();if(stair){send({type:'descend'});return;}if(nearestSite()){send({type:'interact'});return;}const npc=nearestNpc();if(npc){talkTo(npc);}else if(merchantNear()){merchantPanel.open();}else openExpansion('atlas');}
+  function talkTo(npc){
+    if(npc.service==='merchant'){merchantPanel.open(npc);return;}
+    if(globalThis.BractwoServiceUI.menus[npc.service]){servicePanel.open(npc);return;}
+    adventurePanel.open(npc);
+  }
+  function interact(){
+    if(!canControl())return;
+    for(const panel of [servicePanel,adventurePanel,merchantPanel])if(panel?.visible){panel.close();return;}
+    if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}
+    const npc=nearestNpc();
+    if(npc?.service==='binding_stone'){talkTo(npc);return;}
+    const nature=(world.nature_sites||[]).find(s=>sameFloor(me,s)&&distance(me,s)<=110);
+    if(nature){send({type:'nature_interact',id:nature.id});return;}
+    if(nearestStair()){send({type:'descend'});return;}
+    if(npc){talkTo(npc);return;}
+    if(nearestSite()){send({type:'interact'});return;}
+    if(merchantNear())merchantPanel.open(nearestMerchant());else openExpansion('atlas');
+  }
   function ability(){if(canControl())cast(me.favorite_spell||world.classes?.[me.class_id]?.default_ability);}
   function potion(item){if(playing&&me?.hp>0)send({type:"potion",item});}
-  function toggleHelp(){merchantPanel?.close();characterSheet?.close();ui.helpPanel.hidden=!ui.helpPanel.hidden;}
+  function toggleHelp(){servicePanel?.close();adventurePanel?.close();merchantPanel?.close();characterSheet?.close();ui.helpPanel.hidden=!ui.helpPanel.hidden;}
   function openChat(){
     if(!playing)return; resetControls(); ui.chatForm.hidden=false;
     ui.chatForm.parentElement.classList.add("writing"); ui.chatInput.focus({preventScroll:true});
@@ -581,7 +597,8 @@
     if(!playing||mobileHud?.blocksControls()||restUI?.blocksControls()||appShell?.blocksControls())return;
     if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton, #hotbarGroupMenu button, .hotbar-group-toggle'))return;
     if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
-    if(event.target.closest?.('#adventurePanel button')&&['Enter','Space'].includes(event.code))return;
+    if(event.target.closest?.('#adventurePanel button, #servicePanel button, #merchantPanel button')&&['Enter','Space'].includes(event.code))return;
+    if(servicePanel?.visible&&event.code==='Escape'){event.preventDefault();servicePanel.close();return;}
     if(adventurePanel?.visible&&event.code==='Escape'){event.preventDefault();adventurePanel.close();return;}
     if(merchantPanel?.visible&&event.code==='Escape'){event.preventDefault();merchantPanel.close();return;}
     if(lootPanel?.visible&&event.code==='Escape'){event.preventDefault();lootPanel.close();return;}
@@ -758,11 +775,13 @@
       root.append(element('p','panel-tip','Twoje statystyki i rzuty znajdziesz w C → Statystyki. Poniżej rozwój wyłącznie Twojej klasy.'));
       root.append(element('div','section-label','KOLEJNE MOŻLIWOŚCI'));
       for(const m of world.class_progression?.[me.class_id]||[])guideRow(root,`${me.level>=m.level?'✓':'◇'} Poziom ${m.level} · ${m.name}`,m.description);
-      const can=!!nearbyService('master')&&!me.combat_remaining;
-      guideRow(root,'Promocja profesji',me.promoted?'Masz wyższą rangę. Mistrzostwo od poziomu 50.':'Poziom 20 · 2000 złota · porozmawiaj z mistrzem w mieście.',[actionButton(me.promoted?'✓ Promowany':'Kup promocję',()=>send({type:'promote'}),!can||me.promoted||me.level<20||me.gold<2000)]);
-      root.append(element('p','muted',`Punkty specjalizacji: ${me.mastery_points||0}. Pierwszy na poziomie 50, kolejne co 5 poziomów. Wymagana promocja. Punkt przydzielisz poza walką w C → Statystyki.`));
+      const can=!!nearbyService('master')&&!me.combat_remaining&&me.hp>0;
+      const promotionLevel=me.promotion?.required_level??10,promotionCost=me.promotion?.cost??2000;
+      const circleBenefit=me.class_id==='druid'?' Odblokowuje wybór kręgu w C → Atuty.':me.class_id==='mage'?' Odblokowuje wybór szkoły czarodzieja w C → Atuty.':'';
+      guideRow(root,'Promocja profesji',me.promoted?'Masz wyższą rangę.'+circleBenefit+' Mistrzostwo od poziomu 50.':`Poziom ${promotionLevel} · ${promotionCost} złota · porozmawiaj z mistrzem w mieście.`+circleBenefit,[actionButton('Porozmawiaj z mistrzem',()=>servicePanel.open(nearbyService('master')),!can)]);
+      root.append(element('p','muted',`Punkty mistrzostwa: ${me.mastery_points||0}. Pierwszy na poziomie 50, kolejne co 5 poziomów. Wymagana promocja. Punkt przydzielisz poza walką w C → Statystyki.`));
       for(const[key,name,detail]of[['power','Potęga',me.class_id==='mage'?'Nie wzmacnia Iskry ani czarów.':'Ataki bronią +1 obrażeń co 10 punktów, maksymalnie +2. Bez premii do przemian i czarów.'],['focus','Skupienie','+4 maksymalnej many za punkt']])guideRow(root,`${name} · ${me.mastery?.[key]||0}/20`,detail,[actionButton('Dodaj punkt',()=>send({type:'mastery',branch:key}),me.combat_remaining>0||!me.promoted||me.level<50||!me.mastery_points||(me.mastery?.[key]||0)>=20)]);
-      root.append(actionButton('Wyzeruj specjalizację · 200 zł',()=>send({type:'mastery_reset'}),!can||me.gold<200||!Object.values(me.mastery||{}).some(n=>n>0)));
+      
     }else if(expansionTab==='atlas'){
       root.append(element('p','panel-tip',`${(world.regions||[]).length} krain · ${(world.cities||[]).length} miast. Poziomy krain to zalecenie. Mapa nie zamyka się po kliknięciu.`));
       if(!atlasView)atlasView=new globalThis.BractwoAtlas.View(world.width,world.height);
@@ -786,34 +805,14 @@
       guideRow(root,me.premium_demo?'Testowe premium aktywne':'Wypróbuj szybki marsz',me.premium_demo?`Pozostało ${Math.ceil(me.premium_demo_remaining/86400)} dni. Bonus łączy się z podłożem i czarem przyspieszenia.`:'Włącz na 30 dni; możesz w każdej chwili wyłączyć.',[actionButton(me.premium_demo?'Wyłącz symulację':'Włącz bezpłatną symulację',()=>send({type:'premium_demo',enabled:!me.premium_demo}))]);
       guideRow(root,'Podłoże ma znaczenie','Ścieżka +18% · kamień +25% · trawa normalnie · ściółka −6% · piasek −14% · śnieg −12% · błoto −28%. Podłoże wpływa również na potwory.');
     }else{
-      const safe=me.hp>0&&!me.combat_remaining,bank=nearbyService('bank'),master=nearbyService('master'),captain=nearbyService('boat');
-      root.append(element('p','panel-tip',me.combat_remaining>0?'Trwa blokada po walce. Zaczekaj przed usługami.':'Usługi wymagają rozmowy z odpowiednim mieszkańcem. Atlas pokazuje miasta.'));
-      const city=(world.cities||[]).filter(c=>sameFloor(me,c)).sort((a,b)=>distance(me,a)-distance(me,b))[0];
-      for(const[service,labelText]of[['boat','Przewoźnik — miejscowe przeprawy'],['bank','Bankier — depozyt'],['master','Mistrz — promocja i błogosławieństwo'],['merchant','Kupiec — zapasy']]){
+      root.append(element('p','panel-tip','Porozmawiaj z wybraną postacią. Każda usługa otwiera własny panel po prawej.'));
+      for(const[service,labelText]of[['boat','Przeprawy'],['bank','Bank i depozyt'],['master','Mistrz profesji'],['binding_stone','Kamień przypisania'],['merchant','Kupiec']]){
         const n=service==='merchant'?nearestMerchant():(world.npcs||[]).filter(n=>n.service===service).sort((a,b)=>distance(me,a)-distance(me,b))[0];
-        if(n)root.append(actionButton(`${labelText} · ${directionTo(n)}`,()=>navigateTo(n,n.name)));
+        if(n)guideRow(root,labelText,`${n.name} · ${directionTo(n)}`,[actionButton('Pokaż drogę',()=>navigateTo(n,n.name)),actionButton('Otwórz',()=>talkTo(n),!sameFloor(me,n)||distance(me,n)>(n.radius||125))]);
       }
-      root.append(element('div','section-label','MIEJSCOWE PRZEPRAWY'));
-      if(!captain)root.append(element('p','muted','Podejdź do przewoźnika, aby zobaczyć połączenia z tego portu. Porty i szlaki znajdziesz w Atlasie.'));
-      for(const route of (world.sea_routes||[]).filter(r=>captain?.routes?.includes(r.id))){
-        const port=(world.ports||[]).find(p=>p.id===route.to_id);if(!port)continue;
-        const reason=BractwoAdventureUI.boatReason(me,captain,route);
-        guideRow(root,port.name,BractwoAdventureUI.routeText(route)+(reason?' · '+reason:''),[actionButton('Wypłyń',()=>send({type:'boat',route_id:route.id}),!!reason)]);
-      }
-      guideRow(root,`Bank · ${formatNumber(me.bank_gold)} złota`,'Złoto w banku i przedmioty w depozycie nie przepadają przy śmierci.',[
-        actionButton('Wpłać wszystko',()=>send({type:'bank_deposit',amount:'all'}),!bank||!safe||me.gold<1),
-        actionButton('Wypłać 100',()=>send({type:'bank_withdraw',amount:100}),!bank||!safe||me.bank_gold<100),
-        actionButton('Wypłać wszystko',()=>send({type:'bank_withdraw',amount:'all'}),!bank||!safe||me.bank_gold<1)]);
-      guideRow(root,'Miejsce odrodzenia',`${(world.cities||[]).find(c=>c.id===me.home_city)?.name||'Przystań'} · Miasto zapisuje się automatycznie po odwiedzeniu.`,[]);
-      guideRow(root,'Błogosławieństwo',me.blessed?'Aktywne do następnej śmierci. Czerwona czaszka wyłącza ochronę.':'Poz. 40 · 500 zł · połowa zwykłej kary złota i PD przy następnej śmierci.',[actionButton('Kup błogosławieństwo',()=>send({type:'bless'}),!master||!safe||me.level<40||me.gold<500||me.blessed)]);
-      root.append(element('div','section-label',`DEPOZYT · ${(me.depot||[]).length}/120`));
-      for(const item of me.inventory||[])if(!Object.values(me.equipment||{}).includes(item.uid))guideRow(root,item.name,'W plecaku',[actionButton('Odłóż do depozytu',()=>send({type:'depot_store',uid:item.uid}),!bank||!safe||(me.depot||[]).length>=120)]);
-      for(const item of me.depot||[])guideRow(root,item.name,'W depozycie',[actionButton('Zabierz',()=>send({type:'depot_take',uid:item.uid}),!bank||!safe||(me.inventory||[]).length>=40)]);
-      root.append(element('div','section-label','MIKSTURY NA DALSZE WYPRAWY'));
-      for(const[id,s]of Object.entries(world.potions||{})){
-        const count=me.potions?.[id]||0;
-        guideRow(root,`${s.name} · ${count}`,`${world.items?.[id]?.effect_summary||'Mikstura leczenia'} · akcja dodatkowa · ${s.price} złota. Skrót Q ustawisz w plecaku.`,[actionButton('Kup',()=>send({type:'buy',item:id}),!me.merchant?.stock?.includes(id)||!safe||me.gold<s.price||count>=99)]);
-      }
+      guideRow(root,'Przypisane odrodzenie',(world.cities||[]).find(c=>c.id===me.home_city)?.name||'Przystań',[]);
+      root.append(element('p','muted','Miejsce odrodzenia zmienisz wyłącznie przy kamieniu przypisania.'));
+
     }
   }
   function buildStaticIndex(){
@@ -940,9 +939,26 @@
     const x=v.x,y=v.y,dragon=spec.appearance==='dragon',boss=spec.boss,color=spec.color||'#d18573';
     if(!inView(x,y)||v.entity.hp<=0)return;
     ctx.save();ctx.translate(x,y);ctx.scale(spec.size||1,spec.size||1);ellipse(ctx,0,4,28,11,'#20232666');
+    if(!dragon){
+      // Keep demons humanoid even while their animated sheet is still loading.
+      const step=Math.round(Math.sin(v.move*8)*2),horn='#e4c38d';
+      line(ctx,[[13,-8],[30,4],[38,-7],[36,-18]],color,5);
+      for(const side of[-1,1]){const swing=side*step;
+        block(ctx,side*11-5,-8+swing,10,19,color);block(ctx,side*12-7,7+swing,14,6,'#352c38');
+        line(ctx,[[side*14,-39],[side*24,-28+swing],[side*27,-13+swing]],color,9);
+        for(let claw=0;claw<3;claw++)line(ctx,[[side*(24+claw*3),-13+swing],[side*(25+claw*3),-5+swing]],horn,2);
+        line(ctx,[[side*10,-56],[side*22,-60],[side*24,-70]],horn,5);
+      }
+      block(ctx,-16,-43,32,35,color);block(ctx,-11,-36,22,10,'#e5997888');
+      block(ctx,-15,-12,30,10,'#45323e');block(ctx,-4,-11,8,7,horn);
+      block(ctx,-12,-61,24,25,color);block(ctx,-8,-53,5,3,'#ffdf86');block(ctx,4,-53,5,3,'#ffdf86');
+      block(ctx,-6,-43,13,4,'#312633');block(ctx,-5,-43,3,5,horn);block(ctx,3,-43,3,5,horn);
+      if(boss){line(ctx,[[34,-61],[34,10]],horn,3);line(ctx,[[27,-65],[27,-52],[34,-47],[41,-52],[41,-65]],horn,3);}
+    }else{
     const wing=Math.sin(t*4+x)*6;
     for(const side of[-1,1]){ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(side*8,-35);ctx.lineTo(side*55,-65-wing);ctx.lineTo(side*42,-20);ctx.lineTo(side*17,-9);ctx.closePath();ctx.fill();line(ctx,[[side*8,-35],[side*55,-65-wing],[side*31,-25]],'#553f54',2);block(ctx,side*11-4,-1,10,12,'#68535e');}
-    block(ctx,-17,-38,34,39,color);block(ctx,-11,-33,21,24,dragon?'#d3b878':'#bca3bf');block(ctx,-13,-61,27,26,color);block(ctx,-18,-66,7,16,'#d9c88e');block(ctx,12,-66,7,16,'#d9c88e');block(ctx,-8,-54,5,4,'#fff088');block(ctx,5,-54,5,4,'#fff088');block(ctx,-5,-44,14,3,'#3d3541');if(dragon)line(ctx,[[-8,-7],[-30,4],[-54,-4]],color,10);ctx.restore();
+    block(ctx,-17,-38,34,39,color);block(ctx,-11,-33,21,24,'#d3b878');block(ctx,-13,-61,27,26,color);block(ctx,-18,-66,7,16,'#d9c88e');block(ctx,12,-66,7,16,'#d9c88e');block(ctx,-8,-54,5,4,'#fff088');block(ctx,5,-54,5,4,'#fff088');block(ctx,-5,-44,14,3,'#3d3541');line(ctx,[[-8,-7],[-30,4],[-54,-4]],color,10);
+    }ctx.restore();
     const yy=y-85*(spec.size||1);label(v.entity.name,x,yy,'#ffddb7',11);block(ctx,x-26,yy+9,52,5,'#3b323a');block(ctx,x-25,yy+10,50*v.entity.hp/v.entity.max_hp,3,'#e8896c');
   }
 
@@ -1208,6 +1224,14 @@
   }
   function drawNPC(npc,t){
     if(!inView(npc.x,npc.y,npc.service==='boat'?400:100))return;
+    if(npc.service==='binding_stone'){
+      const bound=me?.home_city===npc.city_id,x=npc.x,y=npc.y;
+      ctx.save();ctx.shadowColor=bound?'#9de8ca':'#93c9e6';ctx.shadowBlur=12+Math.sin(t*2)*3;
+      ellipse(ctx,x,y+5,25,10,'#7bad9766');ctx.fillStyle='#526967';ctx.strokeStyle='#b9c6ad';ctx.lineWidth=2;
+      ctx.beginPath();ctx.moveTo(x-16,y);ctx.lineTo(x-12,y-42);ctx.lineTo(x,y-58);ctx.lineTo(x+14,y-42);ctx.lineTo(x+18,y);ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.shadowBlur=0;line(ctx,[[x,y-45],[x-7,y-32],[x,y-19],[x+7,y-32],[x,y-45]],bound?'#baf6c3':'#a8d6fa',2.5);line(ctx,[[x,y-19],[x,y-8]],'#a8d6fa',2);
+      ctx.restore();label(bound?'✓ Kamień przypisania':'Kamień przypisania',x,y-70,bound?'#c7f2b9':'#d7e5dc',10);return;
+    }
     if(npc.service==='boat'){
       const sx=npc.shore_x??npc.x+58,sy=npc.shore_y??npc.y+20,dx=sx-npc.x,dy=sy-npc.y,len=Math.hypot(dx,dy)||1,nx=dx/len,ny=dy/len;
       line(ctx,[[npc.x,npc.y],[sx,sy]],'#664b33',34);line(ctx,[[npc.x,npc.y],[sx,sy]],'#b28956',28);
@@ -1323,7 +1347,7 @@
     const e=v.entity,x=v.x,y=v.y,spec=e.kind==='giant_crocodile'?{...world.enemy_types?.crocodile,size:1.6}:world.enemy_types?.[e.kind]||{},kind=spec.appearance||e.kind;
     if(!inView(x,y)||e.alive===false||e.hp<=0)return;
     if(String(e.id)===selectedEnemy){const z=Number(e.size)||spec.size||1;ctx.strokeStyle='#f05942';ctx.lineWidth=2;ctx.strokeRect(x-30*z,y-62*z,60*z,70*z);}
-    const custom=globalThis.BractwoCircleVFX?.form(ctx,x,y,e,t)||globalThis.BractwoCasterVFX.actor(ctx,v,t);
+    const custom=globalThis.BractwoWizardVFX?.actor(ctx,v,t)||globalThis.BractwoCircleVFX?.form(ctx,x,y,e,t)||globalThis.BractwoCasterVFX.actor(ctx,v,t);
     if(custom){if(!e.is_companion&&!e.is_familiar){label(e.name||e.kind,x,y-72,'#e5dbc1',9);block(ctx,x-20,y-65,40,4,'#3a453d');block(ctx,x-19,y-64,38*Math.max(0,e.hp/e.max_hp),2,'#e87955');}return;}
     if(spec.sprite&&globalThis.BractwoLootUI.drawMonster(ctx,v,spec,snapshot.time)){
       const z=spec.size||1,yy=y-78*z,w=spec.boss?64:42;
@@ -1413,6 +1437,7 @@
       const x=e.x,y=e.y-17,tx=e.target_x??e.x,ty=(e.target_y??e.y)-17,angle=Math.atan2(ty-y,tx-x);
       ctx.save();
       if(globalThis.BractwoFighterVFX.draw(ctx,e,q)){ctx.restore();continue;}
+      if(globalThis.BractwoWizardVFX?.draw(ctx,e,q,now/1000)){ctx.restore();continue;}
       if(globalThis.BractwoSpellVFX.draw(ctx,e,q,now/1000)){ctx.restore();continue;}
       const enemyColor=({stone:'#d5bf8a',arrow:'#f5d48d',venom:'#b4dd68',fire:'#ff9856',ice:'#9ae1f6',shadow:'#ce9ee7',arcane:'#9ccaf2',feather:'#e3d9bd'})[e.element||e.kind.replace('enemy_','')]||'#efbd8c';
       if(e.kind==='combat_roll'){
@@ -1505,7 +1530,7 @@
     camera.x=Math.max(Math.min(halfW,world.width/2),Math.min(world.width-Math.min(halfW,world.width/2),camera.x));camera.y=Math.max(Math.min(halfH,world.height/2),Math.min(world.height-Math.min(halfH,world.height/2),camera.y));
     ctx.setTransform(viewport.dpr,0,0,viewport.dpr,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle="#668b48";ctx.fillRect(0,0,viewport.w,viewport.h);
     ctx.save();ctx.translate(Math.round(viewport.w/2),Math.round(viewport.h/2));ctx.scale(camera.scale,camera.scale);ctx.translate(-Math.round(camera.x),-Math.round(camera.y));
-    drawGround();globalThis.BractwoCasterVFX.world(ctx,world,me,snapshot,t);if(!(me?.floor)){drawWaterways(t);drawRiver(t);drawSafeZone();drawVillage(t);}
+    drawGround();globalThis.BractwoWizardVFX?.fields(ctx,snapshot.players||[],me,t);globalThis.BractwoCasterVFX.world(ctx,world,me,snapshot,t);if(!(me?.floor)){drawWaterways(t);drawRiver(t);drawSafeZone();drawVillage(t);}
     globalThis.BractwoCircleVFX?.fields(ctx,(snapshot.circle_fields||[]).filter(f=>sameFloor(me,f)&&inView(f.x,f.y,Math.max(150,f.radius||0,f.length||0))),t);
     const objects=[];
     for(const entry of nearbyDrawables()){
@@ -1522,7 +1547,7 @@
       if(entry.kind==='camp'&&inView(o.x,o.y,150))objects.push({y:o.y,draw:()=>drawCamp(o,t)});
     }
     objects.sort((a,b)=>a.y-b.y);for(const o of objects)o.draw();
-    for(const v of visuals.values())if(v.entity.hp>0&&sameFloor(me,v.entity)&&inView(v.x,v.y)){globalThis.BractwoSpellVFX.drawStatuses(ctx,v.entity.status_effects||[],v.x,v.y,t,v.entity.size||1);globalThis.BractwoFighterVFX.statuses(ctx,v.entity,v.x,v.y,t);globalThis.BractwoCasterVFX.statuses(ctx,v.entity,v.x,v.y,t);}
+    for(const v of visuals.values())if(v.entity.hp>0&&sameFloor(me,v.entity)&&inView(v.x,v.y)){globalThis.BractwoSpellVFX.drawStatuses(ctx,v.entity.status_effects||[],v.x,v.y,t,v.entity.size||1);globalThis.BractwoFighterVFX.statuses(ctx,v.entity,v.x,v.y,t);globalThis.BractwoCasterVFX.statuses(ctx,v.entity,v.x,v.y,t);globalThis.BractwoWizardVFX?.statuses(ctx,v.entity,v.x,v.y,t);}
     drawGoal();drawTreeTargets(t);drawWorldPoint(t);drawEffects(now);drawParticles(dt);for(const v of visuals.values())if(v.kind==="p"&&sameFloor(me,v.entity))drawSpeech(v,now);
     ctx.restore();drawMinimap();
     if(playing&&lastSnapshotAt&&now-lastSnapshotAt>5000)ui.connectionStatus.textContent="BRAK ODPOWIEDZI";else if(playing&&ui.connectionStatus.textContent!==" ONLINE")ui.connectionStatus.innerHTML="<i></i> ONLINE";
@@ -1643,23 +1668,27 @@
     beginPointAction,
     studyTarget:()=>selectedEnemy?{enemy_id:selectedEnemy}:selectedTarget?{target_id:selectedTarget}:null,
     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
-    prepare:()=>{adventurePanel?.close();merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
+    prepare:()=>{adventurePanel?.close();servicePanel?.close();merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
     changed:()=>{if(me)updateHUD();}
   });
   merchantPanel=globalThis.BractwoInventoryUI.createMerchant({state:()=>({player:me,world}),send,rest:()=>restUI.open(),
     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
-    prepare:()=>{adventurePanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+    prepare:()=>{adventurePanel?.close();servicePanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   adventurePanel=globalThis.BractwoAdventureUI.create({state:()=>({player:me,world}),send,
-    trade:()=>merchantPanel.open(),services:s=>openExpansion(s==='master'?'growth':'services'),
+    trade:npc=>merchantPanel.open(npc),services:npc=>servicePanel.open(npc),
     track:id=>{saveTrackedQuest(id);navigationGoal=null;updateHUD();},
     prepare:()=>{resetControls();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+  servicePanel=globalThis.BractwoServiceUI.create({state:()=>({player:me,world}),send,
+    character:tab=>characterSheet.open(tab),conversation:npc=>adventurePanel.open(npc),
+    prepare:()=>{resetControls();closeChat();adventurePanel?.close();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   hudWindows=globalThis.BractwoWindows.create({stop:resetControls,levelLayout:()=>levelUpPanels?.layout()});
   fighterPrompt=globalThis.BractwoFighterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
   casterPrompt=globalThis.BractwoCasterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
   mobileHud=globalThis.BractwoMobile.create({stop:resetControls,closeChat});
   restUI=globalThis.BractwoRestUI.create({state:()=>({player:me,world}),send,notice,stop:resetControls,clearTarget,
-    prepare:()=>{adventurePanel?.close();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+    prepare:()=>{adventurePanel?.close();servicePanel?.close();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   appShell=globalThis.BractwoAppShell.create({stop:()=>{resetControls();closeChat();restUI.close();}});
+  globalThis.BractwoHUDIcons.apply(document);
   ui.closeEffectDetail.addEventListener('click',()=>{ui.effectDetail.hidden=true;});
   let selectedEffectId='',effectActionPacket=null;
   ui.escapeRestraint.addEventListener('click',()=>{if(effectActionPacket&&!ui.escapeRestraint.disabled&&!ui.escapeRestraint.hidden)send({...effectActionPacket});});

@@ -86,6 +86,7 @@ def resolve(p, key, *, automatic=False, active=True):
     base-rank Guiding Bolt can falsely appear as a damage loss on level-up.
     """
     s = copy.deepcopy(dnd.SPELLS[key])
+    if key=='wizard_phantasm' and not automatic and not getattr(p,'wizard_school_state',{}).get('phantasm_spent',0):s['mana']=0
     options = circle_options(p, key)
     selected = getattr(p, 'spell_circle_choices', {}).get(key, 0)
     rank = (selected if not automatic and selected in options else options[-1]) if options else s['circle']
@@ -250,7 +251,12 @@ def client_profiles(p):
         from . import druid_circles as dc, rest_rules
     except ImportError:
         import druid_circles as dc, rest_rules
-    signature+=(p.form,dc.circle(p),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),repr(getattr(p,'druid_circle_state',{})),repr(getattr(p,'rest_resources',{})))
+    wizard_live=getattr(p,'wizard_school_runtime',{})
+    signature+=(getattr(p,'promoted',False),getattr(p,'wizard_school',''),repr(getattr(p,'wizard_school_state',{})),
+        wizard_live.get('decoy_until',0)>getattr(p,'current_wall_time',0),
+        wizard_live.get('shelter',{}).get('until',0)>getattr(p,'current_wall_time',0),
+        tuple(sorted(k for k,v in p.buffs.items() if k.startswith('wizard_') and v.get('until',0)>getattr(p,'current_wall_time',0))),
+        p.form,dc.circle(p),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),repr(getattr(p,'druid_circle_state',{})),repr(getattr(p,'rest_resources',{})))
     cache=getattr(p,'_spell_profiles_cache',None)
     if cache and cache[0]==signature:
         return cache[1]
@@ -278,6 +284,19 @@ def client_profiles(p):
             if key=='guiding_bolt' and dc.circle(p)=='stars' and dc.feature_remaining(p,'guiding_bolt') and dc.state(p).get('map_equipped',True):result[key]['mana']=0
             if dc.circle(p)=='land' and p.level>=25 and dc.state(p).get('natural_free_armed') and not dc.spent(p,'natural_free') and key in dc.bonus_spells(p) and spec.get('circle',0)>0:result[key]['mana']=0
         result[key]['cast_in_form']=dc.circle(p)=='moon' and key in dc.bonus_spells(p)
+        if key.startswith('wizard_'):
+            try: from . import wizard_schools as ws
+            except ImportError: import wizard_schools as ws
+            state=ws.state(p)
+            if key=='wizard_phantasm':result[key]['mana']=0 if not state.get('phantasm_spent',0) else 30
+            uses={'wizard_decoy':('decoy_spent',2,'Sobowtór'), 'wizard_shelter':('shelter_spent',1,'Urzeczywistniona osłona'), 'wizard_third_eye':('third_eye_used',1,'Trzecie oko')}
+            if key in uses:
+                field,maximum,name=uses[key]
+                result[key].update(uses_remaining=max(0,maximum-state.get(field,0)),uses_maximum=maximum,resource_cost=1,resource_name=name)
+            if key=='wizard_ward_recharge':result[key]['already_active']=not state.get('ward_created') or state.get('ward_hp',0)>=ws.ward_max(p)
+            if key=='wizard_self_restore':result[key]['already_active']=not state.get('self_spent',0)
+            if key=='wizard_decoy':result[key]['already_active']=ws.runtime(p).get('decoy_until',0)>getattr(p,'current_wall_time',0)
+            if key=='wizard_shelter':result[key]['already_active']=ws.runtime(p).get('shelter',{}).get('until',0)>getattr(p,'current_wall_time',0)
         if key in rest_rules.NAMES:
             result[key]['uses_remaining']=rest_rules.remaining(p,key)
             result[key]['uses_maximum']=rest_rules.maximum(p,key)

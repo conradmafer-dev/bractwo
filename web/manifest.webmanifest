@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Bractwo — Pogranicze",
-  "short_name": "Bractwo",
-  "description": "Bractwo — Pogranicze. Gra RPG online. Wymaga połączenia z internetem.",
+  "name": "Bractwo Krain",
+  "short_name": "Bractwo Krain",
+  "description": "Bractwo Krain. Gra RPG online. Wymaga połączenia z internetem.",
   "lang": "pl",
   "start_url": "/",
   "scope": "/",
@@ -10,7 +10,17 @@
   "background_color": "#10231e",
   "theme_color": "#10231e",
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

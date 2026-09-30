@@ -1,0 +1,16 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "tests.test_promotion_ui23",
+    "tests.test_druid_circles_0818",
+    "tests.test_druid_circle_spells_0818",
+    "tests.test_level_up_086",
+    "tests.test_app_shell_http_0818",
+    "tests.test_railway"
+  ],
+  "exit_code": 1,
+  "seconds": 12.1,
+  "report": "python.txt"
+}

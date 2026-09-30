@@ -1,0 +1,57 @@
+{
+  "version": "0.8.18",
+  "ui_revision": "UI_24",
+  "based_on": "BRACTWO_0.8.18_UI_23_FULL_SOURCE.zip",
+  "finished_at_utc": "2026-09-30T01:40:18.041017+00:00",
+  "status": "PASS — selected release checks",
+  "features": [
+    "Four playable wizard schools: Evocation, Abjuration, Divination and Illusion; milestones10/25/45/65.",
+    "Permanent server-authoritative school choice requires level10 and purchased promotion; UI previews before eligibility.",
+    "School choice, spent resources, ward HP and portent dice persist; reconnect does not replenish resources or bypass portent turn limit.",
+    "Combat integration covers wards, concentration, PvP support/protection, rolled damage, reactions, saves, companions and rests.",
+    "Own icons, school controls, hotbar support, live cooldown/resource readiness and authoritative persistent visual effects.",
+    "Visibility bug corrected: a blinded observer does not become hidden; Third Eye respects blindness and walls.",
+    "Google account limit4, druid circles, UI23 promotion and distinct demon art retained."
+  ],
+  "results": {
+    "python_unique_tests": 212,
+    "python_main_suite": 172,
+    "pvp_selected": 39,
+    "post_fix_visibility_rerun": 25,
+    "post_fix_new_unique_test": 1,
+    "javascript_tests": 151,
+    "browser_checks": 20,
+    "browser_javascript_exceptions": 0,
+    "syntax_files": 37
+  },
+  "reports": [
+    "browser-wizard-packets.json",
+    "browser_results.json",
+    "browser_visual_results.json",
+    "javascript.json",
+    "javascript.txt",
+    "pvp.json",
+    "pvp.txt",
+    "pvp_initial.json",
+    "pvp_initial.txt",
+    "python.json",
+    "python.txt",
+    "source_changes.json",
+    "syntax.json",
+    "visibility_retest.json",
+    "visibility_retest.txt"
+  ],
+  "corrections": [
+    "Initial PvP check found38/39 passing. The pre-existing blindness visibility bug was fixed; final39/39 passed. Initial log preserved in pvp_initial.*.",
+    "Post-fix offense/environment25/25 includes24 existing checks from the172-test main suite and1 new unique blindness/Third Eye regression; unique counts do not double-count reruns.",
+    "Browser QA found school filtering and readiness details; final focused7/7 confirms active decoy and action cooldown button behavior."
+  ],
+  "limits": [
+    "School abilities are explicit Bractwo adaptations, not a claim of complete tabletop rule parity.",
+    "Only listed suites are claimed passing. Exploratory historical test_dnd run had failures in old catalogue/stat/class metadata and password login expectations; it is not the current release gate.",
+    "Selected PvP regressions exclude obsolete all-catalogue class_ids enumeration, password WebSocket auth and the35-unit spike movement assertion; exclusions are listed in pvp.txt.",
+    "Browser uses an isolated database, fixtures and explicit fake Google provider. No production Google sign-in or Railway deployment performed.",
+    "Desktop and touch viewport emulation; not a physical phone test.",
+    "Historical Godot client is retained but has no Google authentication integration or new APK; no Godot runtime verification."
+  ]
+}

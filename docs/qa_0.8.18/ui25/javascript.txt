@@ -1,0 +1,1007 @@
+TAP version 13
+# Subtest: fullscreen is requested by a click and browser events synchronize every control
+ok 1 - fullscreen is requested by a click and browser events synchronize every control
+  ---
+  duration_ms: 3.373031
+  type: 'test'
+  ...
+# Subtest: fullscreen denial opens dismissible help, stops movement and permits retry
+ok 2 - fullscreen denial opens dismissible help, stops movement and permits retry
+  ---
+  duration_ms: 1.353921
+  type: 'test'
+  ...
+# Subtest: iPhone without fullscreen receives honest Add to Home Screen instructions
+ok 3 - iPhone without fullscreen receives honest Add to Home Screen instructions
+  ---
+  duration_ms: 0.885545
+  type: 'test'
+  ...
+# Subtest: accepted install prompt does not falsely report completed installation
+ok 4 - accepted install prompt does not falsely report completed installation
+  ---
+  duration_ms: 1.360671
+  type: 'test'
+  ...
+# Subtest: dismissed install consumes the prompt and the next click offers manual help
+ok 5 - dismissed install consumes the prompt and the next click offers manual help
+  ---
+  duration_ms: 1.007597
+  type: 'test'
+  ...
+# Subtest: standalone mode hides install affordances and worker only registers on secure origins
+ok 6 - standalone mode hides install affordances and worker only registers on secure origins
+  ---
+  duration_ms: 1.643982
+  type: 'test'
+  ...
+# Subtest: worker precaches only disconnected page and icons, and preserves unrelated caches
+ok 7 - worker precaches only disconnected page and icons, and preserves unrelated caches
+  ---
+  duration_ms: 2.051387
+  type: 'test'
+  ...
+# Subtest: worker never intercepts game code, API, credential POST or cross-origin requests
+ok 8 - worker never intercepts game code, API, credential POST or cross-origin requests
+  ---
+  duration_ms: 1.223738
+  type: 'test'
+  ...
+# Subtest: navigation loads fresh HTML online and falls back to disconnected page offline
+ok 9 - navigation loads fresh HTML online and falls back to disconnected page offline
+  ---
+  duration_ms: 1.915626
+  type: 'test'
+  ...
+# Subtest: first druid path does not require a master
+ok 10 - first druid path does not require a master
+  ---
+  duration_ms: 1.353741
+  type: 'test'
+  ...
+# Subtest: reselection requires master
+ok 11 - reselection requires master
+  ---
+  duration_ms: 0.199386
+  type: 'test'
+  ...
+# Subtest: dead, combat, transformed and non-druid cannot pick path
+ok 12 - dead, combat, transformed and non-druid cannot pick path
+  ---
+  duration_ms: 0.210693
+  type: 'test'
+  ...
+# Subtest: simple and martial labels; no third/exotic fallback
+ok 13 - simple and martial labels; no third/exotic fallback
+  ---
+  duration_ms: 0.515065
+  type: 'test'
+  ...
+# Subtest: proficient weapon has no redundant affirmative proficiency row
+ok 14 - proficient weapon has no redundant affirmative proficiency row
+  ---
+  duration_ms: 0.245545
+  type: 'test'
+  ...
+# Subtest: missing weapon training shown once, does not subtract from actual attack twice
+ok 15 - missing weapon training shown once, does not subtract from actual attack twice
+  ---
+  duration_ms: 0.26275
+  type: 'test'
+  ...
+# Subtest: personalized zero spell bonus overrides staff nominal focus bonus for noncasters
+ok 16 - personalized zero spell bonus overrides staff nominal focus bonus for noncasters
+  ---
+  duration_ms: 0.26923
+  type: 'test'
+  ...
+# Subtest: mastery lock independent of proficiency
+ok 17 - mastery lock independent of proficiency
+  ---
+  duration_ms: 0.220838
+  type: 'test'
+  ...
+# Subtest: armor shows actual wearer AC and warns about missing training
+ok 18 - armor shows actual wearer AC and warns about missing training
+  ---
+  duration_ms: 3.836849
+  type: 'test'
+  ...
+# Subtest: untrained shield explicitly denies AC bonus
+ok 19 - untrained shield explicitly denies AC bonus
+  ---
+  duration_ms: 0.331463
+  type: 'test'
+  ...
+# Subtest: tooltip text remains text not injected HTML
+ok 20 - tooltip text remains text not injected HTML
+  ---
+  duration_ms: 0.452482
+  type: 'test'
+  ...
+# Subtest: shared staff and bow artwork follows type rather than former class restriction
+ok 21 - shared staff and bow artwork follows type rather than former class restriction
+  ---
+  duration_ms: 0.241279
+  type: 'test'
+  ...
+# Subtest: untrained armor warning renders the message, not its CSS class
+ok 22 - untrained armor warning renders the message, not its CSS class
+  ---
+  duration_ms: 0.342859
+  type: 'test'
+  ...
+# Subtest: spatial queries preserve every visible object at boundaries and across floors
+ok 23 - spatial queries preserve every visible object at boundaries and across floors
+  ---
+  duration_ms: 31.744747
+  type: 'test'
+  ...
+# Subtest: FPS measures actual frame timestamps, including slow frames and reset
+ok 24 - FPS measures actual frame timestamps, including slow frames and reset
+  ---
+  duration_ms: 0.333455
+  type: 'test'
+  ...
+# Subtest: motion interpolates evenly and snaps on floor change or distant travel
+ok 25 - motion interpolates evenly and snaps on floor change or distant travel
+  ---
+  duration_ms: 0.334627
+  type: 'test'
+  ...
+# Subtest: picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+ok 26 - picking uses drawn positions, ignores corpses/other floors, selects monsters and players
+  ---
+  duration_ms: 0.353996
+  type: 'test'
+  ...
+# Subtest: owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+ok 27 - owner deltas retain unchanged bags but replace empty lists and never merge other accounts
+  ---
+  duration_ms: 0.199917
+  type: 'test'
+  ...
+# Subtest: surface index gives trails priority, curved segments, ellipse edges and floor stone
+ok 28 - surface index gives trails priority, curved segments, ellipse edges and floor stone
+  ---
+  duration_ms: 0.49764
+  type: 'test'
+  ...
+# Subtest: large monster picking follows species size and ignores other floors
+ok 29 - large monster picking follows species size and ignores other floors
+  ---
+  duration_ms: 0.143143
+  type: 'test'
+  ...
+# Subtest: combat readout explains lower d20, misses, criticals and saving throws
+ok 30 - combat readout explains lower d20, misses, criticals and saving throws
+  ---
+  duration_ms: 0.315499
+  type: 'test'
+  ...
+# Subtest: companion cannot be accidentally selected as a hostile monster
+ok 31 - companion cannot be accidentally selected as a hostile monster
+  ---
+  duration_ms: 0.13401
+  type: 'test'
+  ...
+# Subtest: combat summary exposes actual damage dice and zero save damage
+ok 32 - combat summary exposes actual damage dice and zero save damage
+  ---
+  duration_ms: 3.063771
+  type: 'test'
+  ...
+# Subtest: paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+ok 33 - paginated hotbar keeps twenty-four keys and exposes every unlocked spell
+  ---
+  duration_ms: 0.298323
+  type: 'test'
+  ...
+# Subtest: hotbar pages handle empty lists and exact twenty-four-slot boundaries
+ok 34 - hotbar pages handle empty lists and exact twenty-four-slot boundaries
+  ---
+  duration_ms: 0.212115
+  type: 'test'
+  ...
+# Subtest: status timer distinguishes six hundred rounds from real-world duration
+ok 35 - status timer distinguishes six hundred rounds from real-world duration
+  ---
+  duration_ms: 0.195331
+  type: 'test'
+  ...
+# Subtest: mana budget UI names mixed slot distribution and flexible pool
+ok 36 - mana budget UI names mixed slot distribution and flexible pool
+  ---
+  duration_ms: 0.253667
+  type: 'test'
+  ...
+# Subtest: spell profile overlays owner scaling without mutating the shared catalogue
+ok 37 - spell profile overlays owner scaling without mutating the shared catalogue
+  ---
+  duration_ms: 0.21508
+  type: 'test'
+  ...
+# Subtest: hotbar mana uses selected casting rank, never static base spell cost
+ok 38 - hotbar mana uses selected casting rank, never static base spell cost
+  ---
+  duration_ms: 0.263581
+  type: 'test'
+  ...
+# Subtest: repeating active concentration is free, other spell costs remain payable
+ok 39 - repeating active concentration is free, other spell costs remain payable
+  ---
+  duration_ms: 0.199727
+  type: 'test'
+  ...
+# Subtest: missing locked spell profile falls back to a safe base and empty slots stay empty
+ok 40 - missing locked spell profile falls back to a safe base and empty slots stay empty
+  ---
+  duration_ms: 0.18838
+  type: 'test'
+  ...
+# Subtest: owner delta replaces spell profiles completely and never leaks them across accounts
+ok 41 - owner delta replaces spell profiles completely and never leaks them across accounts
+  ---
+  duration_ms: 0.10122
+  type: 'test'
+  ...
+# Subtest: Google tickets may enter only the exact same-origin game socket
+ok 42 - Google tickets may enter only the exact same-origin game socket
+  ---
+  duration_ms: 1.420661
+  type: 'test'
+  ...
+# Subtest: local HTTP development follows its own port; downloaded HTML cannot use Google
+ok 43 - local HTTP development follows its own port; downloaded HTML cannot use Google
+  ---
+  duration_ms: 0.259365
+  type: 'test'
+  ...
+# Subtest: new Google characters need nickname/class and never transmit a password
+ok 44 - new Google characters need nickname/class and never transmit a password
+  ---
+  duration_ms: 1.107716
+  type: 'test'
+  ...
+# Subtest: legacy claiming is removed even with a correct-looking password
+ok 45 - legacy claiming is removed even with a correct-looking password
+  ---
+  duration_ms: 0.545972
+  type: 'test'
+  ...
+# Subtest: profile builder rejects legacy login mode and missing proof of Google authentication
+ok 46 - profile builder rejects legacy login mode and missing proof of Google authentication
+  ---
+  duration_ms: 0.372984
+  type: 'test'
+  ...
+# Subtest: profile builder rejects invalid nicknames or unknown class IDs before opening a socket
+ok 47 - profile builder rejects invalid nicknames or unknown class IDs before opening a socket
+  ---
+  duration_ms: 0.569086
+  type: 'test'
+  ...
+# Subtest: compact potion includes strength and quantity, no zero weapon stats
+ok 48 - compact potion includes strength and quantity, no zero weapon stats
+  ---
+  duration_ms: 1.863428
+  type: 'test'
+  ...
+# Subtest: weapon shows actual personalized rolls without repeating enchantment
+ok 49 - weapon shows actual personalized rolls without repeating enchantment
+  ---
+  duration_ms: 0.238104
+  type: 'test'
+  ...
+# Subtest: armor and resistance use compact concrete descriptions
+ok 50 - armor and resistance use compact concrete descriptions
+  ---
+  duration_ms: 0.321578
+  type: 'test'
+  ...
+# Subtest: requirements display meaningful level but no class wall of text
+ok 51 - requirements display meaningful level but no class wall of text
+  ---
+  duration_ms: 0.435006
+  type: 'test'
+  ...
+# Subtest: all-class supplies need no class wall of text
+ok 52 - all-class supplies need no class wall of text
+  ---
+  duration_ms: 0.207999
+  type: 'test'
+  ...
+# Subtest: no source row until server provides owner-discovered sources
+ok 53 - no source row until server provides owner-discovered sources
+  ---
+  duration_ms: 0.259145
+  type: 'test'
+  ...
+# Subtest: negative window position remains on screen
+ok 54 - negative window position remains on screen
+  ---
+  duration_ms: 1.086474
+  type: 'test'
+  ...
+# Subtest: offscreen close header is clamped to viewport
+ok 55 - offscreen close header is clamped to viewport
+  ---
+  duration_ms: 0.332895
+  type: 'test'
+  ...
+# Subtest: oversized saved window remains reachable on mobile
+ok 56 - oversized saved window remains reachable on mobile
+  ---
+  duration_ms: 0.226126
+  type: 'test'
+  ...
+# Subtest: late-granted cantrips and circle-I spells stay in the first matching section
+ok 57 - late-granted cantrips and circle-I spells stay in the first matching section
+  ---
+  duration_ms: 2.898436
+  type: 'test'
+  ...
+# Subtest: class features are in one final section, never between spell circles
+ok 58 - class features are in one final section, never between spell circles
+  ---
+  duration_ms: 0.264823
+  type: 'test'
+  ...
+# Subtest: upcasting cannot move a base circle-I spell to circle-II or create a new group
+ok 59 - upcasting cannot move a base circle-I spell to circle-II or create a new group
+  ---
+  duration_ms: 0.194439
+  type: 'test'
+  ...
+# Subtest: the catalogue is the authority for section rank even with a profile override
+ok 60 - the catalogue is the authority for section rank even with a profile override
+  ---
+  duration_ms: 0.133418
+  type: 'test'
+  ...
+# Subtest: spells are alphabetic inside each circle using Polish collation
+ok 61 - spells are alphabetic inside each circle using Polish collation
+  ---
+  duration_ms: 0.206567
+  type: 'test'
+  ...
+# Subtest: class plus subclass access creates only one row, not two copies
+ok 62 - class plus subclass access creates only one row, not two copies
+  ---
+  duration_ms: 0.145827
+  type: 'test'
+  ...
+# Subtest: visibility and locked-state rules are preserved, and unrelated classes stay hidden
+ok 63 - visibility and locked-state rules are preserved, and unrelated classes stay hidden
+  ---
+  duration_ms: 0.273647
+  type: 'test'
+  ...
+# Subtest: empty or incomplete state does not create empty sections or fail
+ok 64 - empty or incomplete state does not create empty sections or fail
+  ---
+  duration_ms: 0.153809
+  type: 'test'
+  ...
+# Subtest: building sections never mutates the catalogue, profiles or saved hotbar
+ok 65 - building sections never mutates the catalogue, profiles or saved hotbar
+  ---
+  duration_ms: 0.265905
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//1
+ok 66 - production catalogue: druid/base//1
+  ---
+  duration_ms: 0.77455
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//10
+ok 67 - production catalogue: druid/base//10
+  ---
+  duration_ms: 0.35692
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//18
+ok 68 - production catalogue: druid/base//18
+  ---
+  duration_ms: 0.207648
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//20
+ok 69 - production catalogue: druid/base//20
+  ---
+  duration_ms: 1.66274
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//45
+ok 70 - production catalogue: druid/base//45
+  ---
+  duration_ms: 0.321407
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//80
+ok 71 - production catalogue: druid/base//80
+  ---
+  duration_ms: 0.384571
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/base//100
+ok 72 - production catalogue: druid/base//100
+  ---
+  duration_ms: 0.210913
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//1
+ok 73 - production catalogue: druid/stars//1
+  ---
+  duration_ms: 0.196812
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//10
+ok 74 - production catalogue: druid/stars//10
+  ---
+  duration_ms: 0.355818
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//18
+ok 75 - production catalogue: druid/stars//18
+  ---
+  duration_ms: 0.349309
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//20
+ok 76 - production catalogue: druid/stars//20
+  ---
+  duration_ms: 0.278484
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//45
+ok 77 - production catalogue: druid/stars//45
+  ---
+  duration_ms: 0.245004
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//80
+ok 78 - production catalogue: druid/stars//80
+  ---
+  duration_ms: 0.292104
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/stars//100
+ok 79 - production catalogue: druid/stars//100
+  ---
+  duration_ms: 0.217714
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//1
+ok 80 - production catalogue: druid/moon//1
+  ---
+  duration_ms: 0.172997
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//10
+ok 81 - production catalogue: druid/moon//10
+  ---
+  duration_ms: 0.161881
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//18
+ok 82 - production catalogue: druid/moon//18
+  ---
+  duration_ms: 0.20855
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//20
+ok 83 - production catalogue: druid/moon//20
+  ---
+  duration_ms: 0.197083
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//45
+ok 84 - production catalogue: druid/moon//45
+  ---
+  duration_ms: 0.317442
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//80
+ok 85 - production catalogue: druid/moon//80
+  ---
+  duration_ms: 0.364382
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/moon//100
+ok 86 - production catalogue: druid/moon//100
+  ---
+  duration_ms: 0.297452
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//1
+ok 87 - production catalogue: druid/sea//1
+  ---
+  duration_ms: 0.223332
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//10
+ok 88 - production catalogue: druid/sea//10
+  ---
+  duration_ms: 0.300677
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//18
+ok 89 - production catalogue: druid/sea//18
+  ---
+  duration_ms: 0.274418
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//20
+ok 90 - production catalogue: druid/sea//20
+  ---
+  duration_ms: 0.284592
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//45
+ok 91 - production catalogue: druid/sea//45
+  ---
+  duration_ms: 0.236151
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//80
+ok 92 - production catalogue: druid/sea//80
+  ---
+  duration_ms: 0.349049
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/sea//100
+ok 93 - production catalogue: druid/sea//100
+  ---
+  duration_ms: 0.333385
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/1
+ok 94 - production catalogue: druid/land/arid/1
+  ---
+  duration_ms: 0.239405
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/10
+ok 95 - production catalogue: druid/land/arid/10
+  ---
+  duration_ms: 0.359634
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/18
+ok 96 - production catalogue: druid/land/arid/18
+  ---
+  duration_ms: 0.212896
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/20
+ok 97 - production catalogue: druid/land/arid/20
+  ---
+  duration_ms: 0.284303
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/45
+ok 98 - production catalogue: druid/land/arid/45
+  ---
+  duration_ms: 0.317381
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/80
+ok 99 - production catalogue: druid/land/arid/80
+  ---
+  duration_ms: 0.367025
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/arid/100
+ok 100 - production catalogue: druid/land/arid/100
+  ---
+  duration_ms: 0.30921
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/1
+ok 101 - production catalogue: druid/land/polar/1
+  ---
+  duration_ms: 0.819327
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/10
+ok 102 - production catalogue: druid/land/polar/10
+  ---
+  duration_ms: 0.206396
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/18
+ok 103 - production catalogue: druid/land/polar/18
+  ---
+  duration_ms: 0.194248
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/20
+ok 104 - production catalogue: druid/land/polar/20
+  ---
+  duration_ms: 0.163322
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/45
+ok 105 - production catalogue: druid/land/polar/45
+  ---
+  duration_ms: 0.157424
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/80
+ok 106 - production catalogue: druid/land/polar/80
+  ---
+  duration_ms: 0.152387
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/polar/100
+ok 107 - production catalogue: druid/land/polar/100
+  ---
+  duration_ms: 0.190703
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/1
+ok 108 - production catalogue: druid/land/temperate/1
+  ---
+  duration_ms: 0.185426
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/10
+ok 109 - production catalogue: druid/land/temperate/10
+  ---
+  duration_ms: 0.204834
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/18
+ok 110 - production catalogue: druid/land/temperate/18
+  ---
+  duration_ms: 0.179026
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/20
+ok 111 - production catalogue: druid/land/temperate/20
+  ---
+  duration_ms: 0.215109
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/45
+ok 112 - production catalogue: druid/land/temperate/45
+  ---
+  duration_ms: 0.244022
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/80
+ok 113 - production catalogue: druid/land/temperate/80
+  ---
+  duration_ms: 0.190563
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/temperate/100
+ok 114 - production catalogue: druid/land/temperate/100
+  ---
+  duration_ms: 0.190003
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/1
+ok 115 - production catalogue: druid/land/tropical/1
+  ---
+  duration_ms: 0.133649
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/10
+ok 116 - production catalogue: druid/land/tropical/10
+  ---
+  duration_ms: 0.166718
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/18
+ok 117 - production catalogue: druid/land/tropical/18
+  ---
+  duration_ms: 0.163292
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/20
+ok 118 - production catalogue: druid/land/tropical/20
+  ---
+  duration_ms: 0.268479
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/45
+ok 119 - production catalogue: druid/land/tropical/45
+  ---
+  duration_ms: 0.254908
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/80
+ok 120 - production catalogue: druid/land/tropical/80
+  ---
+  duration_ms: 0.343991
+  type: 'test'
+  ...
+# Subtest: production catalogue: druid/land/tropical/100
+ok 121 - production catalogue: druid/land/tropical/100
+  ---
+  duration_ms: 0.281518
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//1
+ok 122 - production catalogue: mage/base//1
+  ---
+  duration_ms: 0.346134
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//10
+ok 123 - production catalogue: mage/base//10
+  ---
+  duration_ms: 0.164434
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//18
+ok 124 - production catalogue: mage/base//18
+  ---
+  duration_ms: 0.155991
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//20
+ok 125 - production catalogue: mage/base//20
+  ---
+  duration_ms: 0.261328
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//45
+ok 126 - production catalogue: mage/base//45
+  ---
+  duration_ms: 0.244773
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//80
+ok 127 - production catalogue: mage/base//80
+  ---
+  duration_ms: 0.263602
+  type: 'test'
+  ...
+# Subtest: production catalogue: mage/base//100
+ok 128 - production catalogue: mage/base//100
+  ---
+  duration_ms: 0.180338
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//1
+ok 129 - production catalogue: ranger/base//1
+  ---
+  duration_ms: 0.213086
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//10
+ok 130 - production catalogue: ranger/base//10
+  ---
+  duration_ms: 0.179777
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//18
+ok 131 - production catalogue: ranger/base//18
+  ---
+  duration_ms: 0.151655
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//20
+ok 132 - production catalogue: ranger/base//20
+  ---
+  duration_ms: 0.144415
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//45
+ok 133 - production catalogue: ranger/base//45
+  ---
+  duration_ms: 0.163202
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//80
+ok 134 - production catalogue: ranger/base//80
+  ---
+  duration_ms: 0.193788
+  type: 'test'
+  ...
+# Subtest: production catalogue: ranger/base//100
+ok 135 - production catalogue: ranger/base//100
+  ---
+  duration_ms: 0.105697
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//1
+ok 136 - production catalogue: knight/base//1
+  ---
+  duration_ms: 0.088612
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//10
+ok 137 - production catalogue: knight/base//10
+  ---
+  duration_ms: 0.078056
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//18
+ok 138 - production catalogue: knight/base//18
+  ---
+  duration_ms: 0.069003
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//20
+ok 139 - production catalogue: knight/base//20
+  ---
+  duration_ms: 0.066089
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//45
+ok 140 - production catalogue: knight/base//45
+  ---
+  duration_ms: 0.133288
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//80
+ok 141 - production catalogue: knight/base//80
+  ---
+  duration_ms: 0.071196
+  type: 'test'
+  ...
+# Subtest: production catalogue: knight/base//100
+ok 142 - production catalogue: knight/base//100
+  ---
+  duration_ms: 0.068091
+  type: 'test'
+  ...
+# PASS UI20 ferry UI: sufficient gold at level 1; five real locks have explanations.
+# Subtest: tests/test_transport_ui20.cjs
+ok 7 - tests/test_transport_ui20.cjs
+  ---
+  duration_ms: 95.269203
+  type: 'test'
+  ...
+# Subtest: owner form overrides stale visuals; explicit empty never resurrects cached form
+ok 144 - owner form overrides stale visuals; explicit empty never resurrects cached form
+  ---
+  duration_ms: 1.509813
+  type: 'test'
+  ...
+# Subtest: legacy fallback uses visuals, then sheet; empty visual overrides older sheet
+ok 145 - legacy fallback uses visuals, then sheet; empty visual overrides older sheet
+  ---
+  duration_ms: 0.218304
+  type: 'test'
+  ...
+# Subtest: active archer has short distinct label, icon and zero-cost arrow action
+ok 146 - active archer has short distinct label, icon and zero-cost arrow action
+  ---
+  duration_ms: 1.099103
+  type: 'test'
+  ...
+# Subtest: bonus cooldown disables arrow without disabling resource-free dismissal
+ok 147 - bonus cooldown disables arrow without disabling resource-free dismissal
+  ---
+  duration_ms: 0.27619
+  type: 'test'
+  ...
+# Subtest: Kielich and Smok main action is dismissal, not another paid activation
+ok 148 - Kielich and Smok main action is dismissal, not another paid activation
+  ---
+  duration_ms: 0.332654
+  type: 'test'
+  ...
+# Subtest: blocked and dead states do not offer dismissal
+ok 149 - blocked and dead states do not offer dismissal
+  ---
+  duration_ms: 0.165125
+  type: 'test'
+  ...
+# Subtest: compact scale is identical before/after fullscreen at a fixed visual viewport scale
+ok 150 - compact scale is identical before/after fullscreen at a fixed visual viewport scale
+  ---
+  duration_ms: 1.941434
+  type: 'test'
+  ...
+# Subtest: browser shrink reset is compensated once for HUD and world
+ok 151 - browser shrink reset is compensated once for HUD and world
+  ---
+  duration_ms: 1.218049
+  type: 'test'
+  ...
+# Subtest: portrait profile is stable; user zoom above 1 remains available
+ok 152 - portrait profile is stable; user zoom above 1 remains available
+  ---
+  duration_ms: 1.263277
+  type: 'test'
+  ...
+# Subtest: school cards are browsable before promotion but permanent choice needs level, promotion and acknowledgement
+ok 153 - school cards are browsable before promotion but permanent choice needs level, promotion and acknowledgement
+  ---
+  duration_ms: 15.002847
+  type: 'test'
+  ...
+# Subtest: candidate and acknowledgement survive refresh, a different school requires a fresh acknowledgement
+ok 154 - candidate and acknowledgement survive refresh, a different school requires a fresh acknowledgement
+  ---
+  duration_ms: 6.203416
+  type: 'test'
+  ...
+# Subtest: stale confirmation cannot change an already chosen school or select a removed option
+ok 155 - stale confirmation cannot change an already chosen school or select a removed option
+  ---
+  duration_ms: 6.116095
+  type: 'test'
+  ...
+# Subtest: portent uses actual server dice and does not consume a stale or spent value
+ok 156 - portent uses actual server dice and does not consume a stale or spent value
+  ---
+  duration_ms: 6.397374
+  type: 'test'
+  ...
+# Subtest: school spell actions check the current spell readiness and toggles use current state
+ok 157 - school spell actions check the current spell readiness and toggles use current state
+  ---
+  duration_ms: 3.377848
+  type: 'test'
+  ...
+# Subtest: prompt is silent before promotion and exposes school selection after promotion
+ok 158 - prompt is silent before promotion and exposes school selection after promotion
+  ---
+  duration_ms: 1.397206
+  type: 'test'
+  ...
+# Subtest: selection and allied ward guards reject invalid current state
+ok 159 - selection and allied ward guards reject invalid current state
+  ---
+  duration_ms: 1.190178
+  type: 'test'
+  ...
+# Subtest: class feature buttons honor authoritative uses and mana from the current spell profile
+ok 160 - class feature buttons honor authoritative uses and mana from the current spell profile
+  ---
+  duration_ms: 3.642852
+  type: 'test'
+  ...
+# Subtest: spellbook lists only the selected wizard school, with future abilities visibly locked
+ok 161 - spellbook lists only the selected wizard school, with future abilities visibly locked
+  ---
+  duration_ms: 7.37133
+  type: 'test'
+  ...
+# Subtest: school cast and hit art has finite bounded geometry and restores canvas state
+ok 162 - school cast and hit art has finite bounded geometry and restores canvas state
+  ---
+  duration_ms: 11.53793
+  type: 'test'
+  ...
+# Subtest: decoy live overlays follow actor interpolation; expired cast never leaves a stationary echo
+ok 163 - decoy live overlays follow actor interpolation; expired cast never leaves a stationary echo
+  ---
+  duration_ms: 0.279566
+  type: 'test'
+  ...
+# Subtest: shelter uses its stationary server origin and disappears on expiry, logout and floor change
+ok 164 - shelter uses its stationary server origin and disappears on expiry, logout and floor change
+  ---
+  duration_ms: 0.590828
+  type: 'test'
+  ...
+# Subtest: only spectral companions receive illusion art and either facing remains valid
+ok 165 - only spectral companions receive illusion art and either facing remains valid
+  ---
+  duration_ms: 0.27642
+  type: 'test'
+  ...
+# Subtest: ward and third eye render only with active authoritative state
+ok 166 - ward and third eye render only with active authoritative state
+  ---
+  duration_ms: 0.22229
+  type: 'test'
+  ...
+1..166
+# tests 166
+# suites 0
+# pass 166
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 10802.721036

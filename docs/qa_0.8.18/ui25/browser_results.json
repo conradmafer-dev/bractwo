@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Bractwo Krain branding and Google-only creation without legacy claim/password controls"
+    },
+    {
+      "name": "Ten recognizable HUD pictograms load, with existing accessible control labels",
+      "icons": 10
+    },
+    {
+      "name": "Character pictogram opens the character sheet"
+    },
+    {
+      "name": "Dedicated master promotion panel obeys level gate and buys promotion for2000"
+    },
+    {
+      "name": "Master tabs show only the selected service; blessing uses real server rules"
+    },
+    {
+      "name": "Bank panel performs deposit and withdrawal without travel or master content"
+    },
+    {
+      "name": "Depot separates putting in and taking out; actual inventory transfers succeed"
+    },
+    {
+      "name": "Open NPC service disables actions immediately after walking out of reach"
+    },
+    {
+      "name": "Visiting city preserves old binding; stone confirmation explicitly binds Brzezina"
+    },
+    {
+      "name": "Dedicated ferry panel sails with exact fare; arrival is in safe zone and retains binding"
+    },
+    {
+      "name": "Merchant buy/sell panel is docked on the right and names the selected vendor"
+    },
+    {
+      "name": "Saved binding survives reconnect; mobile bank/depot and icon menu fit430px"
+    },
+    {
+      "name": "Mobile master tabs fit without horizontal overflow"
+    },
+    {
+      "name": "Binding can be changed again using another city stone on mobile"
+    },
+    {
+      "name": "Mobile merchant remains contained and independently scrollable"
+    }
+  ],
+  "errors": [],
+  "limits": [
+    "Isolated in-memory database, fake Google provider and fixture-granted location/level/gold. Production service and login operations remain unchanged.",
+    "Desktop and touch viewport emulation, not a real phone or real Google account. No Railway deployment."
+  ]
+}

@@ -56,7 +56,8 @@ class Companion:
     def public(self):
         return dict(id=self.id,owner_id=self.owner_id,name=self.name,x=round(self.x,2),y=round(self.y,2),floor=self.floor,
                     hp=round(max(0,self.hp),1),max_hp=self.max_hp,alive=self.alive,kind='wolf',is_companion=True,
-                    armor_class=self.armor_class,attack_bonus=self.attack_bonus,facing=self.facing,attack_until=self.attack_until)
+                    armor_class=self.armor_class,attack_bonus=self.attack_bonus,facing=self.facing,attack_until=self.attack_until,
+                    wizard_phantasm=bool(getattr(self,'wizard_phantasm',False)))
 
 
 class DNDGame(RangerMagic):
@@ -263,6 +264,12 @@ class DNDGame(RangerMagic):
     def target_save_bonus(self, target, ability):
         return rules.save_bonus(target, ability) if self.is_player_target(target) else environment_rules.enemy_spec(target).get('saves',{}).get(ability,0)
 
+    def spell_target_save(self, source, target, ability, dc, damage, half=False):
+        previous=getattr(self,'_wizard_spell_source',None)
+        self._wizard_spell_source=source
+        try:return self.target_save(target,ability,dc,damage,half)
+        finally:self._wizard_spell_source=previous
+
     def target_save(self, target, ability, dc, damage, half=False):
         return rules.roll_save(self.combat_rng, self.target_save_bonus(target, ability), dc, damage, half,
             advantage=self.is_player_target(target) and self.target_condition(target, 'foresight'),
@@ -355,6 +362,7 @@ class DNDGame(RangerMagic):
                 self.spend_mana(p,dnd.SPELLS['shield']['mana']);p.buffs['shield']={'until':self.now()+3,'spell_id':'shield'};p.reaction_ready=self.now()+3
                 result.update(hit=False,damage=0,shielded=True,defense=p.armor_class)
                 dnd.record_spell_use(p,'shield');self.spell_effect(p,'shield',p)
+                self.wizard_after_paid_spell(p,'shield',dnd.SPELLS['shield'])
 
     def shield_blocks_missiles(self, target):
         target.current_wall_time = self.now()
@@ -364,6 +372,7 @@ class DNDGame(RangerMagic):
             self.spend_mana(target,dnd.SPELLS['shield']['mana']);target.buffs['shield'] = {'until':self.now()+3,'spell_id':'shield'}
             target.reaction_ready = self.now()+3
             dnd.record_spell_use(target,'shield');self.spell_effect(target,'shield',target)
+            self.wizard_after_paid_spell(target,'shield',dnd.SPELLS['shield'])
             return True
         return False
 
@@ -456,7 +465,14 @@ class DNDGame(RangerMagic):
         return targets[:s.get('max_targets',200)]
 
     def spell_damage(self, p, target, s):
+        previous=getattr(p,'_wizard_damage_spec',None)
+        p._wizard_damage_spec=s
+        try:return self._spell_damage_resolved(p,target,s)
+        finally:p._wizard_damage_spec=previous
+
+    def _spell_damage_resolved(self, p, target, s):
         player_target = self.is_player_target(target)
+        if player_target and target.id in s.get('_wizard_protected',()):return None
         if not target.alive or target.hp<=0:return None
         if player_target:
             if self.pvp_error(p, target) or not same_floor(p, target):return None
@@ -476,20 +492,23 @@ class DNDGame(RangerMagic):
             else:
                 result = self.hit_enemy(p,target,dice=dice,spell=True,melee=s.get('melee',False),damage_kind=s['damage_type'],action=s['name'])
         else:
-            damage = rules.roll_damage(self.combat_rng, dice)
+            damage = self.wizard_spell_roll_damage(p,s,dice)
             components = [{'type':s.get('damage_type','force'), 'damage':damage['damage']}]
             if s.get('extra_dice'):
-                extra = rules.roll_damage(self.combat_rng, s['extra_dice'])
+                extra = self.wizard_spell_roll_damage(p,s,s['extra_dice'],empower=False)
                 components.append({'type':s['extra_type'], 'damage':extra['damage']})
                 damage['damage'] += extra['damage'];damage['damage_dice'] += ' + '+extra['damage_dice'];damage['extra_rolls'] = extra['damage_rolls']
             if s.get('save'):
-                result = self.target_save(target,s['save'],rules.spell_dc(p),damage,s.get('save_half',False))
+                result = self.spell_target_save(p,target,s['save'],rules.spell_dc(p),damage,s.get('save_half',False))
                 result['save_ability'] = s['save']
                 if result['saved']:
-                    components = [dict(c, damage=c['damage']//2 if s.get('save_half') else 0) for c in components]
+                    potent=self.wizard_potent_cantrip(p,s)
+                    components = [dict(c, damage=c['damage']//2 if s.get('save_half') or potent else 0) for c in components]
+                    if potent:result['potent_cantrip']=True
                     result['damage'] = sum(c['damage'] for c in components)
             else:result = dict(check='automatic',hit=True,**damage)
             result['damage_type'] = s.get('damage_type','force')
+            result['is_spell'] = True
             if player_target:
                 if s['kind']=='missiles' and self.shield_blocks_missiles(target):
                     result.update(hit=False,damage=0,shielded=True);components=[]
@@ -498,7 +517,7 @@ class DNDGame(RangerMagic):
             else:
                 result['damage']=self.environment_damage_enemy(target,result['damage'],p,result['damage_type'],components,critical=result.get('critical',False));self.remember_attacker(target,p)
                 self.report_roll(p,target,result,s['name'],p)
-        if result and target.alive and result.get('hit') and (result.get('damage',0)>0 or not result.get('saved')):
+        if result and target.alive and result.get('hit') and not result.get('potent_cantrip') and (result.get('damage',0)>0 or not result.get('saved')):
             applied = False
             for key in ('slow','no_reactions','glow'):
                 if s.get(key):applied = self.apply_status(p,target,key,s[key],s) or applied
@@ -586,12 +605,14 @@ class DNDGame(RangerMagic):
                 if not self.blocked(point.x,point.y,floor=p.floor) and self.line_clear(p,point) and not (p.pvp_combat_until>now and self.in_safe(point)):
                     dest=point;break
             if dest is None:return await self.notice(p,'Nie ma widocznego, wolnego miejsca na teleport.')
+        self.wizard_prepare_spell(p,s,targets,target_id,mana)
         dnd.record_spell_use(p,key)
         # A new immediate main spell replaces an older queued main spell. Bonus
         # actions (e.g. Recovery) and reactions intentionally keep the queue.
         if not bonus:p.pending_spell={}
         self.begin_action(p,bonus);self.spend_mana(p,mana);p.gold-=s.get('gold',0);p.spell_cooldowns[key]=now+s['cooldown'];train(p,'magic',max(1,mana))
         self.circle_commit_spell(p,s,free_key)
+        if mana>0:self.wizard_after_paid_spell(p,key,s)
         if key in ('second_wind','animal_companion'):rest_rules.spend(p,key)
         if s.get('concentration') and not recast:
             self.break_concentration(p);p.concentration=key;p.concentration_until=now+s['duration']
@@ -626,7 +647,7 @@ class DNDGame(RangerMagic):
         elif s['kind']=='control':
             for target in targets:
                 unjust=self.begin_pvp_hostility(p,target) if self.is_player_target(target) else False
-                result=self.target_save(target,s['save'],rules.spell_dc(p),dict(damage=0,damage_dice='',damage_rolls=[]),False)
+                result=self.spell_target_save(p,target,s['save'],rules.spell_dc(p),dict(damage=0,damage_dice='',damage_rolls=[]),False)
                 result['save_ability']=s['save']
                 if not result['saved']:
                     applied=self.apply_status(p,target,s['buff'],s['duration'],s)
@@ -637,7 +658,7 @@ class DNDGame(RangerMagic):
         elif s['kind']=='field':
             target=targets[0]
             for q in targets:
-                if self.is_player_target(q):self.begin_pvp_hostility(p,q)
+                if self.is_player_target(q) and q.id not in s.get('_wizard_protected',()):self.begin_pvp_hostility(p,q)
             field_effect=self.spell_effect(p,key,target,targets,duration=s['duration'],spec=s,phase='field')
             field_effect.update(persistent=True,field_id=field_effect['id'])
             self.spell_fields.append(dict(effect_id=field_effect['id'],owner=p.id,key=key,x=target.x,y=target.y,floor=p.floor,until=now+s['duration'],next=now,
@@ -663,6 +684,7 @@ class DNDGame(RangerMagic):
                     self.spell_damage(p,e,s)
             for e in targets:
                 if e.hp<=0 and not self.is_player_target(e):await self.defeat(e)
+        self.wizard_finish_spell(p,s)
         with self.db:
             self.save_player(p)
             for q in friends:
@@ -683,7 +705,7 @@ class DNDGame(RangerMagic):
             if invalid:conditions.pop(key,None)
             elif value.get('hostile') and key in ('restrained','blind') and value.get('retry',float('inf'))<=now:
                 value['retry']=now+3
-                result=self.target_save(target,value['save'],value['dc'],dict(damage=0,damage_dice='',damage_rolls=[]))
+                result=self.spell_target_save(owner,target,value['save'],value['dc'],dict(damage=0,damage_dice='',damage_rolls=[]))
                 if result['saved']:conditions.pop(key,None)
 
     def end_field_effect(self,field):
@@ -770,12 +792,16 @@ class DNDGame(RangerMagic):
                 unjust=self.begin_pvp_hostility(p,target) if player_target else False
                 ac=rules.armor_class(target) if player_target else environment_rules.enemy_spec(target)['armor_class']
                 edis,eadv=self.environment_attack_flags(pet,target)
+                if player_target:
+                    decoy_dis=self.wizard_attack_disadvantage(target)
+                    edis=bool(edis or decoy_dis)
                 result=rules.roll_attack(self.combat_rng,pet.attack_bonus,ac,pet.dice,
                     disadvantage=edis or player_target and self.target_condition(target,'foresight'),
                     advantage=eadv or self.target_condition(target,'restrained') or self.target_condition(target,'blind'))
                 result['damage_type']='piercing'
                 self.environment_adjust_damage(pet,target,result,pet.dice,True)
                 if player_target:
+                    self.wizard_attack_reaction(target,result)
                     self.shield_reaction(target,result)
                     self.resolve_player_hit(pet,target,result,'Ugryzienie towarzysza',owner=p,unjust=unjust)
                 else:

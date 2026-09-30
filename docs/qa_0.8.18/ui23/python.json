@@ -1,0 +1,18 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "test_promotion_ui23",
+    "test_druid_circles_0818",
+    "test_druid_circle_spells_0818",
+    "test_level_up_086",
+    "test_app_shell_http_0818",
+    "test_railway"
+  ],
+  "pythonpath": "tests and repository root",
+  "tests": 90,
+  "exit_code": 0,
+  "seconds": 19.29,
+  "report": "python.txt"
+}

@@ -6,8 +6,10 @@ no character/inventory/loot data and does not alter progression or balance.
 from types import SimpleNamespace
 try:
     from . import combat_rules as rules, dnd_content as dnd
+    from .profession_rules import PROMOTION_LEVEL, PROMOTION_COST
 except ImportError:
     import combat_rules as rules, dnd_content as dnd
+    from profession_rules import PROMOTION_LEVEL, PROMOTION_COST
 
 ATTRIBUTE_NAMES = {'strength':'Siła', 'dexterity':'Zręczność', 'constitution':'Kondycja',
     'intelligence':'Inteligencja', 'wisdom':'Mądrość', 'charisma':'Charyzma'}
@@ -58,7 +60,11 @@ def catalog():
             if class_id=='knight' and level==1:
                 details.append('Wybierz jeden styl walki w C → Atuty. Mistrzostwa: miecz długi, miecz dwuręczny, młot dwuręczny. Kolczuga i tarcza na start.')
             if level==8:details.append('Rejsy i możliwość odblokowania PvP poza osadami.')
-            if level==20:details.append('Możliwość promocji u mistrza: 2000 złota.')
+            if level==PROMOTION_LEVEL:
+                details.append(f'Możliwość promocji u mistrza: {PROMOTION_COST} złota.')
+                if class_id=='druid':details.append('Po promocji możesz wybrać krąg druida w C → Atuty.')
+                if class_id=='mage':details.append('Po promocji wybierz szkołę czarodzieja w C → Atuty: Ewokacja, Odpychanie, Wróżbiarstwo lub Iluzja.')
+            if class_id=='mage' and level in (25,45,65):details.append('Nowa zdolność wybranej szkoły czarodzieja; szczegóły w C → Atuty.')
             if level==40:details.append('Możliwość zakupu błogosławieństwa u mistrza: 500 złota.')
             if level==50:details.append('Po promocji: pierwszy punkt mistrzostwa; kolejne co 5 poziomów. Przydzielasz poza walką.')
             if details:

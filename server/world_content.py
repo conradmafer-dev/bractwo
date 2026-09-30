@@ -100,6 +100,9 @@ def configure(items, zones, npcs, landmarks, quests, enemies, obstacles, merchan
         enemies[key]={'name':name,'hp':level*90,'damage':level*1.6,'range':100,'speed':55,'xp':level*45,'gold':level*12,
           'respawn':180,'aggro':300,'leash':530,'level':level,'tier':max(t for t,l in TIER_LEVELS.items() if l<=level),
           'appearance':appearance,'color':color,'boss':True}
+    for key in ('demon', 'abyss_walker', 'abyss_lord'):
+        enemies[key].update(sprite=f'assets/monsters/{key}.svg', sprite_frame_width=80,
+                            sprite_frame_height=80, sprite_frames=4)
     for cls,noun in [('knight','Miecz'),('ranger','Łuk'),('mage','Kostur'),('druid','Laska')]:
         for tier,adj,damage,value in [(4,'weterana',23,150),(5,'runiczny',38,280),(6,'żywiołów',60,500),(7,'królewski',90,850),(8,'pradawny',125,1400),(9,'otchłani',170,2200)]:
             items[f'{cls}_weapon_{tier}']={**items[f'{cls}_weapon_3'],'name':f'{noun} {adj}',

@@ -1,0 +1,17 @@
+PASS Bractwo Krain branding and Google-only creation without legacy claim/password controls
+PASS Ten recognizable HUD pictograms load, with existing accessible control labels
+PASS Character pictogram opens the character sheet
+PASS Dedicated master promotion panel obeys level gate and buys promotion for2000
+PASS Master tabs show only the selected service; blessing uses real server rules
+PASS Bank panel performs deposit and withdrawal without travel or master content
+PASS Depot separates putting in and taking out; actual inventory transfers succeed
+PASS Open NPC service disables actions immediately after walking out of reach
+page.waitForFunction: Timeout 12000ms exceeded.
+    at prepare (/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tools/browser_ui25.cjs:15:101)
+    at async service (/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tools/browser_ui25.cjs:17:66)
+    at async main (/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tools/browser_ui25.cjs:38:2) {
+  log: [],
+  name: 'TimeoutError'
+}
+======== Running on http://127.0.0.1:8771 ========
+(Press CTRL+C to quit)

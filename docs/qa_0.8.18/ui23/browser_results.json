@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Level 9 cannot buy promotion; requirement says level 10 and 2000 gold"
+    },
+    {
+      "name": "Level 10 still needs the full 2000 gold at the master"
+    },
+    {
+      "name": "Level 10 unpromoted druid sees a disabled circle choice and server rejects direct WS bypass"
+    },
+    {
+      "name": "Actual UI purchase at level 10 costs 2000 once, persists promotion and duplicate WS purchase is harmless"
+    },
+    {
+      "name": "Promotion unlocks actual circle confirmation; Stars choice is saved through production WS"
+    },
+    {
+      "name": "Saved promotion and circle survive reconnect; 430px character panel fits viewport",
+      "width": 430,
+      "scrollWidth": 430,
+      "panelWidth": 418.1875,
+      "panelRight": 424.09375
+    },
+    {
+      "name": "Existing unpromoted druid retains its selected circle and unlocked level-10 features after load"
+    },
+    {
+      "name": "Three demon-family monsters load distinct SVG sprites through the production canvas renderer; dragon keeps procedural rendering",
+      "sprites": [
+        {
+          "key": "demon",
+          "sprite": "assets/monsters/demon.svg",
+          "width": 320,
+          "height": 80,
+          "frames": 4
+        },
+        {
+          "key": "abyss_walker",
+          "sprite": "assets/monsters/abyss_walker.svg",
+          "width": 320,
+          "height": 80,
+          "frames": 4
+        },
+        {
+          "key": "abyss_lord",
+          "sprite": "assets/monsters/abyss_lord.svg",
+          "width": 320,
+          "height": 80,
+          "frames": 4
+        }
+      ],
+      "dragon": {
+        "sprite": null
+      }
+    }
+  ],
+  "errors": [],
+  "limits": [
+    "Isolated in-memory production HTTP/WS app on loopback; test fixture sets level/location and pauses monster AI.",
+    "Google SDK and signature verifier are replaced only in explicit QA tools; real Google consent/signature exchange is not covered.",
+    "Headless Chromium desktop 1440px and touch viewport 430px, not a physical Android device."
+  ]
+}

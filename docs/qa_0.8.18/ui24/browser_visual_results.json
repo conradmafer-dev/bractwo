@@ -1,0 +1,38 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Actual wizard visual packet: decoy",
+      "events": 1
+    },
+    {
+      "name": "Active decoy profile and actual school button prevent duplicate casting"
+    },
+    {
+      "name": "Actual wizard visual packet: arcane_ward",
+      "events": 1
+    },
+    {
+      "name": "Actual wizard visual packet: third_eye",
+      "events": 1
+    },
+    {
+      "name": "Actual wizard visual packet: shelter",
+      "events": 1
+    },
+    {
+      "name": "Four actual wizard effects and public actor states draw through production spell/status/field renderers",
+      "draws": 4
+    },
+    {
+      "name": "School buttons block bonus/action cooldowns and become usable once each action is ready"
+    }
+  ],
+  "errors": [],
+  "limits": [
+    "Production HTTP/native WebSocket on isolated in-memory SQLite; fixtures grant levels/promotion and move actors, with monster AI paused.",
+    "Google SDK and signature verifier are explicit test-only replacements; real Google login and Railway deployment are not covered.",
+    "Headless Chromium 1440px desktop and 430px touch viewport, not a physical phone.",
+    "Browser covers selection, resource UI, representative casts, persistence and rendering. Full combat behavior is verified in separate Python tests."
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "scope": "Distinct original infernal graphics for demon, abyss_walker and abyss_lord",
+  "checks": [
+    {
+      "name": "Final server catalogue maps all three infernal kinds to their own SVG sheet",
+      "passed": true
+    },
+    {
+      "name": "Each sheet contains four 80 by 80 movement frames; dimensions 320 by 80",
+      "passed": true
+    },
+    {
+      "name": "Web and Godot client copies are byte-identical",
+      "passed": true
+    },
+    {
+      "name": "Dragon, dragon_lord and ancient_dragon retain dragon appearance and do not reference infernal sprites",
+      "passed": true
+    },
+    {
+      "name": "Production BractwoLootUI.drawMonster rendered all four frames, both facings, and final 1.8/1.7/2.2 actor sizes in Chromium",
+      "passed": true
+    },
+    {
+      "name": "Production drawNewCreature fallback rendered three horned humanoid demons and the distinct winged dragon",
+      "passed": true
+    },
+    {
+      "name": "Visual review of demon_preview.png confirmed distinct silhouettes, variants and unclipped sprites",
+      "passed": true
+    },
+    {
+      "name": "Chromium render session reported no page errors",
+      "passed": true
+    },
+    {
+      "name": "node --check web/game.js",
+      "passed": true
+    },
+    {
+      "name": "Python compilation of generator and world_content.py",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Godot executable was unavailable; its fallback source was updated but not runtime-tested.",
+    "Browser verification used the production drawing functions on a local review canvas, not a live multiplayer encounter."
+  ],
+  "preview": "demon_preview.png"
+}

@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#10231e">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Bractwo">
+  <meta name="apple-mobile-web-app-title" content="Bractwo Krain">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-  <title>Bractwo — Pogranicze</title>
+  <title>Bractwo Krain</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="character_sheet.css">
   <link rel="stylesheet" href="level_up.css">
@@ -23,20 +23,21 @@
   <link rel="stylesheet" href="hotbar_ui.css">
   <link rel="stylesheet" href="adventure_ui.css">
   <link rel="stylesheet" href="google_auth.css">
+  <link rel="stylesheet" href="service_ui.css">
 </head>
 <body>
-  <canvas id="world" aria-label="Otwarty świat Bractwa — Pogranicze"></canvas>
+  <canvas id="world" aria-label="Otwarty świat Bractwa Krain"></canvas>
   <div id="vignette"></div>
   <main id="authScreen" class="auth-screen">
     <div class="intro">
       <div class="eyebrow">OTWARTY ŚWIAT · RPG ONLINE</div>
-      <h1>Bractwo<br><em>Pogranicze</em></h1>
+      <h1>Bractwo<br><em>Krain</em></h1>
       <p>Od zielonych marchii po lodowe pustkowia.<br>Kontynent, archipelagi i rozległe krypty. Twoja wyprawa.</p>
       <section class="ranking-card" aria-label="Ranking graczy"><div class="ranking-heading">RANKING GRACZY <small>TOP 20 · poziom / PD</small></div><div id="rankingList" class="ranking-list">Łączenie z rankingiem…</div></section><div class="intro-bottom">CZTERY KLASY <i></i> JEDEN ŚWIAT</div>
     </div>
     <section class="auth-card" aria-label="Wejście do gry">
-      <div class="eyebrow">ŚCIEŻKI POGRANICZA</div>
-      <h2>Twoja droga przez Pogranicze.</h2>
+      <div class="eyebrow">ŚCIEŻKI KRAIN</div>
+      <h2>Twoja droga przez krainy.</h2>
       <p class="muted">Rozwijaj postać bez limitu poziomów.<br>Postęp i wyposażenie są zapisywane.</p>
       <section id="googleSignIn" class="google-sign-in" aria-label="Logowanie przez Google">
         <div id="googleButton" class="google-button"></div>
@@ -48,17 +49,11 @@
           <p id="googleAccountHint" class="google-help"></p>
           <div id="googleCharacterActions" class="google-character-actions">
             <button id="googleNewCharacter" class="google-secondary" type="button">Stwórz nową postać</button>
-            <button id="googleClaimCharacter" class="google-secondary" type="button">Dodaj dotychczasową postać</button>
           </div>
           <form id="googleProfile" hidden>
             <h3 id="googleProfileTitle">Nowa postać</h3>
             <label for="googleName">Imię postaci</label>
             <input id="googleName" name="google-character" autocomplete="off" minlength="3" maxlength="20" required placeholder="Imię twojej postaci">
-            <div id="googlePasswordRow" hidden>
-              <label for="googlePassword">Dotychczasowe hasło do tej postaci</label>
-              <input id="googlePassword" name="google-claim-password" type="password" autocomplete="current-password" minlength="8" maxlength="128">
-              <p class="google-help">Potwierdź, że to twoja postać. Jej postęp i wyposażenie zostaną zachowane. Od teraz wejdziesz do niej przez Google.</p>
-            </div>
             <fieldset id="googleClassPicker" class="class-picker"><legend>Wybierz klasę — wybór jest stały</legend>
               <button type="button" data-class="knight" class="class-option selected" aria-pressed="true"><span>⚔</span><strong>Rycerz</strong><small>Miecz · dodatkowe ataki</small></button>
               <button type="button" data-class="ranger" class="class-option" aria-pressed="false"><span>➶</span><strong>Łowca</strong><small>Łuk · wilczy towarzysz</small></button>
@@ -71,16 +66,16 @@
           <button id="googleCancel" class="google-secondary" type="button">Zmień konto Google</button>
         </section>
         <p id="authError" class="auth-error" role="alert"></p>
-        <p id="googleIntro" class="google-help">Zaloguj się przez Google. Do jednego konta możesz przypisać maksymalnie 4 postacie.</p>
+        <p id="googleIntro" class="google-help">Zaloguj się przez Google. Na jednym koncie możesz utworzyć maksymalnie 4 postacie.</p>
       </section>
-      <div class="auth-foot"><span class="status-dot"></span> BRACTWO 0.8.18 · UI_22 · KOMPUTER I TELEFON</div>
+      <div class="auth-foot"><span class="status-dot"></span> BRACTWO KRAIN 0.8.18 · UI_25 · KOMPUTER I TELEFON</div>
     </section>
   </main>
 
   <section id="gameUI" class="game-ui" hidden aria-label="Panel gry">
     <output id="fpsCounter" class="fps-counter" aria-label="Liczba klatek na sekundę">— FPS</output>
     <header class="topbar">
-      <div class="brand"><span>⚔</span><div>BRACTWO<small>POGRANICZE</small></div></div>
+      <div class="brand"><span>⚔</span><div>BRACTWO<small>KRAIN</small></div></div>
       <div class="player-card">
         <div class="player-top"><strong id="playerName">Wędrowiec</strong><span id="playerLevel">POZ. 1</span></div>
         <div class="player-sub"><span id="classText">Rycerz</span><span id="xpText">0 / 100 PD</span></div>
@@ -139,7 +134,7 @@
     <div id="deathPanel" class="death-panel" hidden><div>✦</div><h2>Podróż jeszcze się nie kończy.</h2><p id="deathText">Powrót do osady…</p><p>Część złota i postępu poziomu została utracona.</p></div>
     <div id="disconnectPanel" class="disconnect-panel" hidden><h2>Utracono połączenie</h2><p>Postęp jest zapisywany. Jeśli trwa walka PvP, postać pozostaje w świecie do wygaśnięcia blokady walki.</p><button id="reconnectButton" class="primary">Wróć do logowania</button></div>
     <div id="legacyClassPanel" class="modal-panel" hidden><div class="eyebrow">POSTAĆ Z WCZEŚNIEJSZEJ WERSJI</div><h2>Wybierz swoją drogę.</h2><p>Poziom i złoto zostają. Klasę możesz wybrać raz, w bezpiecznej osadzie.</p><div id="legacyChoices" class="class-picker"></div><button id="closeLegacy" class="text-button">Wybiorę później</button></div>
-    <div id="helpPanel" class="help-panel" hidden><button id="closeHelp" class="close-button" aria-label="Zamknij pomoc">×</button><div class="eyebrow">PRZEWODNIK POGRANICZA</div><h2>Kości, kręgi i towarzysze.</h2><p>Ruch jest ciągły. Jedna runda trwa 3 sekundy. Kliknij potwora, aby go zaznaczyć. Spacja lub przycisk Atakuj uruchamia atak. Esc usuwa cel i zatrzymuje autoatak. Poza aktywnym oknem autoatak jest wstrzymany.</p><dl><dt>Ruch</dt><dd>WASD / strzałki / joystick</dd><dt>Atak bez celu</dt><dd>Spacja / Atakuj — najbliższy potwór w zasięgu</dd><dt>Czary i przypisanie</dt><dd>1–0, −, = i F1–F12 — bieżąca strona paska · Page Up / Page Down — strony · K — zakładka Czary</dd><dt>Najczęściej używany czar</dt><dd>F — wybór z ostatnich 100 udanych użyć</dd><dt>Karta postaci</dt><dd>C / przycisk w prawym górnym rogu · I — ekwipunek</dd><dt>Mikstura zdrowia</dt><dd>Q — mikstura przypisana w plecaku</dd><dt>Odpoczynek</dt><dd>R — krótki odpoczynek · Shift+R — długi · ponowne użycie przerywa</dd><dt>Rozmowa / ekwipunek</dt><dd>E / I</dd><dt>Dziennik / gracze / minimapa / Atlas</dt><dd>J / P / M / N; Atlas otwiera się także po kliknięciu minimapy.</dd><dt>Czat / pomoc / usuń cel</dt><dd>Enter / H / Esc</dd></dl><p>Atak: k20 + premia przeciw KP. Naturalna 1 zawsze pudłuje; 20 daje krytyk — podwaja kości, nie stały modyfikator. Obrażenia są naprawdę losowane, np. 1k8+3. Rzuty obronne i ich skutki zależą od czaru. Czar wpisany podczas odnowienia głównej akcji jest kolejny w kolejce przed autoatakiem. Akcje dodatkowe i reakcja Tarcza mają osobne odnowienia.</p><p>Czarodziej i druid: I krąg od poziomu 1, II od 10, III od 20 i kolejne co 10, aż do IX na 80. Łowca: kręgi I–V na 1/20/40/60/80. Sztuczki kosztują 0 many. Łowca wzywa wilka od 10.; druid zmienia się w wilka i kota od 5., czarnego niedźwiedzia od 15. i brunatnego od 35. Krąg Księżyca może w przemianie rzucać swoje dodatkowe czary; pozostałe czary są wtedy niedostępne. Ponowne użycie przemiany przywraca ludzką postać. Koncentracja pozwala utrzymać jeden taki efekt; otrzymanie obrażeń wymaga obrony KON.</p><p>Długonogi: 600 rund, bez koncentracji; atak go nie przerywa. 600 rund D&amp;D to godzina; w tempie Bractwa 3 s/rundę oznacza to 30 min czasu rzeczywistego. Efekty i ich liczniki widzisz u góry ekranu; dotknij efektu, by odczytać opis.</p><p>Mana odpowiada ważonej puli komórek: na starcie 40 many, I krąg kosztuje 20, więc wystarcza na dwa czary. Mana nie odnawia się samoczynnie. Długi odpoczynek przywraca ją w całości; wybrane zdolności odzyskiwania działają po krótkim odpoczynku. Wszystkie odblokowane czary automatycznie trafiają na kolejne strony paska.</p><p>To adaptacja SRD 5.2.1: mana, 3-sekundowe rundy, progi poziomów i skrócone czasy są zasadami Bractwa. Ofensywne czary i wilk walczą z potworami oraz graczami po odblokowaniu PvP, z zachowaniem ochrony osad i niskich poziomów. Leczenie innych graczy wymaga wspólnej drużyny; wsparcie walczącego w PvP sojusznika wymaga odblokowania PvP i włącza leczącego do walki. Wyciszenie wskazówki sterowania krzyżykiem zapamiętuje się na tym urządzeniu.</p><div class="section-label">PvP Z KONSEKWENCJAMI</div><p id="pvpHelp">Osada i postacie poniżej 8. poziomu są chronione. Aby zaatakować gracza, wyłącz blokadę PvP i wybierz go kliknięciem w świecie lub na liście graczy. Biała czaszka oznacza agresora. Trzy nieuzasadnione zabójstwa w 24 godziny dają czerwoną czaszkę na 24 godziny. Walka blokuje wejście do osady i bezpieczne wylogowanie przez 20 sekund.</p><p id="deathHelp">Śmierć: −5% złota i −10% postępu bieżącego poziomu. Z czerwoną czaszką: −20% złota, −20% postępu i utrata jednego niezałożonego przedmiotu. Bez utraty poziomu. Za zabicie gracza nie ma doświadczenia.</p><p><b>Śledzenie zadań:</b> w Dzienniku (J) naciśnij Śledź zadanie przy wybranym zleceniu. Kierunek zmienia się wraz z postępem, a po wykonaniu prowadzi po nagrodę. Przycisk Śledzone · wyłącz kończy śledzenie. Kliknięcie panelu zadania otwiera jego wpis w dzienniku.</p><p><b>Odpoczynek:</b> wybierz przycisk przy pasku czarów, a na telefonie nad przyciskiem Rozmawiaj. Przycisk otwiera krótki wybór. R rozpoczyna krótki odpoczynek (10 s): leczenie z kości zdrowia, część użyć zdolności i dostępne odzyskanie many. Shift+R rozpoczyna długi odpoczynek (30 s), także poza miastem: całe HP, mana i zasoby. Po ukończeniu krótki odnawia się przez 15 s, a długi przez 60 s. Czasy odnowienia pozostają po ponownym zalogowaniu. Możesz zacząć 3 s po ostatnim starciu z potworem; blokada PvP trwa nadal 20 s. Postęp jest nad postacią, która medytuje w niebieskim kręgu z kroplami many. Ruch, walka lub ponowne naciśnięcie Odpoczynek przerywają regenerację. Punkty odzyskujesz po ukończeniu. Przerwanie nie uruchamia cooldownu. Sposób odnawiania poszczególnych zdolności znajdziesz w ich opisach i zakładce Atuty. Mikstury many zostały usunięte; jedyny slot mikstury zdrowia ma skrót Q.</p><p><b>Czary kręgów:</b> wariant, postać i umiejętność wybierzesz w zakładce Czary. Kliknięcie wolnego miejsca w świecie ustawia niebieski cel obszaru; kliknięcie drzewa wskazuje cel Wędrówki drzew. Esc usuwa wskazanie. Krąg druida wybierzesz od poziomu 10 w zakładce Atuty.</p><p><b>Pełny ekran i aplikacja:</b> przycisk ⛶ przełącza pełny ekran. Na telefonie jest obok mapy, a na komputerze w górnym menu. „Zainstaluj grę” pozwala otwierać Bractwo z własnej ikony. Rozgrywka wymaga internetu.</p><div class="help-footer">Blokada PvP zapobiega twoim atakom. Poza strefą ochrony nie zapewnia nietykalności.</div></div>
+    <div id="helpPanel" class="help-panel" hidden><button id="closeHelp" class="close-button" aria-label="Zamknij pomoc">×</button><div class="eyebrow">PRZEWODNIK POGRANICZA</div><h2>Kości, kręgi i towarzysze.</h2><p>Ruch jest ciągły. Jedna runda trwa 3 sekundy. Kliknij potwora, aby go zaznaczyć. Spacja lub przycisk Atakuj uruchamia atak. Esc usuwa cel i zatrzymuje autoatak. Poza aktywnym oknem autoatak jest wstrzymany.</p><dl><dt>Ruch</dt><dd>WASD / strzałki / joystick</dd><dt>Atak bez celu</dt><dd>Spacja / Atakuj — najbliższy potwór w zasięgu</dd><dt>Czary i przypisanie</dt><dd>1–0, −, = i F1–F12 — bieżąca strona paska · Page Up / Page Down — strony · K — zakładka Czary</dd><dt>Najczęściej używany czar</dt><dd>F — wybór z ostatnich 100 udanych użyć</dd><dt>Karta postaci</dt><dd>C / przycisk w prawym górnym rogu · I — ekwipunek</dd><dt>Mikstura zdrowia</dt><dd>Q — mikstura przypisana w plecaku</dd><dt>Odpoczynek</dt><dd>R — krótki odpoczynek · Shift+R — długi · ponowne użycie przerywa</dd><dt>Rozmowa / ekwipunek</dt><dd>E / I</dd><dt>Dziennik / gracze / minimapa / Atlas</dt><dd>J / P / M / N; Atlas otwiera się także po kliknięciu minimapy.</dd><dt>Czat / pomoc / usuń cel</dt><dd>Enter / H / Esc</dd></dl><p>Atak: k20 + premia przeciw KP. Naturalna 1 zawsze pudłuje; 20 daje krytyk — podwaja kości, nie stały modyfikator. Obrażenia są naprawdę losowane, np. 1k8+3. Rzuty obronne i ich skutki zależą od czaru. Czar wpisany podczas odnowienia głównej akcji jest kolejny w kolejce przed autoatakiem. Akcje dodatkowe i reakcja Tarcza mają osobne odnowienia.</p><p>Czarodziej i druid: I krąg od poziomu 1, II od 10, III od 20 i kolejne co 10, aż do IX na 80. Łowca: kręgi I–V na 1/20/40/60/80. Sztuczki kosztują 0 many. Łowca wzywa wilka od 10.; druid zmienia się w wilka i kota od 5., czarnego niedźwiedzia od 15. i brunatnego od 35. Krąg Księżyca może w przemianie rzucać swoje dodatkowe czary; pozostałe czary są wtedy niedostępne. Ponowne użycie przemiany przywraca ludzką postać. Koncentracja pozwala utrzymać jeden taki efekt; otrzymanie obrażeń wymaga obrony KON.</p><p>Długonogi: 600 rund, bez koncentracji; atak go nie przerywa. 600 rund D&amp;D to godzina; w tempie Bractwa 3 s/rundę oznacza to 30 min czasu rzeczywistego. Efekty i ich liczniki widzisz u góry ekranu; dotknij efektu, by odczytać opis.</p><p>Mana odpowiada ważonej puli komórek: na starcie 40 many, I krąg kosztuje 20, więc wystarcza na dwa czary. Mana nie odnawia się samoczynnie. Długi odpoczynek przywraca ją w całości; wybrane zdolności odzyskiwania działają po krótkim odpoczynku. Wszystkie odblokowane czary automatycznie trafiają na kolejne strony paska.</p><p>To adaptacja SRD 5.2.1: mana, 3-sekundowe rundy, progi poziomów i skrócone czasy są zasadami Bractwa Krain. Ofensywne czary i wilk walczą z potworami oraz graczami po odblokowaniu PvP, z zachowaniem ochrony osad i niskich poziomów. Leczenie innych graczy wymaga wspólnej drużyny; wsparcie walczącego w PvP sojusznika wymaga odblokowania PvP i włącza leczącego do walki. Wyciszenie wskazówki sterowania krzyżykiem zapamiętuje się na tym urządzeniu.</p><div class="section-label">PvP Z KONSEKWENCJAMI</div><p id="pvpHelp">Osada i postacie poniżej 8. poziomu są chronione. Aby zaatakować gracza, wyłącz blokadę PvP i wybierz go kliknięciem w świecie lub na liście graczy. Biała czaszka oznacza agresora. Trzy nieuzasadnione zabójstwa w 24 godziny dają czerwoną czaszkę na 24 godziny. Walka blokuje wejście do osady i bezpieczne wylogowanie przez 20 sekund.</p><p id="deathHelp">Śmierć: −5% złota i −10% postępu bieżącego poziomu. Z czerwoną czaszką: −20% złota, −20% postępu i utrata jednego niezałożonego przedmiotu. Bez utraty poziomu. Za zabicie gracza nie ma doświadczenia.</p><p><b>Śledzenie zadań:</b> w Dzienniku (J) naciśnij Śledź zadanie przy wybranym zleceniu. Kierunek zmienia się wraz z postępem, a po wykonaniu prowadzi po nagrodę. Przycisk Śledzone · wyłącz kończy śledzenie. Kliknięcie panelu zadania otwiera jego wpis w dzienniku.</p><p><b>Odpoczynek:</b> wybierz przycisk przy pasku czarów, a na telefonie nad przyciskiem Rozmawiaj. Przycisk otwiera krótki wybór. R rozpoczyna krótki odpoczynek (10 s): leczenie z kości zdrowia, część użyć zdolności i dostępne odzyskanie many. Shift+R rozpoczyna długi odpoczynek (30 s), także poza miastem: całe HP, mana i zasoby. Po ukończeniu krótki odnawia się przez 15 s, a długi przez 60 s. Czasy odnowienia pozostają po ponownym zalogowaniu. Możesz zacząć 3 s po ostatnim starciu z potworem; blokada PvP trwa nadal 20 s. Postęp jest nad postacią, która medytuje w niebieskim kręgu z kroplami many. Ruch, walka lub ponowne naciśnięcie Odpoczynek przerywają regenerację. Punkty odzyskujesz po ukończeniu. Przerwanie nie uruchamia cooldownu. Sposób odnawiania poszczególnych zdolności znajdziesz w ich opisach i zakładce Atuty. Mikstury many zostały usunięte; jedyny slot mikstury zdrowia ma skrót Q.</p><p><b>Czary kręgów:</b> wariant, postać i umiejętność wybierzesz w zakładce Czary. Kliknięcie wolnego miejsca w świecie ustawia niebieski cel obszaru; kliknięcie drzewa wskazuje cel Wędrówki drzew. Esc usuwa wskazanie. Krąg druida wybierzesz od poziomu 10 w zakładce Atuty.</p><p><b>Pełny ekran i aplikacja:</b> przycisk ⛶ przełącza pełny ekran. Na telefonie jest obok mapy, a na komputerze w górnym menu. „Zainstaluj grę” pozwala otwierać Bractwo Krain z własnej ikony. Rozgrywka wymaga internetu.</p><p><b>Odrodzenie:</b> użyj kamienia przypisania w wybranym mieście i potwierdź przypisanie. Wejście do miasta ani rejs nie zmienia tego wyboru. Przystanie przy łodziach są strefami bezpiecznymi; blokada walki PvP nadal zabrania wejścia do strefy ochrony.</p><div class="help-footer">Blokada PvP zapobiega twoim atakom. Poza strefą ochrony nie zapewnia nietykalności.</div></div>
   </section>
   <script src="runtime.js"></script>
   <script src="world_geometry.js"></script>
@@ -162,6 +157,9 @@
   <script src="hotbar_ui.js"></script>
   <script src="adventure_ui.js"></script>
   <script src="google_auth.js"></script>
+  <script src="wizard_vfx.js"></script>
+<script src="service_ui.js"></script>
+  <script src="hud_icons.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

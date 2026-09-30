@@ -34,15 +34,8 @@
       const dialogue=npc.dialogue||{},selected=(dialogue.topics||[]).find(t=>t.id===topic);
       body.append(node('p',selected?.text||dialogue.greeting||npc.description||'Witaj na szlaku. Sprawdź miejscowe zlecenia.','adventure-speech'));
       if(dialogue.topics?.length){const topics=node('nav',undefined,'adventure-topics');topics.setAttribute('aria-label','Tematy rozmowy');for(const t of dialogue.topics){const b=button(t.title,()=>{topic=t.id;signature='';render();},!closeEnough);b.setAttribute('aria-pressed',String(t.id===topic));topics.append(b);}body.append(topics);}
-      if(npc.service==='merchant')body.append(button('Pokaż towary',()=>{close();h.trade?.();},!closeEnough||p.combat_remaining>0));
-      if(['bank','master'].includes(npc.service))body.append(button('Usługi',()=>{close();h.services?.(npc.service);},!closeEnough));
-      if(routes.length){
-        body.append(node('h3','Miejscowe przeprawy'));
-        for(const route of routes){const port=(w.ports||[]).find(p=>p.id===route.to_id);if(!port)continue;
-          const row=node('article',undefined,'adventure-quest');row.append(node('strong',port.name),node('p',routeText(route)));
-          const reason=boatReason(p,npc,route),sail=button('Wypłyń',()=>h.send({type:'boat',route_id:route.id}),!!reason);sail.title=reason;row.append(sail);if(reason)row.append(node('small',reason,'adventure-warning'));body.append(row);
-        }
-      }
+      if(npc.service==='merchant')body.append(button('Pokaż towary',()=>{close();h.trade?.(npc);},!closeEnough||p.combat_remaining>0));
+      if(['bank','master','boat','binding_stone'].includes(npc.service))body.append(button('Usługi',()=>{close();h.services?.(npc);},!closeEnough));
       for(const q of quests){
         const row=node('article',undefined,'adventure-quest');row.dataset.questId=q.id;row.append(node('h3',q.title));
         const speech=q.status==='ready'?dialogue.quest_complete:q.status==='active'?dialogue.quest_progress:dialogue.quest_offer;

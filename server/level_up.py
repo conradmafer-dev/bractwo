@@ -28,6 +28,7 @@ def record(p, first, last):
     context = copy.deepcopy(dict(class_id=p.class_id, promoted=p.promoted,
         primal_order=p.primal_order,training_feats=p.training_feats,caster_rules_version=p.caster_rules_version,
         druid_circle=p.druid_circle,druid_circle_state=p.druid_circle_state,
+        wizard_school=p.wizard_school,wizard_school_state=p.wizard_school_state,
         mana_rules_version=p.mana_rules_version,hp_rules_version=p.hp_rules_version,
         mastery=p.mastery, fighting_style=p.fighting_style, weapon_grip=p.weapon_grip, equipment=p.equipment,
         inventory=[i for i in p.inventory if i.get('uid') in worn]))
@@ -56,6 +57,7 @@ def permanent(p, level, context):
     q = copy.copy(p)
     q.fighting_style="";q.weapon_grip="one";q.primal_order='';q.training_feats={}
     q.druid_circle='';q.druid_circle_state={};q.druid_circle_runtime={}
+    q.wizard_school='';q.wizard_school_state={};q.wizard_school_runtime={}
     # Pre-0.8.16 receipts have no mana-version stamp: preserve their earned gains.
     q.mana_rules_version=2
     q.hp_rules_version=0  # Preserve HP deltas in receipts earned before UI_12.
@@ -77,6 +79,11 @@ def receipt(p, batch, level):
         if unit:entry['unit']=unit
         if icon:entry['icon']=icon
         rows.append(entry)
+    try: from . import wizard_schools
+    except ImportError: import wizard_schools
+    selected=wizard_schools.school(after)
+    for feature_id, gate, name, description in wizard_schools.FEATURES.get(selected,()):
+        if gate==level:add('school_'+feature_id,'Zdolność szkoły','+ '+name,icon=f'assets/feats/wizard_{selected}.svg')
     add('hp','HP',after.max_hp-before.max_hp)
     add('mana','Mana',after.max_mana-before.max_mana)
     for key in ATTRIBUTES:

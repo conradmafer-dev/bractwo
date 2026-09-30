@@ -3,8 +3,10 @@ import math
 import secrets
 try:
     from . import world_content as content
+    from .profession_rules import PROMOTION_LEVEL, PROMOTION_COST, promotion_requirements
 except ImportError:
     import world_content as content
+    from profession_rules import PROMOTION_LEVEL, PROMOTION_COST, promotion_requirements
 
 
 def same_floor(a,b):
@@ -33,10 +35,10 @@ def train(p,key,amount=1):
     p.skill_tries[key]=int(p.skill_tries.get(key,0))+int(amount)
 
 
-def merchant_at(p):
+def merchant_at(p, npc_id=None):
     sellers = [getattr(content, 'STARTER_MERCHANT', None)] + [
         n for n in content.NPCS if n.get('service') == 'merchant']
-    nearby = [n for n in sellers if n and near(p, n)]
+    nearby = [n for n in sellers if n and (npc_id is None or n.get('id','starter_merchant')==npc_id) and near(p, n)]
     return min(nearby, key=lambda n: math.hypot(p.x-n['x'], p.y-n['y']), default=None)
 
 
@@ -50,6 +52,7 @@ def private_state(p,now):
     return {'site_cooldowns':{key:max(0,round(until-now)) for key,until in p.site_cooldowns.items() if until>now},
       'wind_remaining':max(0,p.wind_until-now), 'ward_remaining':max(0,p.ward_until-now), 'premium_demo':p.premium_demo_until>now,'premium_demo_remaining':max(0,int(p.premium_demo_until-now)),
       'surface':content.SURFACE_MAP.at(p.x,p.y,p.floor), 'floor':p.floor,'promoted':p.promoted,'profession':content.PROMOTIONS[p.class_id] if p.promoted else p.spec['name'],
+      'promotion':promotion_requirements(),
       'skills':skill_progress(p),'runes':dict(p.runes),'soul':int(p.soul),'max_soul':200 if p.promoted else 100,
       'bank_gold':p.bank_gold,'depot':list(p.depot),'home_city':p.home_city,'blessed':p.blessed,
       'merchant':merchant_state(p),
@@ -89,8 +92,8 @@ class ExpansionGame:
                 result.extend(self.enemy_cells.get((p.floor,cx,cy),{}).values())
         return result
 
-    def near_service(self,p,service):
-        return next((n for n in content.NPCS if n.get('service')==service and near(p,n)),None)
+    def near_service(self,p,service,npc_id=None):
+        return next((n for n in content.NPCS if n.get('service')==service and (npc_id is None or n['id']==npc_id) and near(p,n)),None)
 
     def merchant_near(self,p):
         return merchant_at(p) is not None
@@ -120,9 +123,6 @@ class ExpansionGame:
         p.x, p.y, p.floor = x, y, floor
         p.dx = p.dy = 0
         p.input_time = -10
-        if any(city['id'] == destination.get('city_id') for city in content.CITIES):
-            p.home_city = destination['city_id']
-        self.remember_city_visit(p)
         self.discover_landmarks(p)
         self.persist()
         await self.notice(p, f"Dopłynąłeś do: {destination['name']}.")
@@ -173,11 +173,15 @@ class ExpansionGame:
             self.stop_auto(p);self.break_concentration(p);self.companions.pop(p.id,None)
             p.dx=p.dy=0;p.input_time=-10
             self.discover_landmarks(p)
-        elif kind in ('bank_deposit','bank_withdraw','depot_store','depot_take','bind_city'):
-            bank=self.near_service(p,'bank')
+        elif kind=='bind_city':
+            stone_id=data.get('npc_id')
+            stone=next((n for n in content.BINDING_STONES if n['id']==stone_id and near(p,n)),None)
+            if stone is None:return await self.notice(p,'Podejdź do kamienia przypisania w mieście.')
+            p.home_city=stone['city_id']
+        elif kind in ('bank_deposit','bank_withdraw','depot_store','depot_take'):
+            bank=self.near_service(p,'bank',data.get('npc_id'))
             if not bank:return await self.notice(p,'Bank i depozyt są dostępne przy bankierze.')
-            if kind=='bind_city':p.home_city=bank['city_id']
-            elif kind.startswith('bank_'):
+            if kind.startswith('bank_'):
                 balance=p.gold if kind=='bank_deposit' else p.bank_gold
                 amount=data.get('amount')
                 if amount=='all':amount=balance
@@ -191,23 +195,24 @@ class ExpansionGame:
                 if len(dest)>=(120 if storing else 40):return await self.notice(p,'Brak wolnego miejsca.')
                 source.remove(item);dest.append(item)
         elif kind in ('promote','bless','mastery','mastery_reset'):
-            if kind != 'mastery' and not self.near_service(p,'master'):return await self.notice(p,'Podejdź do mistrza profesji w dowolnym mieście.')
+            if kind != 'mastery' and not self.near_service(p,'master',data.get('npc_id')):return await self.notice(p,'Podejdź do mistrza profesji w dowolnym mieście.')
             if kind=='promote':
-                if p.promoted or p.level<20 or p.gold<2000:return await self.notice(p,'Promocja wymaga poziomu 20 i 2000 złota; można ją kupić tylko raz.')
-                p.gold-=2000;p.promoted=True;p.soul=min(200,p.soul+100)
+                if p.promoted or p.level<PROMOTION_LEVEL or p.gold<PROMOTION_COST:
+                    return await self.notice(p,f'Promocja wymaga poziomu {PROMOTION_LEVEL} i {PROMOTION_COST} złota; można ją kupić tylko raz.')
+                p.gold-=PROMOTION_COST;p.promoted=True;p.soul=min(200,p.soul+100)
             elif kind=='bless':
                 if p.blessed or p.level<40 or p.gold<500:return await self.notice(p,'Błogosławieństwo: poziom 40, 500 złota; działa na jedną śmierć.')
                 p.gold-=500;p.blessed=True
             elif kind=='mastery':
                 branch=data.get('branch')
-                if p.level<50 or not p.promoted:return await self.notice(p,'Specjalizacja wymaga promocji i poziomu 50.')
+                if p.level<50 or not p.promoted:return await self.notice(p,'Mistrzostwo wymaga promocji i poziomu 50.')
                 points=(p.level-50)//5+1-sum(p.mastery.values())
                 if not isinstance(branch,str) or branch not in ('power','focus') or points<1 or p.mastery.get(branch,0)>=20:
                     return await self.notice(p,'Brak punktu lub wybrana gałąź osiągnęła 20 punktów.')
                 p.mastery[branch]=p.mastery.get(branch,0)+1
             else:
                 if not sum(p.mastery.values()):return
-                if p.gold<200:return await self.notice(p,'Zmiana specjalizacji kosztuje 200 złota.')
+                if p.gold<200:return await self.notice(p,'Zmiana przydziału punktów mistrzostwa kosztuje 200 złota.')
                 p.gold-=200;p.mastery={};p.hp=min(p.hp,p.max_hp);p.mana=min(p.mana,p.max_mana)
         else:return
         self.persist()

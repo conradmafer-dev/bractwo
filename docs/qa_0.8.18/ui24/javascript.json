@@ -1,0 +1,20 @@
+{
+  "command": [
+    "node",
+    "--test",
+    "tests/test_wizard_schools_ui24.cjs",
+    "tests/test_wizard_vfx_ui24.cjs",
+    "tests/test_casters_0814.cjs",
+    "tests/test_training_refresh_ui08.cjs",
+    "tests/test_spellbook_ui16.cjs",
+    "tests/test_client_runtime.cjs",
+    "tests/test_app_shell.cjs",
+    "tests/test_level_up.cjs"
+  ],
+  "pythonpath": "tests and repository root",
+  "tests": 151,
+  "exit_code": 0,
+  "seconds": 29.29,
+  "report": "javascript.txt",
+  "runner_duration_ms": 11022.098785
+}

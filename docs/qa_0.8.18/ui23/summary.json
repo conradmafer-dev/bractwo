@@ -1,0 +1,42 @@
+{
+  "version": "0.8.18",
+  "ui_revision": "UI_23",
+  "based_on": "BRACTWO_0.8.18_UI_22_FULL_SOURCE.zip",
+  "finished_at_utc": "2026-09-30T01:10:29.902817+00:00",
+  "status": "PASS",
+  "features": [
+    "Promotion for every class at level 10, one-time 2000 in-game gold, server-authoritative",
+    "New druid circle selection requires promotion; existing circle owners retain skills without extra charge or automatic promotion",
+    "Distinct animated SVG graphics for Demon, Abyss Walker and Abyss Lord; humanoid fallback in both clients",
+    "Mastery remains level50/every5, consistent mastery label instead of confusing specialization label"
+  ],
+  "results": {
+    "python_tests": 90,
+    "javascript_tests": 22,
+    "browser_checks": 8,
+    "browser_javascript_exceptions": 0,
+    "graphics_checks": 10,
+    "syntax_files": 20
+  },
+  "reports": [
+    "python.json",
+    "python.txt",
+    "javascript.json",
+    "javascript.txt",
+    "browser_results.json",
+    "demon_graphics.json",
+    "syntax.json",
+    "source_changes.json"
+  ],
+  "limits": [
+    "Wizard schools remain a proposal and are not implemented in this revision; future selection is planned to require level10 and promotion.",
+    "Other class promotion perks are proposals only and do not alter combat in this revision.",
+    "Browser checks use an isolated database and explicit fake Google provider. No real production Google sign-in or Railway deployment performed.",
+    "Desktop/touch browser emulation, not a physical phone test.",
+    "Godot was unavailable for runtime tests; its historical client still lacks mandatory Google login integration."
+  ],
+  "test_setup_corrections": [
+    "Initial unittest invocation omitted tests/ from PYTHONPATH; rerun with repository test path passed all90 selected tests. Original import-error log retained.",
+    "Browser fixture was corrected to open the mobile character panel through its menu and to treat dragon graphics as procedural rather than a missing SVG. Final8 scenarios passed without production changes."
+  ]
+}

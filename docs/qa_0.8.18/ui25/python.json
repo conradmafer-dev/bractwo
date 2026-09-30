@@ -1,0 +1,25 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "test_town_services_ui25",
+    "test_transport_ui20",
+    "test_google_security_ui22",
+    "test_google_auth_ui22",
+    "test_google_account_constraints_ui22",
+    "test_ui19_core_integration",
+    "test_continent_ui20",
+    "test_expedition_ui20",
+    "test_promotion_ui23",
+    "test_wizard_schools_ui24",
+    "test_wizard_offense_ui24",
+    "test_wizard_defense_ui24",
+    "test_app_shell_http_0818",
+    "test_railway"
+  ],
+  "tests": 146,
+  "exit_code": 0,
+  "seconds": 30.44,
+  "report": "python.txt"
+}

@@ -1,0 +1,191 @@
+{
+  "status": "PASS",
+  "files": 37,
+  "checks": [
+    {
+      "path": "server/caster_rules.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/combat_rules.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/dnd_content.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/dnd_game.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/druid_circle_game.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/druid_circle_spells.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/environment_rules.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/equipment_rules.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/level_up.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/progression_guide.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/server.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/spell_scaling.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/wizard_defense.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/wizard_offense.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/wizard_school_game.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "server/wizard_schools.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "tests/smoke_railway.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "tests/test_app_shell.cjs",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "tests/test_app_shell_http_0818.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "tests/test_railway.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "tests/test_spellbook_ui16.cjs",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "tests/test_training_refresh_ui08.cjs",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "tests/test_wizard_defense_ui24.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "tests/test_wizard_offense_ui24.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "tests/test_wizard_schools_ui24.cjs",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "tests/test_wizard_schools_ui24.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "tests/test_wizard_vfx_ui24.cjs",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "tools/browser_ui24.cjs",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "tools/browser_ui24_run.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "tools/browser_ui24_server.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "tools/package_0818.py",
+      "status": "PASS",
+      "check": "Python AST parse"
+    },
+    {
+      "path": "web/caster_ui.js",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "web/character_sheet.js",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "web/game.js",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "web/runtime.js",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "web/sw.js",
+      "status": "PASS",
+      "check": "node --check"
+    },
+    {
+      "path": "web/wizard_vfx.js",
+      "status": "PASS",
+      "check": "node --check"
+    }
+  ]
+}

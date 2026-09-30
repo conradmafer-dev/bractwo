@@ -289,7 +289,7 @@ DEFAULT_HOTBARS = {
 def hotbar_signature(p):
     try:from . import druid_circles as dc
     except ImportError:import druid_circles as dc
-    return (p.class_id,p.level,getattr(p,'druid_circle',''),getattr(p,'form',''),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),dc.active(p,'grappled'))
+    return (p.class_id,p.level,getattr(p,'promoted',False),getattr(p,'wizard_school',''),getattr(p,'druid_circle',''),getattr(p,'form',''),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),dc.active(p,'grappled'))
 
 def sync_hotbar(p):
     """Preserve valid custom positions, but never hide unlocked spells off-bar."""
@@ -393,6 +393,10 @@ def spell_allowed(p, key):
     except ImportError:
         import druid_circles as dc
     if not s:return False
+    if key.startswith('wizard_'):
+        try: from . import wizard_schools
+        except ImportError: import wizard_schools
+        return wizard_schools.feature_allowed(p,key)
     if key=='beast_trample':
         try:from . import caster_rules
         except ImportError:import caster_rules

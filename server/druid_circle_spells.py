@@ -184,7 +184,7 @@ class DruidCircleSpells:
         return True
 
     def _circle_save_roll(self,p,t,s,ability=None):
-        result=self.target_save(t,ability or s.get('save','wisdom'),rules.spell_dc(p),
+        result=self.spell_target_save(p,t,ability or s.get('save','wisdom'),rules.spell_dc(p),
             dict(damage=0,damage_dice='',damage_rolls=[]),False)
         self.report_roll(p,t,result,s['name'],p)
         return result.get('saved',False)
@@ -347,7 +347,9 @@ class DruidCircleSpells:
                 return await self.notice(p,'Ten czar działa tylko na humanoidy.')
         # No resources or previous concentration change before all validation passes.
         self.cancel_channel(p) if hasattr(self,'cancel_channel') else None
+        self.wizard_prepare_spell(p,s,targets,target_id,mana)
         self.begin_action(p);self.spend_mana(p,mana);self.circle_commit_spell(p,s,free)
+        if mana>0:self.wizard_after_paid_spell(p,key,s)
         dnd.record_spell_use(p,key);p.pending_spell={};train(p,'magic',max(1,mana))
         if s.get('concentration'):
             self.break_concentration(p);p.concentration=key;p.concentration_until=now+s['duration'];p.concentration_profile=s
@@ -379,6 +381,7 @@ class DruidCircleSpells:
         if key not in FIELD_KEYS:
             footprint=self._field_visual_area(dict(x=point.x,y=point.y,floor=p.floor,radius=s['radius']),s) if point is not None and s.get('area') else None
             self.spell_effect(p,key,point if point is not None else targets[0] if targets else p,targets,spec=s,area=footprint)
+        self.wizard_finish_spell(p,s)
         with self.db:
             self.save_player(p)
             for t in targets:

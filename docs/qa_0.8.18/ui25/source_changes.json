@@ -1,0 +1,250 @@
+{
+  "baseline": "BRACTWO_0.8.18_UI_24_FULL_SOURCE.zip",
+  "changes": [
+    {
+      "path": "README.md",
+      "kind": "modified",
+      "sha256": "3e69533d23267d293b936aac347b73f73b0659d1ee2b641a4088bddd4d215596"
+    },
+    {
+      "path": "client/project.godot",
+      "kind": "modified",
+      "sha256": "5261d492b5bc330e98d745fa5777f084f42a48db4d56972fbecbeddecc03157b"
+    },
+    {
+      "path": "client/scripts/main.gd",
+      "kind": "modified",
+      "sha256": "5422696a2d94899bcf9b2c0171058ff5bcdfad908236ca5f85cdb14c147c1a92"
+    },
+    {
+      "path": "docs/UI_22_GOOGLE_ACCOUNTS.md",
+      "kind": "modified",
+      "sha256": "8de54eeb5f1a04576b9bcc9f9f8c7bac9eed59d4b435274f836636f04ad3ca5c"
+    },
+    {
+      "path": "docs/UI_25_BRACTWO_KRAIN.md",
+      "kind": "added",
+      "sha256": "93961ccacd1194c3d16bcf052fc8695957f0dedb47accb2047a398e62a75c818"
+    },
+    {
+      "path": "run.py",
+      "kind": "modified",
+      "sha256": "5d9437d1eac3cd592b2d5e28f42b82c8f186780bd26474c7548b5beec83a573a"
+    },
+    {
+      "path": "server/continent_world.py",
+      "kind": "modified",
+      "sha256": "a41ebf1b11db6620ca7c7071813474c6cb0e6c970150b9dcc281315d73ab6660"
+    },
+    {
+      "path": "server/google_accounts.py",
+      "kind": "modified",
+      "sha256": "3947a1ed57fae41249e43142b2a771ba4d7ff6c8b340989d0bc16cb737e7d593"
+    },
+    {
+      "path": "server/progression.py",
+      "kind": "modified",
+      "sha256": "b868b585212359b5d07516747ab417d03309c59d52c10471752b741f3f49dfcb"
+    },
+    {
+      "path": "server/server.py",
+      "kind": "modified",
+      "sha256": "8c8761d76afb0b04dada4f667823c6c8cea7b77138999559f541650a6b8dc9d9"
+    },
+    {
+      "path": "server/town_services.py",
+      "kind": "added",
+      "sha256": "264c3ac462af4b7fe0ae87cb927a74de35f43ba75a36326f0d1dc7c5b8548e68"
+    },
+    {
+      "path": "tests/smoke_railway.py",
+      "kind": "modified",
+      "sha256": "ad1a8aeb3744db0fbb592fd454b114dea87d23d95a2b850c126aa7e27697634a"
+    },
+    {
+      "path": "tests/test_app_shell.cjs",
+      "kind": "modified",
+      "sha256": "fdb9bbf02aa23b7a183956915169c93871d60a8431144cda849a29402853be66"
+    },
+    {
+      "path": "tests/test_app_shell_http_0818.py",
+      "kind": "modified",
+      "sha256": "8ea4752af45cc03fd362fc22ac7665337a988275fb9bbd7196aabc23b99e7087"
+    },
+    {
+      "path": "tests/test_google_account_constraints_ui22.py",
+      "kind": "modified",
+      "sha256": "939cd3f4c5c91ba6165b50306d2f1157ab45587f0ec17d6fa42f5cce1db4be0a"
+    },
+    {
+      "path": "tests/test_google_auth_ui22.cjs",
+      "kind": "modified",
+      "sha256": "78a9e05386ea93c7dccf0eae8dfc24105e1233b032e192dd78c52b24f920b110"
+    },
+    {
+      "path": "tests/test_google_security_ui22.py",
+      "kind": "modified",
+      "sha256": "8a8f884d21c733b8c7491f283af6418dff26259852461e8d0ac29567beab38ef"
+    },
+    {
+      "path": "tests/test_railway.py",
+      "kind": "modified",
+      "sha256": "f010db20e6af1d237e950c0661fba21db02cc0daf41ec5e99145c8c2f3944d01"
+    },
+    {
+      "path": "tests/test_respawn_city_ui18.py",
+      "kind": "modified",
+      "sha256": "02451ece2eaaa7c1718b6b8fe7c5d2c32d28b38d393efa79be888795ed618c82"
+    },
+    {
+      "path": "tests/test_town_services_ui25.py",
+      "kind": "added",
+      "sha256": "5a717a87ba7ac77d5e0dd5f6cccb02046eb6fcdc4222ff41bb14f52919cfe39b"
+    },
+    {
+      "path": "tests/test_transport_ui20.py",
+      "kind": "modified",
+      "sha256": "0799215326b210b30d6d409685908c71610b3a4e70a51bbb24f9c267506a6f0f"
+    },
+    {
+      "path": "tests/test_ui19_core_integration.py",
+      "kind": "modified",
+      "sha256": "2fa1a5a46823145827164112537172847e1f43be7451dd27c368f9ddd03361a7"
+    },
+    {
+      "path": "tools/browser_ui25.cjs",
+      "kind": "added",
+      "sha256": "3ac49175703da872fa0267ef627841090d17f9735fdcc573c12633ce1f865637"
+    },
+    {
+      "path": "tools/browser_ui25_run.py",
+      "kind": "added",
+      "sha256": "29efe458900e5876cc61ded0286868617fe5f72a5fad1d2f5d5d265a0173cd11"
+    },
+    {
+      "path": "tools/browser_ui25_server.py",
+      "kind": "added",
+      "sha256": "3980dc1399a6db87c7602ea55f638d4688f5854d90768472db3ab63a1ec0083a"
+    },
+    {
+      "path": "tools/package_0818.py",
+      "kind": "modified",
+      "sha256": "fdd65aa906f4fdd632f88601e2f2223f62a14712269d9e5b49c4a759f001fc61"
+    },
+    {
+      "path": "web/adventure_ui.js",
+      "kind": "modified",
+      "sha256": "87e55182597b1e517b2d71e93f56a11e330e844100cea14e8f2aef687489a1c5"
+    },
+    {
+      "path": "web/app_shell.js",
+      "kind": "modified",
+      "sha256": "01767473f246ca8f1494d0a681e175b32013aac550946a6ef56fdd8cb4597152"
+    },
+    {
+      "path": "web/assets/ui/atlas.svg",
+      "kind": "added",
+      "sha256": "4b79af268e9065691447ad36d4667292bcb201a13da1be045f4f4f5c709beb67"
+    },
+    {
+      "path": "web/assets/ui/character.svg",
+      "kind": "added",
+      "sha256": "4963ea8af68059a4ad66cd00cc0c154ff825a810bf8ee0651039d0b2c3fc4b5c"
+    },
+    {
+      "path": "web/assets/ui/fullscreen.svg",
+      "kind": "added",
+      "sha256": "539191fcb56b94ce8ac9d676375af6e26b6caaaa8840e462ec32fde95d278328"
+    },
+    {
+      "path": "web/assets/ui/help.svg",
+      "kind": "added",
+      "sha256": "d8fc42296e0b5f4acbc8747b2d5a51a9c3cf1cc6012934fa026ebd3f1163d357"
+    },
+    {
+      "path": "web/assets/ui/install.svg",
+      "kind": "added",
+      "sha256": "ea7d1849bc0f7c11c2fd6214fd7f20d68d5669b28a2d1959c0b864b640d5fbb1"
+    },
+    {
+      "path": "web/assets/ui/inventory.svg",
+      "kind": "added",
+      "sha256": "f528701012b59a14feba6d60a807034837a8ee2884fa7565eebf0b5b0a8afeb9"
+    },
+    {
+      "path": "web/assets/ui/journal.svg",
+      "kind": "added",
+      "sha256": "dd2d703202fcc2ca364640a876af176ea94054844cee37a075a6db06df76f35e"
+    },
+    {
+      "path": "web/assets/ui/logout.svg",
+      "kind": "added",
+      "sha256": "8d81b2c482f1f790948cae77e69c7c24ced0b918d49672a6f73b6557f8468a37"
+    },
+    {
+      "path": "web/assets/ui/minimap.svg",
+      "kind": "added",
+      "sha256": "d6ef18178c2daf4e42c24843be464904276f5e871e636b01df155f2921d5d364"
+    },
+    {
+      "path": "web/assets/ui/party.svg",
+      "kind": "added",
+      "sha256": "69988c404b1ca2b114f61ff3daf90c4ce88b02c5e61c4427a2c2740bb0ca9e27"
+    },
+    {
+      "path": "web/game.js",
+      "kind": "modified",
+      "sha256": "05defa4563866474f7d6a9d13d08452f81c2cb9f050dcb976559c0efbe93adaf"
+    },
+    {
+      "path": "web/google_auth.js",
+      "kind": "modified",
+      "sha256": "a1441323f0dddc0c62bffbcbad59edde9e8e2978497a6bfde3e4f93310478d2e"
+    },
+    {
+      "path": "web/hud_icons.js",
+      "kind": "added",
+      "sha256": "5b9279f9a63d5ef095511b3e1878e8721ee21585fdc05afed067edb92b39fec8"
+    },
+    {
+      "path": "web/index.html",
+      "kind": "modified",
+      "sha256": "83d85933dc12ae2790a8d19d66124a9dab21b16833ccca3b256eb6718316b614"
+    },
+    {
+      "path": "web/inventory_ui.js",
+      "kind": "modified",
+      "sha256": "9a2edaa9fb6351628847ca5b602d1dc7d79405d1d2b0a6616985be2e7b9fcfe3"
+    },
+    {
+      "path": "web/manifest.webmanifest",
+      "kind": "modified",
+      "sha256": "180d6ef6dfa944065b7ed1eee22d90e505ccf69bd85c60cd9bd09b8ab4b43144"
+    },
+    {
+      "path": "web/offline.html",
+      "kind": "modified",
+      "sha256": "a5a97652061717be886b7526c5f0b0fd6f993dff62def9fb805d689950028424"
+    },
+    {
+      "path": "web/service_ui.css",
+      "kind": "added",
+      "sha256": "c228a0997e3ca0f6b606db960b14402db197043a6f88ebd6850c5df0cc68335a"
+    },
+    {
+      "path": "web/service_ui.js",
+      "kind": "added",
+      "sha256": "cb8965807a91a0f3ed88bf6edcaf6a126fb843d654c874dcab899b480af1a1c5"
+    },
+    {
+      "path": "web/sw.js",
+      "kind": "modified",
+      "sha256": "5cfcc7820a686ad48d246aa7e44eacdd308bf756e3567c185a200443bd79b26f"
+    },
+    {
+      "path": "web/windows.js",
+      "kind": "modified",
+      "sha256": "61f192ae67b0b709cf819d082f82a5a41edb05262773927c22170edb77a32c0d"
+    }
+  ]
+}
