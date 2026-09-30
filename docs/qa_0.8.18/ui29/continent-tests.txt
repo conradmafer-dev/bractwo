@@ -1,0 +1,13 @@
+test_01_all_gameplay_points_use_real_unblocked_tiles (test_continent_ui20.GeographyUI20.test_01_all_gameplay_points_use_real_unblocked_tiles) ... ok
+test_02_local_services_ports_and_entrances_reach_regional_roads (test_continent_ui20.GeographyUI20.test_02_local_services_ports_and_entrances_reach_regional_roads) ... ok
+test_03_port_network_and_authored_region_plans (test_continent_ui20.GeographyUI20.test_03_port_network_and_authored_region_plans) ... ok
+test_04_natural_regions_tessellate_and_have_dry_navigation_targets (test_continent_ui20.GeographyUI20.test_04_natural_regions_tessellate_and_have_dry_navigation_targets) ... ok
+test_05_shore_landings_and_accessible_island_network (test_continent_ui20.GeographyUI20.test_05_shore_landings_and_accessible_island_network) ... ok
+test_06_seas_block_walking_and_have_no_land_roads (test_continent_ui20.GeographyUI20.test_06_seas_block_walking_and_have_no_land_roads) ... ok
+test_07_different_island_sizes_and_authored_landscapes (test_continent_ui20.GeographyUI20.test_07_different_island_sizes_and_authored_landscapes) ... ok
+test_08_every_inhabited_land_component_has_a_port (test_continent_ui20.GeographyUI20.test_08_every_inhabited_land_component_has_a_port) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 21.619s
+
+OK

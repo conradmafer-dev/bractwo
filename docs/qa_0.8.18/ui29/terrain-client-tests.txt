@@ -1,0 +1,11 @@
+✔ web and server classify actual polygon borders, roads and all new landscapes identically (18124.370967ms)
+✔ different blockers in one terrain pocket get separate sprites; repeat frames reuse their own sprite (1.964246ms)
+✔ cached relief stays bounded across travel and produces deterministic artwork after clearing (18.420114ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 18322.841301

@@ -872,6 +872,9 @@
     const c=document.createElement('canvas');c.width=c.height=512;const g=c.getContext('2d');
     const ox=cx*512,oy=cy*512,random=seeded((cx*73856093^cy*19349663^floor*83492791)>>>0);
     const palettes={forest:['#527b42','#598449','#507a47'],meadow:['#7dab4f','#80a951','#86ae54'],swamp:['#63887a','#688c7d','#5c8378'],desert:['#cbb273','#d4bb7b','#c8ac72'],snow:['#c6dadd','#bfd4da','#d5e2e1'],lava:['#79584e','#865e4e','#81584f'],obsidian:['#635b73','#6c627d','#695f75'],mountain:['#93988b','#8e9489','#a0a194'],ruins:['#879584','#8f9b8b','#929987'],orc:['#a19161','#a99a66','#988759']};
+    if(floor===0&&(ox>=7000||oy>=6600)&&globalThis.BractwoTerrainArt){
+      globalThis.BractwoTerrainArt.paintChunk(g,{world,surfaceMap,cx,cy,floor});return c;
+    }
     const rooms=[...(world.dungeons||[]),...(world.elevations||[])].filter(d=>d.floor===floor).flatMap(d=>d.rooms);
     const desertCrypt=(world.dungeons||[]).some(d=>d.floor===floor&&d.theme==='catacomb');
 
@@ -898,6 +901,7 @@
         if(surface==='stone'){line(g,[[xx+2,yy+2],[xx+26,yy+2],[xx+29,yy+19]],'#c3c1a8',1);line(g,[[xx+4,yy+29],[xx+23,yy+29]],'#737c75',2);}
         for(let k=0;k<3;k++){const tx=xx+random()*27,ty=yy+random()*27;block(g,tx,ty,2,3,region?.biome==='snow'?'#e7eeee':region?.biome==='lava'?'#c17b58':'#a8b078');}if(noise>.94){const color=region?.biome==='lava'?'#ee9163':region?.biome==='snow'?'#eff5ed':'#dbca9b';block(g,xx+15,yy+14,4,4,color);}}
     }
+    if(floor===0)globalThis.BractwoTerrainArt?.paintChunk(g,{world,surfaceMap,cx,cy,floor});
     return c;
   }
   function drawGround(){
@@ -976,6 +980,7 @@
   let roads=[[[560,1180],[620,900],[650,640],[900,580],[1210,580],[1305,340]],[[560,1180],[1000,1180],[1490,1150],[1700,1150],[2060,1120],[2300,900],[2550,500],[2590,370]],[[560,1180],[600,1350],[820,1490]],[[560,1180],[450,1460],[340,1640]],[[2050,1120],[2050,1460],[1870,1710]],[[2080,1140],[2500,1340],[2530,1630],[2530,1930]],[[430,1130],[740,1180],[740,1260]]];
   function buildGround(){
     groundChunks.clear();warmQueue=[];warmStamp="";
+    globalThis.BractwoTerrainArt?.clear();
     if(world.landmasses?.length){ground=null;return;}
     ground=document.createElement("canvas");ground.width=3200;ground.height=2304;
     const g=ground.getContext("2d"),random=seeded(933742),tile=32,starterZones=[...(world.zones||[])].reverse();
@@ -1159,6 +1164,7 @@
   }
   function drawObstacle(o,index){
     const{x,y,w,h}=o;if(!inView(x+w/2,y+h/2,Math.max(w,h)+90))return;
+    if(o.relief_theme&&globalThis.BractwoTerrainArt?.drawRelief(ctx,o,index))return;
     if(o.type==='ruin'&&o.expedition){
       ellipse(ctx,x+w/2,y+h*.85,w*.61,h*.56,'#25231b77');block(ctx,x,y+8,w,h-8,'#776247');block(ctx,x-3,y+2,w+6,h-15,'#bdac80');block(ctx,x+3,y+5,w-6,h-21,'#d4bf8e');
       const cx=x+w/2;ellipse(ctx,cx,y+12,6,5,'#aa8849');line(ctx,[[cx,y+17],[cx,y+h-13]],'#987644',6);line(ctx,[[cx-11,y+22],[cx+11,y+22]],'#987644',3);for(const xx of[x+5,x+w-9])block(ctx,xx,y+4,4,h-15,'#766543');return;

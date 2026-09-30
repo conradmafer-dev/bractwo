@@ -1,0 +1,15 @@
+test_01_starter_valley_is_byte_identical (test_terrain_ui29.TerrainUI29.test_01_starter_valley_is_byte_identical) ... ok
+test_02_coasts_water_and_original_gameplay_locations_are_unchanged (test_terrain_ui29.TerrainUI29.test_02_coasts_water_and_original_gameplay_locations_are_unchanged) ... ok
+test_03_existing_surface_gameplay_remains_walkable (test_terrain_ui29.TerrainUI29.test_03_existing_surface_gameplay_remains_walkable) ... ok
+test_04_new_blockers_cannot_cut_a_player_sized_road_corridor (test_terrain_ui29.TerrainUI29.test_04_new_blockers_cannot_cut_a_player_sized_road_corridor) ... ok
+test_05_all_new_pocket_centres_have_real_walking_access_to_roads (test_terrain_ui29.TerrainUI29.test_05_all_new_pocket_centres_have_real_walking_access_to_roads) ... ok
+test_06_distinct_local_landscapes_are_present_in_every_biome (test_terrain_ui29.TerrainUI29.test_06_distinct_local_landscapes_are_present_in_every_biome) ... ok
+test_07_a_fresh_server_process_builds_the_same_world (test_terrain_ui29.TerrainUI29.test_07_a_fresh_server_process_builds_the_same_world) ... ok
+test_08_old_save_recovers_locally_without_restoring_pools_or_changing_items (test_terrain_ui29.TerrainUI29.test_08_old_save_recovers_locally_without_restoring_pools_or_changing_items) ... ok
+test_09_pve_and_pvp_combat_defer_recovery_and_keep_old_save_revision (test_terrain_ui29.TerrainUI29.test_09_pve_and_pvp_combat_defer_recovery_and_keep_old_save_revision) ... ok
+test_10_dead_players_and_underground_positions_are_not_teleported (test_terrain_ui29.TerrainUI29.test_10_dead_players_and_underground_positions_are_not_teleported) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 66.686s
+
+OK

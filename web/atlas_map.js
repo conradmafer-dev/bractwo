@@ -61,7 +61,7 @@
       }
       for(const r of w.regions||[]){if(!visible(r))continue;path(r);g.fillStyle=r.color||'#6b8c58';g.fill();}
       // Real forest clearings, dunes, marshes and passes retain their own irregular outline.
-      for(const p of w.terrain||[]){if(!visible(p))continue;g.save();g.globalAlpha=.34;g.fillStyle=w.surfaces?.[p.kind]?.color||({forest:'#2e633b',sand:'#e1c582',stone:'#91958b',mud:'#426d64',snow:'#e2eaee',ash:'#64555a'})[p.kind]||'#7da052';
+      for(const p of w.terrain||[]){if(!visible(p))continue;g.save();g.globalAlpha=p.relief_layer==='edge'?.16:p.relief_theme?.42:.34;g.fillStyle=w.surfaces?.[p.kind]?.color||({forest:'#2e633b',sand:'#e1c582',stone:'#91958b',mud:'#426d64',snow:'#e2eaee',ash:'#64555a'})[p.kind]||'#7da052';
         if(p.points?.length){path(p);g.fill();}else{g.beginPath();g.ellipse((p.x+p.w/2-b.x)*sx,(p.y+p.h/2-b.y)*sy,p.w*sx/2,p.h*sy/2,0,0,Math.PI*2);g.fill();}g.restore();}
       // Sparse topographic symbols describe the biome without hiding its geography.
       if(details&&b.w>18000){
@@ -84,7 +84,7 @@
       drawWater(g,w,b,width,height);
       if(b.w<16000){for(const o of w.obstacles||[])if(!(o.floor||0)&&visible(o)){
         if((o.type||o.kind)==='house'){g.fillStyle='#ab8a5b';g.fillRect((o.x-b.x)*sx,(o.y-b.y)*sy,o.w*sx,o.h*sy);}
-        else if(['mountain','canyon','terrace','grove'].includes(o.type)){g.fillStyle=o.type==='grove'?'#315d35':'#646c62';g.fillRect((o.x-b.x)*sx,(o.y-b.y)*sy,o.w*sx,o.h*sy);}
+        else if(['mountain','canyon','terrace','grove'].includes(o.type)||o.relief_theme){g.fillStyle=o.type==='grove'?'#315d35':o.relief_color||'#646c62';g.fillRect((o.x-b.x)*sx,(o.y-b.y)*sy,o.w*sx,o.h*sy);}
       }}
       if(coasts){g.restore();geo.outline(g,w,b,width,height);g.strokeStyle='#c8c297';g.lineWidth=1.2;g.stroke();}
       // Routes are indexed by server port IDs. Both directions share one visible line.

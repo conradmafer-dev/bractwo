@@ -1,0 +1,27 @@
+✔ spatial queries preserve every visible object at boundaries and across floors (39.573976ms)
+✔ FPS measures actual frame timestamps, including slow frames and reset (0.880515ms)
+✔ motion interpolates evenly and snaps on floor change or distant travel (0.401435ms)
+✔ picking uses drawn positions, ignores corpses/other floors, selects monsters and players (0.473473ms)
+✔ owner deltas retain unchanged bags but replace empty lists and never merge other accounts (0.469036ms)
+✔ surface index gives trails priority, curved segments, ellipse edges and floor stone (1.208519ms)
+✔ large monster picking follows species size and ignores other floors (0.469437ms)
+✔ combat readout explains lower d20, misses, criticals and saving throws (0.68419ms)
+✔ companion cannot be accidentally selected as a hostile monster (0.335475ms)
+✔ combat summary exposes actual damage dice and zero save damage (0.413332ms)
+✔ paginated hotbar keeps twenty-four keys and exposes every unlocked spell (0.376006ms)
+✔ hotbar pages handle empty lists and exact twenty-four-slot boundaries (0.729448ms)
+✔ status timer distinguishes six hundred rounds from real-world duration (0.520343ms)
+✔ mana budget UI names mixed slot distribution and flexible pool (0.478821ms)
+✔ spell profile overlays owner scaling without mutating the shared catalogue (0.348614ms)
+✔ hotbar mana uses selected casting rank, never static base spell cost (0.428945ms)
+✔ repeating active concentration is free, other spell costs remain payable (0.460212ms)
+✔ missing locked spell profile falls back to a safe base and empty slots stay empty (0.347242ms)
+✔ owner delta replaces spell profiles completely and never leaks them across accounts (0.495837ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 64.958667

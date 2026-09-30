@@ -38,7 +38,7 @@
     }
     at(x,y,floor=0){
       if(floor)return 'stone';
-      if((this.world.cities||[]).some(c=>Math.hypot(x-c.x,y-c.y)<205))return 'stone';
+      if((this.world.cities||[]).some(c=>Math.hypot(x-c.x,y-c.y)<(c.paving_radius||205)))return 'stone';
       const entries=this.index.cells.get(`0:${Math.floor(x/512)}:${Math.floor(y/512)}`)||[];
       for(const e of entries)if(e.kind==='road'){
         const dx=e.b[0]-e.a[0],dy=e.b[1]-e.a[1],q=Math.max(0,Math.min(1,((x-e.a[0])*dx+(y-e.a[1])*dy)/Math.max(1,dx*dx+dy*dy)));

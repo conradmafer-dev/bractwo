@@ -1,0 +1,43 @@
+{
+  "changed_files": [
+    "web/game.js",
+    "web/terrain_art.js"
+  ],
+  "syntax": {
+    "web/game.js": "passed",
+    "web/terrain_art.js": "passed"
+  },
+  "visual_review": {
+    "forest": "pixel tree canopies, low rooted soil banks, distinct clearings, continuous road",
+    "desert": "weathered rock faces, sand contours, coherent drift patterns",
+    "ridge": "jagged relief, open pass, exposed ground strata",
+    "marsh": "dry earth hummocks, mud, reeds, clear grassy areas",
+    "snow": "snow caps, wind lines, exposed stone",
+    "ash": "dark relief, basalt tones",
+    "shore": "actual landmass boundary, narrow inner bank, sea only outside land"
+  },
+  "starter_clip": "passed: every pixel in protected part of boundary chunk cx13 cy12 stayed exactly RGB(255,0,34)",
+  "sprite_isolation": "passed: distinct blockers sharing one relief_id receive distinct sprites",
+  "sprite_budget": {
+    "limit_pixels": 4000000,
+    "tested_pixels": 3462592,
+    "tested_sprites": 92
+  },
+  "cold_chunk_bake_ms_node_native_canvas": {
+    "forest": 31.38,
+    "desert": 22.98,
+    "ridge": 15.05,
+    "marsh": 15.25
+  },
+  "runtime_controls": "Whole outside chunks bypass legacy tile pass; background art created only once per 512px chunk; relief sprites pre-render once into bounded LRU cache; cache clears on welcome/buildGround; starter and floor rendering retain existing path.",
+  "limits": "Native canvas renders validate actual Canvas drawing code. Chromium was unavailable, so no browser/mobile FPS measurement was claimed.",
+  "screenshots": [
+    "terrain-forest.png",
+    "terrain-desert.png",
+    "terrain-ridge.png",
+    "terrain-marsh.png",
+    "terrain-snow.png",
+    "terrain-ash.png",
+    "terrain-shore.png"
+  ]
+}

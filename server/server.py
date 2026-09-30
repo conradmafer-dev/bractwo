@@ -24,7 +24,7 @@ try:
     from . import world_content as content
     from . import seo
     from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
-    from . import continent_world, adventure_content, expedition_content
+    from . import continent_world, adventure_content, expedition_content, terrain_detail
     from .adventure_combat import AdventureGame
     from .google_accounts import GoogleAccountGame
     from .google_auth import GoogleAuthService, register_routes as register_google_routes
@@ -54,7 +54,7 @@ except ImportError:
     import world_content as content
     import seo
     import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
-    import continent_world, adventure_content, expedition_content
+    import continent_world, adventure_content, expedition_content, terrain_detail
     from adventure_combat import AdventureGame
     from google_accounts import GoogleAccountGame
     from google_auth import GoogleAuthService, register_routes as register_google_routes
@@ -288,6 +288,8 @@ wizard_schools.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 martial_rules.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 environment_rules.configure_world()
 continent_world.finalize(content, OBSTACLES)
+terrain_detail.configure(content, OBSTACLES, LANDMARKS)
+content.WORLD_REVISION = 29
 MERCHANT['stock'] = list(content.STARTER_MERCHANT_STOCK)
 content.STARTER_MERCHANT = MERCHANT
 # Powerful rings are deliberate rewards; repeatable monster drops remain rare.
@@ -771,7 +773,7 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
                 "ports": getattr(content,"PORTS",[]), "sea_routes": getattr(content,"SEA_ROUTES",[]),
                 "magic_items": magic_items.metadata(),
                 "skill_challenge_catalog": self.skill_challenge_metadata(),
-                "terrain": content.TERRAIN, "surfaces": content.SURFACES, "premium": content.PREMIUM,
+                "terrain": content.TERRAIN, "terrain_detail": getattr(content,"TERRAIN_DETAIL",{}), "surfaces": content.SURFACES, "premium": content.PREMIUM,
                 "elevations": content.ELEVATIONS, "waterways": content.WATERWAYS, "bridges": content.BRIDGES,
                 "pois": content.POIS, "canyons": content.CANYONS, "rarities": loot_tables.RARITIES,
                 "environment_trees": self.environment_trees(),
@@ -872,14 +874,48 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
         # Old relic progression may have saved a character in an invalid tile.
         stranded = p.floor == 0 and getattr(content.WATER_MAP,"ocean_blocked",lambda *_:False)(p.x,p.y,18)
         p._shore_recovery_pending = stranded
+        p._terrain_recovery_pending = (not stranded and p.floor == 0 and saved.get('world_revision',20) < 29
+                                      and self.terrain_obstacle_at(p) and self.blocked_for(p,p.x,p.y))
         if stranded:
             self.environment_recover_shore(p)
+        elif p._terrain_recovery_pending:
+            self.recover_terrain_position(p)
         elif self.blocked_for(p,p.x,p.y) and max(p.combat_until,p.pvp_combat_until) <= self.now():
             p.x,p.y,p.floor = town_services.respawn_position(content,p.home_city)
-        p.world_revision = saved.get("world_revision",18) if p._shore_recovery_pending else getattr(content,"WORLD_REVISION",20)
+        p.world_revision = saved.get("world_revision",18) if p._shore_recovery_pending or p._terrain_recovery_pending else getattr(content,"WORLD_REVISION",20)
         p.unjust_kills = [t for t in p.unjust_kills if t > self.now()-86400]
         p.aggressors = {k: t for k, t in p.aggressors.items() if t > self.now()}
         return p
+
+    def terrain_obstacle_at(self,p):
+        """Only new static relief can trigger the one-time geography migration."""
+        if p.floor:return False
+        return any(o.get('relief_theme') and intersects(p.x,p.y,o,18)
+                   for cx in range(int((p.x-18)//256),int((p.x+18)//256)+1)
+                   for cy in range(int((p.y-18)//256),int((p.y+18)//256)+1)
+                   for o in self.obstacle_cells.get((0,cx,cy),()))
+
+    def recover_terrain_position(self,p):
+        """Move a pre-update save out of new relief locally, after combat ends."""
+        if not getattr(p,'_terrain_recovery_pending',False) or not p.alive:return False
+        if max(p.combat_until,p.pvp_combat_until)>self.now():return False
+        if not self.terrain_obstacle_at(p) or not self.blocked_for(p,p.x,p.y):
+            p._terrain_recovery_pending=False
+            p.world_revision=getattr(content,'WORLD_REVISION',29)
+            return False
+        origin=(p.x,p.y)
+        destination=None
+        for radius in (32,64,96,128,192,256,384,512,768,1024):
+            candidates=[(origin[0]+math.cos(i*math.tau/32)*radius,
+                         origin[1]+math.sin(i*math.tau/32)*radius) for i in range(32)]
+            destination=next((q for q in candidates if not self.blocked(*q,radius=18,floor=0)),None)
+            if destination:break
+        if destination is None:return False
+        p.x,p.y=destination;p.dx=p.dy=0;p.input_time=-10
+        p.world_revision=getattr(content,'WORLD_REVISION',29)
+        p._terrain_recovery_pending=False
+        self.caster_message(p,'Po zmianie terenu przeniesiono postać na pobliskie dostępne miejsce.')
+        return True
 
     async def send(self, ws, message):
         if ws is not None and not ws.closed:
@@ -1746,6 +1782,7 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
                 continue
             if not p.alive:
                 continue
+            self.recover_terrain_position(p)
             if not p.disconnected and self.time-p.input_time <= .35:
                 self.move(p, p.dx*p.speed*dt, p.dy*p.speed*dt)
             # Health and spell resources recover through the explicit rest rules.
@@ -1904,7 +1941,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_28","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_29","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):
@@ -1928,7 +1965,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
             raise web.HTTPNotFound()
         return web.FileResponse(path,headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
     app.router.add_get("/landing.css",landing_css)
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/skills_ui.js","skills_ui.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/skills_ui.js","skills_ui.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/terrain_art.js","terrain_art.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

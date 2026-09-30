@@ -1,0 +1,59 @@
+{
+  "revision": "UI_29",
+  "created_at": "2026-09-30T17:30:48.846568+00:00",
+  "base": "BRACTWO_KRAIN_0.8.18_UI_28_CECHY_UMIEJETNOSCI_FULL_SOURCE.zip",
+  "passed": true,
+  "terrain": {
+    "pockets": 167,
+    "patches": 668,
+    "obstacles": 666,
+    "regions": 20,
+    "themes": 15
+  },
+  "validation": {
+    "python_terrain": {
+      "passed": 10,
+      "failed": 0,
+      "log": "terrain-tests.txt"
+    },
+    "continent": {
+      "passed": 8,
+      "failed": 0,
+      "log": "continent-tests.txt"
+    },
+    "javascript_terrain": {
+      "passed": 3,
+      "failed": 0,
+      "log": "terrain-client-tests.txt"
+    },
+    "atlas": {
+      "passed": 13,
+      "failed": 0,
+      "log": "atlas-tests.txt"
+    },
+    "runtime": {
+      "passed": 19,
+      "failed": 0,
+      "log": "runtime-tests.txt"
+    },
+    "http_websocket": {
+      "passed": true,
+      "report": "http_ws.json"
+    },
+    "canvas": {
+      "passed": true,
+      "report": "rendering.json"
+    },
+    "syntax": {
+      "python": true,
+      "javascript": true
+    }
+  },
+  "limits": [
+    "No Chromium available: complete browser UI and mobile browser FPS were not tested.",
+    "No physical Android device or Godot engine run/export.",
+    "The terrain Canvas previews use real world data and a placeholder avatar, not the full game UI.",
+    "No Railway deployment performed."
+  ],
+  "changed_files_report": "changed_files.json"
+}

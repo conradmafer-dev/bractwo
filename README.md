@@ -1,4 +1,7 @@
-# Bractwo Krain 0.8.18 UI_28 — cechy, umiejętności i wybrzeża
+# Bractwo Krain 0.8.18 UI_29 — ukształtowanie terenu
+
+Dalsze krainy otrzymały 167 lokalnych formacji: leśne doliny i polany, skalne przesmyki, wydmowe niecki, suche kępy na bagnach oraz osłonięte miejsca w śniegu. Nowa grafika terenu w przeglądarce korzysta z pamięci podręcznej. Układ początku gry pozostaje zachowany.
+[Szczegóły i sprawdzenia UI_29](docs/UI_29_UKSZTALTOWANIE_TERENU.md).
 
 Dodano wybór cech za 27 punktów, osobny atut pochodzenia, pełną listę 18
 umiejętności, biegłości klasowe i ekspertyzę. Rozwój cech korzysta z tej samej
@@ -70,7 +73,7 @@ repozytorium. `Dockerfile`, `run.py`, `requirements.txt`, `server/` i `web/`
 mają być obok siebie. Zachowaj bazę graczy, wolumen i istniejące zmienne.
 Używaj jednej repliki serwera. Ustaw parametry Google przed wdrożeniem
 i wdróż cały serwer razem z klientem. Odśwież stronę po aktualizacji.
-Ekran wejścia oraz `/health` pokazują **UI_28**. Reset postaci nie jest potrzebny.
+Ekran wejścia oraz `/health` pokazują **UI_29**. Reset postaci nie jest potrzebny.
 Paczka nie została wdrożona automatycznie.
 
 ## Lokalnie i źródła Godota

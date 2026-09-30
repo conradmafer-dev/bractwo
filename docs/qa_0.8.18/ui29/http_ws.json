@@ -1,0 +1,95 @@
+{
+  "passed": true,
+  "limits": [
+    "Isolated test account and in-memory database; no real Google login, browser execution or production deployment."
+  ],
+  "checks": [
+    {
+      "health": {
+        "ok": true,
+        "players": 0,
+        "version": "0.8.18",
+        "ui_revision": "UI_29",
+        "world_revision": 29
+      }
+    },
+    {
+      "local_scripts_served": {
+        "runtime.js": 20849,
+        "world_geometry.js": 1985,
+        "atlas_map.js": 15243,
+        "spell_vfx.js": 35861,
+        "inventory_ui.js": 12837,
+        "fighter_ui.js": 5325,
+        "fighter_vfx.js": 5082,
+        "caster_ui.js": 35266,
+        "caster_vfx.js": 7295,
+        "circle_spell_ui.js": 3701,
+        "circle_vfx.js": 16841,
+        "martial_ui.js": 13859,
+        "skills_ui.js": 19674,
+        "character_sheet.js": 22822,
+        "level_up.js": 6582,
+        "loot_ui.js": 4305,
+        "mobile.js": 8678,
+        "windows.js": 15013,
+        "rest_ui.js": 9038,
+        "app_shell.js": 9339,
+        "hotbar_ui.js": 8877,
+        "adventure_ui.js": 5563,
+        "google_auth.js": 13868,
+        "wizard_vfx.js": 8315,
+        "service_ui.js": 8996,
+        "hud_icons.js": 755,
+        "terrain_art.js": 21495,
+        "game.js": 165129
+      }
+    },
+    {
+      "websocket_world_counts": {
+        "pockets": 167,
+        "patches": 668,
+        "obstacles": 666,
+        "regions": {
+          "region_0": 8,
+          "region_1": 9,
+          "region_2": 8,
+          "region_3": 8,
+          "region_4": 9,
+          "region_5": 8,
+          "region_6": 8,
+          "region_7": 9,
+          "region_8": 8,
+          "region_9": 8,
+          "region_10": 9,
+          "region_11": 8,
+          "region_12": 8,
+          "region_13": 9,
+          "region_14": 8,
+          "region_15": 8,
+          "region_16": 9,
+          "region_17": 8,
+          "region_18": 8,
+          "region_19": 9
+        },
+        "themes": {
+          "wooded_valley": 15,
+          "broken_ridge": 34,
+          "field_copse": 8,
+          "forest_clearing": 6,
+          "root_ridge": 14,
+          "rock_pass": 20,
+          "desert_gully": 9,
+          "dune_basin": 8,
+          "marsh_hummocks": 3,
+          "reed_banks": 2,
+          "ruin_terraces": 9,
+          "ash_rift": 12,
+          "stone_shelf": 16,
+          "snow_hollow": 6,
+          "frost_ridge": 5
+        }
+      }
+    }
+  ]
+}
