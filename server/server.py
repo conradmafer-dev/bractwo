@@ -22,7 +22,6 @@ import time
 from aiohttp import web, WSMsgType
 try:
     from . import world_content as content
-    from . import seo
     from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     from . import continent_world, adventure_content, expedition_content
     from .adventure_combat import AdventureGame
@@ -50,7 +49,6 @@ try:
     from . import progression_guide
 except ImportError:
     import world_content as content
-    import seo
     import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     import continent_world, adventure_content, expedition_content
     from adventure_combat import AdventureGame
@@ -1874,35 +1872,17 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app=web.Application(client_max_size=MAX_MESSAGE)
     app["game"]=Game(db_path, clock=clock)
     app["google_auth"]=google_auth_service if google_auth_service is not None else GoogleAuthService.from_env()
-    seo_config=seo.SEOConfig.from_env()
     register_google_routes(app,app["google_auth"],account_info=app["game"].google_account_info)
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_27","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_26","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    async def index_redirect(request):
-        raise web.HTTPMovedPermanently(location=request.rel_url.with_path("/",keep_query=True))
-    async def robots(request):
-        return web.Response(text=seo.robots_txt(seo_config),content_type="text/plain",
-                            headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
-    async def sitemap(request):
-        return web.Response(text=seo.sitemap_xml(seo_config),content_type="application/xml",
-                            headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
-    app.router.add_get("/index.html",index_redirect)
-    app.router.add_get("/robots.txt",robots)
-    app.router.add_get("/sitemap.xml",sitemap)
-    async def landing_css(request):
-        path=web_dir/"landing.css"
-        if not path.is_file():
-            raise web.HTTPNotFound()
-        return web.FileResponse(path,headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
-    app.router.add_get("/landing.css",landing_css)
     for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
@@ -1912,8 +1892,6 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
             if filename == "index.html":
                 headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
                 headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-                return web.Response(text=seo.render_index(path.read_text(encoding="utf-8"),seo_config),
-                                    content_type="text/html",headers=headers)
             if filename == "manifest.webmanifest":
                 headers["Content-Type"] = "application/manifest+json"
             elif filename == "sw.js":

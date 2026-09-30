@@ -8,11 +8,7 @@
   <meta name="apple-mobile-web-app-title" content="Bractwo Krain">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-  <title>Bractwo Krain – polska gra RPG online w przeglądarce</title>
-  <meta name="description" content="Polska gra RPG online w przeglądarce. Wybierz jedną z czterech klas, odkrywaj krainy i podziemia, zdobywaj łupy i graj z innymi.">
-  <meta name="robots" content="index, follow, max-image-preview:large">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
-  <!-- SEO_HEAD -->
+  <title>Bractwo Krain</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="character_sheet.css">
   <link rel="stylesheet" href="level_up.css">
@@ -29,33 +25,21 @@
   <link rel="stylesheet" href="adventure_ui.css">
   <link rel="stylesheet" href="google_auth.css">
   <link rel="stylesheet" href="service_ui.css">
-  <link rel="stylesheet" href="/landing.css">
 </head>
 <body>
   <canvas id="world" aria-label="Otwarty świat Bractwa Krain"></canvas>
   <div id="vignette"></div>
-  <main id="authScreen" class="auth-screen" aria-label="Bractwo Krain — strona gry">
-    <div class="landing-shell">
-      <header class="landing-header">
-        <a class="landing-brand" href="#poczatek" aria-label="Bractwo Krain — początek strony"><svg viewBox="0 0 36 44" width="30" height="38" aria-hidden="true"><path d="M18 2 33 9v13c0 9-8 16-15 20C11 38 3 31 3 22V9Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M18 8v25m-7-9h14m-11 9h8m-8-18 4-7 4 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><span>BRACTWO<small>KRAIN</small></span></a>
-        <nav class="landing-nav" aria-label="O grze">
-          <a href="#swiat">Świat</a><a href="#klasy">Klasy</a><a href="#pytania">Pytania</a><a class="landing-nav-play" href="#wejscie">Zagraj <span aria-hidden="true">↗</span></a>
-        </nav>
-      </header>
-      <div id="poczatek" class="landing-hero">
-        <section class="landing-intro" aria-labelledby="landing-title">
-          <p class="landing-kicker"><span aria-hidden="true"></span> OTWARTY ŚWIAT · WSPÓLNA PRZYGODA</p>
-          <h1 id="landing-title">Bractwo <em>Krain</em></h1>
-          <p class="landing-subtitle">Polska gra RPG online w przeglądarce</p>
-          <p class="landing-lead">Za murami osady zaczyna się twoja historia. Wyrusz przez lasy i archipelagi, zejdź do zapomnianych krypt i rozwijaj bohatera w świecie dzielonym z innymi graczami.</p>
-          <a class="landing-cta" href="#wejscie">Rozpocznij przygodę <span aria-hidden="true">↗</span></a>
-          <p class="landing-platforms">Na komputerze i telefonie <span aria-hidden="true">·</span> Bez pobierania gry</p>
-        </section>
-        <section id="wejscie" class="auth-card landing-login" aria-labelledby="landing-login-title" tabindex="-1">
-          <div class="landing-login-ornament" aria-hidden="true">✦</div>
-          <div class="eyebrow">TWOJA PRZYGODA ZACZYNA SIĘ TUTAJ</div>
-          <h2 id="landing-login-title">Wejdź do świata.</h2>
-          <p class="muted">Wybierz bohatera lub stwórz nową postać.<br>Twój postęp i ekwipunek zostają z tobą.</p>
+  <main id="authScreen" class="auth-screen">
+    <div class="intro">
+      <div class="eyebrow">OTWARTY ŚWIAT · RPG ONLINE</div>
+      <h1>Bractwo<br><em>Krain</em></h1>
+      <p>Od zielonych marchii po lodowe pustkowia.<br>Kontynent, archipelagi i rozległe krypty. Twoja wyprawa.</p>
+      <section class="ranking-card" aria-label="Ranking graczy"><div class="ranking-heading">RANKING GRACZY <small>TOP 20 · poziom / PD</small></div><div id="rankingList" class="ranking-list">Łączenie z rankingiem…</div></section><div class="intro-bottom">CZTERY KLASY <i></i> JEDEN ŚWIAT</div>
+    </div>
+    <section class="auth-card" aria-label="Wejście do gry">
+      <div class="eyebrow">ŚCIEŻKI KRAIN</div>
+      <h2>Twoja droga przez krainy.</h2>
+      <p class="muted">Rozwijaj postać bez limitu poziomów.<br>Postęp i wyposażenie są zapisywane.</p>
       <section id="googleSignIn" class="google-sign-in" aria-label="Logowanie przez Google">
         <div id="googleButton" class="google-button"></div>
         <p id="googleStatus" class="google-status" role="status" aria-live="polite">Przygotowywanie logowania Google…</p>
@@ -85,56 +69,8 @@
         <p id="authError" class="auth-error" role="alert"></p>
         <p id="googleIntro" class="google-help">Zaloguj się przez Google. Na jednym koncie możesz utworzyć maksymalnie 4 postacie.</p>
       </section>
-          <noscript><p class="landing-noscript">Możesz przeczytać o grze poniżej. Aby zalogować się przez Google i rozpocząć rozgrywkę, włącz JavaScript w przeglądarce.</p></noscript>
-          <div class="auth-foot">BRACTWO KRAIN 0.8.18 · UI_27</div>
-        </section>
-      </div>
-      <section id="swiat" class="landing-world landing-section" aria-labelledby="landing-world-title">
-        <div class="landing-section-label"><span>01 / ŚWIAT</span><span class="landing-section-rule" aria-hidden="true"></span><span>DALEJ NIŻ ZNANA ŚCIEŻKA</span></div>
-        <div class="landing-world-grid">
-          <figure class="landing-screenshot">
-            <img src="/assets/seo/bractwo-krain-og.png" width="1920" height="1080" loading="lazy" decoding="async" alt="Rozgrywka w Bractwie Krain: bohater w pustynnej Solnej Przystani, kamienne zabudowania i nieumarli przeciwnicy.">
-            <figcaption><span class="landing-caption-dot" aria-hidden="true"></span> KADR Z GRY <span>Bractwo Krain</span></figcaption>
-          </figure>
-          <div class="landing-world-copy">
-            <h2 id="landing-world-title">Wybierz drogę.<br>Odkryj, dokąd prowadzi.</h2>
-            <p>Kontynent i otaczające go wyspy tworzą autorski świat fantasy. Przemierzaj lasy, pustynie i przełęcze. Korzystaj z przepraw łodziami i szukaj wejść do podziemi.</p>
-            <p>W jaskiniach i rozległych kryptach czekają potwory, bossowie oraz rzadkie łupy. Zdobyte wyposażenie, atuty i nowe zdolności zmieniają sposób, w jaki walczy twoja postać.</p>
-            <a class="landing-text-link" href="#klasy">Znajdź swoją klasę <span aria-hidden="true">↓</span></a>
-          </div>
-        </div>
-        <div class="landing-features">
-          <article><span class="landing-feature-number">I</span><div><h3>Wyprawy po łupy</h3><p>Wykonuj zadania, pokonuj potwory i szukaj przedmiotów pasujących do twojego bohatera.</p></div></article>
-          <article><span class="landing-feature-number">II</span><div><h3>Przygoda w drużynie</h3><p>Połącz siły z innymi graczami. Drużyna może liczyć do czterech osób.</p></div></article>
-          <article><span class="landing-feature-number">III</span><div><h3>PvP z konsekwencjami</h3><p>Poza strefami ochrony możliwa jest walka między graczami. Agresja i śmierć mają swoją cenę.</p></div></article>
-        </div>
-      </section>
-      <section id="klasy" class="landing-section landing-classes" aria-labelledby="landing-classes-title">
-        <div class="landing-section-label"><span>02 / BOHATEROWIE</span><span class="landing-section-rule" aria-hidden="true"></span><span>CZTERY DROGI ROZWOJU</span></div>
-        <div class="landing-section-heading"><h2 id="landing-classes-title">Kim staniesz się w krainach?</h2><p>Oręż, celny strzał, magia czy siła natury.<br>Wybierz klasę i rozwijaj jej możliwości.</p></div>
-        <div class="landing-class-grid">
-          <article class="landing-class"><img src="/assets/feats/martial_weapons.svg" width="58" height="58" loading="lazy" alt=""><p class="landing-class-role">ORĘŻ I WYTRZYMAŁOŚĆ</p><h3>Rycerz</h3><p>Wojownik pierwszej linii. Korzysta ze stylów walki i dodatkowych ataków. Po promocji może zostać Mistrzem Bitewnym lub Czempionem.</p></article>
-          <article class="landing-class"><img src="/assets/equipment/bow.svg" width="58" height="58" loading="lazy" alt=""><p class="landing-class-role">ŁUK I TROPIENIE</p><h3>Łowca</h3><p>Łączy walkę na dystans z czarami. Z czasem przywołuje wilczego towarzysza, a po promocji wybiera technikę łowiecką.</p></article>
-          <article class="landing-class"><img src="/assets/feats/wizard_evocation.svg" width="58" height="58" loading="lazy" alt=""><p class="landing-class-role">WIEDZA I ŻYWIOŁY</p><h3>Czarodziej</h3><p>Włada sztuczkami i czarami kolejnych kręgów. Po promocji wybiera szkołę magii, która nadaje kierunek jego rozwojowi.</p></article>
-          <article class="landing-class"><img src="/assets/equipment/nature_staff.svg" width="58" height="58" loading="lazy" alt=""><p class="landing-class-role">NATURA I PRZEMIANY</p><h3>Druid</h3><p>Czerpie moc z natury, wspiera towarzyszy i przybiera zwierzęce postacie. Po promocji wybiera własny krąg.</p></article>
-        </div>
-      </section>
-      <section class="landing-start landing-section" aria-labelledby="landing-start-title">
-        <div><p class="landing-kicker">PIERWSZY KROK</p><h2 id="landing-start-title">Od konta do przygody.</h2><a class="landing-text-link" href="#wejscie">Przejdź do logowania <span aria-hidden="true">↗</span></a></div>
-        <ol class="landing-steps"><li><span>01</span><div><h3>Zaloguj się przez Google</h3><p>Jedno konto pozwala utworzyć maksymalnie 4 postacie.</p></div></li><li><span>02</span><div><h3>Wybierz imię i klasę</h3><p>Każda postać ma własny rozwój i wyposażenie. Wybór klasy jest stały.</p></div></li><li><span>03</span><div><h3>Wyrusz z osady</h3><p>Poznaj mieszkańców, przyjmij pierwsze zadanie i odkrywaj świat w swoim tempie.</p></div></li></ol>
-      </section>
-      <div class="landing-bottom-grid landing-section">
-        <section id="pytania" class="landing-faq" aria-labelledby="landing-faq-title">
-          <p class="landing-kicker">ZANIM WYRUSZYSZ</p><h2 id="landing-faq-title">Dobrze wiedzieć.</h2>
-          <details><summary>Czy muszę pobierać grę?</summary><p>Nie. Bractwo Krain działa w przeglądarce internetowej na komputerze i telefonie. Do rozgrywki potrzebujesz połączenia z internetem oraz włączonego JavaScript.</p></details>
-          <details><summary>Jak rozpocząć grę i ile mogę mieć postaci?</summary><p>Zaloguj się przez Google w panelu na tej stronie. Następnie wybierz istniejącą postać albo utwórz nową, nadając jej imię i wybierając klasę. Na koncie możesz mieć maksymalnie 4 postacie.</p></details>
-          <details><summary>Czy mogę grać ze znajomymi?</summary><p>Tak. Gracze dzielą wspólny świat i mogą tworzyć drużyny do 4 osób. Wspólne wyprawy pozwalają walczyć z potworami i zdobywać łupy. Dostępna jest również walka PvP z ochroną osad i postaci na niskich poziomach.</p></details>
-          <details><summary>Czy postęp zapisuje się między sesjami?</summary><p>Tak. Postęp postaci i wyposażenie są zapisywane na serwerze. Po ponownym zalogowaniu na to samo konto Google możesz wybrać swojego bohatera i kontynuować przygodę, także na innym urządzeniu.</p></details>
-        </section>
-        <section class="ranking-card landing-ranking" aria-labelledby="landing-ranking-title"><div class="landing-ranking-top"><p class="landing-kicker">Z KRONIK ŚWIATA</p><h2 id="landing-ranking-title">Bohaterowie krain</h2><div class="ranking-heading">RANKING GRACZY <small>TOP 20 · poziom / PD</small></div></div><div id="rankingList" class="ranking-list">Ranking graczy pojawi się po połączeniu z serwerem.</div></section>
-      </div>
-      <footer class="landing-footer"><span>Bractwo Krain <span aria-hidden="true">·</span> Autorski świat fantasy</span><a href="#poczatek">Wróć na początek <span aria-hidden="true">↑</span></a></footer>
-    </div>
+      <div class="auth-foot"><span class="status-dot"></span> BRACTWO KRAIN 0.8.18 · UI_26 · KOMPUTER I TELEFON</div>
+    </section>
   </main>
 
   <section id="gameUI" class="game-ui" hidden aria-label="Panel gry">
