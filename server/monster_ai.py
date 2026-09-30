@@ -191,7 +191,7 @@ class MonsterAI:
             self.combat_effect(target,'enemy_impact',radius=h['radius'],duration=.35)['element']=h['element']
             for p in (*self.players.values(), *self.companions.values(), *self.familiars.values()):
                 if p.alive and p.floor==h['floor'] and not self.in_safe(p) and math.hypot(p.x-target.x,p.y-target.y)<=h['radius']+12 and self.line_clear(origin,p):
-                    self.hit_player(e,p,h['damage'],area=h['special'],damage_kind={'fire':'fire','ice':'cold','venom':'poison','arrow':'piercing','magic':'force','shadow':'necrotic'}.get(h['element'],'bludgeoning'))
+                    self.hit_player(e,p,h['damage'],area=h['special'],melee=False,damage_kind={'fire':'fire','ice':'cold','venom':'poison','arrow':'piercing','magic':'force','shadow':'necrotic'}.get(h['element'],'bludgeoning'))
         self.hazards=waiting
 
     def step_monsters(self, dt, player_cells, unsafe_ids):
@@ -316,7 +316,7 @@ class MonsterAI:
                 e.ready = self.time + spec['attack_interval']
                 e.attack_until = self.time + .3
                 damage = spec['melee_damage'] if spec.get('projectile') else spec['damage']
-                self.hit_player(e, target, damage)
+                self.hit_player(e, target, damage, melee=True)
                 self.combat_effect(e, 'sword', target, duration=.25)
             elif (spec.get('projectile') and d <= spec['range']
                     and self.time >= max(e.ready, e.ranged_ready)):
@@ -326,5 +326,5 @@ class MonsterAI:
             elif not spec.get('projectile') and d <= spec['range'] and self.time >= e.ready:
                 e.ready = self.time + spec['attack_interval']
                 e.attack_until = self.time + .3
-                self.hit_player(e, target, spec['damage'])
+                self.hit_player(e, target, spec['damage'], melee=True)
                 self.combat_effect(e, 'sword', target, duration=.25)

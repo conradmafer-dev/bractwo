@@ -287,9 +287,11 @@ DEFAULT_HOTBARS = {
 
 
 def hotbar_signature(p):
-    try:from . import druid_circles as dc
-    except ImportError:import druid_circles as dc
-    return (p.class_id,p.level,getattr(p,'promoted',False),getattr(p,'wizard_school',''),getattr(p,'druid_circle',''),getattr(p,'form',''),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),dc.active(p,'grappled'))
+    try:from . import druid_circles as dc, martial_rules as martial
+    except ImportError:import druid_circles as dc, martial_rules as martial
+    learned=martial.state(p).get('maneuvers',[])
+    learned=tuple(k for k in learned if isinstance(k,str)) if isinstance(learned,list) else ()
+    return (p.class_id,p.level,getattr(p,'promoted',False),getattr(p,'wizard_school',''),getattr(p,'druid_circle',''),getattr(p,'form',''),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),dc.active(p,'grappled'),martial.path(p),learned)
 
 def sync_hotbar(p):
     """Preserve valid custom positions, but never hide unlocked spells off-bar."""
@@ -393,6 +395,10 @@ def spell_allowed(p, key):
     except ImportError:
         import druid_circles as dc
     if not s:return False
+    if s.get('kind')=='martial_feature':
+        try:from . import martial_rules as martial
+        except ImportError:import martial_rules as martial
+        return martial.knows(p,key.removeprefix('martial_'))
     if key.startswith('wizard_'):
         try: from . import wizard_schools
         except ImportError: import wizard_schools

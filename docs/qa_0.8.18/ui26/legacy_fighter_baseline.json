@@ -1,0 +1,15 @@
+{
+  "baseline": "BRACTWO_KRAIN_0.8.18_UI_25_FULL_SOURCE.zip",
+  "exit_code": 1,
+  "failures": [
+    "test_second_wind_cooldown_survives_save (test_fighter_0813.FighterGame.test_second_wind_cooldown_survives_save)",
+    "test_surge_additional_attack_does_not_reset_other_actions (test_fighter_0813.FighterGame.test_surge_additional_attack_does_not_reset_other_actions)",
+    "test_surge_cooldown_persistent_and_main_attack_still_available (test_fighter_0813.FighterGame.test_surge_cooldown_persistent_and_main_attack_still_available)",
+    "test_second_wind_free_and_sixty_seconds (test_fighter_0813.FighterData.test_second_wind_free_and_sixty_seconds)",
+    "test_surge_is_free_not_a_spell_circle (test_fighter_0813.FighterData.test_surge_is_free_not_a_spell_circle)",
+    "test_second_wind_zero_mana_shared_bonus_and_sixty_cooldown (test_fighter_0813.FighterGame.test_second_wind_zero_mana_shared_bonus_and_sixty_cooldown)",
+    "test_shop_buy_actual_weapon_and_persistent_inventory (test_fighter_0813.FighterGame.test_shop_buy_actual_weapon_and_persistent_inventory)",
+    "test_surge_extra_attacks_all_levels (test_fighter_0813.FighterGame.test_surge_extra_attacks_all_levels)"
+  ],
+  "explanation": "All eight failed historical fighter tests also fail on untouched UI25. They assume obsolete second-based cooldowns, resetting action surge by clearing a timer, and former merchant stock. Current rest resource tests cover supported behavior."
+}

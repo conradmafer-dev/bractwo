@@ -73,9 +73,15 @@ def finish(p,kind,rng,recover=True):
     return dict(hp=round(p.hp-hp0,1),mana=round(p.mana-mana0,1),hit_dice=used)
 
 def sheet(p):
-    return [dict(id=key,name=name,remaining=remaining(p,key),maximum=maximum(p,key),
+    rows = [dict(id=key,name=name,remaining=remaining(p,key),maximum=maximum(p,key),
         recovery='Krótki: wszystkie' if key=='action_surge' else 'Krótki: 1; długi: wszystkie' if key=='second_wind' else 'Długi odpoczynek')
         for key,name in NAMES.items() if maximum(p,key)]
+    try: from . import martial_rules as martial
+    except ImportError: import martial_rules as martial
+    if martial.maximum(p):
+        rows.append(dict(id='superiority_dice', name='Kości przewagi k'+str(martial.die_sides(p)),
+            remaining=martial.remaining(p), maximum=martial.maximum(p), recovery='Krótki lub długi: wszystkie'))
+    return rows
 
 def configure(spells):
     descriptions={

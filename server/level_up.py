@@ -29,6 +29,8 @@ def record(p, first, last):
         primal_order=p.primal_order,training_feats=p.training_feats,caster_rules_version=p.caster_rules_version,
         druid_circle=p.druid_circle,druid_circle_state=p.druid_circle_state,
         wizard_school=p.wizard_school,wizard_school_state=p.wizard_school_state,
+        martial_archetype=getattr(p,'martial_archetype',''),
+        martial_state={k:v for k,v in getattr(p,'martial_state',{}).items() if k in ('maneuvers','hunter_choice')},
         mana_rules_version=p.mana_rules_version,hp_rules_version=p.hp_rules_version,
         mastery=p.mastery, fighting_style=p.fighting_style, weapon_grip=p.weapon_grip, equipment=p.equipment,
         inventory=[i for i in p.inventory if i.get('uid') in worn]))
@@ -58,6 +60,7 @@ def permanent(p, level, context):
     q.fighting_style="";q.weapon_grip="one";q.primal_order='';q.training_feats={}
     q.druid_circle='';q.druid_circle_state={};q.druid_circle_runtime={}
     q.wizard_school='';q.wizard_school_state={};q.wizard_school_runtime={}
+    q.martial_archetype='';q.martial_state={}
     # Pre-0.8.16 receipts have no mana-version stamp: preserve their earned gains.
     q.mana_rules_version=2
     q.hp_rules_version=0  # Preserve HP deltas in receipts earned before UI_12.
@@ -84,6 +87,16 @@ def receipt(p, batch, level):
     selected=wizard_schools.school(after)
     for feature_id, gate, name, description in wizard_schools.FEATURES.get(selected,()):
         if gate==level:add('school_'+feature_id,'Zdolność szkoły','+ '+name,icon=f'assets/feats/wizard_{selected}.svg')
+    try: from . import martial_rules as martial
+    except ImportError: import martial_rules as martial
+    if level==martial.PROMOTION_LEVEL and after.class_id in ('knight','ranger'):
+        add('martial_unlock','Specjalizacja po promocji','+ możliwość wyboru',icon='assets/feats/martial_'+('battle_master' if after.class_id=='knight' else 'hunter')+'.svg')
+        actions.append(dict(kind='martial',label='Wybierz specjalizację',tab='feats'))
+    if martial.path(after)=='battle_master':
+        add('superiority_dice','Kości przewagi',martial.maximum(after)-martial.maximum(before))
+        if martial.die_sides(after)!=martial.die_sides(before):add('superiority_die','Kość przewagi',f'k{martial.die_sides(before)} → k{martial.die_sides(after)}')
+    if martial.path(after)=='champion' and martial.critical_threshold(after)<martial.critical_threshold(before):
+        add('champion_critical','Krytyk bronią',f'{martial.critical_threshold(after)}–20')
     add('hp','HP',after.max_hp-before.max_hp)
     add('mana','Mana',after.max_mana-before.max_mana)
     for key in ATTRIBUTES:

@@ -1,0 +1,41 @@
+{
+  "status": "PASS",
+  "tests": 258,
+  "seconds": 32.91,
+  "failures": 0,
+  "errors": 0,
+  "modules": [
+    "test_martial_state_ui26",
+    "test_martial_combat_ui26",
+    "test_martial_hotbar_ui26",
+    "test_town_services_ui25",
+    "test_transport_ui20",
+    "test_google_security_ui22",
+    "test_google_auth_ui22",
+    "test_google_account_constraints_ui22",
+    "test_ui19_core_integration",
+    "test_continent_ui20",
+    "test_expedition_ui20",
+    "test_promotion_ui23",
+    "test_wizard_schools_ui24",
+    "test_wizard_offense_ui24",
+    "test_wizard_defense_ui24",
+    "test_app_shell_http_0818",
+    "test_railway",
+    "test_fighter_0813",
+    "test_rest_resources_0818",
+    "test_rest_0818",
+    "test_martial_review_ui26"
+  ],
+  "excluded_obsolete_tests": [
+    "test_fighter_0813.FighterData.test_second_wind_free_and_sixty_seconds",
+    "test_fighter_0813.FighterData.test_surge_is_free_not_a_spell_circle",
+    "test_fighter_0813.FighterGame.test_second_wind_zero_mana_shared_bonus_and_sixty_cooldown",
+    "test_fighter_0813.FighterGame.test_second_wind_cooldown_survives_save",
+    "test_fighter_0813.FighterGame.test_surge_additional_attack_does_not_reset_other_actions",
+    "test_fighter_0813.FighterGame.test_surge_extra_attacks_all_levels",
+    "test_fighter_0813.FighterGame.test_surge_cooldown_persistent_and_main_attack_still_available",
+    "test_fighter_0813.FighterGame.test_shop_buy_actual_weapon_and_persistent_inventory"
+  ],
+  "baseline_evidence": "legacy_fighter_baseline.json"
+}

@@ -220,11 +220,11 @@ def savage_attacker_damage(p,result,rng,now):
                   damage_rolls=chosen,damage=max(0,sum(chosen)+result.get('damage_modifier',modifier)))
     p._savage_attack_used=True
 
-def roll_attack(rng,bonus,ac,dice,disadvantage=False,advantage=False,fixed_roll=None,maximize=False):
+def roll_attack(rng,bonus,ac,dice,disadvantage=False,advantage=False,fixed_roll=None,maximize=False,critical_threshold=20):
     disadvantage,advantage=bool(disadvantage and not advantage),bool(advantage and not disadvantage)
     rolls=[fixed_roll] if fixed_roll is not None else [rng.randint(1,20) for _ in range(2 if disadvantage or advantage else 1)]
     roll=min(rolls) if disadvantage else max(rolls)
-    crit=roll==20;hit=crit or (roll!=1 and roll+bonus>=ac)
+    crit=roll>=critical_threshold;hit=crit or (roll!=1 and roll+bonus>=ac)
     result={'check':'attack','rolls':rolls,'roll':roll,'bonus':bonus,'total':roll+bonus,'defense':ac,'hit':hit,'critical':crit,
         'disadvantage':disadvantage,'advantage':advantage,'damage':0,'damage_dice':dice_text(dice),'damage_rolls':[],'damage_modifier':dice[2]}
     if hit:result.update(roll_damage(rng,dice,crit,maximize=maximize))
@@ -340,8 +340,10 @@ class CombatRounds:
         edis,eadv=self.environment_attack_flags(p,enemy)
         bonus=(spell_bonus(p) if spell else attack_bonus(p))+self.circle_roll_adjustment(p,'attack',target=enemy)-getattr(p,'exhaustion',0)*2
         result=roll_attack(self.combat_rng,bonus,spec['armor_class'],dice,disadvantage or fdis or edis or (not spell and gear.weapon_disadvantage(p)),advantage or fadv or eadv or self.caster_attack_advantage(p,enemy),
-            fixed_roll=self.wizard_take_portent(p,'attack'),maximize=spell and self.wizard_maximize_spell(p,getattr(p,'_wizard_damage_spec',{})))
+            fixed_roll=self.wizard_take_portent(p,'attack'),maximize=spell and self.wizard_maximize_spell(p,getattr(p,'_wizard_damage_spec',{})),
+            critical_threshold=self.martial_critical_threshold(p,spell))
         result['damage_type']=damage_kind or damage_type(p)
+        self.martial_precision(p,enemy,result,dice,spell)
         self.environment_adjust_damage(p,enemy,result,dice,melee)
         if not spell:
             savage_attacker_damage(p,result,self.combat_rng,self.now())
@@ -349,11 +351,13 @@ class CombatRounds:
         if spell:self.wizard_adjust_spell_attack(p,enemy,result,dice)
         self.circle_adjust_damage(p,enemy,result,weapon=not spell)
         self.environment_attack_riders(p,enemy,result,melee)
+        self.martial_damage_riders(p,enemy,result,spell)
         self.provoke_enemy(enemy,p)
         if result['hit'] or result.get('graze') or result.get('potent_cantrip'):
             self.add_hunters_mark(p,enemy,result)
             result['damage']=self.environment_damage_enemy(enemy,result['damage'],p,result['damage_type'],result.get('damage_components'),critical=result.get('critical',False));self.remember_attacker(enemy,p)
         self.report_roll(p,enemy,result,action,p)
+        self.martial_after_weapon_hit(p,enemy,result,spell)
         return result
 
     def area_hit(self,p,enemies,power,action):
@@ -366,6 +370,7 @@ class CombatRounds:
     def resolve_player_hit(self, source, target, result, action, owner=None, unjust=False):
         """One damage path for weapon hits, spells and pets: resistance, forms, death and crimes."""
         self.tag(target,owner is not None)
+        self.martial_parry(source,target,result)
         if result.get('hit') or result.get('graze') or result.get('potent_cantrip'):
             before=target.hp+getattr(target,'temp_hp',0)
             self.damage_player(target,result['damage'],killer=owner,unjust=unjust,rolled=True,
@@ -373,6 +378,8 @@ class CombatRounds:
                 is_attack=result.get('check')=='attack' and bool(result.get('hit')),source=source,is_spell=result.get('is_spell',False))
             result['damage']=round(before-target.hp-getattr(target,'temp_hp',0),1)
         self.report_roll(source,target,result,action,owner)
+        if owner is source:self.martial_after_weapon_hit(source,target,result,result.get('is_spell',False))
+        self.martial_after_incoming_attack(source,target,result)
         return result
 
     def hit_player(self,source,target,power=0,*,pvp=False,unjust=False,area=False,dice=None,damage_kind=None,spell=False,melee=None,action=None):
@@ -406,19 +413,27 @@ class CombatRounds:
             dis=bool(dis or decoy_dis)
             result=roll_attack(self.combat_rng,bonus,armor_class(target),chosen,dis or edis or active_buff(target,'foresight') or fdis,adv or fadv or eadv,
                 fixed_roll=self.wizard_take_portent(source,'attack') if pvp else None,
-                maximize=spell and self.wizard_maximize_spell(source,getattr(source,'_wizard_damage_spec',{})))
+                maximize=spell and self.wizard_maximize_spell(source,getattr(source,'_wizard_damage_spec',{})),
+                critical_threshold=self.martial_critical_threshold(source,spell) if pvp else 20)
             result['damage_type']=kind
+            if pvp:self.martial_precision(source,target,result,chosen,spell)
             self.environment_adjust_damage(source,target,result,chosen,melee if melee is not None else (gear.melee(source) if pvp else not spec.get('projectile')))
             if not getattr(target,'is_companion',False):
                 self.wizard_attack_reaction(target,result)
                 self.shield_reaction(target,result)
+            if pvp and self.martial_precision(source,target,result,chosen,spell,after_shield=True):
+                self.environment_adjust_damage(source,target,result,chosen,melee if melee is not None else gear.melee(source))
             if spell:self.wizard_adjust_spell_attack(source,target,result,chosen)
             if pvp and not spell:
                 savage_attacker_damage(source,result,self.combat_rng,self.now())
                 self.fighter_adjust_damage(source,result)
         result['damage_type']=kind
         result['is_spell']=bool(spell)
+        result['is_melee']=not area and (melee if melee is not None else (gear.melee(source) if pvp else not spec.get('projectile')))
         if pvp:self.circle_adjust_damage(source,target,result,weapon=not spell)
         if not area:self.environment_attack_riders(source,target,result,melee if melee is not None else (gear.melee(source) if pvp else not spec.get('projectile')))
-        if pvp:self.add_hunters_mark(source,target,result)
-        return self.resolve_player_hit(source,target,result,action or ('Atak' if pvp else spec['name']),owner=source if pvp else None,unjust=unjust)
+        if pvp:
+            self.martial_damage_riders(source,target,result,spell)
+            self.add_hunters_mark(source,target,result)
+        result=self.resolve_player_hit(source,target,result,action or ('Atak' if pvp else spec['name']),owner=source if pvp else None,unjust=unjust)
+        return result

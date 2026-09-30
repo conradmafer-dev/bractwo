@@ -228,7 +228,7 @@ class DNDGame(RangerMagic):
         action_name = 'Zryw akcji' if surge else 'Iskra różdżki' if rules.gear.is_focus(rules.gear.weapon(p)) else 'Atak'
         touched={}
         for i in range(rules.attacks_per_round(p)):
-            if target.hp<=0:break
+            if not p.alive or p.hp<=0 or target.hp<=0:break
             chosen=self.circle_beast_target(p,target,i)
             if chosen is None or chosen.hp<=0:continue
             touched[chosen.id]=chosen
@@ -239,6 +239,9 @@ class DNDGame(RangerMagic):
             self.trigger_ensnaring_strike(p,chosen,result)
             self.fighter_on_weapon_hit(p,chosen,result)
             self.beast_on_hit(p,chosen,result)
+            if result is not None:
+                extra=self.martial_horde_breaker(p,chosen)
+                if extra is not None:touched[extra.id]=extra
         p.form_attack_index=0
         for victim in touched.values():
             if not self.is_player_target(victim) and victim.hp<=0:await self.defeat(victim)

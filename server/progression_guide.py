@@ -64,6 +64,10 @@ def catalog():
                 details.append(f'Możliwość promocji u mistrza: {PROMOTION_COST} złota.')
                 if class_id=='druid':details.append('Po promocji możesz wybrać krąg druida w C → Atuty.')
                 if class_id=='mage':details.append('Po promocji wybierz szkołę czarodzieja w C → Atuty: Ewokacja, Odpychanie, Wróżbiarstwo lub Iluzja.')
+                if class_id=='knight':details.append('Po promocji wybierz w C → Atuty: Mistrz Bitewny (trzy manewry i 4 kości przewagi k8) albo Czempion (krytyk bronią 19–20).')
+                if class_id=='ranger':details.append('Po promocji wybierz Huntera i jedną technikę w C → Atuty: Pogromca kolosów, Rozbijacz hord albo Zabójca olbrzymów.')
+            if class_id=='knight' and level in (30,45,70,85):
+                details.append({30:'Mistrz Bitewny: piąta kość przewagi.',45:'Mistrz Bitewny: kości przewagi k10.',70:'Mistrz Bitewny: szósta kość przewagi. Czempion: krytyk bronią 18–20.',85:'Mistrz Bitewny: kości przewagi k12.'}[level])
             if class_id=='mage' and level in (25,45,65):details.append('Nowa zdolność wybranej szkoły czarodzieja; szczegóły w C → Atuty.')
             if level==40:details.append('Możliwość zakupu błogosławieństwa u mistrza: 500 złota.')
             if level==50:details.append('Po promocji: pierwszy punkt mistrzostwa; kolejne co 5 poziomów. Przydzielasz poza walką.')

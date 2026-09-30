@@ -239,13 +239,15 @@
     ui.healthPotion.disabled=!(me.potions?.health_potion>0) || me.hp<=0;
     const favoriteId=me.favorite_spell||world.classes?.[me.class_id]?.default_ability;
     const abilitySpec=Runtime.spellProfile(world.spells?.[favoriteId],me);
-    const cooldown=Math.max(0,Number(me.spell_cooldowns?.[favoriteId])||0,Number(abilitySpec?.action==='extra'?0:abilitySpec?.action==='bonus'?me.bonus_remaining:me.action_remaining)||0);
+    const cooldown=Math.max(0,Number(me.spell_cooldowns?.[favoriteId])||0,Number(['extra','toggle'].includes(abilitySpec?.action)?0:abilitySpec?.action==='bonus'?me.bonus_remaining:me.action_remaining)||0);
     ui.abilityName.textContent=abilitySpec?.name||'Brak czaru';
-    ui.abilityButton.title=`F · ${abilitySpec?.name||'Brak czaru'} — najczęściej używany z ostatnich 100 użyć`;
+    ui.abilityButton.title=`F · ${abilitySpec?.name||'Brak czaru'} — najczęściej używany z ostatnich 100 użyć`+(abilitySpec?.kind==='martial_feature'?`\n${Runtime.spellCostText(abilitySpec,me)}\n${abilitySpec.description}`:'');
     ui.abilityButton.dataset.spell=favoriteId||'';
     if(ui.abilityIcon.dataset.spell!==favoriteId){ui.abilityIcon.dataset.spell=favoriteId||'';ui.abilityIcon.replaceChildren();if(abilitySpec){const img=document.createElement('img');img.src=abilitySpec.icon;img.alt='';ui.abilityIcon.append(img);}else ui.abilityIcon.textContent=info.icon;}
-    ui.abilityCooldown.textContent=Runtime.queuedSpellLabel(abilitySpec,me)|| (abilitySpec?.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cooldown>0?`${Math.ceil(cooldown)}s`:abilitySpec?.uses_remaining!==undefined?`${abilitySpec.uses_remaining}/${abilitySpec.uses_maximum}`:"");
+    ui.abilityCooldown.textContent=Runtime.martialHotbarLabel(abilitySpec,me)||Runtime.queuedSpellLabel(abilitySpec,me)|| (abilitySpec?.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cooldown>0?`${Math.ceil(cooldown)}s`:abilitySpec?.uses_remaining!==undefined?`${abilitySpec.uses_remaining}/${abilitySpec.uses_maximum}`:"");
     ui.abilityButton.classList.toggle('queued',!!favoriteId&&me.queued_spell===favoriteId);
+    ui.abilityButton.classList.toggle('active-spell',abilitySpec?.kind==='martial_feature'&&!!abilitySpec.armed);
+    if(abilitySpec?.kind==='martial_feature')ui.abilityButton.setAttribute('aria-pressed',String(!!abilitySpec.armed));else ui.abilityButton.removeAttribute('aria-pressed');
     ui.abilityButton.classList.toggle("cooldown",cooldown>0); ui.abilityButton.disabled=!abilitySpec||!spellAvailable(abilitySpec)||!Runtime.spellUsable(abilitySpec,me);
     if(abilitySpec?.kind==='recovery')ui.abilityButton.disabled=!globalThis.BractwoCasterUI.canRecover(me);
     const zone=[...world.zones,...(world.regions||[])].find(item=>sameFloor(me,item)&&globalThis.BractwoWorldGeometry.inRegion(item,me.x,me.y));
@@ -286,7 +288,7 @@
     updateEffects(target);
     updatePotionButtons();
     updateQuestTracker(); updateBattleList();
-    characterSheet?.render();merchantPanel?.render();adventurePanel?.render();servicePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();
+    characterSheet?.render();merchantPanel?.render();adventurePanel?.render();servicePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();martialPrompt?.sync();
     if(!ui.sidePanel.hidden){if(panelMode==="inventory")renderInventory();else if(panelMode==="journal")renderJournal();else if(panelMode==="progression")renderExpansion();else renderPlayers();}
   }
   function nearestNpc(){
@@ -1624,7 +1626,7 @@
       b.dataset.spell=id||'';
       if(group){
         const span=b.querySelector('span'),iconKey=id+':'+group.icon;if(span.dataset.spell!==iconKey){span.dataset.spell=iconKey;span.replaceChildren();const img=document.createElement('img');img.src=group.icon;img.className='spell-icon';img.alt='';span.append(img);}
-        b.classList.remove('empty','locked','queued');b.classList.toggle('active-spell',group.active);
+        b.classList.remove('empty','locked','queued');b.classList.toggle('active-spell',group.active);b.removeAttribute('aria-pressed');
         b.querySelector('small').textContent=globalThis.BractwoMobile.active()?group.shortLabel:group.label;
         b.querySelector('b').textContent=group.readyIn>0?Math.ceil(group.readyIn)+' s':group.command?'Powrót':group.primary?(group.star==='archer'?'0 MP':'Powrót'):`${group.pool.remaining}/${group.pool.maximum} użyć`;
         b.disabled=group.disabled;b.groupToggle.disabled=!me.alive;
@@ -1640,10 +1642,11 @@
       b.classList.toggle('empty',!s);
       if(b.querySelector('span').dataset.spell!==id){const span=b.querySelector('span');span.dataset.spell=id;span.replaceChildren();if(s){const img=document.createElement('img');img.src=s.icon;img.className='spell-icon';img.alt='';span.append(img);}else span.textContent='·';}
       b.querySelector('small').textContent=s?.name||'Pusty';
-      b.querySelector('b').textContent=!s?'':!available?'poz. '+spellGate(s):Runtime.queuedSpellLabel(s,me)|| (revert?'Powrót':s.kind==='reaction'?(me.shield_armed?'ON':'OFF'):s.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cd>0?Math.ceil(cd)+' s':s.uses_remaining!==undefined?s.uses_remaining+'/'+s.uses_maximum:spellMana(s)?spellMana(s)+' MP':'0 MP');
+      b.querySelector('b').textContent=!s?'':!available?'poz. '+spellGate(s):Runtime.martialHotbarLabel(s,me)||Runtime.queuedSpellLabel(s,me)|| (revert?'Powrót':s.kind==='reaction'?(me.shield_armed?'ON':'OFF'):s.kind==='weapon_trigger'&&me.ensnaring_armed?'GOTOWE':cd>0?Math.ceil(cd)+' s':s.uses_remaining!==undefined?s.uses_remaining+'/'+s.uses_maximum:spellMana(s)?spellMana(s)+' MP':'0 MP');
       b.disabled=!s||!available||!Runtime.spellUsable(s,me);
+      if(s?.kind==='martial_feature')b.setAttribute('aria-pressed',String(!!s.armed));else b.removeAttribute('aria-pressed');
       if(s?.kind==='recovery')b.disabled=!globalThis.BractwoCasterUI.canRecover(me);
-      b.classList.toggle('locked',!!s&&!available);b.classList.toggle('queued',!!id&&me.queued_spell===id);b.classList.toggle('active-spell',!!s&&(s.kind==='reaction'&&me.shield_armed||revert||!!(s.buff&&me.statuses?.[s.buff]>0)||me.concentration===id||s.kind==='weapon_trigger'&&me.ensnaring_armed));
+      b.classList.toggle('locked',!!s&&!available);b.classList.toggle('queued',!!id&&me.queued_spell===id);b.classList.toggle('active-spell',!!s&&(s.kind==='martial_feature'&&s.armed||s.kind==='reaction'&&me.shield_armed||revert||!!(s.buff&&me.statuses?.[s.buff]>0)||me.concentration===id||s.kind==='weapon_trigger'&&me.ensnaring_armed));
       b.title=s?`Zestaw ${hotbarPage+1} / ${Runtime.hotbarLabel(i,false)} · ${s.name} (${s.english}) · ${s.feature?'zdolność':s.circle?'krąg '+s.circle:'sztuczka'} · poz. ${spellGate(s)} · ${Runtime.spellCostText(s,me)}\n${s.power_summary||''}\n${s.description}\n${Runtime.concentrationWarning(s,me,world.spells)}`:'Pusty slot — przypisz czar w księdze K';
     }
     hotbarMenu.refresh();
@@ -1660,7 +1663,7 @@
   lootPanel=globalThis.BractwoLootUI.create({world:()=>world,player:()=>me,prepare:()=>{characterSheet?.close();}});
   ui.targetLoot.addEventListener('click',()=>{const enemy=snapshot.enemies.find(e=>String(e.id)===selectedEnemy);if(enemy)lootPanel.open({...world.enemy_types?.[enemy.kind],kind:enemy.kind});});
   levelUpPanels=globalThis.BractwoLevelUp.create({send,ready:()=>playing&&socket?.readyState===WebSocket.OPEN,open:tab=>characterSheet.open(tab)});
-  let fighterPrompt=null,casterPrompt=null;
+  let fighterPrompt=null,casterPrompt=null,martialPrompt=null;
   characterSheet=globalThis.BractwoCharacterSheet.create({
     state:()=>({player:me,world}),send,cast,gate:spellGate,mana:spellMana,nearMaster:()=>!!nearbyService("master"),
     selectedAlly:()=>snapshot.players.find(q=>String(q.id)===String(selectedTarget)&&q.hp>0&&me?.party_id&&q.party_id===me.party_id)||null,
@@ -1684,6 +1687,7 @@
   hudWindows=globalThis.BractwoWindows.create({stop:resetControls,levelLayout:()=>levelUpPanels?.layout()});
   fighterPrompt=globalThis.BractwoFighterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
   casterPrompt=globalThis.BractwoCasterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
+  martialPrompt=globalThis.BractwoMartialUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab)});
   mobileHud=globalThis.BractwoMobile.create({stop:resetControls,closeChat});
   restUI=globalThis.BractwoRestUI.create({state:()=>({player:me,world}),send,notice,stop:resetControls,clearTarget,
     prepare:()=>{adventurePanel?.close();servicePanel?.close();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});

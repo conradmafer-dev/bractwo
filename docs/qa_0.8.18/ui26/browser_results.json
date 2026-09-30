@@ -1,0 +1,53 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Level9 blocks subclass choice in UI and authoritative WebSocket handler"
+    },
+    {
+      "name": "Level10 still requires promotion, including direct WS attempts"
+    },
+    {
+      "name": "Promotion costs2000; selecting only two maneuvers cannot submit or send a choice packet"
+    },
+    {
+      "name": "Battle Master permanently selects three unique maneuvers and receives4d8"
+    },
+    {
+      "name": "Preparing Precision and switching Riposte/Parry use real commands without spending a die"
+    },
+    {
+      "name": "A real weapon attack spends one armed superiority die and persists spent count"
+    },
+    {
+      "name": "Spellbook exposes only learned maneuvers and binds Precision to a real hotbar slot"
+    },
+    {
+      "name": "Mobile hotbar arms and cancels the assigned maneuver without spending a superiority die"
+    },
+    {
+      "name": "Battle Master choice and3/4 remaining dice survive reconnect; mobile controls fit430px"
+    },
+    {
+      "name": "Champion promotion and choice expose weapon critical threshold19–20 in the character sheet"
+    },
+    {
+      "name": "A permanently chosen Champion cannot change subclass by direct WS request"
+    },
+    {
+      "name": "Hunter permanently selects colossus_slayer after a real promotion; available descriptions and layout fit"
+    },
+    {
+      "name": "Hunter permanently selects horde_breaker after a real promotion; available descriptions and layout fit"
+    },
+    {
+      "name": "Hunter permanently selects giant_killer after a real promotion; available descriptions and layout fit"
+    }
+  ],
+  "errors": [],
+  "limits": [
+    "Isolated in-memory database, explicit fake Google provider, fixture-granted levels/gold/location and paused monster AI. Real promotion, subclass and combat handlers execute unchanged.",
+    "Headless Chromium desktop1440x900 and touch430x932 emulation; real Google accounts, physical phones and Railway deployment are not covered.",
+    "Browser tests cover choices, lockouts, controls, representative die expenditure, persistence and layout; complete combat cases belong to the Python suite."
+  ]
+}

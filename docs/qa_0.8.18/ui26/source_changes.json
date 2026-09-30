@@ -1,0 +1,198 @@
+[
+  {
+    "path": "server/martial_rules.py",
+    "status": "added"
+  },
+  {
+    "path": "server/rest_rules.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/progression_guide.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/character_sheet.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/dnd_content.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/level_up.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/dnd_game.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/combat_rules.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/martial_combat.py",
+    "status": "added"
+  },
+  {
+    "path": "server/spell_scaling.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/monster_ai.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/environment_rules.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/server.py",
+    "status": "modified"
+  },
+  {
+    "path": "server/martial_game.py",
+    "status": "added"
+  },
+  {
+    "path": "web/character_sheet.js",
+    "status": "modified"
+  },
+  {
+    "path": "web/runtime.js",
+    "status": "modified"
+  },
+  {
+    "path": "web/index.html",
+    "status": "modified"
+  },
+  {
+    "path": "web/martial_ui.js",
+    "status": "added"
+  },
+  {
+    "path": "web/game.js",
+    "status": "modified"
+  },
+  {
+    "path": "web/fighter_vfx.js",
+    "status": "modified"
+  },
+  {
+    "path": "web/sw.js",
+    "status": "modified"
+  },
+  {
+    "path": "web/martial.css",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_menacing.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_giant_killer.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_parry.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_horde_breaker.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_precision.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_champion.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_riposte.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_hunter.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_battle_master.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_colossus_slayer.svg",
+    "status": "added"
+  },
+  {
+    "path": "web/assets/feats/martial_trip.svg",
+    "status": "added"
+  },
+  {
+    "path": "tests/test_martial_state_ui26.py",
+    "status": "added"
+  },
+  {
+    "path": "tests/test_railway.py",
+    "status": "modified"
+  },
+  {
+    "path": "tests/test_martial_hotbar_ui26.cjs",
+    "status": "added"
+  },
+  {
+    "path": "tests/test_app_shell.cjs",
+    "status": "modified"
+  },
+  {
+    "path": "tests/test_spellbook_ui16.cjs",
+    "status": "modified"
+  },
+  {
+    "path": "tests/test_martial_review_ui26.py",
+    "status": "added"
+  },
+  {
+    "path": "tests/test_martial_ui26.cjs",
+    "status": "added"
+  },
+  {
+    "path": "tests/test_martial_hotbar_ui26.py",
+    "status": "added"
+  },
+  {
+    "path": "tests/test_martial_combat_ui26.py",
+    "status": "added"
+  },
+  {
+    "path": "tests/test_app_shell_http_0818.py",
+    "status": "modified"
+  },
+  {
+    "path": "tools/browser_ui26.cjs",
+    "status": "added"
+  },
+  {
+    "path": "tools/package_0818.py",
+    "status": "modified"
+  },
+  {
+    "path": "tools/browser_ui26_run.py",
+    "status": "added"
+  },
+  {
+    "path": "tools/browser_ui26_server.py",
+    "status": "added"
+  },
+  {
+    "path": "docs/UI_26_MARTIAL_PROMOTIONS.md",
+    "status": "added"
+  },
+  {
+    "path": "README.md",
+    "status": "modified"
+  }
+]

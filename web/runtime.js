@@ -104,6 +104,7 @@
   }
   function spellCostText(spec,player) {
     const s=spellProfile(spec,player);if(!s)return '';
+    if(s.kind==='martial_feature')return `${s.martial_role==='reaction'?'Reakcja':'Przygotowanie'} · 1 kość przewagi przy wykonaniu · pozostało ${s.uses_remaining??0}/${s.uses_maximum??0}`;
     if(s.already_active)return 'Aktywna postać';
     if(s.resource_cost>0)return `${s.resource_name||'Użycia'}: koszt ${s.resource_cost} · pozostało ${s.uses_remaining??0}/${s.uses_maximum??0}`;
     if(s.resource_cost===0&&!spellMana(s,player))return 'Bez many i użyć przemiany';
@@ -174,6 +175,12 @@
   function spellUsable(spec,player) {
     const s=spellProfile(spec,player);
     if(!s||!player||player.hp<=0||player.alive===false||s.available===false||s.already_active)return false;
+    if(s.kind==='martial_feature'){
+      if(player.form||player.rest?.kind||player.rest?.remaining>0||player.character_sheet?.martial?.actions_available!==true)return false;
+      // Preparing is free; the shared die and reaction are paid on execution.
+      // An exhausted warrior can still cancel a previously armed preference.
+      return s.armed===true||Number.isFinite(s.uses_remaining)&&s.uses_remaining>=1;
+    }
     if(s.kind==='wizard_feature'&&(s.action==='bonus'?player.bonus_remaining>0:player.action_remaining>0))return false;
     if(s.kind==='shape'&&player.form||s.kind==='reaction'||s.kind==='weapon_trigger'&&player.ensnaring_armed)return true;
     if(player.form&&!s.cast_in_form&&!['druid_circle','beast_action'].includes(s.kind))return false;
@@ -183,6 +190,10 @@
     if(!spec?.id||player?.queued_spell!==spec.id)return '';
     const remaining=Math.max(0,Number(player.action_remaining)||0);
     return remaining>0?`Za ${remaining.toFixed(1)} s`:'W kolejce';
+  }
+  function martialHotbarLabel(spec,player) {
+    const s=spellProfile(spec,player);
+    return s?.kind==='martial_feature'?`${s.armed?'ON':'OFF'} ${s.uses_remaining??0}/${s.uses_maximum??0}`:'';
   }
   function combatSummary(roll) {
     if (!roll || !roll.id) return "";
@@ -309,7 +320,7 @@
     }
     return right+100>=view.left&&left-100<=view.right&&bottom+100>=view.top&&top-360<=view.bottom;
   }
-  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, effectVisible, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, displayHotbar, hotbarGroupForSpell, spellCostText, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, combatSummary, bindTouchTap, bindTouchScroll };
+  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, effectVisible, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, displayHotbar, hotbarGroupForSpell, spellCostText, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, martialHotbarLabel, combatSummary, bindTouchTap, bindTouchScroll };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BractwoRuntime = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

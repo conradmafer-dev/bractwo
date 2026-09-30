@@ -30,6 +30,7 @@
       // locked ones) and server-granted subclass spells. Never leak other classes.
       if(!base||!(base.class_ids?.includes(player.class_id)||player.spell_profiles?.[id]?.available===true))continue;
       if(base.kind==='wizard_feature'&&(!base.wizard_school||base.wizard_school!==player.character_sheet?.caster?.school?.id))continue;
+      if(base.kind==='martial_feature'&&player.spell_profiles?.[id]?.available!==true)continue;
       const spec=root.BractwoRuntime.spellProfile({...base,id},player);
       const required=gate(spec),unlocked=spec.available??player.level>=required;
       const rank=Number(base.circle)||0,feature=!!base.feature;
@@ -93,8 +94,9 @@
       if(s.caster?.order)tiles([['Ścieżka',s.caster.orders?.find(o=>o.id===s.caster.order)?.name||'']]);if(s.training?.armor_penalty)content.append(node('p','caster-status-warning','Brak wyszkolenia w pancerzu: czary zablokowane; utrudnienie Siły/Zręczności.'));
       if(s.caster?.circle?.id)tiles([['Krąg druida',s.caster.circle.name||'']]);
       if(s.caster?.school?.id)tiles([['Szkoła czarodzieja',s.caster.school.name||'']]);
+      if(s.martial?.id)tiles([[p.class_id==='ranger'?'Specjalizacja łowcy':'Archetyp wojownika',s.martial.name||'']]);
       if(s.fighter?.style)tiles([['Styl walki',s.fighter.style_name+(s.fighter.style_active?'':' · nieaktywny')],['Mistrzostwo broni',s.fighter.masteries?.find(m=>m.active)?.effect_name||'—']]);
-      heading('Walka');tiles([['Atak bronią',dice(p.attack_bonus)],['Obrażenia',`${p.damage_dice} · ${s.damage_name||''}`],['Ataki na rundę',p.attacks_per_round],['Atak czarem',dice(s.spell_attack_bonus||0)],['ST obrony przed czarami',p.save_dc],['Premia z biegłości',signed(p.proficiency)],['Krąg czarów',p.spell_circle||'—'],['Trafienie krytyczne','20 na k20']]);
+      heading('Walka');tiles([['Atak bronią',dice(p.attack_bonus)],['Obrażenia',`${p.damage_dice} · ${s.damage_name||''}`],['Ataki na rundę',p.attacks_per_round],['Atak czarem',dice(s.spell_attack_bonus||0)],['ST obrony przed czarami',p.save_dc],['Premia z biegłości',signed(p.proficiency)],['Krąg czarów',p.spell_circle||'—'],['Trafienie krytyczne bronią',s.martial?.critical_threshold===18?'18–20 na k20':s.martial?.critical_threshold===19?'19–20 na k20':'20 na k20']]);
       heading('Cechy i rzuty obronne');const grid=node('div','sheet-abilities');
       for(const[k,v]of Object.entries(p.attributes||{})){const c=node('article','sheet-ability');c.append(node('small','',labels[k]||k),node('strong','',`${v} (${signed(s.ability_modifiers?.[k]||0)})`),node('span','',`Obrona ${dice(s.saving_throws?.[k]||0)}${s.proficient_saves?.includes(k)?' ✦':''}`));grid.append(c);}content.append(grid);
       heading('Odporności');const resistance=node('div','sheet-resistances');for(const r of s.resistances||[]){const c=node('span',r.multiplier<1?'resistant':'',r.name+(r.multiplier===.5?' · połowa obrażeń':r.multiplier===0?' · niewrażliwość':' · zwykłe obrażenia'));resistance.append(c);}content.append(resistance);
@@ -111,7 +113,7 @@
         const title=node('h3','sheet-section-title',section.label);title.dataset.spellSection=section.id;list.append(title);
         for(const {id,spec:s,gate,unlocked}of section.entries){
         const row=node('article','sheet-spell'+(unlocked?'':' locked'));row.dataset.spell=id;row.append(image(s.icon||`assets/spells/${id}.svg`));const text=node('div','sheet-spell-text');text.append(node('strong','',s.name));
-        const parts=[root.BractwoRuntime.spellCostText(s,p),s.action==='bonus'?'Akcja dodatkowa':s.action==='reaction'?'Reakcja':s.action==='extra'?'Dodatkowa akcja':'Akcja'];if(s.gold)parts.push(s.gold+' zł');if(s.ritual)parts.push('Rytuał '+s.ritual_seconds+' s');if(!unlocked)parts.push(p.level<gate?`Od poziomu ${gate}`:'Czar obecnie niedostępny');text.append(node('small','',parts.join(' · ')));
+        const parts=[root.BractwoRuntime.spellCostText(s,p),s.kind==='martial_feature'?'Przygotowanie bez zużycia akcji':s.action==='bonus'?'Akcja dodatkowa':s.action==='reaction'?'Reakcja':s.action==='extra'?'Dodatkowa akcja':'Akcja'];if(s.gold)parts.push(s.gold+' zł');if(s.ritual)parts.push('Rytuał '+s.ritual_seconds+' s');if(!unlocked)parts.push(p.level<gate?`Od poziomu ${gate}`:'Czar obecnie niedostępny');text.append(node('small','',parts.join(' · ')));
         // Player-facing original summaries; no implementation labels.
         const desc=String(s.description||'').replace(/W tej adaptacji /g,'').replace(/w adaptacji /g,'').replace(/(\d+) jednost(?:ek|ki)/g,(_,n)=>`${Math.round(Number(n)/6.4)} stóp`);
         if(s.power_summary)text.append(node('p','spell-power-summary',s.power_summary));
@@ -121,7 +123,8 @@
         if(unlocked&&s.next_upgrade)text.append(node('small','spell-next-upgrade',s.next_upgrade));
         row.append(text);const actions=node('div','sheet-spell-actions'),revert=s.kind==='shape'&&p.form;
         const usable=unlocked&&(s.kind==='recovery'?root.BractwoCasterUI.canRecover(p):root.BractwoRuntime.spellUsable(s,p));
-        actions.append(button(root.BractwoRuntime.queuedSpellLabel(s,p)|| (revert?'Powrót':s.kind==='recovery'?'Odpocznij i odzyskaj':s.kind==='reaction'?(p.shield_armed?'Wyłącz':'Włącz'):s.kind==='weapon_trigger'?(p.ensnaring_armed?'Anuluj':'Przygotuj'):'Użyj'),()=>h.cast(id),!usable));
+        const use=button(s.kind==='martial_feature'?root.BractwoMartialUI?.actionLabel(p,s.martial_maneuver)||'Przygotuj na atak':root.BractwoRuntime.queuedSpellLabel(s,p)|| (revert?'Powrót':s.kind==='recovery'?'Odpocznij i odzyskaj':s.kind==='reaction'?(p.shield_armed?'Wyłącz':'Włącz'):s.kind==='weapon_trigger'?(p.ensnaring_armed?'Anuluj':'Przygotuj'):'Użyj'),()=>h.cast(id),!usable);
+        if(s.kind==='martial_feature'){use.dataset.martialAction=s.martial_maneuver;use.setAttribute('aria-pressed',String(!!s.armed));}actions.append(use);
         root.BractwoCircleSpellUI?.append(actions,p,s,h,unlocked);
         if(unlocked&&s.ritual)actions.append(button('Rytuał · 0 many',()=>h.send({type:'ritual',spell_id:id}),!p.alive||!!p.form||p.combat_remaining>0||!!p.character_sheet?.caster?.channel?.key||p.gold<(s.gold||0)||p.character_sheet?.training?.armor_penalty));
         if(unlocked&&s.power_options?.length>1){
@@ -140,12 +143,18 @@
       // Native mobile pickers keep focus after selection: refresh gates without replacing them.
       if(tab==='feats')root.BractwoCasterUI.syncTraining(content,p,h);
       if(tab==='spells')root.BractwoCasterUI.syncCircle(content,p,h);
+      if(tab==='feats'||tab==='spells')root.BractwoMartialUI?.sync(content,p);
       if(panel.contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
       const next=JSON.stringify([tab,bagPage,selectedItem,p.inventory,p.equipment,p.level,Math.floor(p.mana),Math.ceil(p.hp),p.hotbar,p.grouped_hotbar,p.attributes,p.character_sheet,p.skills,p.mastery,p.mastery_points,p.combat_remaining>0,p.bonus_remaining>0,p.xp,p.xp_next,p.max_hp,p.max_mana,p.attack_bonus,p.damage_dice,p.armor_class,p.save_dc,p.attacks_per_round,p.bank_gold,p.soul,p.kills,p.boss_kills,p.gold,p.potions,p.potion_slots,p.form,p.shield_armed,p.ensnaring_armed,p.concentration,p.queued_spell,p.queued_spell?Math.ceil((p.action_remaining||0)*10):0,p.spell_cooldowns,p.spell_profiles,p.environment,p.rest_resources,p.status_effects?.map(e=>[e.id,Math.ceil(e.remaining)]),h.canTrade(),h.nearMaster?.()]);if(signature===next)return;signature=next;
       document.getElementById('characterName').textContent=p.name;document.getElementById('characterSubtitle').textContent=`${p.profession||w.classes?.[p.class_id]?.name||''} · poziom ${p.level}`;
       tabButtons.forEach(b=>{const active=b.dataset.characterTab===tab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
       const scroll=content.scrollTop;content.replaceChildren();content.dataset.tab=tab;
-      if(tab==='inventory')equipment(p,w);else if(tab==='stats')stats(p,w);else if(tab==='spells')spells(p,w);else root.BractwoCasterUI.feats(content,p,h);
+      if(tab==='inventory')equipment(p,w);else if(tab==='stats')stats(p,w);else if(tab==='spells')spells(p,w);else {
+        // Each panel owns its local previews, so selecting a fighting style or
+        // ordinary feat cannot discard an unconfirmed martial specialization.
+        const martial=node('div'),caster=node('div');content.append(martial,caster);
+        root.BractwoMartialUI?.feats(martial,p,h);root.BractwoCasterUI.feats(caster,p,h);
+      }
       content.scrollTop=scroll;
     }
     return {open,close,toggle,render,get visible(){return !panel.hidden;},get tab(){return tab;}};

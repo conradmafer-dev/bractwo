@@ -38,6 +38,9 @@ try:
     from . import wizard_schools
     from . import town_services
     from .wizard_school_game import WizardSchoolGame
+    from . import martial_rules
+    from .martial_game import MartialGame
+    from .martial_combat import MartialCombat
     from . import rest_rules, druid_circles, environment_rules
     from .environment_rules import EnvironmentGame
     from .druid_circle_game import DruidCircleGame
@@ -62,6 +65,9 @@ except ImportError:
     import wizard_schools
     import town_services
     from wizard_school_game import WizardSchoolGame
+    import martial_rules
+    from martial_game import MartialGame
+    from martial_combat import MartialCombat
     import rest_rules, druid_circles, environment_rules
     from environment_rules import EnvironmentGame
     from druid_circle_game import DruidCircleGame
@@ -273,6 +279,7 @@ druid_circles.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 configure_circle_spells(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 rest_rules.configure(dnd_content.SPELLS)
 wizard_schools.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
+martial_rules.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 environment_rules.configure_world()
 continent_world.finalize(content, OBSTACLES)
 MERCHANT['stock'] = list(content.STARTER_MERCHANT_STOCK)
@@ -341,6 +348,8 @@ class Player:
     wizard_school: str = ""
     wizard_school_state: dict = field(default_factory=dict)
     wizard_school_runtime: dict = field(default_factory=dict)
+    martial_archetype: str = ""
+    martial_state: dict = field(default_factory=dict)
     druid_circle: str = ""
     druid_circle_state: dict = field(default_factory=dict)
     druid_circle_runtime: dict = field(default_factory=dict)
@@ -611,6 +620,7 @@ class Player:
             "primal_order", "training_feats", "caster_rules_version", "legacy_medium_grace",
             "world_revision", "magic_items_version", "magic_attunements",
             "wizard_school", "wizard_school_state", "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "exhaustion",
+            "martial_archetype", "martial_state",
             "fighting_style", "weapon_grip", "fighter_rules_version",
             "level_up_batches", "rules_version", "mana_rules_version", "hp_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
             "site_cooldowns", "wind_until", "ward_until", "premium_demo_until", "floor", "skill_tries", "promoted", "soul", "runes", "bank_gold", "depot", "home_city", "blessed", "mastery", "spell_cooldowns", "spell_ready", "rune_ready", "haste_until", "transition_ready",
@@ -678,7 +688,7 @@ class Enemy:
                 "attack_until": self.attack_until, "facing": self.facing, "armor_class": spec["armor_class"], "attack_bonus": spec["attack_bonus"], "damage_dice": combat_rules.dice_text(spec["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
 
 
-class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,WizardSchoolGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
+class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,EnvironmentGame,WizardSchoolGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
     def __init__(self, db_path, clock=None):
         self.clock = clock or time.time
         self.rng = random.Random()
@@ -800,6 +810,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,WizardSchoolGame,Drui
         self.migrate_caster(p)
         self.migrate_druid_circle(p)
         self.migrate_wizard_school(p)
+        self.migrate_martial(p)
         rest_rules.migrate(p,self.now())
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
 
@@ -829,6 +840,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,WizardSchoolGame,Drui
         self.migrate_caster(p)
         self.migrate_druid_circle(p)
         self.migrate_wizard_school(p)
+        self.migrate_martial(p)
         rest_rules.migrate(p,self.now())
         refunded=combat_rules.migrate_hp(p)
         if refunded:self.caster_message(p,f'Przeliczono HP według klasy i Kondycji. Zwrócono punkty Witalności: {refunded}.')
@@ -1119,6 +1131,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,WizardSchoolGame,Drui
         attunement_message = magic_items.finish_rest(p, rest)
         self.on_circle_rest(p,rest["kind"])
         self.wizard_school_rest(p,rest["kind"])
+        self.martial_rest(p,rest["kind"])
         p.rest_resources[rest["kind"]+"_ready"]=now+REST_RULES[rest["kind"]+"_cooldown_seconds"]
         p.rest_cooldown_until=0
         if rest["kind"]=="long":
@@ -1460,6 +1473,8 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,WizardSchoolGame,Drui
         if kind == "environment_action":return await self.environment_action(p,data.get("action"),data.get("enabled"),data.get("enemy_id"),data.get("target_id"))
         if kind == "wizard_school":return await self.select_wizard_school(p,data.get("school"))
         if kind == "wizard_school_action":return await self.wizard_school_command(p,data)
+        if kind == "martial_choice":return await self.select_martial(p,data)
+        if kind == "martial_action":return await self.martial_command(p,data)
         if kind == "druid_circle":return await self.select_druid_circle(p,data.get("circle"),data.get("land","arid"))
         if kind == "circle_command":return await self.circle_command(p,data.get("action"),data.get("value"))
         if kind == "primal_order":return await self.select_primal_order(p,data.get("order"))
@@ -1669,6 +1684,7 @@ class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,WizardSchoolGame,Drui
         p.last_pvp_attacker, p.last_pvp_hit_until, p.last_pvp_unjust = "", 0, False
         self.stop_auto(p);self.break_concentration(p);self.companions.pop(p.id,None)
         p.form="";p.form_until=0;p.temp_hp=0;p.buffs={}
+        self.clear_martial_preparation(p)
         p.dx, p.dy = 0, 0
         p.respawn_until, p.respawn_at = now+4, self.time+4
         p.combat_until = p.pvp_combat_until = 0
@@ -1860,14 +1876,14 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_25","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_26","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

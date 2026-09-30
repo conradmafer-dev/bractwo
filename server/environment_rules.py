@@ -269,7 +269,7 @@ class EnvironmentGame:
             from . import combat_rules as rules
         except ImportError:
             import combat_rules as rules
-        now=self.now();dis=active(actor,'poisoned',now) or active(actor,'stinking_poison',now)
+        now=self.now();dis=active(actor,'poisoned',now) or active(actor,'stinking_poison',now) or self.martial_frightened(actor)
         if skill=='stealth' and hasattr(actor,'class_id') and not getattr(actor,'form',''):
             dis=dis or rules.equipped_item(actor,'armor').get('stealth_disadvantage',False)
         adv=active(actor,'foresight',now)

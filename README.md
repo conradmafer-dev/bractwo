@@ -1,4 +1,4 @@
-# Bractwo Krain 0.8.18 UI_25 — usługi, przystanie i kamienie przypisania
+# Bractwo Krain 0.8.18 UI_26 — specjalizacje wojownika i łowcy
 
 Wejście do gry wymaga logowania przez Google. Jedno konto Google może mieć
 maksymalnie **4 postacie**, wliczając postacie offline i przypisane stare zapisy.
@@ -13,6 +13,14 @@ bez automatycznego przypisywania podczas wizyty lub rejsu.
 [Zakres UI_25](docs/UI_25_BRACTWO_KRAIN.md).
 
 Promocja profesji jest dostępna od **poziomu 10**, za **2000 złota**.
+W **C → Atuty** wojownik wybiera **Mistrza Bitewnego** (3 z 5 manewrów,
+kości przewagi) albo **Czempiona** (krytyk bronią 19–20). Łowca wybiera
+**Huntera** i jedną technikę: Pogromcę kolosów, Rozbijacza hord albo Zabójcę
+olbrzymów. Wybór jest bezpłatny po promocji i stały. Poznane manewry
+pojawiają się na pasku umiejętności. Krótki lub długi odpoczynek odnawia
+kości; logowanie ich nie odnawia. Wilk łowcy pozostaje dostępny.
+[Zdolności, sterowanie i zakres UI_26](docs/UI_26_MARTIAL_PROMOTIONS.md).
+
 Promowany czarodziej wybiera w **C → Atuty** jedną z czterech działających szkół:
 **Ewokację, Odpychanie, Wróżbiarstwo albo Iluzję**. Wybór jest trwały;
 zdolności rozwijają się na poziomach **10, 25, 45 i 65**. Serwer sprawdza
@@ -49,7 +57,7 @@ repozytorium. `Dockerfile`, `run.py`, `requirements.txt`, `server/` i `web/`
 mają być obok siebie. Zachowaj bazę graczy, wolumen i istniejące zmienne.
 Używaj jednej repliki serwera. Ustaw parametry Google przed wdrożeniem
 i wdróż cały serwer razem z klientem. Odśwież stronę po aktualizacji.
-Ekran wejścia oraz `/health` pokazują **UI_25**. Reset postaci nie jest potrzebny.
+Ekran wejścia oraz `/health` pokazują **UI_26**. Reset postaci nie jest potrzebny.
 Paczka nie została wdrożona automatycznie.
 
 ## Lokalnie i źródła Godota

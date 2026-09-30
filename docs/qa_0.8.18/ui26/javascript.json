@@ -1,0 +1,22 @@
+{
+  "status": "PASS",
+  "exit_code": 0,
+  "tests": 201,
+  "seconds": 10.63,
+  "files": [
+    "test_martial_ui26.cjs",
+    "test_martial_hotbar_ui26.cjs",
+    "test_google_auth_ui22.cjs",
+    "test_app_shell.cjs",
+    "test_transport_ui20.cjs",
+    "test_inventory_windows.cjs",
+    "test_client_runtime.cjs",
+    "test_wizard_schools_ui24.cjs",
+    "test_wizard_vfx_ui24.cjs",
+    "test_casters_0814.cjs",
+    "test_spellbook_ui16.cjs",
+    "test_ui14_mobile_forms.cjs",
+    "test_fighter_0813.cjs",
+    "test_rest_ui_0818.cjs"
+  ]
+}

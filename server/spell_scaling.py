@@ -149,6 +149,9 @@ def dice_text(dice):
 
 
 def summary(s):
+    if s.get('kind')=='martial_feature':
+        role='Reakcja' if s.get('martial_maneuver') in ('riposte','parry') else 'Przygotowanie następnego ataku'
+        return role+' · 1 kość przewagi przy wykonaniu · przygotowanie bez kosztu'
     parts = []
     if s['circle']:
         parts.append(f'Rzucanie: krąg {s["cast_circle"]}')
@@ -248,15 +251,15 @@ def client_profiles(p):
         rules.ability_modifier(p,rules.spell_ability(p)),p.gear_bonus('attack'),p.mastery.get('power',0),
         p.concentration if active else '',locked.get('cast_circle',0) if active else 0)
     try:
-        from . import druid_circles as dc, rest_rules
+        from . import druid_circles as dc, rest_rules, martial_rules as martial
     except ImportError:
-        import druid_circles as dc, rest_rules
+        import druid_circles as dc, rest_rules, martial_rules as martial
     wizard_live=getattr(p,'wizard_school_runtime',{})
     signature+=(getattr(p,'promoted',False),getattr(p,'wizard_school',''),repr(getattr(p,'wizard_school_state',{})),
         wizard_live.get('decoy_until',0)>getattr(p,'current_wall_time',0),
         wizard_live.get('shelter',{}).get('until',0)>getattr(p,'current_wall_time',0),
         tuple(sorted(k for k,v in p.buffs.items() if k.startswith('wizard_') and v.get('until',0)>getattr(p,'current_wall_time',0))),
-        p.form,dc.circle(p),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),repr(getattr(p,'druid_circle_state',{})),repr(getattr(p,'rest_resources',{})))
+        p.form,dc.circle(p),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),repr(getattr(p,'druid_circle_state',{})),repr(getattr(p,'rest_resources',{})),martial.path(p),repr(martial.state(p)))
     cache=getattr(p,'_spell_profiles_cache',None)
     if cache and cache[0]==signature:
         return cache[1]
@@ -284,6 +287,12 @@ def client_profiles(p):
             if key=='guiding_bolt' and dc.circle(p)=='stars' and dc.feature_remaining(p,'guiding_bolt') and dc.state(p).get('map_equipped',True):result[key]['mana']=0
             if dc.circle(p)=='land' and p.level>=25 and dc.state(p).get('natural_free_armed') and not dc.spent(p,'natural_free') and key in dc.bonus_spells(p) and spec.get('circle',0)>0:result[key]['mana']=0
         result[key]['cast_in_form']=dc.circle(p)=='moon' and key in dc.bonus_spells(p)
+        if spec.get('kind')=='martial_feature':
+            maneuver=spec['martial_maneuver']
+            role=martial.MANEUVERS[maneuver]['kind']
+            result[key].update(uses_remaining=martial.remaining(p),uses_maximum=martial.maximum(p),
+                resource_cost=1,resource_name='Kości przewagi',martial_role=role,
+                armed=martial.state(p).get(role)==maneuver)
         if key.startswith('wizard_'):
             try: from . import wizard_schools as ws
             except ImportError: import wizard_schools as ws

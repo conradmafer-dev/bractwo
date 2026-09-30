@@ -1,0 +1,53 @@
+{
+  "revision": "UI_26",
+  "version": "0.8.18",
+  "based_on": "BRACTWO_KRAIN_0.8.18_UI_25_FULL_SOURCE.zip",
+  "status": "PASS",
+  "scope": "Selected release checks; not the entire historical repository test suite.",
+  "python": {
+    "tests": 258,
+    "report": "python.json"
+  },
+  "javascript": {
+    "tests": 201,
+    "report": "javascript.json"
+  },
+  "browser": {
+    "checks": 14,
+    "javascript_errors": 0,
+    "report": "browser_results.json"
+  },
+  "syntax": 45,
+  "review": {
+    "new_combat_cases": 27,
+    "independent_regressions": 5,
+    "issues_fixed": [
+      "Current polymorph size for Trip and Giant Killer",
+      "Group same-type bonus damage before resistance rounding",
+      "Stop all remaining swings after death by Riposte",
+      "Allow finite defensive reaction chains",
+      "Styled, clickable promotion reminder"
+    ]
+  },
+  "legacy_exclusions": {
+    "count": 8,
+    "report": "legacy_fighter_baseline.json",
+    "reason": "These eight historical fighter tests fail identically on untouched UI25; existing supported rest behavior is checked by current suites."
+  },
+  "visual_review": [
+    "Desktop subclass confirmation, icons and prompt",
+    "Mobile Battle Master pool/actions fit430px",
+    "Mobile Hunter options"
+  ],
+  "limits": [
+    "Test Google provider and isolated memory database only; real Google OAuth was not exercised.",
+    "Headless Chromium desktop1440x900 and touch430x932; no physical device.",
+    "No Railway deployment or APK build.",
+    "Initial combat subclass package only, with dice/critical scaling; later tabletop features remain outside this release."
+  ],
+  "preserved": [
+    "UI25 NPC panels, harbour safety, respawn stones, Google-only login and max4characters per account",
+    "Wizard schools and druid circles",
+    "Current character saves and legacy linked Google ownership"
+  ]
+}

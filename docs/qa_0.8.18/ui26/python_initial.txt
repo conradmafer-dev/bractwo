@@ -1,0 +1,148 @@
+.................................................Executing <Task finished name='Task-199' coro=<TransportUI20.test_every_route_accepts_level_one_and_exact_fare() done, defined at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_transport_ui20.py:33> result=None created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.166 seconds
+..Executing <Task finished name='Task-208' coro=<GoogleAccountSecurity.asyncSetUp() done, defined at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_google_security_ui22.py:58> result=None created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.110 seconds
+...Executing <Task finished name='Task-233' coro=<GoogleAccountSecurity.asyncSetUp() done, defined at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_google_security_ui22.py:58> result=None created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.109 seconds
+.Executing <Task finished name='Task-238' coro=<GoogleAccountSecurity.asyncSetUp() done, defined at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_google_security_ui22.py:58> result=None created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.106 seconds
+.Executing <Task finished name='Task-243' coro=<GoogleAccountSecurity.asyncSetUp() done, defined at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_google_security_ui22.py:58> result=None created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.133 seconds
+.Executing <Task finished name='Task-248' coro=<GoogleAccountSecurity.asyncSetUp() done, defined at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_google_security_ui22.py:58> result=None created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.165 seconds
+.Executing <Task finished name='Task-253' coro=<GoogleAccountSecurity.asyncSetUp() done, defined at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_google_security_ui22.py:58> result=None created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.120 seconds
+../workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/server/server.py:1873: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["game"]=Game(db_path, clock=clock)
+/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/server/server.py:1874: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["google_auth"]=google_auth_service if google_auth_service is not None else GoogleAuthService.from_env()
+Executing <Task pending name='Task-264' coro=<GoogleWebSocketOriginSecurity.test_missing_null_and_duplicate_origin_headers_are_rejected() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_google_security_ui22.py:197> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.106 seconds
+......................................................................Executing <Task finished name='Task-566' coro=<WizardSchoolsUI24.test_owner_sheet_hotbar_and_profiles_show_only_selected_school_at_each_gate() done, defined at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_wizard_schools_ui24.py:189> result=None created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.186 seconds
+...................................Executing <Task pending name='Task-739' coro=<AppShellHTTPTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_app_shell_http_0818.py:22> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.216 seconds
+.Executing <Task pending name='Task-753' coro=<AppShellHTTPTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_app_shell_http_0818.py:22> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.221 seconds
+..Executing <Task pending name='Task-786' coro=<AppShellHTTPTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_app_shell_http_0818.py:22> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.245 seconds
+................Executing <Task pending name='Task-813' coro=<RuntimeTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_railway.py:133> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.214 seconds
+.Executing <Task pending name='Task-837' coro=<RuntimeTests.asyncSetUp() running at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_railway.py:133> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.222 seconds
+.......FF.........................E.FF.EEF................................Executing <Task finished name='Task-1176' coro=<RestRules.test_wall_clock_cooldown_survives_reconnect_restart_and_old_saves() done, defined at /workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_rest_0818.py:355> result=None created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.404 seconds
+..
+======================================================================
+ERROR: test_second_wind_cooldown_survives_save (test_fighter_0813.FighterGame.test_second_wind_cooldown_survives_save)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_fighter_0813.py", line 204, in test_second_wind_cooldown_survives_save
+    self.assertEqual(q.spell_cooldowns['second_wind'],self.clock()+60)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+KeyError: 'second_wind'
+
+======================================================================
+ERROR: test_surge_additional_attack_does_not_reset_other_actions (test_fighter_0813.FighterGame.test_surge_additional_attack_does_not_reset_other_actions)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_fighter_0813.py", line 210, in test_surge_additional_attack_does_not_reset_other_actions
+    self.assertEqual(self.p.spell_cooldowns['action_surge'],self.clock()+90)
+                     ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'action_surge'
+
+======================================================================
+ERROR: test_surge_cooldown_persistent_and_main_attack_still_available (test_fighter_0813.FighterGame.test_surge_cooldown_persistent_and_main_attack_still_available)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_fighter_0813.py", line 233, in test_surge_cooldown_persistent_and_main_attack_still_available
+    self.assertEqual(q.spell_cooldowns['action_surge'],self.clock()+90)
+                     ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+KeyError: 'action_surge'
+
+======================================================================
+FAIL: test_second_wind_free_and_sixty_seconds (test_fighter_0813.FighterData.test_second_wind_free_and_sixty_seconds)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_fighter_0813.py", line 22, in test_second_wind_free_and_sixty_seconds
+    self.assertEqual((s['mana'],s['cooldown'],s['action']),(0,60,'bonus'))
+AssertionError: Tuples differ: (0, 0, 'bonus') != (0, 60, 'bonus')
+
+First differing element 1:
+0
+60
+
+- (0, 0, 'bonus')
++ (0, 60, 'bonus')
+?     +
+
+
+======================================================================
+FAIL: test_surge_is_free_not_a_spell_circle (test_fighter_0813.FighterData.test_surge_is_free_not_a_spell_circle)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_fighter_0813.py", line 31, in test_surge_is_free_not_a_spell_circle
+    self.assertEqual((s['mana'],s['cooldown'],s['action'],s['circle']),(0,90,'extra',0))
+AssertionError: Tuples differ: (0, 0, 'extra', 0) != (0, 90, 'extra', 0)
+
+First differing element 1:
+0
+90
+
+- (0, 0, 'extra', 0)
++ (0, 90, 'extra', 0)
+?     +
+
+
+======================================================================
+FAIL: test_second_wind_zero_mana_shared_bonus_and_sixty_cooldown (test_fighter_0813.FighterGame.test_second_wind_zero_mana_shared_bonus_and_sixty_cooldown)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_fighter_0813.py", line 195, in test_second_wind_zero_mana_shared_bonus_and_sixty_cooldown
+    self.assertEqual(p.spell_cooldowns['second_wind'],self.clock()+60)
+AssertionError: 1000.0 != 1060.0
+
+======================================================================
+FAIL: test_shop_buy_actual_weapon_and_persistent_inventory (test_fighter_0813.FighterGame.test_shop_buy_actual_weapon_and_persistent_inventory)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_fighter_0813.py", line 237, in test_shop_buy_actual_weapon_and_persistent_inventory
+    self.assertEqual(len(self.p.inventory),old+1);self.assertEqual(self.p.gold,gold-15)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 5 != 6
+
+======================================================================
+FAIL: test_surge_extra_attacks_all_levels (test_fighter_0813.FighterGame.test_surge_extra_attacks_all_levels)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_fighter_0813.py", line 216, in test_surge_extra_attacks_all_levels
+    self.assertEqual(self.g.combat_rng.checks,n)
+AssertionError: 0 != 2
+
+----------------------------------------------------------------------
+Ran 261 tests in 34.559s
+
+FAILED (failures=5, errors=3)
