@@ -24,7 +24,7 @@ try:
     from . import world_content as content
     from . import seo
     from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
-    from . import continent_world, adventure_content, expedition_content, terrain_detail
+    from . import continent_world, adventure_content, expedition_content, terrain_detail, encounter_layout
     from .adventure_combat import AdventureGame
     from .google_accounts import GoogleAccountGame
     from .google_auth import GoogleAuthService, register_routes as register_google_routes
@@ -54,7 +54,7 @@ except ImportError:
     import world_content as content
     import seo
     import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
-    import continent_world, adventure_content, expedition_content, terrain_detail
+    import continent_world, adventure_content, expedition_content, terrain_detail, encounter_layout
     from adventure_combat import AdventureGame
     from google_accounts import GoogleAccountGame
     from google_auth import GoogleAuthService, register_routes as register_google_routes
@@ -289,7 +289,8 @@ martial_rules.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 environment_rules.configure_world()
 continent_world.finalize(content, OBSTACLES)
 terrain_detail.configure(content, OBSTACLES, LANDMARKS)
-content.WORLD_REVISION = 29
+encounter_layout.configure(content, OBSTACLES, LANDMARKS)
+content.WORLD_REVISION = 30
 MERCHANT['stock'] = list(content.STARTER_MERCHANT_STOCK)
 content.STARTER_MERCHANT = MERCHANT
 # Powerful rings are deliberate rewards; repeatable monster drops remain rare.
@@ -773,7 +774,9 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
                 "ports": getattr(content,"PORTS",[]), "sea_routes": getattr(content,"SEA_ROUTES",[]),
                 "magic_items": magic_items.metadata(),
                 "skill_challenge_catalog": self.skill_challenge_metadata(),
-                "terrain": content.TERRAIN, "terrain_detail": getattr(content,"TERRAIN_DETAIL",{}), "surfaces": content.SURFACES, "premium": content.PREMIUM,
+                "terrain": content.TERRAIN, "terrain_detail": getattr(content,"TERRAIN_DETAIL",{}),
+                "encounter_layout": {"version": content.ENCOUNTER_LAYOUT["version"], "counts": content.ENCOUNTER_LAYOUT["counts"]},
+                "surfaces": content.SURFACES, "premium": content.PREMIUM,
                 "elevations": content.ELEVATIONS, "waterways": content.WATERWAYS, "bridges": content.BRIDGES,
                 "pois": content.POIS, "canyons": content.CANYONS, "rarities": loot_tables.RARITIES,
                 "environment_trees": self.environment_trees(),
@@ -1941,7 +1944,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_29","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_30","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):

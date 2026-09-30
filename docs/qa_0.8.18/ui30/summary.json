@@ -1,0 +1,164 @@
+{
+  "passed": true,
+  "ui_revision": "UI_30",
+  "world_revision": 30,
+  "based_on": "UI_29",
+  "prepared_at": "2026-09-30T19:11:21.297500+00:00",
+  "encounter_module_sha256": "d9d807247c1d00dac518c941a4824c927139423980f06e50c8ea20ef1b565175",
+  "counts": {
+    "sites": 159,
+    "groups": 438,
+    "moved": 1149,
+    "original_surface": 11149,
+    "background_surface": 10000,
+    "protected": 534,
+    "protected_reasons": {
+      "other_floor": 373,
+      "starter": 46,
+      "boss": 2,
+      "named_habitat": 42,
+      "loot_hunt": 22,
+      "final_loot_pin": 31,
+      "quest_target": 18
+    },
+    "regions": {
+      "region_0": 54,
+      "region_1": 69,
+      "region_2": 52,
+      "region_3": 53,
+      "region_4": 61,
+      "region_5": 41,
+      "region_6": 52,
+      "region_7": 80,
+      "region_8": 50,
+      "region_9": 52,
+      "region_10": 46,
+      "region_11": 42,
+      "region_12": 67,
+      "region_13": 64,
+      "region_14": 32,
+      "region_15": 55,
+      "region_16": 64,
+      "region_17": 54,
+      "region_18": 77,
+      "region_19": 84
+    },
+    "families": {
+      "wolves": 4,
+      "bandits": 12,
+      "goblins": 5,
+      "bog": 3,
+      "spiders": 7,
+      "elves": 9,
+      "trolls": 2,
+      "orcs": 10,
+      "desert": 9,
+      "undead": 20,
+      "dwarves": 11,
+      "rift": 24,
+      "dragons": 12,
+      "harpies": 2,
+      "ice": 11,
+      "frost_wolves": 6,
+      "frost_guard": 2,
+      "abyss": 10
+    },
+    "skipped": {
+      "no_road": 16,
+      "no_usable_positions": 8,
+      "no_family": 3
+    }
+  },
+  "automated_test_executions": 67,
+  "suites": [
+    {
+      "suite": "encounters",
+      "tests_run": 11,
+      "passed": true,
+      "report": "encounter-tests.json"
+    },
+    {
+      "suite": "terrain_and_continent_combined",
+      "tests_run": 21,
+      "passed": true,
+      "report": "terrain-continent-tests.txt",
+      "note": "Combined discovery includes three imported geometry helper tests; counts are executions, not a claim of distinct test definitions."
+    },
+    {
+      "suite": "atlas",
+      "tests_run": 13,
+      "passed": true,
+      "report": "atlas-tests.txt"
+    },
+    {
+      "suite": "client_runtime",
+      "tests_run": 19,
+      "passed": true,
+      "report": "runtime-tests.txt"
+    },
+    {
+      "suite": "terrain_client",
+      "tests_run": 3,
+      "passed": true,
+      "report": "terrain-client-tests.txt"
+    }
+  ],
+  "http_websocket": {
+    "passed": true,
+    "checks": 4,
+    "served_local_scripts": 28,
+    "report": "http_ws.json",
+    "fixture": "Isolated test identity and in-memory database; no real Google login."
+  },
+  "independent_world_audit": {
+    "passed": true,
+    "report": "encounter-audit.json",
+    "checks": {
+      "identity_checks": 3,
+      "homes": 1149,
+      "road_margins": 1149,
+      "region_landmass": 1149,
+      "named_hunts": 21,
+      "protected_spawn_pins": 534,
+      "ground_metadata": 438
+    },
+    "fresh_full_server_import_seconds": 27.184,
+    "measurement_conditions": "Fresh Python process; other independent QA Python processes may run concurrently on the shared machine. This measures the complete server import, including unchanged UI29 world construction."
+  },
+  "visual_qa": {
+    "passed": true,
+    "before_after_plans": 6,
+    "after_details": 6,
+    "warnings": 0,
+    "report": "encounter_preview_report.json",
+    "review": {
+      "reviewed_plans": 6,
+      "reviewed_details": 6,
+      "finding": "Different family footprints: city roadside trio, unequal three-group pack and undead territory, two separated spider broods, staggered desert pairs, two cold-region groups. Final live decoration anchors match resident indices, with no 600px soft-threshold warnings.",
+      "terrain_context": "Relief groups use open flanks and approach corridors next to the real UI29 polygons; selected group anchors are 41–666px outside their own patch, homes up to904px. City encounters intentionally follow city roads and outskirts. This is adjacent terrain context, not a promise that all homes sit inside one polygon.",
+      "ranged_placement": "Selected bandit, undead and ice ranged residents are deeper from the road on average than melee residents: respectively809vs665,1427vs1239,1015vs959px.",
+      "layout_variety": "Selected scenes use1,2 or3group centers. Three-group normalized side signatures differ:[0.39,0.84,1.0]for wolves and[0.62,0.64,1.0]for undead. No common equilateral or shared triangle footprint in the six examples.",
+      "plan_limit": "Plans show exact home positions; dot size is schematic. They do not show animated roaming or the game HUD."
+    },
+    "scope": "Exact world-coordinate plans, not in-game screenshots."
+  },
+  "preserved": [
+    "Starter positions and starter terrain",
+    "Enemy identities, population, species, floors and actual regions",
+    "Combat stats, XP, loot, respawn timers and AI rules",
+    "Named hunts, bosses, quest targets and loot pins",
+    "UI29 terrain, roads, coastlines and landmarks"
+  ],
+  "deployment": {
+    "performed": false,
+    "packages": "Prepared for manual Railway/GitHub deployment; no character reset required."
+  },
+  "limitations": [
+    "No full interactive browser or FPS assessment.",
+    "No physical-phone assessment.",
+    "No Godot run or export.",
+    "Existing background density is preserved.",
+    "Provoked pursuit retains existing behavior and can cross roads.",
+    "Fresh import time measures startup on a shared QA machine, not Railway performance."
+  ]
+}

@@ -1,0 +1,101 @@
+{
+  "passed": true,
+  "world_revision": 30,
+  "fresh_import_wall_seconds": 27.184,
+  "measurement_conditions": "Fresh Python process; other independent QA Python processes may run concurrently on the shared machine. This measures the complete server import, including unchanged UI29 world construction.",
+  "scope": "Read-only world audit against actual Game actors and collision; route sampling and live AI covered separately by encounter tests.",
+  "counts": {
+    "sites": 159,
+    "groups": 438,
+    "moved": 1149,
+    "original_surface": 11149,
+    "background_surface": 10000,
+    "protected": 534,
+    "protected_reasons": {
+      "other_floor": 373,
+      "starter": 46,
+      "boss": 2,
+      "named_habitat": 42,
+      "loot_hunt": 22,
+      "final_loot_pin": 31,
+      "quest_target": 18
+    },
+    "regions": {
+      "region_0": 54,
+      "region_1": 69,
+      "region_2": 52,
+      "region_3": 53,
+      "region_4": 61,
+      "region_5": 41,
+      "region_6": 52,
+      "region_7": 80,
+      "region_8": 50,
+      "region_9": 52,
+      "region_10": 46,
+      "region_11": 42,
+      "region_12": 67,
+      "region_13": 64,
+      "region_14": 32,
+      "region_15": 55,
+      "region_16": 64,
+      "region_17": 54,
+      "region_18": 77,
+      "region_19": 84
+    },
+    "families": {
+      "wolves": 4,
+      "bandits": 12,
+      "goblins": 5,
+      "bog": 3,
+      "spiders": 7,
+      "elves": 9,
+      "trolls": 2,
+      "orcs": 10,
+      "desert": 9,
+      "undead": 20,
+      "dwarves": 11,
+      "rift": 24,
+      "dragons": 12,
+      "harpies": 2,
+      "ice": 11,
+      "frost_wolves": 6,
+      "frost_guard": 2,
+      "abyss": 10
+    },
+    "skipped": {
+      "no_road": 16,
+      "no_usable_positions": 8,
+      "no_family": 3
+    }
+  },
+  "checks": {
+    "identity_checks": 3,
+    "homes": 1149,
+    "road_margins": 1149,
+    "region_landmass": 1149,
+    "named_hunts": 21,
+    "protected_spawn_pins": 534,
+    "ground_metadata": 438
+  },
+  "minimum_static_road_margin_after_aggro_wander_and45": 81.51,
+  "identity_sha256_ensure_ascii_true": {
+    "enemy_types": "abcadd2eacfefe438acad6d171deca5bb48cdd53334eaba38c40cd35f9fbaf77",
+    "kind_floor": "7698eee23cdbfa1113b02d1044b77fa8f3329c593047b46075ba5c2572b50e32",
+    "region_kinds": "1c648ceb5d24f6c45fa69c8b04c97c5b0efc27c63633e387a9330a7c2c9bd5cb"
+  },
+  "failures": [],
+  "notes": [
+    "environment_rules.enemy_spec has no additional night or biome multiplier on aggro.",
+    "Existing provoked pursuit may cross roads; this audit checks ordinary home and idle approach clearance."
+  ],
+  "final_followup": {
+    "note": "The audit preceded a correction of 12 decoration anchors. All monster homes, move records, species and counts remain unchanged. The final anchor metadata was subsequently checked by the 11-test encounter suite and the exact-coordinate visual report.",
+    "final_encounter_module_sha256": "d9d807247c1d00dac518c941a4824c927139423980f06e50c8ea20ef1b565175",
+    "reports": [
+      "encounter-tests.json",
+      "encounter_preview_report.json"
+    ],
+    "final_tests_passed": true,
+    "final_visual_warnings": 0
+  }
+}

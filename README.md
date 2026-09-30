@@ -1,4 +1,7 @@
-# Bractwo Krain 0.8.18 UI_29 — ukształtowanie terenu
+# Bractwo Krain 0.8.18 UI_30 — łowiska potworów
+
+Nowe układy przeciwników wiążą potwory z lokalnym terenem: czaty, obozowiska, watahy, legowiska i dziedzińce ruin. Mieszkańcy mają różne pozycje na podejściu, bokach i w głębi łowiska. Aktualizacja przestawia istniejących przeciwników; zachowuje ich liczbę, statystyki i łupy oraz układ początku gry.
+[Szczegóły i sprawdzenia UI_30](docs/UI_30_LOWISKA_POTWOROW.md).
 
 Dalsze krainy otrzymały 167 lokalnych formacji: leśne doliny i polany, skalne przesmyki, wydmowe niecki, suche kępy na bagnach oraz osłonięte miejsca w śniegu. Nowa grafika terenu w przeglądarce korzysta z pamięci podręcznej. Układ początku gry pozostaje zachowany.
 [Szczegóły i sprawdzenia UI_29](docs/UI_29_UKSZTALTOWANIE_TERENU.md).
@@ -73,7 +76,7 @@ repozytorium. `Dockerfile`, `run.py`, `requirements.txt`, `server/` i `web/`
 mają być obok siebie. Zachowaj bazę graczy, wolumen i istniejące zmienne.
 Używaj jednej repliki serwera. Ustaw parametry Google przed wdrożeniem
 i wdróż cały serwer razem z klientem. Odśwież stronę po aktualizacji.
-Ekran wejścia oraz `/health` pokazują **UI_29**. Reset postaci nie jest potrzebny.
+Ekran wejścia oraz `/health` pokazują **UI_30**. Reset postaci nie jest potrzebny.
 Paczka nie została wdrożona automatycznie.
 
 ## Lokalnie i źródła Godota

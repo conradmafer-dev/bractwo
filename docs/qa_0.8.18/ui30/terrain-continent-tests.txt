@@ -1,0 +1,26 @@
+test_01_starter_valley_is_byte_identical (test_terrain_ui29.TerrainUI29.test_01_starter_valley_is_byte_identical) ... ok
+test_02_coasts_water_and_original_gameplay_locations_are_unchanged (test_terrain_ui29.TerrainUI29.test_02_coasts_water_and_original_gameplay_locations_are_unchanged) ... ok
+test_03_existing_surface_gameplay_remains_walkable (test_terrain_ui29.TerrainUI29.test_03_existing_surface_gameplay_remains_walkable) ... ok
+test_04_new_blockers_cannot_cut_a_player_sized_road_corridor (test_terrain_ui29.TerrainUI29.test_04_new_blockers_cannot_cut_a_player_sized_road_corridor) ... ok
+test_05_all_new_pocket_centres_have_real_walking_access_to_roads (test_terrain_ui29.TerrainUI29.test_05_all_new_pocket_centres_have_real_walking_access_to_roads) ... ok
+test_06_distinct_local_landscapes_are_present_in_every_biome (test_terrain_ui29.TerrainUI29.test_06_distinct_local_landscapes_are_present_in_every_biome) ... ok
+test_07_a_fresh_server_process_builds_the_same_world (test_terrain_ui29.TerrainUI29.test_07_a_fresh_server_process_builds_the_same_world) ... ok
+test_08_old_save_recovers_locally_without_restoring_pools_or_changing_items (test_terrain_ui29.TerrainUI29.test_08_old_save_recovers_locally_without_restoring_pools_or_changing_items) ... ok
+test_09_pve_and_pvp_combat_defer_recovery_and_keep_old_save_revision (test_terrain_ui29.TerrainUI29.test_09_pve_and_pvp_combat_defer_recovery_and_keep_old_save_revision) ... ok
+test_10_dead_players_and_underground_positions_are_not_teleported (test_terrain_ui29.TerrainUI29.test_10_dead_players_and_underground_positions_are_not_teleported) ... ok
+test_01_all_gameplay_points_use_real_unblocked_tiles (test_continent_ui19.ContinentIntegration.test_01_all_gameplay_points_use_real_unblocked_tiles) ... ok
+test_02_local_services_ports_and_entrances_reach_regional_roads (test_continent_ui19.ContinentIntegration.test_02_local_services_ports_and_entrances_reach_regional_roads) ... ok
+test_03_port_network_and_authored_region_plans (test_continent_ui19.ContinentIntegration.test_03_port_network_and_authored_region_plans) ... ok
+test_01_all_gameplay_points_use_real_unblocked_tiles (test_continent_ui20.GeographyUI20.test_01_all_gameplay_points_use_real_unblocked_tiles) ... ok
+test_02_local_services_ports_and_entrances_reach_regional_roads (test_continent_ui20.GeographyUI20.test_02_local_services_ports_and_entrances_reach_regional_roads) ... ok
+test_03_port_network_and_authored_region_plans (test_continent_ui20.GeographyUI20.test_03_port_network_and_authored_region_plans) ... ok
+test_04_natural_regions_tessellate_and_have_dry_navigation_targets (test_continent_ui20.GeographyUI20.test_04_natural_regions_tessellate_and_have_dry_navigation_targets) ... ok
+test_05_shore_landings_and_accessible_island_network (test_continent_ui20.GeographyUI20.test_05_shore_landings_and_accessible_island_network) ... ok
+test_06_seas_block_walking_and_have_no_land_roads (test_continent_ui20.GeographyUI20.test_06_seas_block_walking_and_have_no_land_roads) ... ok
+test_07_different_island_sizes_and_authored_landscapes (test_continent_ui20.GeographyUI20.test_07_different_island_sizes_and_authored_landscapes) ... ok
+test_08_every_inhabited_land_component_has_a_port (test_continent_ui20.GeographyUI20.test_08_every_inhabited_land_component_has_a_port) ... ok
+
+----------------------------------------------------------------------
+Ran 21 tests in 88.733s
+
+OK

@@ -1,0 +1,137 @@
+{
+  "passed": true,
+  "started_at": "2026-09-30T18:57:06.639496+00:00",
+  "elapsed_seconds": 84.178881,
+  "tests_run": 11,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "tests": [
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_01_original_population_species_and_regional_balance_are_preserved",
+      "status": "passed",
+      "seconds": 0.128369
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_02_start_other_floors_bosses_named_grounds_and_quest_pins_stay_fixed",
+      "status": "passed",
+      "seconds": 0.194431
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_03_world_geometry_services_and_skill_endpoints_are_unchanged",
+      "status": "passed",
+      "seconds": 0.043542
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_04_every_new_home_is_free_and_remains_on_its_original_region_and_landmass",
+      "status": "passed",
+      "seconds": 0.111769
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_05_allocations_are_unique_complete_and_varied_across_the_world",
+      "status": "passed",
+      "seconds": 0.011258
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_06_new_homes_keep_160px_separation_from_moved_and_background_enemies",
+      "status": "passed",
+      "seconds": 0.004857
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_07_new_groups_do_not_create_dense_piles_or_automatic_road_ambushes",
+      "status": "passed",
+      "seconds": 0.033968
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_08_every_allocated_monster_has_a_real_player_sized_approach_from_a_road",
+      "status": "passed",
+      "seconds": 7.003632
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_09_hunting_metadata_describes_exactly_the_actual_assigned_monsters",
+      "status": "passed",
+      "seconds": 0.004322
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_10_fresh_process_is_deterministic_and_reconfiguration_is_idempotent",
+      "status": "passed",
+      "seconds": 49.50579
+    },
+    {
+      "name": "test_encounter_ui30.EncounterUI30.test_11_representative_monsters_really_roam_and_respawn_at_their_new_home",
+      "status": "passed",
+      "seconds": 2.404426
+    }
+  ],
+  "encounter_module_sha256": "d9d807247c1d00dac518c941a4824c927139423980f06e50c8ea20ef1b565175",
+  "source_unchanged_during_run": true,
+  "counts": {
+    "sites": 159,
+    "groups": 438,
+    "moved": 1149,
+    "original_surface": 11149,
+    "background_surface": 10000,
+    "protected": 534,
+    "protected_reasons": {
+      "other_floor": 373,
+      "starter": 46,
+      "boss": 2,
+      "named_habitat": 42,
+      "loot_hunt": 22,
+      "final_loot_pin": 31,
+      "quest_target": 18
+    },
+    "regions": {
+      "region_0": 54,
+      "region_1": 69,
+      "region_2": 52,
+      "region_3": 53,
+      "region_4": 61,
+      "region_5": 41,
+      "region_6": 52,
+      "region_7": 80,
+      "region_8": 50,
+      "region_9": 52,
+      "region_10": 46,
+      "region_11": 42,
+      "region_12": 67,
+      "region_13": 64,
+      "region_14": 32,
+      "region_15": 55,
+      "region_16": 64,
+      "region_17": 54,
+      "region_18": 77,
+      "region_19": 84
+    },
+    "families": {
+      "wolves": 4,
+      "bandits": 12,
+      "goblins": 5,
+      "bog": 3,
+      "spiders": 7,
+      "elves": 9,
+      "trolls": 2,
+      "orcs": 10,
+      "desert": 9,
+      "undead": 20,
+      "dwarves": 11,
+      "rift": 24,
+      "dragons": 12,
+      "harpies": 2,
+      "ice": 11,
+      "frost_wolves": 6,
+      "frost_guard": 2,
+      "abyss": 10
+    },
+    "skipped": {
+      "no_road": 16,
+      "no_usable_positions": 8,
+      "no_family": 3
+    }
+  },
+  "scope": "Independent Python server regression; actual Game collision at radius 18 every 8 px on all access paths; live roaming and respawn across 8 families; fresh-process and repeated configure determinism.",
+  "limitations": [
+    "No browser or renderer validation in this suite.",
+    "Existing background density is preserved; density limit applies to moved homes within 240 px."
+  ]
+}

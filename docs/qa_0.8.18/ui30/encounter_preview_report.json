@@ -1,0 +1,5119 @@
+{
+  "before_source": "UI29_enemy_baseline_visuals.json",
+  "after_source": "UI30_enemy_after_visuals.json",
+  "validation": {
+    "spawn_count": 11522,
+    "starter_count": 28,
+    "site_count": 159,
+    "assigned_spawns": 1149,
+    "checks": "passed",
+    "sites": [
+      {
+        "id": "encounter_relief_region_0_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_0_0_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 306.3
+          },
+          {
+            "id": "encounter_relief_region_0_0_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 306.2
+          },
+          {
+            "id": "encounter_relief_region_0_0_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_0_0_group_0",
+          "encounter_relief_region_0_0_group_1",
+          "encounter_relief_region_0_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 306.3
+      },
+      {
+        "id": "encounter_relief_region_0_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_0_1_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_0_1_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 400.3
+          },
+          {
+            "id": "encounter_relief_region_0_1_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_0_1_group_0",
+          "encounter_relief_region_0_1_group_1",
+          "encounter_relief_region_0_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 400.3
+      },
+      {
+        "id": "encounter_relief_region_0_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_0_2_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_relief_region_0_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_0_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 178.3
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_0_2_group_0",
+          "encounter_relief_region_0_2_group_1",
+          "encounter_relief_region_0_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_0_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_0_3_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          },
+          {
+            "id": "encounter_relief_region_0_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_0_3_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 278.8
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_0_3_group_0",
+          "encounter_relief_region_0_3_group_1",
+          "encounter_relief_region_0_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 278.8
+      },
+      {
+        "id": "encounter_relief_region_0_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_0_4_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 90.7
+          },
+          {
+            "id": "encounter_relief_region_0_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_0_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_0_4_group_0",
+          "encounter_relief_region_0_4_group_1",
+          "encounter_relief_region_0_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_0_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_0_6_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 138.1
+          },
+          {
+            "id": "encounter_relief_region_0_6_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 281.8
+          },
+          {
+            "id": "encounter_relief_region_0_6_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_0_6_group_0",
+          "encounter_relief_region_0_6_group_1",
+          "encounter_relief_region_0_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 281.8
+      },
+      {
+        "id": "encounter_relief_region_0_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_0_7_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.4
+          },
+          {
+            "id": "encounter_relief_region_0_7_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_0_7_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_0_7_group_0",
+          "encounter_relief_region_0_7_group_1",
+          "encounter_relief_region_0_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_1_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_1_0_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 306.3
+          },
+          {
+            "id": "encounter_relief_region_1_0_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 306.2
+          },
+          {
+            "id": "encounter_relief_region_1_0_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_1_0_group_0",
+          "encounter_relief_region_1_0_group_1",
+          "encounter_relief_region_1_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 306.3
+      },
+      {
+        "id": "encounter_relief_region_1_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_1_1_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_1_1_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_1_1_group_0",
+          "encounter_relief_region_1_1_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_1_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_1_2_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          },
+          {
+            "id": "encounter_relief_region_1_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_1_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_1_2_group_0",
+          "encounter_relief_region_1_2_group_1",
+          "encounter_relief_region_1_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.0
+      },
+      {
+        "id": "encounter_relief_region_1_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_1_3_group_0",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          },
+          {
+            "id": "encounter_relief_region_1_3_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 306.2
+          },
+          {
+            "id": "encounter_relief_region_1_3_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_1_3_group_0",
+          "encounter_relief_region_1_3_group_1",
+          "encounter_relief_region_1_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 306.2
+      },
+      {
+        "id": "encounter_relief_region_1_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_1_4_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_relief_region_1_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_1_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_1_4_group_0",
+          "encounter_relief_region_1_4_group_1",
+          "encounter_relief_region_1_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_1_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_1_5_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_1_5_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 306.1
+          },
+          {
+            "id": "encounter_relief_region_1_5_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_1_5_group_0",
+          "encounter_relief_region_1_5_group_1",
+          "encounter_relief_region_1_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 306.1
+      },
+      {
+        "id": "encounter_relief_region_1_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_1_6_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 352.5
+          },
+          {
+            "id": "encounter_relief_region_1_6_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 216.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_1_6_group_0",
+          "encounter_relief_region_1_6_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 352.5
+      },
+      {
+        "id": "encounter_relief_region_1_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_1_7_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          },
+          {
+            "id": "encounter_relief_region_1_7_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_1_7_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_1_7_group_0",
+          "encounter_relief_region_1_7_group_1",
+          "encounter_relief_region_1_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.1
+      },
+      {
+        "id": "encounter_relief_region_1_8",
+        "groups": [
+          {
+            "id": "encounter_relief_region_1_8_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 368.4
+          },
+          {
+            "id": "encounter_relief_region_1_8_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 306.1
+          },
+          {
+            "id": "encounter_relief_region_1_8_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_1_8_group_0",
+          "encounter_relief_region_1_8_group_1",
+          "encounter_relief_region_1_8_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 368.4
+      },
+      {
+        "id": "encounter_relief_region_2_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_2_0_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          },
+          {
+            "id": "encounter_relief_region_2_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_2_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_2_0_group_0",
+          "encounter_relief_region_2_0_group_1",
+          "encounter_relief_region_2_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_2_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_2_1_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 83.1
+          },
+          {
+            "id": "encounter_relief_region_2_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_2_1_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_2_1_group_0",
+          "encounter_relief_region_2_1_group_1",
+          "encounter_relief_region_2_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_2_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_2_3_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_relief_region_2_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_2_3_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_2_3_group_0",
+          "encounter_relief_region_2_3_group_1",
+          "encounter_relief_region_2_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_2_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_2_4_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_relief_region_2_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_2_4_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_2_4_group_0",
+          "encounter_relief_region_2_4_group_1",
+          "encounter_relief_region_2_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_2_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_2_5_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          },
+          {
+            "id": "encounter_relief_region_2_5_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 329.2
+          },
+          {
+            "id": "encounter_relief_region_2_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 100.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_2_5_group_0",
+          "encounter_relief_region_2_5_group_1",
+          "encounter_relief_region_2_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 329.2
+      },
+      {
+        "id": "encounter_relief_region_2_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_2_6_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_relief_region_2_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_2_6_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_2_6_group_0",
+          "encounter_relief_region_2_6_group_1",
+          "encounter_relief_region_2_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_2_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_2_7_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 100.6
+          },
+          {
+            "id": "encounter_relief_region_2_7_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 156.7
+          },
+          {
+            "id": "encounter_relief_region_2_7_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 83.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_2_7_group_0",
+          "encounter_relief_region_2_7_group_1",
+          "encounter_relief_region_2_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 156.7
+      },
+      {
+        "id": "encounter_relief_region_3_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_3_0_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 302.5
+          },
+          {
+            "id": "encounter_relief_region_3_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.1
+          },
+          {
+            "id": "encounter_relief_region_3_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_3_0_group_0",
+          "encounter_relief_region_3_0_group_1",
+          "encounter_relief_region_3_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 302.5
+      },
+      {
+        "id": "encounter_relief_region_3_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_3_1_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 90.7
+          },
+          {
+            "id": "encounter_relief_region_3_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 294.7
+          },
+          {
+            "id": "encounter_relief_region_3_1_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_3_1_group_0",
+          "encounter_relief_region_3_1_group_1",
+          "encounter_relief_region_3_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 294.7
+      },
+      {
+        "id": "encounter_relief_region_3_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_3_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.1
+          },
+          {
+            "id": "encounter_relief_region_3_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_3_2_group_1",
+          "encounter_relief_region_3_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.1
+      },
+      {
+        "id": "encounter_relief_region_3_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_3_3_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 173.0
+          },
+          {
+            "id": "encounter_relief_region_3_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 354.2
+          },
+          {
+            "id": "encounter_relief_region_3_3_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.4
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_3_3_group_0",
+          "encounter_relief_region_3_3_group_1",
+          "encounter_relief_region_3_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 354.2
+      },
+      {
+        "id": "encounter_relief_region_3_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_3_4_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 303.7
+          },
+          {
+            "id": "encounter_relief_region_3_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_3_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_3_4_group_0",
+          "encounter_relief_region_3_4_group_1",
+          "encounter_relief_region_3_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 303.7
+      },
+      {
+        "id": "encounter_relief_region_4_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_4_0_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 302.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_4_0_group_0"
+        ],
+        "maximum_home_live_decoration_distance": 302.5
+      },
+      {
+        "id": "encounter_relief_region_4_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_4_1_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_4_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 352.3
+          },
+          {
+            "id": "encounter_relief_region_4_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 100.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_4_1_group_0",
+          "encounter_relief_region_4_1_group_1",
+          "encounter_relief_region_4_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 352.3
+      },
+      {
+        "id": "encounter_relief_region_4_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_4_2_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 461.1
+          },
+          {
+            "id": "encounter_relief_region_4_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_4_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_4_2_group_0",
+          "encounter_relief_region_4_2_group_1",
+          "encounter_relief_region_4_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 461.1
+      },
+      {
+        "id": "encounter_relief_region_4_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_4_3_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 496.1
+          },
+          {
+            "id": "encounter_relief_region_4_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_4_3_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 90.7
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_4_3_group_0",
+          "encounter_relief_region_4_3_group_1",
+          "encounter_relief_region_4_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 496.1
+      },
+      {
+        "id": "encounter_relief_region_4_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_4_4_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 302.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_4_4_group_0"
+        ],
+        "maximum_home_live_decoration_distance": 302.5
+      },
+      {
+        "id": "encounter_relief_region_4_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_4_6_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_4_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_4_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_4_6_group_0",
+          "encounter_relief_region_4_6_group_1",
+          "encounter_relief_region_4_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_4_8",
+        "groups": [
+          {
+            "id": "encounter_relief_region_4_8_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 302.5
+          },
+          {
+            "id": "encounter_relief_region_4_8_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_4_8_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_4_8_group_0",
+          "encounter_relief_region_4_8_group_1",
+          "encounter_relief_region_4_8_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 302.5
+      },
+      {
+        "id": "encounter_relief_region_5_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_5_0_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_5_0_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_5_0_group_0",
+          "encounter_relief_region_5_0_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_5_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_5_1_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_5_1_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_5_1_group_0",
+          "encounter_relief_region_5_1_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_5_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_5_3_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.4
+          },
+          {
+            "id": "encounter_relief_region_5_3_group_1",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_5_3_group_0",
+          "encounter_relief_region_5_3_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 305.4
+      },
+      {
+        "id": "encounter_relief_region_5_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_5_4_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 258.3
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_5_4_group_0"
+        ],
+        "maximum_home_live_decoration_distance": 258.3
+      },
+      {
+        "id": "encounter_relief_region_5_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_5_5_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_5_5_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_5_5_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_5_5_group_0",
+          "encounter_relief_region_5_5_group_1",
+          "encounter_relief_region_5_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_5_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_5_7_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 518.0
+          },
+          {
+            "id": "encounter_relief_region_5_7_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_5_7_group_0",
+          "encounter_relief_region_5_7_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 518.0
+      },
+      {
+        "id": "encounter_relief_region_6_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_6_0_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          },
+          {
+            "id": "encounter_relief_region_6_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_6_0_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_6_0_group_0",
+          "encounter_relief_region_6_0_group_1",
+          "encounter_relief_region_6_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.0
+      },
+      {
+        "id": "encounter_relief_region_6_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_6_1_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 216.4
+          },
+          {
+            "id": "encounter_relief_region_6_1_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.4
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_6_1_group_0",
+          "encounter_relief_region_6_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 216.4
+      },
+      {
+        "id": "encounter_relief_region_6_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_6_2_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_relief_region_6_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 156.6
+          },
+          {
+            "id": "encounter_relief_region_6_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_6_2_group_0",
+          "encounter_relief_region_6_2_group_1",
+          "encounter_relief_region_6_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 156.6
+      },
+      {
+        "id": "encounter_relief_region_6_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_6_3_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          },
+          {
+            "id": "encounter_relief_region_6_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.1
+          },
+          {
+            "id": "encounter_relief_region_6_3_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_6_3_group_0",
+          "encounter_relief_region_6_3_group_1",
+          "encounter_relief_region_6_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.1
+      },
+      {
+        "id": "encounter_relief_region_6_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_6_4_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_relief_region_6_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_6_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_6_4_group_0",
+          "encounter_relief_region_6_4_group_1",
+          "encounter_relief_region_6_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_6_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_6_5_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 97.8
+          },
+          {
+            "id": "encounter_relief_region_6_5_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_6_5_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_6_5_group_0",
+          "encounter_relief_region_6_5_group_1",
+          "encounter_relief_region_6_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_6_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_6_7_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          },
+          {
+            "id": "encounter_relief_region_6_7_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_6_7_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_6_7_group_0",
+          "encounter_relief_region_6_7_group_1",
+          "encounter_relief_region_6_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.0
+      },
+      {
+        "id": "encounter_relief_region_7_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_7_0_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.1
+          },
+          {
+            "id": "encounter_relief_region_7_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_7_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_7_0_group_0",
+          "encounter_relief_region_7_0_group_1",
+          "encounter_relief_region_7_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_7_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_7_1_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_7_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_7_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_7_1_group_0",
+          "encounter_relief_region_7_1_group_1",
+          "encounter_relief_region_7_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_7_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_7_2_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_7_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_7_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_7_2_group_0",
+          "encounter_relief_region_7_2_group_1",
+          "encounter_relief_region_7_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_7_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_7_3_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_7_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_7_3_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_7_3_group_0",
+          "encounter_relief_region_7_3_group_1",
+          "encounter_relief_region_7_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_7_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_7_4_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 376.0
+          },
+          {
+            "id": "encounter_relief_region_7_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_7_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_7_4_group_0",
+          "encounter_relief_region_7_4_group_1",
+          "encounter_relief_region_7_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 376.0
+      },
+      {
+        "id": "encounter_relief_region_7_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_7_5_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.2
+          },
+          {
+            "id": "encounter_relief_region_7_5_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_7_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_7_5_group_0",
+          "encounter_relief_region_7_5_group_1",
+          "encounter_relief_region_7_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.2
+      },
+      {
+        "id": "encounter_relief_region_7_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_7_6_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 437.9
+          },
+          {
+            "id": "encounter_relief_region_7_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_7_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_7_6_group_0",
+          "encounter_relief_region_7_6_group_1",
+          "encounter_relief_region_7_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 437.9
+      },
+      {
+        "id": "encounter_relief_region_7_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_7_7_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_7_7_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_7_7_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_7_7_group_0",
+          "encounter_relief_region_7_7_group_1",
+          "encounter_relief_region_7_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_7_8",
+        "groups": [
+          {
+            "id": "encounter_relief_region_7_8_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.4
+          },
+          {
+            "id": "encounter_relief_region_7_8_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_7_8_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_7_8_group_0",
+          "encounter_relief_region_7_8_group_1",
+          "encounter_relief_region_7_8_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.4
+      },
+      {
+        "id": "encounter_relief_region_8_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_8_0_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 222.4
+          },
+          {
+            "id": "encounter_relief_region_8_0_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 303.8
+          },
+          {
+            "id": "encounter_relief_region_8_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_8_0_group_0",
+          "encounter_relief_region_8_0_group_1",
+          "encounter_relief_region_8_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 303.8
+      },
+      {
+        "id": "encounter_relief_region_8_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_8_1_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_8_1_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 303.7
+          },
+          {
+            "id": "encounter_relief_region_8_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_8_1_group_0",
+          "encounter_relief_region_8_1_group_1",
+          "encounter_relief_region_8_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 303.7
+      },
+      {
+        "id": "encounter_relief_region_8_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_8_3_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_8_3_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 303.8
+          },
+          {
+            "id": "encounter_relief_region_8_3_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_8_3_group_0",
+          "encounter_relief_region_8_3_group_1",
+          "encounter_relief_region_8_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 303.8
+      },
+      {
+        "id": "encounter_relief_region_8_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_8_5_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_8_5_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 302.5
+          },
+          {
+            "id": "encounter_relief_region_8_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_8_5_group_0",
+          "encounter_relief_region_8_5_group_1",
+          "encounter_relief_region_8_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 302.5
+      },
+      {
+        "id": "encounter_relief_region_8_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_8_6_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 273.4
+          },
+          {
+            "id": "encounter_relief_region_8_6_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 303.8
+          },
+          {
+            "id": "encounter_relief_region_8_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_8_6_group_0",
+          "encounter_relief_region_8_6_group_1",
+          "encounter_relief_region_8_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 303.8
+      },
+      {
+        "id": "encounter_relief_region_8_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_8_7_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 336.6
+          },
+          {
+            "id": "encounter_relief_region_8_7_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_8_7_group_0",
+          "encounter_relief_region_8_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 336.6
+      },
+      {
+        "id": "encounter_relief_region_9_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_9_0_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 138.1
+          },
+          {
+            "id": "encounter_relief_region_9_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_9_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_9_0_group_0",
+          "encounter_relief_region_9_0_group_1",
+          "encounter_relief_region_9_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_9_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_9_1_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_9_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_9_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_9_1_group_0",
+          "encounter_relief_region_9_1_group_1",
+          "encounter_relief_region_9_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_9_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_9_2_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_9_2_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 209.5
+          },
+          {
+            "id": "encounter_relief_region_9_2_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_9_2_group_0",
+          "encounter_relief_region_9_2_group_1",
+          "encounter_relief_region_9_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 209.5
+      },
+      {
+        "id": "encounter_relief_region_9_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_9_4_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.5
+          },
+          {
+            "id": "encounter_relief_region_9_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_9_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_9_4_group_0",
+          "encounter_relief_region_9_4_group_1",
+          "encounter_relief_region_9_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_9_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_9_5_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_9_5_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.3
+          },
+          {
+            "id": "encounter_relief_region_9_5_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_9_5_group_0",
+          "encounter_relief_region_9_5_group_1",
+          "encounter_relief_region_9_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 122.3
+      },
+      {
+        "id": "encounter_relief_region_9_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_9_6_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.3
+          },
+          {
+            "id": "encounter_relief_region_9_6_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_9_6_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_9_6_group_0",
+          "encounter_relief_region_9_6_group_1",
+          "encounter_relief_region_9_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 122.3
+      },
+      {
+        "id": "encounter_relief_region_9_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_9_7_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_9_7_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_9_7_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_9_7_group_0",
+          "encounter_relief_region_9_7_group_1",
+          "encounter_relief_region_9_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 122.2
+      },
+      {
+        "id": "encounter_relief_region_10_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_10_0_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_relief_region_10_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_10_0_group_0",
+          "encounter_relief_region_10_0_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_10_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_10_1_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          },
+          {
+            "id": "encounter_relief_region_10_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_10_1_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_10_1_group_0",
+          "encounter_relief_region_10_1_group_1",
+          "encounter_relief_region_10_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_10_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_10_3_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 83.1
+          },
+          {
+            "id": "encounter_relief_region_10_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_10_3_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_10_3_group_0",
+          "encounter_relief_region_10_3_group_1",
+          "encounter_relief_region_10_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_10_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_10_4_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_relief_region_10_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_10_4_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_10_4_group_0",
+          "encounter_relief_region_10_4_group_1",
+          "encounter_relief_region_10_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_10_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_10_5_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 181.6
+          },
+          {
+            "id": "encounter_relief_region_10_5_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_10_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_10_5_group_0",
+          "encounter_relief_region_10_5_group_1",
+          "encounter_relief_region_10_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_10_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_10_6_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          },
+          {
+            "id": "encounter_relief_region_10_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_10_6_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_10_6_group_0",
+          "encounter_relief_region_10_6_group_1",
+          "encounter_relief_region_10_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_10_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_10_7_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 309.9
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_10_7_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 309.9
+      },
+      {
+        "id": "encounter_relief_region_11_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_11_1_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_11_1_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 302.5
+          },
+          {
+            "id": "encounter_relief_region_11_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_11_1_group_0",
+          "encounter_relief_region_11_1_group_1",
+          "encounter_relief_region_11_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 302.5
+      },
+      {
+        "id": "encounter_relief_region_11_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_11_2_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_11_2_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_11_2_group_0",
+          "encounter_relief_region_11_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 122.2
+      },
+      {
+        "id": "encounter_relief_region_11_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_11_5_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_11_5_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_11_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 260.9
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_11_5_group_0",
+          "encounter_relief_region_11_5_group_1",
+          "encounter_relief_region_11_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 260.9
+      },
+      {
+        "id": "encounter_relief_region_11_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_11_6_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 273.3
+          },
+          {
+            "id": "encounter_relief_region_11_6_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 497.1
+          },
+          {
+            "id": "encounter_relief_region_11_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 253.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_11_6_group_0",
+          "encounter_relief_region_11_6_group_1",
+          "encounter_relief_region_11_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 497.1
+      },
+      {
+        "id": "encounter_relief_region_11_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_11_7_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_11_7_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_11_7_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_11_7_group_0",
+          "encounter_relief_region_11_7_group_1",
+          "encounter_relief_region_11_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 122.2
+      },
+      {
+        "id": "encounter_relief_region_12_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_12_0_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 429.0
+          },
+          {
+            "id": "encounter_relief_region_12_0_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 522.4
+          },
+          {
+            "id": "encounter_relief_region_12_0_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_12_0_group_0",
+          "encounter_relief_region_12_0_group_1",
+          "encounter_relief_region_12_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 522.4
+      },
+      {
+        "id": "encounter_relief_region_12_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_12_1_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.4
+          },
+          {
+            "id": "encounter_relief_region_12_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_12_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_12_1_group_0",
+          "encounter_relief_region_12_1_group_1",
+          "encounter_relief_region_12_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_12_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_12_2_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_12_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_12_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_12_2_group_0",
+          "encounter_relief_region_12_2_group_1",
+          "encounter_relief_region_12_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_12_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_12_3_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          },
+          {
+            "id": "encounter_relief_region_12_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_12_3_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 104.9
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_12_3_group_0",
+          "encounter_relief_region_12_3_group_1",
+          "encounter_relief_region_12_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.0
+      },
+      {
+        "id": "encounter_relief_region_12_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_12_4_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_12_4_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 303.8
+          },
+          {
+            "id": "encounter_relief_region_12_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_12_4_group_0",
+          "encounter_relief_region_12_4_group_1",
+          "encounter_relief_region_12_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 303.8
+      },
+      {
+        "id": "encounter_relief_region_12_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_12_5_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_12_5_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 303.7
+          },
+          {
+            "id": "encounter_relief_region_12_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_12_5_group_0",
+          "encounter_relief_region_12_5_group_1",
+          "encounter_relief_region_12_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 303.7
+      },
+      {
+        "id": "encounter_relief_region_12_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_12_6_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.5
+          },
+          {
+            "id": "encounter_relief_region_12_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_12_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_12_6_group_0",
+          "encounter_relief_region_12_6_group_1",
+          "encounter_relief_region_12_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_12_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_12_7_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_12_7_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 586.2
+          },
+          {
+            "id": "encounter_relief_region_12_7_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_12_7_group_0",
+          "encounter_relief_region_12_7_group_1",
+          "encounter_relief_region_12_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 586.2
+      },
+      {
+        "id": "encounter_relief_region_13_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_13_0_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_13_0_group_1",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          },
+          {
+            "id": "encounter_relief_region_13_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_13_0_group_0",
+          "encounter_relief_region_13_0_group_1",
+          "encounter_relief_region_13_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_13_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_13_1_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 322.0
+          },
+          {
+            "id": "encounter_relief_region_13_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_13_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_13_1_group_0",
+          "encounter_relief_region_13_1_group_1",
+          "encounter_relief_region_13_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 322.0
+      },
+      {
+        "id": "encounter_relief_region_13_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_13_4_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          },
+          {
+            "id": "encounter_relief_region_13_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_13_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_13_4_group_0",
+          "encounter_relief_region_13_4_group_1",
+          "encounter_relief_region_13_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.0
+      },
+      {
+        "id": "encounter_relief_region_13_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_13_5_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 306.1
+          },
+          {
+            "id": "encounter_relief_region_13_5_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 409.5
+          },
+          {
+            "id": "encounter_relief_region_13_5_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_13_5_group_0",
+          "encounter_relief_region_13_5_group_1",
+          "encounter_relief_region_13_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 409.5
+      },
+      {
+        "id": "encounter_relief_region_13_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_13_6_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 186.7
+          },
+          {
+            "id": "encounter_relief_region_13_6_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 589.3
+          },
+          {
+            "id": "encounter_relief_region_13_6_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_13_6_group_0",
+          "encounter_relief_region_13_6_group_1",
+          "encounter_relief_region_13_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 589.3
+      },
+      {
+        "id": "encounter_relief_region_13_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_13_7_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 84.9
+          },
+          {
+            "id": "encounter_relief_region_13_7_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 387.3
+          },
+          {
+            "id": "encounter_relief_region_13_7_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_13_7_group_0",
+          "encounter_relief_region_13_7_group_1",
+          "encounter_relief_region_13_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 387.3
+      },
+      {
+        "id": "encounter_relief_region_13_8",
+        "groups": [
+          {
+            "id": "encounter_relief_region_13_8_group_0",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          },
+          {
+            "id": "encounter_relief_region_13_8_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 526.3
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_13_8_group_0",
+          "encounter_relief_region_13_8_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 526.3
+      },
+      {
+        "id": "encounter_relief_region_14_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_14_0_group_0",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          },
+          {
+            "id": "encounter_relief_region_14_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 173.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_14_0_group_0",
+          "encounter_relief_region_14_0_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 173.0
+      },
+      {
+        "id": "encounter_relief_region_14_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_14_1_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.3
+          },
+          {
+            "id": "encounter_relief_region_14_1_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_14_1_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_14_1_group_0",
+          "encounter_relief_region_14_1_group_1",
+          "encounter_relief_region_14_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 122.3
+      },
+      {
+        "id": "encounter_relief_region_14_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_14_2_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_14_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_14_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_14_2_group_0",
+          "encounter_relief_region_14_2_group_1",
+          "encounter_relief_region_14_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_14_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_14_3_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_14_3_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 122.2
+      },
+      {
+        "id": "encounter_relief_region_14_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_14_6_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_14_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_14_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_14_6_group_0",
+          "encounter_relief_region_14_6_group_1",
+          "encounter_relief_region_14_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_14_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_14_7_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 84.9
+          },
+          {
+            "id": "encounter_relief_region_14_7_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 232.0
+          },
+          {
+            "id": "encounter_relief_region_14_7_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_14_7_group_0",
+          "encounter_relief_region_14_7_group_1",
+          "encounter_relief_region_14_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 232.0
+      },
+      {
+        "id": "encounter_relief_region_15_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_15_0_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          },
+          {
+            "id": "encounter_relief_region_15_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_15_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_15_0_group_0",
+          "encounter_relief_region_15_0_group_1",
+          "encounter_relief_region_15_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.0
+      },
+      {
+        "id": "encounter_relief_region_15_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_15_1_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 506.6
+          },
+          {
+            "id": "encounter_relief_region_15_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_15_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_15_1_group_0",
+          "encounter_relief_region_15_1_group_1",
+          "encounter_relief_region_15_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 506.6
+      },
+      {
+        "id": "encounter_relief_region_15_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_15_2_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          },
+          {
+            "id": "encounter_relief_region_15_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_15_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_15_2_group_0",
+          "encounter_relief_region_15_2_group_1",
+          "encounter_relief_region_15_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.0
+      },
+      {
+        "id": "encounter_relief_region_15_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_15_3_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 494.2
+          },
+          {
+            "id": "encounter_relief_region_15_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 186.7
+          },
+          {
+            "id": "encounter_relief_region_15_3_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 173.4
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_15_3_group_0",
+          "encounter_relief_region_15_3_group_1",
+          "encounter_relief_region_15_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 494.2
+      },
+      {
+        "id": "encounter_relief_region_15_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_15_4_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          },
+          {
+            "id": "encounter_relief_region_15_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 283.0
+          },
+          {
+            "id": "encounter_relief_region_15_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_15_4_group_0",
+          "encounter_relief_region_15_4_group_1",
+          "encounter_relief_region_15_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 283.0
+      },
+      {
+        "id": "encounter_relief_region_15_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_15_5_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 437.8
+          },
+          {
+            "id": "encounter_relief_region_15_5_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_15_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_15_5_group_0",
+          "encounter_relief_region_15_5_group_1",
+          "encounter_relief_region_15_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 437.8
+      },
+      {
+        "id": "encounter_relief_region_15_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_15_6_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.1
+          },
+          {
+            "id": "encounter_relief_region_15_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.1
+          },
+          {
+            "id": "encounter_relief_region_15_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_15_6_group_0",
+          "encounter_relief_region_15_6_group_1",
+          "encounter_relief_region_15_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 210.1
+      },
+      {
+        "id": "encounter_relief_region_16_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_16_0_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 326.9
+          },
+          {
+            "id": "encounter_relief_region_16_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_16_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_16_0_group_0",
+          "encounter_relief_region_16_0_group_1",
+          "encounter_relief_region_16_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 326.9
+      },
+      {
+        "id": "encounter_relief_region_16_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_16_1_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 403.7
+          },
+          {
+            "id": "encounter_relief_region_16_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 138.1
+          },
+          {
+            "id": "encounter_relief_region_16_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_16_1_group_0",
+          "encounter_relief_region_16_1_group_1",
+          "encounter_relief_region_16_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 403.7
+      },
+      {
+        "id": "encounter_relief_region_16_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_16_2_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 216.5
+          },
+          {
+            "id": "encounter_relief_region_16_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 260.0
+          },
+          {
+            "id": "encounter_relief_region_16_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 260.9
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_16_2_group_0",
+          "encounter_relief_region_16_2_group_1",
+          "encounter_relief_region_16_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 260.9
+      },
+      {
+        "id": "encounter_relief_region_16_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_16_4_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_16_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_16_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_16_4_group_0",
+          "encounter_relief_region_16_4_group_1",
+          "encounter_relief_region_16_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_16_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_16_5_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.3
+          },
+          {
+            "id": "encounter_relief_region_16_5_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 156.7
+          },
+          {
+            "id": "encounter_relief_region_16_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 275.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_16_5_group_0",
+          "encounter_relief_region_16_5_group_1",
+          "encounter_relief_region_16_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 305.3
+      },
+      {
+        "id": "encounter_relief_region_16_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_16_6_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.4
+          },
+          {
+            "id": "encounter_relief_region_16_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_16_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_16_6_group_0",
+          "encounter_relief_region_16_6_group_1",
+          "encounter_relief_region_16_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_16_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_16_7_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 138.1
+          },
+          {
+            "id": "encounter_relief_region_16_7_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_16_7_group_1",
+          "encounter_relief_region_16_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 138.1
+      },
+      {
+        "id": "encounter_relief_region_16_8",
+        "groups": [
+          {
+            "id": "encounter_relief_region_16_8_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.5
+          },
+          {
+            "id": "encounter_relief_region_16_8_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_16_8_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_16_8_group_0",
+          "encounter_relief_region_16_8_group_1",
+          "encounter_relief_region_16_8_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_17_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_17_0_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_17_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_17_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_17_0_group_0",
+          "encounter_relief_region_17_0_group_1",
+          "encounter_relief_region_17_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_17_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_17_1_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_17_1_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 85.0
+          },
+          {
+            "id": "encounter_relief_region_17_1_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_17_1_group_0",
+          "encounter_relief_region_17_1_group_1",
+          "encounter_relief_region_17_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 122.2
+      },
+      {
+        "id": "encounter_relief_region_17_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_17_2_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_17_2_group_0"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_17_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_17_3_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_relief_region_17_3_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 295.1
+          },
+          {
+            "id": "encounter_relief_region_17_3_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_17_3_group_0",
+          "encounter_relief_region_17_3_group_1",
+          "encounter_relief_region_17_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 295.1
+      },
+      {
+        "id": "encounter_relief_region_17_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_17_4_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 529.7
+          },
+          {
+            "id": "encounter_relief_region_17_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_17_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 173.4
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_17_4_group_0",
+          "encounter_relief_region_17_4_group_1",
+          "encounter_relief_region_17_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 529.7
+      },
+      {
+        "id": "encounter_relief_region_17_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_17_5_group_0",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          },
+          {
+            "id": "encounter_relief_region_17_5_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 164.8
+          },
+          {
+            "id": "encounter_relief_region_17_5_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_17_5_group_0",
+          "encounter_relief_region_17_5_group_1",
+          "encounter_relief_region_17_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 164.8
+      },
+      {
+        "id": "encounter_relief_region_17_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_17_6_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_17_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_17_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 261.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_17_6_group_0",
+          "encounter_relief_region_17_6_group_1",
+          "encounter_relief_region_17_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 261.0
+      },
+      {
+        "id": "encounter_relief_region_18_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_18_0_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_18_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_18_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_18_0_group_0",
+          "encounter_relief_region_18_0_group_1",
+          "encounter_relief_region_18_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_18_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_18_1_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 186.6
+          },
+          {
+            "id": "encounter_relief_region_18_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_18_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_18_1_group_0",
+          "encounter_relief_region_18_1_group_1",
+          "encounter_relief_region_18_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_18_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_18_2_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_18_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 445.5
+          },
+          {
+            "id": "encounter_relief_region_18_2_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_18_2_group_0",
+          "encounter_relief_region_18_2_group_1",
+          "encounter_relief_region_18_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 445.5
+      },
+      {
+        "id": "encounter_relief_region_18_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_18_3_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 278.8
+          },
+          {
+            "id": "encounter_relief_region_18_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.5
+          },
+          {
+            "id": "encounter_relief_region_18_3_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_18_3_group_0",
+          "encounter_relief_region_18_3_group_1",
+          "encounter_relief_region_18_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 278.8
+      },
+      {
+        "id": "encounter_relief_region_18_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_18_4_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 383.4
+          },
+          {
+            "id": "encounter_relief_region_18_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_18_4_group_0",
+          "encounter_relief_region_18_4_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 383.4
+      },
+      {
+        "id": "encounter_relief_region_18_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_18_5_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_18_5_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_18_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_18_5_group_0",
+          "encounter_relief_region_18_5_group_1",
+          "encounter_relief_region_18_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_relief_region_18_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_18_6_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 143.5
+          },
+          {
+            "id": "encounter_relief_region_18_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 186.6
+          },
+          {
+            "id": "encounter_relief_region_18_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_18_6_group_0",
+          "encounter_relief_region_18_6_group_1",
+          "encounter_relief_region_18_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 186.6
+      },
+      {
+        "id": "encounter_relief_region_18_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_18_7_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_18_7_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_18_7_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_18_7_group_0",
+          "encounter_relief_region_18_7_group_1",
+          "encounter_relief_region_18_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_19_0",
+        "groups": [
+          {
+            "id": "encounter_relief_region_19_0_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_19_0_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 83.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_19_0_group_1",
+          "encounter_relief_region_19_0_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_19_1",
+        "groups": [
+          {
+            "id": "encounter_relief_region_19_1_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_19_1_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 138.1
+          },
+          {
+            "id": "encounter_relief_region_19_1_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_19_1_group_0",
+          "encounter_relief_region_19_1_group_1",
+          "encounter_relief_region_19_1_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_19_2",
+        "groups": [
+          {
+            "id": "encounter_relief_region_19_2_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_19_2_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 210.0
+          },
+          {
+            "id": "encounter_relief_region_19_2_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_19_2_group_0",
+          "encounter_relief_region_19_2_group_1",
+          "encounter_relief_region_19_2_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_19_3",
+        "groups": [
+          {
+            "id": "encounter_relief_region_19_3_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 167.6
+          },
+          {
+            "id": "encounter_relief_region_19_3_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 372.4
+          },
+          {
+            "id": "encounter_relief_region_19_3_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_19_3_group_0",
+          "encounter_relief_region_19_3_group_1",
+          "encounter_relief_region_19_3_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 372.4
+      },
+      {
+        "id": "encounter_relief_region_19_4",
+        "groups": [
+          {
+            "id": "encounter_relief_region_19_4_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_19_4_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_19_4_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 173.4
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_19_4_group_0",
+          "encounter_relief_region_19_4_group_1",
+          "encounter_relief_region_19_4_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_19_5",
+        "groups": [
+          {
+            "id": "encounter_relief_region_19_5_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_19_5_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_19_5_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_19_5_group_0",
+          "encounter_relief_region_19_5_group_1",
+          "encounter_relief_region_19_5_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_19_6",
+        "groups": [
+          {
+            "id": "encounter_relief_region_19_6_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 127.5
+          },
+          {
+            "id": "encounter_relief_region_19_6_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_relief_region_19_6_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_19_6_group_0",
+          "encounter_relief_region_19_6_group_1",
+          "encounter_relief_region_19_6_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_relief_region_19_7",
+        "groups": [
+          {
+            "id": "encounter_relief_region_19_7_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 244.4
+          },
+          {
+            "id": "encounter_relief_region_19_7_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 288.4
+          },
+          {
+            "id": "encounter_relief_region_19_7_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 100.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_19_7_group_0",
+          "encounter_relief_region_19_7_group_1",
+          "encounter_relief_region_19_7_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 288.4
+      },
+      {
+        "id": "encounter_relief_region_19_8",
+        "groups": [
+          {
+            "id": "encounter_relief_region_19_8_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 354.1
+          },
+          {
+            "id": "encounter_relief_region_19_8_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_relief_region_19_8_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_relief_region_19_8_group_0",
+          "encounter_relief_region_19_8_group_1",
+          "encounter_relief_region_19_8_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 354.1
+      },
+      {
+        "id": "encounter_city_brzezina_142",
+        "groups": [
+          {
+            "id": "encounter_city_brzezina_142_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 156.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_brzezina_142_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 156.6
+      },
+      {
+        "id": "encounter_city_brzezina_143",
+        "groups": [
+          {
+            "id": "encounter_city_brzezina_143_group_1",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_brzezina_143_group_1"
+        ],
+        "maximum_home_live_decoration_distance": 0.0
+      },
+      {
+        "id": "encounter_city_zloty_port_144",
+        "groups": [
+          {
+            "id": "encounter_city_zloty_port_144_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          },
+          {
+            "id": "encounter_city_zloty_port_144_group_2",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_zloty_port_144_group_0",
+          "encounter_city_zloty_port_144_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_city_zloty_port_145",
+        "groups": [
+          {
+            "id": "encounter_city_zloty_port_145_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 303.8
+          },
+          {
+            "id": "encounter_city_zloty_port_145_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 273.3
+          },
+          {
+            "id": "encounter_city_zloty_port_145_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_zloty_port_145_group_0",
+          "encounter_city_zloty_port_145_group_1",
+          "encounter_city_zloty_port_145_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 303.8
+      },
+      {
+        "id": "encounter_city_mrozna_przystan_146",
+        "groups": [
+          {
+            "id": "encounter_city_mrozna_przystan_146_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 156.7
+          },
+          {
+            "id": "encounter_city_mrozna_przystan_146_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 83.1
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_mrozna_przystan_146_group_1",
+          "encounter_city_mrozna_przystan_146_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 156.7
+      },
+      {
+        "id": "encounter_city_mrozna_przystan_147",
+        "groups": [
+          {
+            "id": "encounter_city_mrozna_przystan_147_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 341.1
+          },
+          {
+            "id": "encounter_city_mrozna_przystan_147_group_1",
+            "count": 4,
+            "maximum_home_anchor_distance": 306.2
+          },
+          {
+            "id": "encounter_city_mrozna_przystan_147_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_mrozna_przystan_147_group_0",
+          "encounter_city_mrozna_przystan_147_group_1",
+          "encounter_city_mrozna_przystan_147_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 341.1
+      },
+      {
+        "id": "encounter_city_popielny_port_148",
+        "groups": [
+          {
+            "id": "encounter_city_popielny_port_148_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 229.2
+          },
+          {
+            "id": "encounter_city_popielny_port_148_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 278.8
+          },
+          {
+            "id": "encounter_city_popielny_port_148_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 108.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_popielny_port_148_group_0",
+          "encounter_city_popielny_port_148_group_1",
+          "encounter_city_popielny_port_148_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 278.8
+      },
+      {
+        "id": "encounter_city_popielny_port_149",
+        "groups": [
+          {
+            "id": "encounter_city_popielny_port_149_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 476.2
+          },
+          {
+            "id": "encounter_city_popielny_port_149_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_city_popielny_port_149_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 260.9
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_popielny_port_149_group_0",
+          "encounter_city_popielny_port_149_group_1",
+          "encounter_city_popielny_port_149_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 476.2
+      },
+      {
+        "id": "encounter_city_solna_przystan_150",
+        "groups": [
+          {
+            "id": "encounter_city_solna_przystan_150_group_0",
+            "count": 4,
+            "maximum_home_anchor_distance": 305.4
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_solna_przystan_150_group_0"
+        ],
+        "maximum_home_live_decoration_distance": 305.4
+      },
+      {
+        "id": "encounter_city_solna_przystan_151",
+        "groups": [
+          {
+            "id": "encounter_city_solna_przystan_151_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 118.6
+          },
+          {
+            "id": "encounter_city_solna_przystan_151_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_solna_przystan_151_group_1",
+          "encounter_city_solna_przystan_151_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 118.6
+      },
+      {
+        "id": "encounter_city_zarowe_nabrzeze_152",
+        "groups": [
+          {
+            "id": "encounter_city_zarowe_nabrzeze_152_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.0
+          },
+          {
+            "id": "encounter_city_zarowe_nabrzeze_152_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 118.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_zarowe_nabrzeze_152_group_0",
+          "encounter_city_zarowe_nabrzeze_152_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.0
+      },
+      {
+        "id": "encounter_city_zarowe_nabrzeze_153",
+        "groups": [
+          {
+            "id": "encounter_city_zarowe_nabrzeze_153_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_city_zarowe_nabrzeze_153_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_zarowe_nabrzeze_153_group_1",
+          "encounter_city_zarowe_nabrzeze_153_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 122.2
+      },
+      {
+        "id": "encounter_city_przelom_rzeki_154",
+        "groups": [
+          {
+            "id": "encounter_city_przelom_rzeki_154_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_city_przelom_rzeki_154_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 186.7
+          },
+          {
+            "id": "encounter_city_przelom_rzeki_154_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_przelom_rzeki_154_group_0",
+          "encounter_city_przelom_rzeki_154_group_1",
+          "encounter_city_przelom_rzeki_154_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_city_przystan_cieni_155",
+        "groups": [
+          {
+            "id": "encounter_city_przystan_cieni_155_group_0",
+            "count": 2,
+            "maximum_home_anchor_distance": 85.0
+          },
+          {
+            "id": "encounter_city_przystan_cieni_155_group_1",
+            "count": 2,
+            "maximum_home_anchor_distance": 122.2
+          },
+          {
+            "id": "encounter_city_przystan_cieni_155_group_2",
+            "count": 1,
+            "maximum_home_anchor_distance": 0.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_przystan_cieni_155_group_0",
+          "encounter_city_przystan_cieni_155_group_1",
+          "encounter_city_przystan_cieni_155_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 122.2
+      },
+      {
+        "id": "encounter_city_przystan_cieni_156",
+        "groups": [
+          {
+            "id": "encounter_city_przystan_cieni_156_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 167.7
+          },
+          {
+            "id": "encounter_city_przystan_cieni_156_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_city_przystan_cieni_156_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.6
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_przystan_cieni_156_group_0",
+          "encounter_city_przystan_cieni_156_group_1",
+          "encounter_city_przystan_cieni_156_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      },
+      {
+        "id": "encounter_city_bazaltowa_straznica_157",
+        "groups": [
+          {
+            "id": "encounter_city_bazaltowa_straznica_157_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 410.3
+          },
+          {
+            "id": "encounter_city_bazaltowa_straznica_157_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 331.6
+          },
+          {
+            "id": "encounter_city_bazaltowa_straznica_157_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 105.0
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_bazaltowa_straznica_157_group_0",
+          "encounter_city_bazaltowa_straznica_157_group_1",
+          "encounter_city_bazaltowa_straznica_157_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 410.3
+      },
+      {
+        "id": "encounter_city_bazaltowa_straznica_158",
+        "groups": [
+          {
+            "id": "encounter_city_bazaltowa_straznica_158_group_0",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_city_bazaltowa_straznica_158_group_1",
+            "count": 3,
+            "maximum_home_anchor_distance": 237.1
+          },
+          {
+            "id": "encounter_city_bazaltowa_straznica_158_group_2",
+            "count": 2,
+            "maximum_home_anchor_distance": 133.5
+          }
+        ],
+        "live_habitat_ids": [
+          "encounter_city_bazaltowa_straznica_158_group_0",
+          "encounter_city_bazaltowa_straznica_158_group_1",
+          "encounter_city_bazaltowa_straznica_158_group_2"
+        ],
+        "maximum_home_live_decoration_distance": 237.1
+      }
+    ],
+    "spatial_warnings": []
+  },
+  "scenes": [
+    {
+      "slug": "brzezina_bandits",
+      "label": "Czata przy Brzezinie",
+      "site_id": "encounter_city_brzezina_142",
+      "center": [
+        32760.2,
+        32627.1
+      ],
+      "region_id": "region_6",
+      "family": "bandits",
+      "origin": "city",
+      "count": 3,
+      "groups": [
+        {
+          "id": "encounter_city_brzezina_142_group_1",
+          "count": 3,
+          "maximum_home_anchor_distance": 156.6
+        }
+      ],
+      "live_habitat_ids": [
+        "encounter_city_brzezina_142_group_1"
+      ],
+      "spawns": [
+        {
+          "marker": 1,
+          "index": 8512,
+          "kind": "bandit",
+          "name": "Rozbójnik",
+          "before": [
+            34125,
+            31860
+          ],
+          "after": [
+            33097.3,
+            32015.4
+          ],
+          "distance_moved": 1039.4,
+          "before_road_gap": 1549.3,
+          "after_road_gap": 681.2,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 221.2
+        },
+        {
+          "marker": 2,
+          "index": 11181,
+          "kind": "bandit_veteran",
+          "name": "Bandyta weteran",
+          "before": [
+            38438,
+            24612
+          ],
+          "after": [
+            33160.2,
+            32215.7
+          ],
+          "distance_moved": 9255.9,
+          "before_road_gap": 2579.3,
+          "after_road_gap": 649.6,
+          "aggro": 360,
+          "wander": 135,
+          "after_road_gap_minus_aggro_wander": 154.6
+        },
+        {
+          "marker": 3,
+          "index": 8513,
+          "kind": "bandit_archer",
+          "name": "Bandyta łucznik",
+          "before": [
+            34146,
+            31994
+          ],
+          "after": [
+            33323.6,
+            32185.4
+          ],
+          "distance_moved": 844.4,
+          "before_road_gap": 1494.3,
+          "after_road_gap": 809.0,
+          "aggro": 352,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 282.0
+        }
+      ],
+      "terrain_link": {
+        "relief_id": "",
+        "matching_patch_count": 0,
+        "site_gap_to_own_patch": null,
+        "group_gaps_to_own_patch": [
+          null
+        ],
+        "home_gaps_to_own_patch": [
+          null,
+          null,
+          null
+        ]
+      },
+      "role_spacing": {
+        "ranged_count": 1,
+        "melee_count": 2,
+        "mean_ranged_road_gap": 809.0,
+        "mean_melee_road_gap": 665.4
+      },
+      "group_pair_distances": [],
+      "three_group_normalized_triangle_signature": [],
+      "group_triangle_area": null,
+      "before_min_road_gap": 1494.3,
+      "after_min_road_gap": 649.6,
+      "image": "brzezina_bandits_before_after.png",
+      "bounds": [
+        30751.6,
+        24287.0,
+        40283.2,
+        32952.1
+      ],
+      "detail_image": "brzezina_bandits_after_detail.png"
+    },
+    {
+      "slug": "woodland_pack",
+      "label": "Wataha w leśnym terenie",
+      "site_id": "encounter_relief_region_0_0",
+      "center": [
+        13663.4,
+        11746.3
+      ],
+      "region_id": "region_0",
+      "family": "wolves",
+      "origin": "relief",
+      "count": 9,
+      "groups": [
+        {
+          "id": "encounter_relief_region_0_0_group_0",
+          "count": 4,
+          "maximum_home_anchor_distance": 306.3
+        },
+        {
+          "id": "encounter_relief_region_0_0_group_1",
+          "count": 4,
+          "maximum_home_anchor_distance": 306.2
+        },
+        {
+          "id": "encounter_relief_region_0_0_group_2",
+          "count": 1,
+          "maximum_home_anchor_distance": 0.0
+        }
+      ],
+      "live_habitat_ids": [
+        "encounter_relief_region_0_0_group_0",
+        "encounter_relief_region_0_0_group_1",
+        "encounter_relief_region_0_0_group_2"
+      ],
+      "spawns": [
+        {
+          "marker": 1,
+          "index": 7145,
+          "kind": "wolf",
+          "name": "Wilk cienia",
+          "before": [
+            14266,
+            13027
+          ],
+          "after": [
+            14194.2,
+            12690.4
+          ],
+          "distance_moved": 344.2,
+          "before_road_gap": 983.6,
+          "after_road_gap": 972.8,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 512.8
+        },
+        {
+          "marker": 2,
+          "index": 7144,
+          "kind": "wolf",
+          "name": "Wilk cienia",
+          "before": [
+            14266,
+            13185
+          ],
+          "after": [
+            14009.9,
+            12529.8
+          ],
+          "distance_moved": 703.5,
+          "before_road_gap": 1017.1,
+          "after_road_gap": 1108.4,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 648.4
+        },
+        {
+          "marker": 3,
+          "index": 7146,
+          "kind": "boar",
+          "name": "Dzik",
+          "before": [
+            14418,
+            13133
+          ],
+          "after": [
+            14030.0,
+            12302.2
+          ],
+          "distance_moved": 916.9,
+          "before_road_gap": 857.7,
+          "after_road_gap": 1026.0,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 566.0
+        },
+        {
+          "marker": 4,
+          "index": 154,
+          "kind": "wolf",
+          "name": "Wilk cienia",
+          "before": [
+            14128,
+            10741
+          ],
+          "after": [
+            14082.5,
+            12895.4
+          ],
+          "distance_moved": 2154.9,
+          "before_road_gap": 445.5,
+          "after_road_gap": 1131.8,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 671.8
+        },
+        {
+          "marker": 5,
+          "index": 156,
+          "kind": "boar",
+          "name": "Dzik",
+          "before": [
+            14068,
+            10654
+          ],
+          "after": [
+            13575.9,
+            11704.0
+          ],
+          "distance_moved": 1159.6,
+          "before_road_gap": 473.2,
+          "after_road_gap": 1279.6,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 819.6
+        },
+        {
+          "marker": 6,
+          "index": 155,
+          "kind": "wolf",
+          "name": "Wilk cienia",
+          "before": [
+            14175,
+            10590
+          ],
+          "after": [
+            13391.6,
+            11543.4
+          ],
+          "distance_moved": 1234.0,
+          "before_road_gap": 351.0,
+          "after_road_gap": 1403.4,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 943.4
+        },
+        {
+          "marker": 7,
+          "index": 7035,
+          "kind": "wolf",
+          "name": "Wilk cienia",
+          "before": [
+            17688,
+            8640
+          ],
+          "after": [
+            13411.7,
+            11315.8
+          ],
+          "distance_moved": 5044.5,
+          "before_road_gap": 1645.1,
+          "after_road_gap": 1310.9,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 850.9
+        },
+        {
+          "marker": 8,
+          "index": 7034,
+          "kind": "wolf",
+          "name": "Wilk cienia",
+          "before": [
+            17822,
+            8485
+          ],
+          "after": [
+            13464.2,
+            11909.0
+          ],
+          "distance_moved": 5542.0,
+          "before_road_gap": 1833.6,
+          "after_road_gap": 1449.6,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 989.6
+        },
+        {
+          "marker": 9,
+          "index": 7036,
+          "kind": "boar",
+          "name": "Dzik",
+          "before": [
+            17894,
+            8601
+          ],
+          "after": [
+            13286.5,
+            12041.0
+          ],
+          "distance_moved": 5750.0,
+          "before_road_gap": 1744.8,
+          "after_road_gap": 1659.3,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 1199.3
+        }
+      ],
+      "terrain_link": {
+        "relief_id": "relief_region_0_0",
+        "matching_patch_count": 4,
+        "site_gap_to_own_patch": 136.8,
+        "group_gaps_to_own_patch": [
+          483.8,
+          304.5,
+          596.9
+        ],
+        "home_gaps_to_own_patch": [
+          584.3,
+          412.2,
+          184.2,
+          774.6,
+          202.0,
+          384.0,
+          423.0,
+          382.6,
+          596.9
+        ]
+      },
+      "role_spacing": {
+        "ranged_count": 0,
+        "melee_count": 9,
+        "mean_ranged_road_gap": null,
+        "mean_melee_road_gap": 1260.2
+      },
+      "group_pair_distances": [
+        457.5,
+        972.5,
+        1164.2
+      ],
+      "three_group_normalized_triangle_signature": [
+        0.39,
+        0.84,
+        1.0
+      ],
+      "group_triangle_area": 216772.1,
+      "before_min_road_gap": 351.0,
+      "after_min_road_gap": 972.8,
+      "image": "woodland_pack_before_after.png",
+      "bounds": [
+        12612.6,
+        8160.0,
+        18497.6,
+        13510.0
+      ],
+      "detail_image": "woodland_pack_after_detail.png"
+    },
+    {
+      "slug": "undead_ruins",
+      "label": "Strażnicy i nieumarli w ruinach",
+      "site_id": "encounter_relief_region_15_5",
+      "center": [
+        17663.4,
+        82961.2
+      ],
+      "region_id": "region_15",
+      "family": "undead",
+      "origin": "relief",
+      "count": 9,
+      "groups": [
+        {
+          "id": "encounter_relief_region_15_5_group_0",
+          "count": 4,
+          "maximum_home_anchor_distance": 437.8
+        },
+        {
+          "id": "encounter_relief_region_15_5_group_1",
+          "count": 3,
+          "maximum_home_anchor_distance": 237.1
+        },
+        {
+          "id": "encounter_relief_region_15_5_group_2",
+          "count": 2,
+          "maximum_home_anchor_distance": 133.6
+        }
+      ],
+      "live_habitat_ids": [
+        "encounter_relief_region_15_5_group_0",
+        "encounter_relief_region_15_5_group_1",
+        "encounter_relief_region_15_5_group_2"
+      ],
+      "spawns": [
+        {
+          "marker": 1,
+          "index": 10337,
+          "kind": "vampire",
+          "name": "Wampir",
+          "before": [
+            20659.5,
+            85677.0
+          ],
+          "after": [
+            17598.0,
+            83185.6
+          ],
+          "distance_moved": 3947.1,
+          "before_road_gap": 70.1,
+          "after_road_gap": 1162.5,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 607.5
+        },
+        {
+          "marker": 2,
+          "index": 10342,
+          "kind": "skeleton",
+          "name": "Szkielet wartownika",
+          "before": [
+            20638.8,
+            85729.0
+          ],
+          "after": [
+            17656.3,
+            83387.4
+          ],
+          "distance_moved": 3791.9,
+          "before_road_gap": 103.8,
+          "after_road_gap": 1117.0,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 657.0
+        },
+        {
+          "marker": 3,
+          "index": 5252,
+          "kind": "skeleton",
+          "name": "Szkielet wartownika",
+          "before": [
+            20683.4,
+            85821.9
+          ],
+          "after": [
+            17714.5,
+            83589.2
+          ],
+          "distance_moved": 3714.7,
+          "before_road_gap": 206.3,
+          "after_road_gap": 1048.2,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 588.2
+        },
+        {
+          "marker": 4,
+          "index": 5253,
+          "kind": "necromancer",
+          "name": "Nekromanta",
+          "before": [
+            20722.5,
+            85639.7
+          ],
+          "after": [
+            17659.5,
+            82803.6
+          ],
+          "distance_moved": 4174.4,
+          "before_road_gap": 71.1,
+          "after_road_gap": 1334.1,
+          "aggro": 470,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 689.1
+        },
+        {
+          "marker": 5,
+          "index": 10338,
+          "kind": "skeleton",
+          "name": "Szkielet wartownika",
+          "before": [
+            20838.1,
+            85730.3
+          ],
+          "after": [
+            17834.6,
+            82274.3
+          ],
+          "distance_moved": 4578.7,
+          "before_road_gap": 208.6,
+          "after_road_gap": 1570.6,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 1110.6
+        },
+        {
+          "marker": 6,
+          "index": 5422,
+          "kind": "vampire",
+          "name": "Wampir",
+          "before": [
+            20721.6,
+            85837.0
+          ],
+          "after": [
+            17892.8,
+            82476.0
+          ],
+          "distance_moved": 4393.0,
+          "before_road_gap": 239.1,
+          "after_road_gap": 1613.2,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 1058.2
+        },
+        {
+          "marker": 7,
+          "index": 10340,
+          "kind": "skeleton_archer",
+          "name": "Szkielet łucznik",
+          "before": [
+            20739.1,
+            85638.4
+          ],
+          "after": [
+            18109.6,
+            82632.1
+          ],
+          "distance_moved": 3994.0,
+          "before_road_gap": 78.6,
+          "after_road_gap": 1807.9,
+          "aggro": 352,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 1280.9
+        },
+        {
+          "marker": 8,
+          "index": 10341,
+          "kind": "vampire",
+          "name": "Wampir",
+          "before": [
+            20805.4,
+            85812.6
+          ],
+          "after": [
+            17178.4,
+            81912.0
+          ],
+          "distance_moved": 5326.3,
+          "before_road_gap": 261.9,
+          "after_road_gap": 925.2,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 370.2
+        },
+        {
+          "marker": 9,
+          "index": 10339,
+          "kind": "necromancer",
+          "name": "Nekromanta",
+          "before": [
+            20670.3,
+            85811.7
+          ],
+          "after": [
+            17395.1,
+            82068.1
+          ],
+          "distance_moved": 4974.1,
+          "before_road_gap": 190.8,
+          "after_road_gap": 1139.3,
+          "aggro": 470,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 494.3
+        }
+      ],
+      "terrain_link": {
+        "relief_id": "relief_region_15_5",
+        "matching_patch_count": 4,
+        "site_gap_to_own_patch": 70.3,
+        "group_gaps_to_own_patch": [
+          40.6,
+          572.8,
+          654.2
+        ],
+        "home_gaps_to_own_patch": [
+          0.0,
+          62.4,
+          163.5,
+          126.4,
+          649.7,
+          528.6,
+          592.2,
+          717.5,
+          602.0
+        ]
+      },
+      "role_spacing": {
+        "ranged_count": 3,
+        "melee_count": 6,
+        "mean_ranged_road_gap": 1427.1,
+        "mean_melee_road_gap": 1239.4
+      },
+      "group_pair_distances": [
+        809.8,
+        832.2,
+        1304.9
+      ],
+      "three_group_normalized_triangle_signature": [
+        0.62,
+        0.64,
+        1.0
+      ],
+      "group_triangle_area": 325090.7,
+      "before_min_road_gap": 70.1,
+      "after_min_road_gap": 925.2,
+      "image": "undead_ruins_before_after.png",
+      "bounds": [
+        15938.9,
+        81499.8,
+        21163.1,
+        86249.2
+      ],
+      "detail_image": "undead_ruins_after_detail.png"
+    },
+    {
+      "slug": "spider_grove",
+      "label": "Pajęczy zagajnik",
+      "site_id": "encounter_relief_region_5_1",
+      "center": [
+        10406.0,
+        24893.2
+      ],
+      "region_id": "region_5",
+      "family": "spiders",
+      "origin": "relief",
+      "count": 8,
+      "groups": [
+        {
+          "id": "encounter_relief_region_5_1_group_0",
+          "count": 4,
+          "maximum_home_anchor_distance": 305.3
+        },
+        {
+          "id": "encounter_relief_region_5_1_group_1",
+          "count": 4,
+          "maximum_home_anchor_distance": 305.3
+        }
+      ],
+      "live_habitat_ids": [
+        "encounter_relief_region_5_1_group_0",
+        "encounter_relief_region_5_1_group_1"
+      ],
+      "spawns": [
+        {
+          "marker": 1,
+          "index": 7469,
+          "kind": "spider",
+          "name": "Szmaragdowy pająk",
+          "before": [
+            10028,
+            22673
+          ],
+          "after": [
+            10571.6,
+            24723.2
+          ],
+          "distance_moved": 2121.0,
+          "before_road_gap": 2210.4,
+          "after_road_gap": 1115.0,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 655.0
+        },
+        {
+          "marker": 2,
+          "index": 8259,
+          "kind": "spider",
+          "name": "Szmaragdowy pająk",
+          "before": [
+            8658,
+            23507
+          ],
+          "after": [
+            10645.7,
+            24526.7
+          ],
+          "distance_moved": 2234.0,
+          "before_road_gap": 3336.8,
+          "after_road_gap": 1116.0,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 656.0
+        },
+        {
+          "marker": 3,
+          "index": 8257,
+          "kind": "spider",
+          "name": "Szmaragdowy pająk",
+          "before": [
+            8625,
+            23355
+          ],
+          "after": [
+            10719.9,
+            24330.2
+          ],
+          "distance_moved": 2310.8,
+          "before_road_gap": 3421.4,
+          "after_road_gap": 1116.9,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 656.9
+        },
+        {
+          "marker": 4,
+          "index": 8258,
+          "kind": "spitting_spider",
+          "name": "Plujący pająk",
+          "before": [
+            8770,
+            23454
+          ],
+          "after": [
+            10360.8,
+            24814.7
+          ],
+          "distance_moved": 2093.4,
+          "before_road_gap": 3250.8,
+          "after_road_gap": 1279.6,
+          "aggro": 414,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 690.6
+        },
+        {
+          "marker": 5,
+          "index": 1894,
+          "kind": "spider",
+          "name": "Szmaragdowy pająk",
+          "before": [
+            9253,
+            26096
+          ],
+          "after": [
+            9769.4,
+            25574.9
+          ],
+          "distance_moved": 733.6,
+          "before_road_gap": 1906.5,
+          "after_road_gap": 1576.0,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 1116.0
+        },
+        {
+          "marker": 6,
+          "index": 1896,
+          "kind": "spider",
+          "name": "Szmaragdowy pająk",
+          "before": [
+            9258,
+            26279
+          ],
+          "after": [
+            9843.5,
+            25378.4
+          ],
+          "distance_moved": 1074.2,
+          "before_road_gap": 1849.5,
+          "after_road_gap": 1570.8,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 1110.8
+        },
+        {
+          "marker": 7,
+          "index": 7473,
+          "kind": "spider",
+          "name": "Szmaragdowy pająk",
+          "before": [
+            11963,
+            22436
+          ],
+          "after": [
+            9917.6,
+            25181.9
+          ],
+          "distance_moved": 3424.0,
+          "before_road_gap": 354.4,
+          "after_road_gap": 1567.3,
+          "aggro": 285,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 1107.3
+        },
+        {
+          "marker": 8,
+          "index": 1895,
+          "kind": "spitting_spider",
+          "name": "Plujący pająk",
+          "before": [
+            9211,
+            26298
+          ],
+          "after": [
+            9558.5,
+            25666.3
+          ],
+          "distance_moved": 721.0,
+          "before_road_gap": 1889.4,
+          "after_road_gap": 1746.4,
+          "aggro": 414,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 1157.4
+        }
+      ],
+      "terrain_link": {
+        "relief_id": "relief_region_5_1",
+        "matching_patch_count": 4,
+        "site_gap_to_own_patch": 47.7,
+        "group_gaps_to_own_patch": [
+          132.6,
+          665.8
+        ],
+        "home_gaps_to_own_patch": [
+          23.0,
+          154.6,
+          243.3,
+          91.3,
+          678.9,
+          598.4,
+          537.6,
+          904.1
+        ]
+      },
+      "role_spacing": {
+        "ranged_count": 0,
+        "melee_count": 6,
+        "mean_ranged_road_gap": null,
+        "mean_melee_road_gap": 1343.7
+      },
+      "group_pair_distances": [
+        1170.1
+      ],
+      "three_group_normalized_triangle_signature": [],
+      "group_triangle_area": null,
+      "before_min_road_gap": 354.4,
+      "after_min_road_gap": 1115.0,
+      "image": "spider_grove_before_after.png",
+      "bounds": [
+        7812.4,
+        22111.0,
+        12775.6,
+        26623.0
+      ],
+      "detail_image": "spider_grove_after_detail.png"
+    },
+    {
+      "slug": "desert",
+      "label": "Łowisko na pustyni",
+      "site_id": "encounter_city_solna_przystan_151",
+      "center": [
+        113231.0,
+        14650.8
+      ],
+      "region_id": "region_4",
+      "family": "desert",
+      "origin": "city",
+      "count": 4,
+      "groups": [
+        {
+          "id": "encounter_city_solna_przystan_151_group_1",
+          "count": 2,
+          "maximum_home_anchor_distance": 118.6
+        },
+        {
+          "id": "encounter_city_solna_przystan_151_group_2",
+          "count": 2,
+          "maximum_home_anchor_distance": 105.0
+        }
+      ],
+      "live_habitat_ids": [
+        "encounter_city_solna_przystan_151_group_1",
+        "encounter_city_solna_przystan_151_group_2"
+      ],
+      "spawns": [
+        {
+          "marker": 1,
+          "index": 1516,
+          "kind": "scorpion",
+          "name": "Skorpion piaskowy",
+          "before": [
+            115104,
+            14230
+          ],
+          "after": [
+            113735.0,
+            14143.3
+          ],
+          "distance_moved": 1371.7,
+          "before_road_gap": 54.0,
+          "after_road_gap": 706.8,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 151.8
+        },
+        {
+          "marker": 2,
+          "index": 1515,
+          "kind": "scarab",
+          "name": "Złoty skarabeusz",
+          "before": [
+            115189,
+            14169
+          ],
+          "after": [
+            113960.5,
+            14216.3
+          ],
+          "distance_moved": 1229.4,
+          "before_road_gap": 139.0,
+          "after_road_gap": 685.4,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 130.4
+        },
+        {
+          "marker": 3,
+          "index": 1517,
+          "kind": "minotaur",
+          "name": "Minotaur",
+          "before": [
+            115235,
+            14171
+          ],
+          "after": [
+            113114.4,
+            13985.9
+          ],
+          "distance_moved": 2128.7,
+          "before_road_gap": 185.0,
+          "after_road_gap": 705.9,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 150.9
+        },
+        {
+          "marker": 4,
+          "index": 1513,
+          "kind": "minotaur",
+          "name": "Minotaur",
+          "before": [
+            114912,
+            12346
+          ],
+          "after": [
+            113321.4,
+            13950.4
+          ],
+          "distance_moved": 2259.2,
+          "before_road_gap": 138.0,
+          "after_road_gap": 797.0,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 242.0
+        }
+      ],
+      "terrain_link": {
+        "relief_id": "",
+        "matching_patch_count": 0,
+        "site_gap_to_own_patch": null,
+        "group_gaps_to_own_patch": [
+          null,
+          null
+        ],
+        "home_gaps_to_own_patch": [
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "role_spacing": {
+        "ranged_count": 0,
+        "melee_count": 4,
+        "mean_ranged_road_gap": null,
+        "mean_melee_road_gap": 723.8
+      },
+      "group_pair_distances": [
+        664.5
+      ],
+      "three_group_normalized_triangle_signature": [],
+      "group_triangle_area": null,
+      "before_min_road_gap": 54.0,
+      "after_min_road_gap": 685.4,
+      "image": "desert_before_after.png",
+      "bounds": [
+        112245.2,
+        12021.0,
+        115672.1,
+        15136.4
+      ],
+      "detail_image": "desert_after_detail.png"
+    },
+    {
+      "slug": "snow",
+      "label": "Grupy na śnieżnym szlaku",
+      "site_id": "encounter_city_mrozna_przystan_146",
+      "center": [
+        84812.7,
+        55669.0
+      ],
+      "region_id": "region_13",
+      "family": "ice",
+      "origin": "city",
+      "count": 5,
+      "groups": [
+        {
+          "id": "encounter_city_mrozna_przystan_146_group_1",
+          "count": 3,
+          "maximum_home_anchor_distance": 156.7
+        },
+        {
+          "id": "encounter_city_mrozna_przystan_146_group_2",
+          "count": 2,
+          "maximum_home_anchor_distance": 83.1
+        }
+      ],
+      "live_habitat_ids": [
+        "encounter_city_mrozna_przystan_146_group_1",
+        "encounter_city_mrozna_przystan_146_group_2"
+      ],
+      "spawns": [
+        {
+          "marker": 1,
+          "index": 9951,
+          "kind": "golem",
+          "name": "Żelazny golem",
+          "before": [
+            83383.0,
+            59740.7
+          ],
+          "after": [
+            84824.0,
+            54928.3
+          ],
+          "distance_moved": 5023.5,
+          "before_road_gap": 1770.2,
+          "after_road_gap": 1048.6,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 493.6
+        },
+        {
+          "marker": 2,
+          "index": 4750,
+          "kind": "frost_giant",
+          "name": "Lodowy olbrzym",
+          "before": [
+            83410.8,
+            59751.3
+          ],
+          "after": [
+            84887.6,
+            55128.5
+          ],
+          "distance_moved": 4853.0,
+          "before_road_gap": 1783.8,
+          "after_road_gap": 902.6,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 347.6
+        },
+        {
+          "marker": 3,
+          "index": 9988,
+          "kind": "ice_elemental",
+          "name": "Żywiołak lodu",
+          "before": [
+            83448.3,
+            59788.6
+          ],
+          "after": [
+            85050.9,
+            55097.6
+          ],
+          "distance_moved": 4957.2,
+          "before_road_gap": 1825.6,
+          "after_road_gap": 1005.9,
+          "aggro": 470,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 360.9
+        },
+        {
+          "marker": 4,
+          "index": 4737,
+          "kind": "golem",
+          "name": "Żelazny golem",
+          "before": [
+            83428.3,
+            59763.9
+          ],
+          "after": [
+            85340.2,
+            55331.0
+          ],
+          "distance_moved": 4827.6,
+          "before_road_gap": 1798.4,
+          "after_road_gap": 926.6,
+          "aggro": 380,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 371.6
+        },
+        {
+          "marker": 5,
+          "index": 4753,
+          "kind": "ice_elemental",
+          "name": "Żywiołak lodu",
+          "before": [
+            83460.6,
+            59824.4
+          ],
+          "after": [
+            85503.5,
+            55300.1
+          ],
+          "distance_moved": 4964.1,
+          "before_road_gap": 1862.7,
+          "after_road_gap": 1024.5,
+          "aggro": 470,
+          "wander": 175,
+          "after_road_gap_minus_aggro_wander": 379.5
+        }
+      ],
+      "terrain_link": {
+        "relief_id": "",
+        "matching_patch_count": 0,
+        "site_gap_to_own_patch": null,
+        "group_gaps_to_own_patch": [
+          null,
+          null
+        ],
+        "home_gaps_to_own_patch": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+      },
+      "role_spacing": {
+        "ranged_count": 2,
+        "melee_count": 3,
+        "mean_ranged_road_gap": 1015.2,
+        "mean_melee_road_gap": 959.3
+      },
+      "group_pair_distances": [
+        566.4
+      ],
+      "three_group_normalized_triangle_signature": [],
+      "group_triangle_area": null,
+      "before_min_road_gap": 1770.2,
+      "after_min_road_gap": 902.6,
+      "image": "snow_before_after.png",
+      "bounds": [
+        81437.8,
+        54603.3,
+        87538.5,
+        60149.4
+      ],
+      "detail_image": "snow_after_detail.png"
+    }
+  ],
+  "visual_type": "exact data plan, not game screenshot",
+  "visual_review": {
+    "reviewed_plans": 6,
+    "reviewed_details": 6,
+    "finding": "Different family footprints: city roadside trio, unequal three-group pack and undead territory, two separated spider broods, staggered desert pairs, two cold-region groups. Final live decoration anchors match resident indices, with no 600px soft-threshold warnings.",
+    "terrain_context": "Relief groups use open flanks and approach corridors next to the real UI29 polygons; selected group anchors are 41–666px outside their own patch, homes up to904px. City encounters intentionally follow city roads and outskirts. This is adjacent terrain context, not a promise that all homes sit inside one polygon.",
+    "ranged_placement": "Selected bandit, undead and ice ranged residents are deeper from the road on average than melee residents: respectively809vs665,1427vs1239,1015vs959px.",
+    "layout_variety": "Selected scenes use1,2 or3group centers. Three-group normalized side signatures differ:[0.39,0.84,1.0]for wolves and[0.62,0.64,1.0]for undead. No common equilateral or shared triangle footprint in the six examples.",
+    "plan_limit": "Plans show exact home positions; dot size is schematic. They do not show animated roaming or the game HUD."
+  }
+}
