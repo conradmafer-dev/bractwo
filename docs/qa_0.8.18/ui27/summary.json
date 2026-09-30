@@ -1,0 +1,33 @@
+{
+  "version": "0.8.18",
+  "ui_revision": "UI_27",
+  "based_on": "BRACTWO_KRAIN_0.8.18_UI_26_FULL_SOURCE.zip",
+  "ok": true,
+  "python_tests": 86,
+  "javascript_tests": 31,
+  "browser_checks": 11,
+  "syntax_checked": 12,
+  "changed_source_and_docs_files": 18,
+  "screenshot_exact_copy": true,
+  "manual_visual_review": [
+    "desktop-top",
+    "desktop-world",
+    "mobile-login",
+    "narrow-character",
+    "no-js-login"
+  ],
+  "reports": [
+    "python.json",
+    "python.txt",
+    "javascript.json",
+    "javascript.txt",
+    "browser_results.json",
+    "source_changes.json"
+  ],
+  "limits": [
+    "Selected regression tests only; not the entire historical test suite.",
+    "Google sign-in browser flow uses a test provider and an isolated in-memory database.",
+    "Phone dimensions are emulated, not tested on a physical phone.",
+    "Not deployed to Railway; no Search Console submission or indexing/ranking guarantee."
+  ]
+}

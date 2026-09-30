@@ -1,0 +1,17 @@
+{
+  "ok": true,
+  "tests": 86,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "seconds": 9.19,
+  "selection": [
+    "test_seo_ui27.py",
+    "test_app_shell_http_0818.py",
+    "test_railway.py",
+    "test_google_auth_ui22.py",
+    "test_google_account_constraints_ui22.py",
+    "test_google_security_ui22.py",
+    "test_martial_state_ui26.py"
+  ]
+}

@@ -1,0 +1,71 @@
+test_app_shell.cjs
+✔ fullscreen is requested by a click and browser events synchronize every control (7.558826ms)
+✔ fullscreen denial opens dismissible help, stops movement and permits retry (7.408411ms)
+✔ iPhone without fullscreen receives honest Add to Home Screen instructions (1.426208ms)
+✔ accepted install prompt does not falsely report completed installation (1.643948ms)
+✔ dismissed install consumes the prompt and the next click offers manual help (5.93086ms)
+✔ standalone mode hides install affordances and worker only registers on secure origins (1.409675ms)
+✔ worker precaches only disconnected page and icons, and preserves unrelated caches (10.651018ms)
+✔ worker never intercepts game code, API, credential POST or cross-origin requests (4.702523ms)
+✔ navigation loads fresh HTML online and falls back to disconnected page offline (2.981897ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 59.90976
+
+test_google_auth_ui22.cjs
+✔ Google tickets may enter only the exact same-origin game socket (1.419605ms)
+✔ local HTTP development follows its own port; downloaded HTML cannot use Google (0.208115ms)
+✔ new Google characters need nickname/class and never transmit a password (3.432343ms)
+✔ legacy claiming is removed even with a correct-looking password (0.446809ms)
+✔ profile builder rejects legacy login mode and missing proof of Google authentication (0.385727ms)
+✔ profile builder rejects invalid nicknames or unknown class IDs before opening a socket (4.57693ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 26.865934
+
+test_ui14_mobile_forms.cjs
+✔ owner form overrides stale visuals; explicit empty never resurrects cached form (3.912825ms)
+✔ legacy fallback uses visuals, then sheet; empty visual overrides older sheet (0.278485ms)
+✔ active archer has short distinct label, icon and zero-cost arrow action (4.868529ms)
+✔ bonus cooldown disables arrow without disabling resource-free dismissal (0.33392ms)
+✔ Kielich and Smok main action is dismissal, not another paid activation (0.273194ms)
+✔ blocked and dead states do not offer dismissal (0.262115ms)
+✔ compact scale is identical before/after fullscreen at a fixed visual viewport scale (2.775943ms)
+✔ browser shrink reset is compensated once for HUD and world (2.77535ms)
+✔ portrait profile is stable; user zoom above 1 remains available (2.910089ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 35.506541
+
+test_martial_hotbar_ui26.cjs
+✔ maneuver preparation stays usable during an action cooldown without paying mana (1.12263ms)
+✔ all maneuver buttons share the authoritative remaining dice count (0.315735ms)
+✔ zero dice block arming but allow cancelling an already armed maneuver (0.222216ms)
+✔ locked, dead, transformed, resting and incapacitated heroes cannot toggle maneuvers (0.234521ms)
+✔ missing or malformed dice resources never enable an unarmed maneuver (1.053613ms)
+✔ owner resource updates refresh labels without mutating spell registry or older snapshots (0.201442ms)
+✔ normal spells keep mana, cooldown and normal cost presentation (0.499823ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 12.886992
+

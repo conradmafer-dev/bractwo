@@ -1,0 +1,110 @@
+{
+  "baseline": "BRACTWO_KRAIN_0.8.18_UI_26_FULL_SOURCE.zip",
+  "changed_files": [
+    {
+      "path": "RAILWAY_VARIABLES.txt",
+      "status": "modified",
+      "sha256": "b73ae82e6da61df1786829ecaf9813e13bf0b1002b627789f404c66059952f91"
+    },
+    {
+      "path": "README.md",
+      "status": "modified",
+      "sha256": "137743bb2c9aa894f4bbe5ba06bbd582eed540deb86beff08d3cef4518dd8b54"
+    },
+    {
+      "path": "docs/UI_27_SEO.md",
+      "status": "added",
+      "sha256": "e46b04e227440a3ad2b7ae087df6b0a5529cf462a29265d06b0de0b9be7c594c"
+    },
+    {
+      "path": "server/seo.py",
+      "status": "added",
+      "sha256": "a2e543a92038ec21afeed543e3064d7eafdeb8c3edbfea32cec6473e19b835ec"
+    },
+    {
+      "path": "server/server.py",
+      "status": "modified",
+      "sha256": "2c62ada34e69598f5d972912be2b5b7fb38e66f660486389a1f31f8f8f925248"
+    },
+    {
+      "path": "tests/test_app_shell.cjs",
+      "status": "modified",
+      "sha256": "c1ea976d9d82b944da62832eae995099ce44d8c21429b5138ff64ec54a88266b"
+    },
+    {
+      "path": "tests/test_app_shell_http_0818.py",
+      "status": "modified",
+      "sha256": "e9058bd385b53d94595f7fdb69b3939d176c85c366fecad30523da370feedd07"
+    },
+    {
+      "path": "tests/test_railway.py",
+      "status": "modified",
+      "sha256": "2aeddf12e12b4605364301e490016e45143e634b1dffa384a21286e9803141ec"
+    },
+    {
+      "path": "tests/test_seo_ui27.py",
+      "status": "added",
+      "sha256": "ff4ef0dfb8033473c983a7790e4dc7b24ae0087a0a64899ce4a7c6ca67a24fb4"
+    },
+    {
+      "path": "tools/browser_ui26.cjs",
+      "status": "modified",
+      "sha256": "4e20676bc5b963aafbd9cd1abe4e101434939175d187b20f6b6ee13f9e65110d"
+    },
+    {
+      "path": "tools/browser_ui27.cjs",
+      "status": "added",
+      "sha256": "e161adaa81493f3c471506de10f7cc6dec5d8dced2ab585b8e2b360f703311b7"
+    },
+    {
+      "path": "tools/browser_ui27_run.py",
+      "status": "added",
+      "sha256": "6733aaa02ef85368cd7bb407a02765c2bf81ac18e87becd3c366cac58e160a15"
+    },
+    {
+      "path": "tools/package_0818.py",
+      "status": "modified",
+      "sha256": "095a263983e4bbbab924e9bf7b0889c48cc9dcda1671deb32792dc576417f987"
+    },
+    {
+      "path": "tools/package_seo_patch.py",
+      "status": "added",
+      "sha256": "00032c44f0f318230e80339388a310ef01f019bb20454a40230564a1c54dfd82"
+    },
+    {
+      "path": "web/assets/seo/bractwo-krain-og.png",
+      "status": "added",
+      "sha256": "37e1699341895185189d74fb210158d4d1e5fc118a6ac3a68afb830e5a0eb11b"
+    },
+    {
+      "path": "web/index.html",
+      "status": "modified",
+      "sha256": "44f721f4a3665e45a0a113eb4eb22aeb3ce1e2adade2c3760d638788c6ec3742"
+    },
+    {
+      "path": "web/landing.css",
+      "status": "added",
+      "sha256": "bfe97042e1703e6383f378b638a057a040728f1db21b8a0afc79d2cee8314dd5"
+    },
+    {
+      "path": "web/sw.js",
+      "status": "modified",
+      "sha256": "51c130ea41ce92ab7201bda81f6de608c3c80af62272a3f81b782b4dc4fad8b6"
+    }
+  ],
+  "syntax_checked": [
+    "server/seo.py",
+    "server/server.py",
+    "tests/test_app_shell.cjs",
+    "tests/test_app_shell_http_0818.py",
+    "tests/test_railway.py",
+    "tests/test_seo_ui27.py",
+    "tools/browser_ui26.cjs",
+    "tools/browser_ui27.cjs",
+    "tools/browser_ui27_run.py",
+    "tools/package_0818.py",
+    "tools/package_seo_patch.py",
+    "web/sw.js"
+  ],
+  "screenshot_exact_copy": true
+}

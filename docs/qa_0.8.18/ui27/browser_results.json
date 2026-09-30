@@ -1,0 +1,86 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Desktop1440 public hero, one Polish H1 and rendered SEO metadata",
+      "metadata": {
+        "lang": "pl",
+        "title": "Bractwo Krain – polska gra RPG online w przeglądarce",
+        "h1": 1,
+        "description": "Polska gra RPG online w przeglądarce. Wybierz jedną z czterech klas, odkrywaj krainy i podziemia, zdobywaj łupy i graj z innymi.",
+        "canonical": "https://bractwo.up.railway.app/",
+        "ogTitle": "Bractwo Krain – polska gra RPG online w przeglądarce",
+        "ogUrl": "https://bractwo.up.railway.app/",
+        "ogImage": "https://bractwo.up.railway.app/assets/seo/bractwo-krain-og.png",
+        "jsonld": [
+          {
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                "@id": "https://bractwo.up.railway.app/#website",
+                "url": "https://bractwo.up.railway.app/",
+                "name": "Bractwo Krain",
+                "inLanguage": "pl-PL",
+                "description": "Polska gra RPG online w przeglądarce. Wybierz jedną z czterech klas, odkrywaj krainy i podziemia, zdobywaj łupy i graj z innymi."
+              },
+              {
+                "@type": "VideoGame",
+                "@id": "https://bractwo.up.railway.app/#game",
+                "url": "https://bractwo.up.railway.app/",
+                "name": "Bractwo Krain",
+                "description": "Polska gra RPG online w przeglądarce. Wybierz jedną z czterech klas, odkrywaj krainy i podziemia, zdobywaj łupy i graj z innymi.",
+                "image": "https://bractwo.up.railway.app/assets/seo/bractwo-krain-og.png",
+                "inLanguage": "pl-PL",
+                "genre": "RPG",
+                "gamePlatform": "Web browser",
+                "playMode": "https://schema.org/MultiPlayer",
+                "isPartOf": {
+                  "@id": "https://bractwo.up.railway.app/#website"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "World anchor scrolls and the real gameplay image loads"
+    },
+    {
+      "name": "Four class descriptions and FAQ remain public and reachable through navigation"
+    },
+    {
+      "name": "Desktop fake Google sign-in, character creation, gameplay visibility and logout preserve the landing flow"
+    },
+    {
+      "name": "Mobile390 hero and login anchor fit without horizontal overflow"
+    },
+    {
+      "name": "Mobile390 scrollable character form creates a character; game and logout work"
+    },
+    {
+      "name": "Narrow320 scrolling, available navigation, login and character form remain reachable without horizontal overflow"
+    },
+    {
+      "name": "Incoming login hash and landscape844x390 form scrolling keep the submit control usable"
+    },
+    {
+      "name": "JavaScript-disabled mobile browser can read content, load screenshot and use anchors; login requirement is explained"
+    },
+    {
+      "name": "Mobile logout keeps Google sign-in or the hero and play CTA within the viewport"
+    },
+    {
+      "name": "All visited local CSS, JavaScript and image resources load; no JavaScript page errors"
+    }
+  ],
+  "errors": [],
+  "failedAssets": [],
+  "limits": [
+    "Isolated loopback HTTP/WebSocket server, in-memory SQLite database and explicit fake Google credentials; no production data or accounts are used.",
+    "Headless Chromium at desktop1440x900, mobile390x844, narrow320x568 and landscape844x390; no physical phone or actual Google OAuth provider is covered.",
+    "Checks verify browser-visible content and implementation metadata, not Google indexing, rankings, rich results or a production Railway deployment."
+  ],
+  "partialRerun": "Successful desktop/mobile/layout checks were retained; JavaScript-disabled navigation and additional mobile logout visibility were run as isolated follow-up scenarios against the same product source tree."
+}

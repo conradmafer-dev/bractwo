@@ -1,0 +1,26 @@
+{
+  "ok": true,
+  "tests": 31,
+  "files": [
+    {
+      "file": "test_app_shell.cjs",
+      "exit_code": 0,
+      "tests": 9
+    },
+    {
+      "file": "test_google_auth_ui22.cjs",
+      "exit_code": 0,
+      "tests": 6
+    },
+    {
+      "file": "test_ui14_mobile_forms.cjs",
+      "exit_code": 0,
+      "tests": 9
+    },
+    {
+      "file": "test_martial_hotbar_ui26.cjs",
+      "exit_code": 0,
+      "tests": 7
+    }
+  ]
+}

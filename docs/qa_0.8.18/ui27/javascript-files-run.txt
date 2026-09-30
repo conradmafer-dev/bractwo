@@ -1,0 +1,12 @@
+✔ tests/test_app_shell.cjs (166.675012ms)
+✔ tests/test_google_auth_ui22.cjs (152.545713ms)
+✔ tests/test_martial_hotbar_ui26.cjs (149.835097ms)
+✔ tests/test_ui14_mobile_forms.cjs (349.618791ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 421.200823

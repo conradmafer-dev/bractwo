@@ -1,0 +1,15 @@
+UI27 browser QA — PASS (11 scenarios/checks)
+
+PASS Desktop1440 public hero, one Polish H1 and rendered SEO metadata
+PASS World anchor scrolls and the real gameplay image loads
+PASS Four class descriptions and FAQ remain public and reachable through navigation
+PASS Desktop fake Google sign-in, character creation, gameplay visibility and logout preserve the landing flow
+PASS Mobile390 hero and login anchor fit without horizontal overflow
+PASS Mobile390 scrollable character form creates a character; game and logout work
+PASS Narrow320 scrolling, available navigation, login and character form remain reachable without horizontal overflow
+PASS Incoming login hash and landscape844x390 form scrolling keep the submit control usable
+PASS JavaScript-disabled mobile browser can read content, load screenshot and use anchors; login requirement is explained
+PASS Mobile logout keeps Google sign-in or the hero and play CTA within the viewport
+PASS All visited local CSS, JavaScript and image resources load; no JavaScript page errors
+
+Successful desktop/mobile/layout checks were retained; JavaScript-disabled navigation and additional mobile logout visibility were run as isolated follow-up scenarios against the same product source tree.
