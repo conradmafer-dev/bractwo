@@ -1,0 +1,57 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Point-buy dropdowns enforce 27 points; valid permanent build saves and updates real attributes"
+    },
+    {
+      "name": "Initial Origin feat is chosen through the real control and saved separately from ASI"
+    },
+    {
+      "name": "All 18 skills render; fighter selects 2 class and 2 background proficiencies with computed bonuses"
+    },
+    {
+      "name": "At Bractwo 15 the level 4 D&D choice increases Strength +2 and consumes one shared feat choice"
+    },
+    {
+      "name": "Fighter extra level 25 choice supports split +1/+1 and respects the 20 cap"
+    },
+    {
+      "name": "Six main tabs separate Abilities and Feats; seven Stats categories render only the selected information"
+    },
+    {
+      "name": "Feats Class retains fighter style and martial choices; general Feats does not duplicate ASI controls"
+    },
+    {
+      "name": "World E interaction resolves a real seeded D20 check and awards gold once; duplicate request gives no second reward"
+    },
+    {
+      "name": "Unlocked route remains usable in reverse through the Skills panel without another reward"
+    },
+    {
+      "name": "Existing character receives an unspent development reminder after login; its button opens ability growth"
+    },
+    {
+      "name": "Spending the available development choice removes the reminder"
+    },
+    {
+      "name": "Mobile Skills panel exposes Hide with explicit PvE-only visibility explanation"
+    },
+    {
+      "name": "Build,origin,proficiencies,ASI and challenge claims survive reconnect; skills and stats fit 390px"
+    },
+    {
+      "name": "Wizard Scholar expertise unlocks at Bractwo 5, doubles proficiency, and choices fit 320px"
+    },
+    {
+      "name": "No browser JavaScript errors or missing local assets"
+    }
+  ],
+  "errors": [],
+  "failedAssets": [],
+  "limits": [
+    "Isolated in-memory database, explicit fake Google provider, fixture-granted levels/gold/location, seeded RNG and paused monster AI. Real character choices, skill checks and persistence handlers execute unchanged.",
+    "Headless Chromium desktop 1440x900, touch 390x844 and touch 320x568; real Google accounts, physical phones and Railway deployment are not covered.",
+    "Browser tests cover actual controls, 27-point ability build, proficiency choices,ASI, one-time rewards, reconnect persistence and layout. Broader rule correctness belongs to Python tests."
+  ]
+}

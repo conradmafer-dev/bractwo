@@ -204,8 +204,9 @@
     if(roll.check==='automatic')return `${name} · ${who}: ${roll.damage_dice||''} → ${roll.immune?'odporność':roll.damage+' obr.'}`;
     const rolls=roll.rolls||[roll.roll];
     const die=roll.disadvantage||roll.advantage?`k20 [${rolls.join(', ')}] → ${roll.roll}`:`k20 ${roll.roll}`;
-    const saving=roll.check==='save'||roll.check==='concentration'||roll.check==='escape';
+    const saving=roll.check==='save'||roll.check==='concentration'||roll.check==='escape'||roll.check==='ability';
     const check=`${die} ${roll.bonus<0?'−':'+'} ${Math.abs(roll.bonus||0)} = ${roll.total} / ${saving?'ST':'KP'} ${roll.defense}`;
+    if(roll.check==='ability')return `${name}: ${check} · ${roll.saved?'sukces':'niepowodzenie'}`;
     if(roll.check==='escape')return `${name} · ${who}: ${check} · ${roll.saved?'uwolnienie':'pnącza trzymają'} · akcja zużyta`;
     if(roll.check==='concentration')return `${check} · koncentracja ${roll.saved?'utrzymana':'przerwana'}`;
     const result=roll.check==='save'?(roll.saved?(roll.save_half?'obrona · połowa':'obrona · brak obrażeń'):'nieudana obrona'):roll.shielded?'TARCZA':roll.critical?'KRYTYK':roll.hit?'trafienie':'PUDŁO';

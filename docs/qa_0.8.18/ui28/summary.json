@@ -1,0 +1,102 @@
+{
+  "revision": "UI_28",
+  "base": "0.8.18 UI_27 SEO",
+  "status": "passed",
+  "python_unique_tests": 270,
+  "python_runs": [
+    {
+      "report": "python-tests.txt",
+      "tests": 252,
+      "passed": true
+    },
+    {
+      "report": "advancement-final.txt",
+      "tests": 48,
+      "passed": true
+    },
+    {
+      "report": "final-integration.txt",
+      "tests": 140,
+      "passed": true
+    }
+  ],
+  "javascript_tests": 33,
+  "javascript_report": "javascript-tests.txt",
+  "browser_checks": 15,
+  "browser_report": "browser_results.json",
+  "browser_screenshots": 12,
+  "browser_errors": 0,
+  "missing_assets": 0,
+  "syntax_checks": {
+    "python": 16,
+    "javascript": 6
+  },
+  "features": [
+    "Ocean collision and nearby shore recovery",
+    "27-point initial ability allocation plus3origin",
+    "Class-specific shared ASI/feat budget and origin feat",
+    "18skills,class/background proficiency,Scholar/ranger expertise",
+    "18authored persisted skill encounters",
+    "PvE Hide with cover,monster perception,attack/casting/chat reveal",
+    "Separate abilities/feats and mutually exclusive statistic categories",
+    "Login reminder and per-level choice notifications"
+  ],
+  "limitations": [
+    "No physical phone test; Chromium mobile viewport/touch emulation.",
+    "Google OAuth fixture is explicit and fake; production JWT/cookie/account tests run separately.",
+    "No Railway deployment or live player data used.",
+    "Godot legacy client has no new UI; browser/PWA is the supported login client.",
+    "Free background ability/skill choice and encounter rewards are Bractwo adaptations; Hide affects PvE only."
+  ],
+  "review_notes": [
+    "Existing test expectations updated for removed automaticprimary growth and new receipt subtab metadata.",
+    "Browser harness case-sensitive assertion adjusted for uppercased class headings; final run all15passed."
+  ],
+  "changed_source_docs_tests": [
+    "client/assets/feats/skilled.svg",
+    "docs/PROTOCOL.md",
+    "docs/UI_28_CECHY_UMIEJETNOSCI.md",
+    "docs/UI_28_STEALTH.md",
+    "server/ability_rules.py",
+    "server/caster_game.py",
+    "server/character_development.py",
+    "server/character_sheet.py",
+    "server/combat_rules.py",
+    "server/continent_world.py",
+    "server/dnd_content.py",
+    "server/environment_rules.py",
+    "server/equipment_rules.py",
+    "server/level_up.py",
+    "server/progression_guide.py",
+    "server/rest_rules.py",
+    "server/server.py",
+    "server/skill_content.py",
+    "server/skill_game.py",
+    "server/skill_rules.py",
+    "tests/test_advancement_ui28.py",
+    "tests/test_casters_0814.py",
+    "tests/test_character_development_ui28.py",
+    "tests/test_general_feats_0818.py",
+    "tests/test_hide_ui28.py",
+    "tests/test_level_up_086.py",
+    "tests/test_skill_challenges_ui28.py",
+    "tests/test_skill_rules_ui28.py",
+    "tests/test_skills_ui28.cjs",
+    "tests/test_ui19_core_integration.py",
+    "tests/test_water_ui28.py",
+    "tools/browser_ui28.cjs",
+    "tools/browser_ui28_run.py",
+    "tools/browser_ui28_server.py",
+    "tools/package_0818.py",
+    "web/assets/feats/skilled.svg",
+    "web/caster_ui.js",
+    "web/character_sheet.css",
+    "web/character_sheet.js",
+    "web/game.js",
+    "web/index.html",
+    "web/level_up.js",
+    "web/runtime.js",
+    "web/skills_ui.js",
+    "web/sw.js"
+  ]
+}

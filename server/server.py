@@ -22,6 +22,7 @@ import time
 from aiohttp import web, WSMsgType
 try:
     from . import world_content as content
+    from . import seo
     from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     from . import continent_world, adventure_content, expedition_content
     from .adventure_combat import AdventureGame
@@ -38,7 +39,9 @@ try:
     from . import wizard_schools
     from . import town_services
     from .wizard_school_game import WizardSchoolGame
-    from . import martial_rules
+    from . import martial_rules, skill_rules, ability_rules
+    from .character_development import CharacterDevelopmentGame
+    from .skill_game import SkillGame
     from .martial_game import MartialGame
     from .martial_combat import MartialCombat
     from . import rest_rules, druid_circles, environment_rules
@@ -49,6 +52,7 @@ try:
     from . import progression_guide
 except ImportError:
     import world_content as content
+    import seo
     import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     import continent_world, adventure_content, expedition_content
     from adventure_combat import AdventureGame
@@ -65,7 +69,9 @@ except ImportError:
     import wizard_schools
     import town_services
     from wizard_school_game import WizardSchoolGame
-    import martial_rules
+    import martial_rules, skill_rules, ability_rules
+    from character_development import CharacterDevelopmentGame
+    from skill_game import SkillGame
     from martial_game import MartialGame
     from martial_combat import MartialCombat
     import rest_rules, druid_circles, environment_rules
@@ -345,6 +351,13 @@ class Player:
     mastery: dict = field(default_factory=dict)
     primal_order: str = ""
     training_feats: dict = field(default_factory=dict)
+    ability_build: dict = field(default_factory=dict)
+    skill_training: dict = field(default_factory=dict)
+    skill_progress: dict = field(default_factory=dict)
+    origin_feat: str = ""
+    feat_rules_version: int = 0
+    feat_legacy_choices: dict = field(default_factory=dict)
+    feat_migration_notice: str = ""
     wizard_school: str = ""
     wizard_school_state: dict = field(default_factory=dict)
     wizard_school_runtime: dict = field(default_factory=dict)
@@ -538,7 +551,7 @@ class Player:
                   "pvp_combat_remaining": max(0, self.pvp_combat_until-now), "disconnected": self.disconnected,
                   "party_id": self.party_id, "party_members": party_members or []}
         result["status_effects"] = dnd_content.status_effects(self.buffs,now,self)
-        result['environment']=environment_rules.public(self)
+        result['environment']=environment_rules.public(self, private)
         aura=self.buffs.get('wrath_of_sea',{})
         sanctuary=druid_circles.runtime(self).get('sanctuary')
         result['circle_visual']={'starry_form':druid_circles.starry_form(self),
@@ -618,6 +631,8 @@ class Player:
     def save_data(self):
         return {key: getattr(self, key) for key in (
             "primal_order", "training_feats", "caster_rules_version", "legacy_medium_grace",
+            "ability_build", "skill_training", "skill_progress", "origin_feat",
+            "feat_rules_version", "feat_legacy_choices", "feat_migration_notice",
             "world_revision", "magic_items_version", "magic_attunements",
             "wizard_school", "wizard_school_state", "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "exhaustion",
             "martial_archetype", "martial_state",
@@ -688,7 +703,7 @@ class Enemy:
                 "attack_until": self.attack_until, "facing": self.facing, "armor_class": spec["armor_class"], "attack_bonus": spec["attack_bonus"], "damage_dice": combat_rules.dice_text(spec["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
 
 
-class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,EnvironmentGame,WizardSchoolGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
+class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,EnvironmentGame,WizardSchoolGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
     def __init__(self, db_path, clock=None):
         self.clock = clock or time.time
         self.rng = random.Random()
@@ -755,6 +770,7 @@ class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,Environment
                 "world_revision": getattr(content,"WORLD_REVISION",20), "landmasses": getattr(content,"LANDMASSES",[]),
                 "ports": getattr(content,"PORTS",[]), "sea_routes": getattr(content,"SEA_ROUTES",[]),
                 "magic_items": magic_items.metadata(),
+                "skill_challenge_catalog": self.skill_challenge_metadata(),
                 "terrain": content.TERRAIN, "surfaces": content.SURFACES, "premium": content.PREMIUM,
                 "elevations": content.ELEVATIONS, "waterways": content.WATERWAYS, "bridges": content.BRIDGES,
                 "pois": content.POIS, "canyons": content.CANYONS, "rarities": loot_tables.RARITIES,
@@ -779,6 +795,7 @@ class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,Environment
         def visible(obj):
             return viewer is None or (same_floor(viewer, obj) and distance(viewer, obj) <= 1800)
         return {"type": "state", "tick": self.tick, "time": self.time,
+                "skill_challenges": self.skill_challenge_state(viewer) if viewer else {},
                 "players": [self.players[pid].public(now, self.time, True, self.parties.get(self.players[pid].party_id, [])) if entry["id"] == pid else entry for entry in public_players] if public_players is not None else
                            [p.public(now, self.time, p.id == pid, self.parties.get(p.party_id, [])) for p in self.players.values()],
                 "companions": [c.public() for c in (*self.companions.values(),*self.familiars.values()) if visible(c)],
@@ -808,6 +825,7 @@ class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,Environment
         p.weapon = p.spec["weapon"]
         self.migrate_fighter(p, make_item)
         self.migrate_caster(p)
+        skill_rules.normalize(p)
         self.migrate_druid_circle(p)
         self.migrate_wizard_school(p)
         self.migrate_martial(p)
@@ -838,6 +856,7 @@ class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,Environment
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
         self.migrate_fighter(p, make_item)
         self.migrate_caster(p)
+        skill_rules.normalize(p)
         self.migrate_druid_circle(p)
         self.migrate_wizard_school(p)
         self.migrate_martial(p)
@@ -851,13 +870,13 @@ class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,Environment
         if p.hp <= 0 and not p.respawn_until:
             p.respawn_until = self.now() + 4
         # Old relic progression may have saved a character in an invalid tile.
-        stranded = (saved.get("world_revision",18) < getattr(content,"WORLD_REVISION",20) and p.floor == 0
-                    and getattr(content.WATER_MAP,"is_ocean",lambda *_:False)(p.x,p.y))
-        if (stranded or self.blocked_for(p,p.x,p.y)) and p.combat_until <= self.now():
-            p.x, p.y, p.floor = town_services.respawn_position(content, p.home_city)
-        # A combat lock may defer relocation; preserve the migration marker so
-        # the next login can still rescue an old position swallowed by the sea.
-        p.world_revision = saved.get("world_revision",18) if stranded and p.combat_until > self.now() else getattr(content,"WORLD_REVISION",20)
+        stranded = p.floor == 0 and getattr(content.WATER_MAP,"ocean_blocked",lambda *_:False)(p.x,p.y,18)
+        p._shore_recovery_pending = stranded
+        if stranded:
+            self.environment_recover_shore(p)
+        elif self.blocked_for(p,p.x,p.y) and max(p.combat_until,p.pvp_combat_until) <= self.now():
+            p.x,p.y,p.floor = town_services.respawn_position(content,p.home_city)
+        p.world_revision = saved.get("world_revision",18) if p._shore_recovery_pending else getattr(content,"WORLD_REVISION",20)
         p.unjust_kills = [t for t in p.unjust_kills if t > self.now()-86400]
         p.aggressors = {k: t for k, t in p.aggressors.items() if t > self.now()}
         return p
@@ -1453,6 +1472,10 @@ class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,Environment
         p = next((p for p in self.players.values() if p.ws is ws), None)
         if p is None:
             return await self.error(ws, "Najpierw zaloguj postać.")
+        if kind in ("ability_build", "skill_train", "origin_feat"):
+            return await self.development_command(p,kind,data)
+        if kind == "skill_challenge":
+            return await self.handle_skill_challenge(p,data)
         if kind == "boat":
             return await self.boat_command(p, data)
         if kind == "magic_item":
@@ -1478,7 +1501,9 @@ class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,Environment
         if kind == "druid_circle":return await self.select_druid_circle(p,data.get("circle"),data.get("land","arid"))
         if kind == "circle_command":return await self.circle_command(p,data.get("action"),data.get("value"))
         if kind == "primal_order":return await self.select_primal_order(p,data.get("order"))
-        if kind == "training_feat":return await self.choose_training_feat(p,data.get("feat"),data.get("ability",''),data.get("abilities"))
+        if kind == "training_feat":
+            if type(data.get("expected_spent")) is not int:return await self.notice(p,"Odśwież kartę postaci przed wyborem atutu.")
+            return await self.choose_training_feat(p,data.get("feat"),data.get("ability",''),data.get("abilities"),data["expected_spent"])
         if kind == "ritual":return await self.start_caster_channel(p,data.get("spell_id"),ritual=True)
         if kind == "channel_cancel":self.cancel_channel(p);return
         if kind == "familiar_command":return await self.familiar_command(p,data.get("mode"))
@@ -1565,6 +1590,7 @@ class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,Environment
             if len(p.inventory) >= INVENTORY_CAP and not any(i["template"].endswith("_weapon_1") for i in p.inventory):
                 return await self.notice(p, "Zwolnij miejsce w plecaku na broń nowej klasy.")
             p.class_id, p.class_chosen = class_id, True
+            skill_rules.normalize(p)
             # Replace only the zero-bonus starter weapon; keep all other earned gear.
             old_starter = next((i for i in p.inventory if i["template"].endswith("_weapon_1")), None)
             if old_starter:
@@ -1592,6 +1618,7 @@ class Game(GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,Environment
             text = "".join(c for c in text.strip() if c.isprintable())
             if not text:
                 return await self.error(ws, "Pusta wiadomość.")
+            self.environment_reveal(p,"Mówienie zdradza kryjówkę.")
             p.chat_at = self.time
             p.speech_text, p.speech_until = text, self.time+6
             await self.broadcast({"type": "chat", "id": p.id, "name": p.name, "text": text})
@@ -1872,18 +1899,36 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app=web.Application(client_max_size=MAX_MESSAGE)
     app["game"]=Game(db_path, clock=clock)
     app["google_auth"]=google_auth_service if google_auth_service is not None else GoogleAuthService.from_env()
+    seo_config=seo.SEOConfig.from_env()
     register_google_routes(app,app["google_auth"],account_info=app["game"].google_account_info)
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_26","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_28","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
+    async def index_redirect(request):
+        raise web.HTTPMovedPermanently(location=request.rel_url.with_path("/",keep_query=True))
+    async def robots(request):
+        return web.Response(text=seo.robots_txt(seo_config),content_type="text/plain",
+                            headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
+    async def sitemap(request):
+        return web.Response(text=seo.sitemap_xml(seo_config),content_type="application/xml",
+                            headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
+    app.router.add_get("/index.html",index_redirect)
+    app.router.add_get("/robots.txt",robots)
+    app.router.add_get("/sitemap.xml",sitemap)
+    async def landing_css(request):
+        path=web_dir/"landing.css"
+        if not path.is_file():
+            raise web.HTTPNotFound()
+        return web.FileResponse(path,headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
+    app.router.add_get("/landing.css",landing_css)
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/skills_ui.js","skills_ui.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():
@@ -1892,6 +1937,8 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
             if filename == "index.html":
                 headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
                 headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+                return web.Response(text=seo.render_index(path.read_text(encoding="utf-8"),seo_config),
+                                    content_type="text/html",headers=headers)
             if filename == "manifest.webmanifest":
                 headers["Content-Type"] = "application/manifest+json"
             elif filename == "sw.js":

@@ -1,7 +1,6 @@
 /* Standalone character sheet. No journal, atlas or account data in this window. */
 (function(root){'use strict';
   const labels={strength:'Siła',dexterity:'Zręczność',constitution:'Kondycja',intelligence:'Inteligencja',wisdom:'Mądrość',charisma:'Charyzma'};
-  const skillNames={melee:'Walka wręcz',distance:'Walka dystansowa',magic:'Magia',shielding:'Obrona'};
   const masteryNames={power:'Potęga',focus:'Skupienie'};
   const signed=n=>Number(n)>=0?'+'+n:String(n), dice=n=>'1k20'+signed(n);
   const node=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
@@ -50,8 +49,9 @@
   function create(h){
     const panel=document.getElementById('characterPanel'),content=document.getElementById('characterContent'),tabButtons=[...panel.querySelectorAll('[data-character-tab]')];
     let tab='inventory',signature='',bagPage=0,selectedItem='',restoreFocus=null;
+    const sections={abilities:'values',stats:'general',skills:'list',feats:'general'};
     function close(){const wasOpen=!panel.hidden;panel.hidden=true;root.BractwoInventoryUI?.hide();signature='';if(!wasOpen)return;h.changed?.();if(restoreFocus?.isConnected&&restoreFocus.getClientRects().length)restoreFocus.focus({preventScroll:true});}
-    function open(which=tab){restoreFocus=document.activeElement;h.prepare();tab=which;panel.hidden=false;signature='';render();panel.querySelector(`[data-character-tab="${tab}"]`)?.focus({preventScroll:true});h.changed?.();}
+    function open(which=tab,section){restoreFocus=document.activeElement;h.prepare();tab=which;if(section)sections[tab]=section;else if(which==='abilities')sections.abilities='growth';else if(which==='skills')sections.skills='list';else if(which==='feats')sections.feats='general';panel.hidden=false;signature='';render();panel.querySelector(`[data-character-tab="${tab}"]`)?.focus({preventScroll:true});h.changed?.();}
     function toggle(which){if(!panel.hidden&&(!which||which===tab))close();else open(which||tab);}
     for(const b of tabButtons)b.addEventListener('click',()=>{tab=b.dataset.characterTab;signature='';content.scrollTop=0;render();});
     panel.querySelector('.character-close').addEventListener('click',close);
@@ -89,23 +89,31 @@
         const row=node('div','sheet-allocation-row'),text=node('div');text.append(node('strong','',`${label} · ${p.mastery?.[k]||0}/20`),node('small','',desc));const b=button('+1 punkt',()=>{b.disabled=true;h.send({type:'mastery',branch:k});},!p.alive||p.combat_remaining>0||(p.mastery?.[k]||0)>=20);b.dataset.mastery=k;row.append(text,b);box.append(row);
       }content.append(box);
     }
-    function stats(p,w){const s=p.character_sheet||{};allocation(p);
-      tiles([['Zdrowie',`${Math.ceil(p.hp)} / ${p.max_hp}`],['Mana',`${Math.floor(p.mana)} / ${p.max_mana}`],['Klasa Pancerza',p.armor_class],['Doświadczenie',`${p.xp} / ${p.xp_next}`]]);
-      if(s.caster?.order)tiles([['Ścieżka',s.caster.orders?.find(o=>o.id===s.caster.order)?.name||'']]);if(s.training?.armor_penalty)content.append(node('p','caster-status-warning','Brak wyszkolenia w pancerzu: czary zablokowane; utrudnienie Siły/Zręczności.'));
-      if(s.caster?.circle?.id)tiles([['Krąg druida',s.caster.circle.name||'']]);
-      if(s.caster?.school?.id)tiles([['Szkoła czarodzieja',s.caster.school.name||'']]);
-      if(s.martial?.id)tiles([[p.class_id==='ranger'?'Specjalizacja łowcy':'Archetyp wojownika',s.martial.name||'']]);
-      if(s.fighter?.style)tiles([['Styl walki',s.fighter.style_name+(s.fighter.style_active?'':' · nieaktywny')],['Mistrzostwo broni',s.fighter.masteries?.find(m=>m.active)?.effect_name||'—']]);
-      heading('Walka');tiles([['Atak bronią',dice(p.attack_bonus)],['Obrażenia',`${p.damage_dice} · ${s.damage_name||''}`],['Ataki na rundę',p.attacks_per_round],['Atak czarem',dice(s.spell_attack_bonus||0)],['ST obrony przed czarami',p.save_dc],['Premia z biegłości',signed(p.proficiency)],['Krąg czarów',p.spell_circle||'—'],['Trafienie krytyczne bronią',s.martial?.critical_threshold===18?'18–20 na k20':s.martial?.critical_threshold===19?'19–20 na k20':'20 na k20']]);
-      heading('Cechy i rzuty obronne');const grid=node('div','sheet-abilities');
-      for(const[k,v]of Object.entries(p.attributes||{})){const c=node('article','sheet-ability');c.append(node('small','',labels[k]||k),node('strong','',`${v} (${signed(s.ability_modifiers?.[k]||0)})`),node('span','',`Obrona ${dice(s.saving_throws?.[k]||0)}${s.proficient_saves?.includes(k)?' ✦':''}`));grid.append(c);}content.append(grid);
-      heading('Odporności');const resistance=node('div','sheet-resistances');for(const r of s.resistances||[]){const c=node('span',r.multiplier<1?'resistant':'',r.name+(r.multiplier===.5?' · połowa obrażeń':r.multiplier===0?' · niewrażliwość':' · zwykłe obrażenia'));resistance.append(c);}content.append(resistance);
-      if(s.ward_reduction)content.append(node('p','sheet-hint',`Kamienna osłona: obrażenia od potworów −${s.ward_reduction}%.`));
-      heading('Ruch i rozwój');tiles([['Ruch w rundzie',`${s.movement_per_round||0} stóp`],['Zasięg broni',`${Math.round((p.attack_range||0)/6.4)} stóp`],['Kość zdrowia',s.hit_die||'—'],['Złoto',p.gold],['Złoto w banku',p.bank_gold||0],['Dusza',`${p.soul||0} / ${p.max_soul||100}`],['Pokonane potwory',p.kills||0],['Pokonani bossowie',p.boss_kills||0]]);
-      const mastery=Object.entries(p.mastery||{}).filter(([,v])=>v>0).map(([k,v])=>[masteryNames[k]||k,v]);if(mastery.length){heading('Mistrzostwo');tiles(mastery);}
-      heading('Aktywne efekty');const effects=node('div','sheet-resistances');for(const e of p.status_effects||[]){const chip=node('span',e.harmful?'harmful':'resistant',`${e.name} · ${root.BractwoRuntime.formatEffectTime(e)}`);chip.title=e.description||'';effects.append(chip);}if(!effects.childNodes.length)effects.append(node('p','sheet-hint','Brak aktywnych efektów.'));content.append(effects);
-      if(p.form)content.append(node('p','',`Postać zwierzęca: ${({wolf:'wilk',cat:'kot',black_bear:'niedźwiedź czarny',bear:'niedźwiedź brunatny'}[p.form]||p.form)} · ${p.temp_hp||0} tymczasowych HP`));
-      if(p.blessed)content.append(node('p','','Błogosławieństwo aktywne.'));
+    function subnav(kind,choices){const nav=node('nav','sheet-subtabs');nav.setAttribute('role','tablist');nav.setAttribute('aria-label','Kategorie: '+({stats:'Statystyki',abilities:'Cechy',skills:'Umiejętności',feats:'Atuty'}[kind]||kind));for(const [id,label]of choices){const b=button(label,()=>{sections[kind]=id;signature='';content.scrollTop=0;render();content.querySelector(`[data-sheet-subtab="${id}"]`)?.focus({preventScroll:true});});b.dataset.sheetSubtab=id;b.setAttribute('role','tab');b.setAttribute('aria-selected',String(sections[kind]===id));b.classList.toggle('active',sections[kind]===id);nav.append(b);}content.append(nav);}
+    function abilityValues(p,showSaves=false){const s=p.character_sheet||{},grid=node('div','sheet-abilities');
+      for(const[k,v]of Object.entries(p.attributes||{})){const c=node('article','sheet-ability');c.append(node('small','',labels[k]||k),node('strong','',showSaves?dice(s.saving_throws?.[k]||0):`${v} (${signed(s.ability_modifiers?.[k]||0)})`),node('span','',showSaves?(s.proficient_saves?.includes(k)?'Biegłość w rzucie obronnym':'Bez biegłości w rzucie obronnym'):`Modyfikator ${signed(s.ability_modifiers?.[k]||0)}`));grid.append(c);}content.append(grid);
+    }
+    function abilities(p){subnav('abilities',[['values','Wartości'],['growth','Rozwój'],['initial','Początkowe']]);const hooks={...h,open};if(sections.abilities==='growth')root.BractwoSkillsUI?.advancement(content,p,hooks);else if(sections.abilities==='initial'){if(p.character_sheet?.ability_build?.chosen)content.append(node('p','sheet-hint','Cechy początkowe zostały zatwierdzone. Kolejne punkty przydzielisz w zakładce Rozwój.'));else root.BractwoSkillsUI?.abilityBuild(content,p,{...hooks,initialExpanded:true});}else{heading('Cechy postaci');abilityValues(p);content.append(node('p','sheet-hint','Modyfikator cechy wpływa na odpowiednie ataki, rzuty obronne i testy umiejętności.'));}}
+    function stats(p,w){const s=p.character_sheet||{};subnav('stats',[['general','Ogólne'],['combat','Walka'],['saves','Rzuty obronne'],['resistances','Odporności'],['movement','Ruch i rozwój'],['mastery','Mistrzostwo'],['effects','Efekty']]);const section=sections.stats;
+      if(section==='general'){
+        tiles([['Zdrowie',`${Math.ceil(p.hp)} / ${p.max_hp}`],['Mana',`${Math.floor(p.mana)} / ${p.max_mana}`],['Klasa Pancerza',p.armor_class],['Doświadczenie',`${p.xp} / ${p.xp_next}`]]);
+        if(s.caster?.order)tiles([['Ścieżka',s.caster.orders?.find(o=>o.id===s.caster.order)?.name||'']]);
+        if(s.caster?.circle?.id)tiles([['Krąg druida',s.caster.circle.name||'']]);if(s.caster?.school?.id)tiles([['Szkoła czarodzieja',s.caster.school.name||'']]);if(s.martial?.id)tiles([[p.class_id==='ranger'?'Specjalizacja łowcy':'Archetyp wojownika',s.martial.name||'']]);
+        if(s.fighter?.style)tiles([['Styl walki',s.fighter.style_name+(s.fighter.style_active?'':' · nieaktywny')],['Mistrzostwo broni',s.fighter.masteries?.find(m=>m.active)?.effect_name||'—']]);
+      }else if(section==='combat'){
+        if(s.training?.armor_penalty)content.append(node('p','caster-status-warning','Brak wyszkolenia w pancerzu: czary zablokowane; utrudnienie Siły/Zręczności.'));
+        tiles([['Atak bronią',dice(p.attack_bonus)],['Obrażenia',`${p.damage_dice} · ${s.damage_name||''}`],['Ataki na rundę',p.attacks_per_round],['Atak czarem',dice(s.spell_attack_bonus||0)],['ST obrony przed czarami',p.save_dc],['Premia z biegłości',signed(p.proficiency)],['Krąg czarów',p.spell_circle||'—'],['Trafienie krytyczne bronią',s.martial?.critical_threshold===18?'18–20 na k20':s.martial?.critical_threshold===19?'19–20 na k20':'20 na k20']]);
+      }else if(section==='saves'){abilityValues(p,true);
+      }else if(section==='resistances'){
+        const resistance=node('div','sheet-resistances');for(const r of s.resistances||[]){const c=node('span',r.multiplier<1?'resistant':'',r.name+(r.multiplier===.5?' · połowa obrażeń':r.multiplier===0?' · niewrażliwość':' · zwykłe obrażenia'));resistance.append(c);}content.append(resistance);if(s.ward_reduction)content.append(node('p','sheet-hint',`Kamienna osłona: obrażenia od potworów −${s.ward_reduction}%.`));
+      }else if(section==='movement'){
+        tiles([['Ruch w rundzie',`${s.movement_per_round||0} stóp`],['Zasięg broni',`${Math.round((p.attack_range||0)/6.4)} stóp`],['Kość zdrowia',s.hit_die||'—'],['Złoto',p.gold],['Złoto w banku',p.bank_gold||0],['Dusza',`${p.soul||0} / ${p.max_soul||100}`],['Pokonane potwory',p.kills||0],['Pokonani bossowie',p.boss_kills||0]]);
+      }else if(section==='mastery'){
+        allocation(p);const mastery=Object.entries(p.mastery||{}).filter(([,v])=>v>0).map(([k,v])=>[masteryNames[k]||k,v]);if(mastery.length)tiles(mastery);else content.append(node('p','sheet-hint','Brak przydzielonych punktów mistrzostwa.'));
+      }else if(section==='effects'){
+        const effects=node('div','sheet-resistances');for(const e of p.status_effects||[]){const chip=node('span',e.harmful?'harmful':'resistant',`${e.name} · ${root.BractwoRuntime.formatEffectTime(e)}`);chip.title=e.description||'';effects.append(chip);}if(!effects.childNodes.length)effects.append(node('p','sheet-hint','Brak aktywnych efektów.'));content.append(effects);
+        if(p.form)content.append(node('p','',`Postać zwierzęca: ${({wolf:'wilk',cat:'kot',black_bear:'niedźwiedź czarny',bear:'niedźwiedź brunatny'}[p.form]||p.form)} · ${p.temp_hp||0} tymczasowych HP`));if(p.blessed)content.append(node('p','','Błogosławieństwo aktywne.'));
+      }
     }
     function spells(p,w){const bar=root.BractwoRuntime.displayHotbar(p);root.BractwoCasterUI.actions(content,p,h);const info=node('div','sheet-spell-summary');info.append(node('span','',`Krąg ${p.spell_circle||0} · mana ${Math.floor(p.mana)}/${p.max_mana}`),node('span','',`F · ${w.spells?.[p.favorite_spell]?.name||'—'}`));content.append(info);
       const list=node('div','sheet-spell-list');list.setAttribute('aria-label','Czary według kręgów');
@@ -142,18 +150,17 @@
     function render(){if(panel.hidden)return;const {player:p,world:w}=h.state();if(!p)return;
       // Native mobile pickers keep focus after selection: refresh gates without replacing them.
       if(tab==='feats')root.BractwoCasterUI.syncTraining(content,p,h);
+      if(tab==='abilities'||tab==='skills'||tab==='feats')root.BractwoSkillsUI?.sync(content,p,{...h,open});
       if(tab==='spells')root.BractwoCasterUI.syncCircle(content,p,h);
       if(tab==='feats'||tab==='spells')root.BractwoMartialUI?.sync(content,p);
       if(panel.contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
-      const next=JSON.stringify([tab,bagPage,selectedItem,p.inventory,p.equipment,p.level,Math.floor(p.mana),Math.ceil(p.hp),p.hotbar,p.grouped_hotbar,p.attributes,p.character_sheet,p.skills,p.mastery,p.mastery_points,p.combat_remaining>0,p.bonus_remaining>0,p.xp,p.xp_next,p.max_hp,p.max_mana,p.attack_bonus,p.damage_dice,p.armor_class,p.save_dc,p.attacks_per_round,p.bank_gold,p.soul,p.kills,p.boss_kills,p.gold,p.potions,p.potion_slots,p.form,p.shield_armed,p.ensnaring_armed,p.concentration,p.queued_spell,p.queued_spell?Math.ceil((p.action_remaining||0)*10):0,p.spell_cooldowns,p.spell_profiles,p.environment,p.rest_resources,p.status_effects?.map(e=>[e.id,Math.ceil(e.remaining)]),h.canTrade(),h.nearMaster?.()]);if(signature===next)return;signature=next;
+      const next=JSON.stringify([tab,sections,bagPage,selectedItem,p.inventory,p.equipment,p.level,Math.floor(p.mana),Math.ceil(p.hp),p.hotbar,p.grouped_hotbar,p.attributes,p.character_sheet,h.state().skill_challenges,p.skills,p.mastery,p.mastery_points,p.combat_remaining>0,p.bonus_remaining>0,p.xp,p.xp_next,p.max_hp,p.max_mana,p.attack_bonus,p.damage_dice,p.armor_class,p.save_dc,p.attacks_per_round,p.bank_gold,p.soul,p.kills,p.boss_kills,p.gold,p.potions,p.potion_slots,p.form,p.shield_armed,p.ensnaring_armed,p.concentration,p.queued_spell,p.queued_spell?Math.ceil((p.action_remaining||0)*10):0,p.spell_cooldowns,p.spell_profiles,p.environment,p.rest_resources,p.status_effects?.map(e=>[e.id,Math.ceil(e.remaining)]),h.canTrade(),h.nearMaster?.()]);if(signature===next)return;signature=next;
       document.getElementById('characterName').textContent=p.name;document.getElementById('characterSubtitle').textContent=`${p.profession||w.classes?.[p.class_id]?.name||''} · poziom ${p.level}`;
       tabButtons.forEach(b=>{const active=b.dataset.characterTab===tab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
-      const scroll=content.scrollTop;content.replaceChildren();content.dataset.tab=tab;
-      if(tab==='inventory')equipment(p,w);else if(tab==='stats')stats(p,w);else if(tab==='spells')spells(p,w);else {
-        // Each panel owns its local previews, so selecting a fighting style or
-        // ordinary feat cannot discard an unconfirmed martial specialization.
-        const martial=node('div'),caster=node('div');content.append(martial,caster);
-        root.BractwoMartialUI?.feats(martial,p,h);root.BractwoCasterUI.feats(caster,p,h);
+      const scroll=content.scrollTop;content.replaceChildren();content.dataset.tab=tab;content.dataset.section=sections[tab]||'';
+      if(tab==='inventory')equipment(p,w);else if(tab==='abilities')abilities(p);else if(tab==='stats')stats(p,w);else if(tab==='spells')spells(p,w);else if(tab==='skills'){subnav('skills',[['list','Lista'],['training','Biegłości'],['challenges','Wyzwania']]);root.BractwoSkillsUI?.skills(content,p,{...h,open},sections.skills);}else {
+        subnav('feats',[['general','Atuty'],['class','Klasa'],['origin','Pochodzenie'],['training','Wyszkolenie']]);
+        if(sections.feats==='origin')root.BractwoSkillsUI?.origin(content,p,{...h,open});else{const martial=node('div'),caster=node('div');content.append(martial,caster);if(sections.feats==='class')root.BractwoMartialUI?.feats(martial,p,h);root.BractwoCasterUI.feats(caster,p,{...h,open,featSection:sections.feats});}
       }
       content.scrollTop=scroll;
     }

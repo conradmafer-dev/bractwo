@@ -1,0 +1,60 @@
+test_allocation_caps_reject_whole_packet (test_advancement_ui28.Advancement.test_allocation_caps_reject_whole_packet) ... ok
+test_asi_and_feats_share_one_budget_and_packet_replay_is_rejected (test_advancement_ui28.Advancement.test_asi_and_feats_share_one_budget_and_packet_replay_is_rejected) ... ok
+test_every_class_boundary_and_no_points_beyond_twenty_dnd (test_advancement_ui28.Advancement.test_every_class_boundary_and_no_points_beyond_twenty_dnd) ... ok
+test_expertise_receipts_at_converted_class_levels (test_advancement_ui28.Advancement.test_expertise_receipts_at_converted_class_levels) ... ok
+test_fighter_can_store_all_seven_selections (test_advancement_ui28.Advancement.test_fighter_can_store_all_seven_selections) ... ok
+test_live_attributes_never_automatically_increase_at_twenty_or_forty (test_advancement_ui28.Advancement.test_live_attributes_never_automatically_increase_at_twenty_or_forty) ... ok
+test_migration_of_valid_high_level_character_does_not_stack_old_auto_bonus (test_advancement_ui28.Advancement.test_migration_of_valid_high_level_character_does_not_stack_old_auto_bonus) ... ok
+test_migration_preserves_choices_archives_excess_and_does_not_heal (test_advancement_ui28.Advancement.test_migration_preserves_choices_archives_excess_and_does_not_heal) ... ok
+test_origin_separate_budget_nonrepeat_and_repeatable_skilled (test_advancement_ui28.Advancement.test_origin_separate_budget_nonrepeat_and_repeatable_skilled) ... ok
+test_pointbuy_and_constitution_asi_affect_hp_and_short_rest_outside_shape (test_advancement_ui28.Advancement.test_pointbuy_and_constitution_asi_affect_hp_and_short_rest_outside_shape) ... ok
+test_receipts_show_fighter_extra_slots_and_preserve_historical_stats (test_advancement_ui28.Advancement.test_receipts_show_fighter_extra_slots_and_preserve_historical_stats) ... ok
+test_skilled_cannot_charge_for_three_unavailable_proficiencies (test_advancement_ui28.Advancement.test_skilled_cannot_charge_for_three_unavailable_proficiencies) ... ok
+test_transformed_scores_cannot_bypass_own_score_cap (test_advancement_ui28.Advancement.test_transformed_scores_cannot_bypass_own_score_cap) ... ok
+test_allocate_from_sheet_without_master_nearby (test_level_up_086.Commands.test_allocate_from_sheet_without_master_nearby) ... ok
+test_branch_and_prerequisites_are_validated (test_level_up_086.Commands.test_branch_and_prerequisites_are_validated) ... ok
+test_cannot_spend_same_point_twice (test_level_up_086.Commands.test_cannot_spend_same_point_twice) ... ok
+test_close_command_persists_even_in_combat (test_level_up_086.Commands.test_close_command_persists_even_in_combat) ... ok
+test_dead_or_fighting_cannot_allocate (test_level_up_086.Commands.test_dead_or_fighting_cannot_allocate) ... ok
+test_new_assets_served_by_real_http (test_level_up_086.Commands.test_new_assets_served_by_real_http) ... /workspace/scratch/238fd4f9c68c/ui28/work/Bractwo_0.8.18/server/server.py:1900: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["game"]=Game(db_path, clock=clock)
+/workspace/scratch/238fd4f9c68c/ui28/work/Bractwo_0.8.18/server/server.py:1901: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["google_auth"]=google_auth_service if google_auth_service is not None else GoogleAuthService.from_env()
+Executing <Task pending name='Task-27' coro=<Commands.test_new_assets_served_by_real_http() running at /workspace/scratch/238fd4f9c68c/ui28/work/Bractwo_0.8.18/tests/test_level_up_086.py:118> cb=[_run_until_complete_cb() at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/base_events.py:181] created at /opt/codex/runtimes/codex-primary-runtime/dependencies/python/lib/python3.12/asyncio/runners.py:100> took 0.207 seconds
+ok
+test_promotion_and_reset_still_need_master (test_level_up_086.Commands.test_promotion_and_reset_still_need_master) ... ok
+test_buffs_terrain_and_form_do_not_contaminate_growth (test_level_up_086.Receipts.test_buffs_terrain_and_form_do_not_contaminate_growth) ... ok
+test_cantrips_list_added_dice_not_total (test_level_up_086.Receipts.test_cantrips_list_added_dice_not_total) ... ok
+test_compact_snapshot_restates_dismissal (test_level_up_086.Receipts.test_compact_snapshot_restates_dismissal) ... ok
+test_dismiss_does_not_spend_or_change_stats (test_level_up_086.Receipts.test_dismiss_does_not_spend_or_change_stats) ... ok
+test_every_intermediate_level_gets_own_receipt (test_level_up_086.Receipts.test_every_intermediate_level_gets_own_receipt) ... ok
+test_healing_has_no_automatic_primary_score_gain (test_level_up_086.Receipts.test_healing_has_no_automatic_primary_score_gain) ... ok
+test_knight_additional_attack (test_level_up_086.Receipts.test_knight_additional_attack) ... ok
+test_legacy_save_does_not_spam_past_levels (test_level_up_086.Receipts.test_legacy_save_does_not_spam_past_levels) ... ok
+test_level_ten_exact_increments (test_level_up_086.Receipts.test_level_ten_exact_increments) ... ok
+test_mastery_action_is_conditional (test_level_up_086.Receipts.test_mastery_action_is_conditional) ... ok
+test_new_form_has_icon (test_level_up_086.Receipts.test_new_form_has_icon) ... ok
+test_no_before_after_values_in_payload (test_level_up_086.Receipts.test_no_before_after_values_in_payload) ... ok
+test_no_fabricated_feat_or_point_rewards (test_level_up_086.Receipts.test_no_fabricated_feat_or_point_rewards) ... ok
+test_no_receipt_without_advancement (test_level_up_086.Receipts.test_no_receipt_without_advancement) ... ok
+test_only_owner_receives_history (test_level_up_086.Receipts.test_only_owner_receives_history) ... ok
+test_other_character_cannot_dismiss (test_level_up_086.Receipts.test_other_character_cannot_dismiss) ... ok
+test_pending_receipts_do_not_expire (test_level_up_086.Receipts.test_pending_receipts_do_not_expire) ... ok
+test_persistence_after_restart (test_level_up_086.Receipts.test_persistence_after_restart) ... ok
+test_pet_improvements_match_new_summon (test_level_up_086.Receipts.test_pet_improvements_match_new_summon) ... ok
+test_primary_score_requires_choice_while_proficiency_grows (test_level_up_086.Receipts.test_primary_score_requires_choice_while_proficiency_grows) ... ok
+test_receipt_immutable_after_equipment_or_mastery_change (test_level_up_086.Receipts.test_receipt_immutable_after_equipment_or_mastery_change) ... ok
+test_reject_invalid_ids (test_level_up_086.Receipts.test_reject_invalid_ids) ... ok
+test_repeated_dismiss_is_idempotent (test_level_up_086.Receipts.test_repeated_dismiss_is_idempotent) ... ok
+test_separate_saving_throws (test_level_up_086.Receipts.test_separate_saving_throws) ... ok
+test_shillelagh_shows_only_labeled_average_gain (test_level_up_086.Receipts.test_shillelagh_shows_only_labeled_average_gain) ... ok
+test_single_click_dismisses_only_its_id (test_level_up_086.Receipts.test_single_click_dismisses_only_its_id) ... ok
+test_thousands_of_levels_are_not_dropped_or_allocated_eagerly (test_level_up_086.Receipts.test_thousands_of_levels_are_not_dropped_or_allocated_eagerly) ... ok
+test_zero_changes_omitted (test_level_up_086.Receipts.test_zero_changes_omitted) ... ok
+
+----------------------------------------------------------------------
+Ran 48 tests in 5.183s
+
+OK

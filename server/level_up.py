@@ -27,6 +27,8 @@ def record(p, first, last):
     worn = set(p.equipment.values())
     context = copy.deepcopy(dict(class_id=p.class_id, promoted=p.promoted,
         primal_order=p.primal_order,training_feats=p.training_feats,caster_rules_version=p.caster_rules_version,
+        feat_rules_version=rules.gear.FEAT_RULES_VERSION,origin_feat=getattr(p,'origin_feat',''),
+        ability_build=getattr(p,'ability_build',{}),skill_training=getattr(p,'skill_training',{}),
         druid_circle=p.druid_circle,druid_circle_state=p.druid_circle_state,
         wizard_school=p.wizard_school,wizard_school_state=p.wizard_school_state,
         martial_archetype=getattr(p,'martial_archetype',''),
@@ -58,6 +60,8 @@ def number(value):
 def permanent(p, level, context):
     q = copy.copy(p)
     q.fighting_style="";q.weapon_grip="one";q.primal_order='';q.training_feats={}
+    q.origin_feat='';q.ability_build={};q.skill_training={}
+    q._legacy_auto_attributes='feat_rules_version' not in context
     q.druid_circle='';q.druid_circle_state={};q.druid_circle_runtime={}
     q.wizard_school='';q.wizard_school_state={};q.wizard_school_runtime={}
     q.martial_archetype='';q.martial_state={}
@@ -164,10 +168,18 @@ def receipt(p, batch, level):
     gained=mastery_points(after)-mastery_points(before)
     if gained>0:
         add('mastery','Punkt mistrzostwa',gained)
-        actions.append(dict(kind='mastery',label='Przydziel punkt',tab='stats'))
-    if level in rules.gear.FEAT_LEVELS:
-        add('training_feat','Wybór atutu wyszkolenia',1)
+        actions.append(dict(kind='mastery',label='Przydziel punkt',tab='stats',section='mastery'))
+    if level in rules.gear.feat_levels(after):
+        add('training_feat','Rozwój cech lub atut',1)
+        actions.append(dict(kind='training_feat',label='Rozwiń cechy',tab='abilities',section='growth'))
         actions.append(dict(kind='training_feat',label='Wybierz atut',tab='feats'))
+    if 'feat_rules_version' in batch['context']:
+        try:from . import skill_rules
+        except ImportError:import skill_rules
+        expertise=skill_rules.limits(after)['expertise']-skill_rules.limits(before)['expertise']
+        if expertise>0:
+            add('expertise','Ekspertyza umiejętności',expertise)
+            actions.append(dict(kind='skill_expertise',label='Wybierz ekspertyzę',tab='skills',section='training'))
     return dict(id=f'{batch["id"]}:{level}',level=level,rows=rows,actions=actions)
 
 

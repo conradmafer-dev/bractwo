@@ -443,6 +443,7 @@ def configure(content, classes, potions):
 # Small client-independent status catalogue. Timers are sent by the server,
 # including public enemy/PvP target effects; no account or owner IDs are exposed.
 STATUS_SPECS = {
+    'hidden': dict(name='Ukrycie · PvE', icon='◐', description='Ukrycie przed potworami. Inni gracze nadal cię widzą. Atak, czar, mówienie, wykrycie lub opuszczenie osłony kończą ukrycie.', harmful=False),
     'longstrider': dict(name='Długonogi', icon='»', description='+10 stóp szybkości. Atak nie przerywa. Bez koncentracji.', harmful=False),
     'shillelagh': dict(name='Magiczna laska', icon='♧', description='Laska używa Mądrości i wzmocnionej kości obrażeń.', harmful=False),
     'mage_armor': dict(name='Zbroja maga', icon='◇', description='Bazowa KP 13 + Zręczność bez noszonej zbroi.', harmful=False),
@@ -468,6 +469,9 @@ def status_effects(conditions, now, player=None):
         remaining=max(0,value.get('until',0)-now)
         if remaining<=0:continue
         info=STATUS_SPECS.get(key,dict(name=key,icon='✦',description='',harmful=bool(value.get('hostile'))))
+        if key=='hidden':
+            result.append(dict(id=key,**info,remaining=None,rounds=0,concentration=False,spell_id=''))
+            continue
         if key == 'starry_form':
             try:
                 from . import druid_circles as circles

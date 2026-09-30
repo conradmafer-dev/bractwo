@@ -59,12 +59,11 @@ def finish(p,kind,rng,recover=True):
         p.exhaustion=max(0,getattr(p,'exhaustion',0)-1)
     else:
         # Spend one die at a time and stop at full HP, preserving unused dice.
-        con=(p.spec['attributes']['constitution']-10)//2
         try:
-            from . import equipment_rules as gear
+            from . import combat_rules as rules
         except ImportError:
-            import equipment_rules as gear
-        con=(min(20,p.spec['attributes']['constitution']+gear.feat_ability_bonuses(p).get('constitution',0))-10)//2
+            import combat_rules as rules
+        con=(rules.own_attributes(p)['constitution']-10)//2
         while p.hp<p.max_hp and spend(p,'hit_dice'):
             used+=1;p.hp=min(p.max_hp,p.hp+max(0,rng.randint(1,p.spec['hit_die'])+con))
         restore(p,'second_wind',1);restore(p,'action_surge')

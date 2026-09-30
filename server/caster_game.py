@@ -48,7 +48,7 @@ class CasterGame:
 
     def migrate_caster(self,p):
         p.primal_order=p.primal_order if p.class_id=='druid' and p.primal_order in caster.ORDERS else ''
-        gear.sanitize_feats(p)
+        gear.migrate_advancement(p)
         p.casting_channel={};p.caster_messages=[];p.familiar_state={}
         # Existing medium armor is not deleted or silently turned into a free feat.
         # A legacy druid gets a grace period until the first explicit path choice.
@@ -81,14 +81,15 @@ class CasterGame:
         with self.db:self.save_player(p)
         await self.notice(p,'Ścieżka: '+caster.ORDERS[key]['name']+'.'+(' Średni pancerz kupisz lub zdobędziesz.' if key=='warden' else ''))
 
-    async def choose_training_feat(self,p,key,ability='',abilities=None):
+    async def choose_training_feat(self,p,key,ability='',abilities=None,expected_spent=None):
         if not isinstance(key,str) or key not in gear.GENERAL_FEATS:return
         s=gear.GENERAL_FEATS[key]
-        if not p.alive or p.form or p.combat_until>self.now():return await self.notice(p,'Wybierz atut poza walką i przemianą.')
+        if self.development_blocked(p):return await self.notice(p,'Wybierz atut poza walką i przemianą.')
         hp_fraction=p.hp/max(1,p.max_hp)
-        reason=gear.select_feat(p,key,ability,abilities)
+        reason=gear.select_feat(p,key,ability,abilities,expected_spent=expected_spent)
         if reason:return await self.notice(p,reason)
         p.hp=min(p.max_hp,hp_fraction*p.max_hp)
+        p._level_up_cache=None
         self.clear_caster_caches(p)
         with self.db:self.save_player(p)
         await self.notice(p,'Nowy atut: '+s['name']+'.')

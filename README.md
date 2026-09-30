@@ -1,4 +1,17 @@
-# Bractwo Krain 0.8.18 UI_26 — specjalizacje wojownika i łowcy
+# Bractwo Krain 0.8.18 UI_28 — cechy, umiejętności i wybrzeża
+
+Dodano wybór cech za 27 punktów, osobny atut pochodzenia, pełną listę 18
+umiejętności, biegłości klasowe i ekspertyzę. Rozwój cech korzysta z tej samej
+puli co atuty, na progach przeliczonych z D&D. Umiejętności wykorzystują
+18 oznaczonych wydarzeń w świecie oraz akcje badania, szukania i ukrycia PvE.
+Naprawiono chodzenie po oceanie; przeprawy odbywają się łodziami.
+[Zasady, sterowanie i migracja UI_28](docs/UI_28_CECHY_UMIEJETNOSCI.md).
+
+
+Nowa publiczna strona przedstawia klasy, świat i rozgrywkę przed logowaniem.
+Zawiera przesłany zrzut gry, polskie metadane, podgląd linku, canonical,
+mapę witryny i opcjonalną weryfikację Google Search Console.
+[Instrukcja wdrożenia i zgłoszenia do Google](docs/UI_27_SEO.md).
 
 Wejście do gry wymaga logowania przez Google. Jedno konto Google może mieć
 maksymalnie **4 postacie**, wliczając postacie offline i przypisane stare zapisy.
@@ -57,7 +70,7 @@ repozytorium. `Dockerfile`, `run.py`, `requirements.txt`, `server/` i `web/`
 mają być obok siebie. Zachowaj bazę graczy, wolumen i istniejące zmienne.
 Używaj jednej repliki serwera. Ustaw parametry Google przed wdrożeniem
 i wdróż cały serwer razem z klientem. Odśwież stronę po aktualizacji.
-Ekran wejścia oraz `/health` pokazują **UI_26**. Reset postaci nie jest potrzebny.
+Ekran wejścia oraz `/health` pokazują **UI_28**. Reset postaci nie jest potrzebny.
 Paczka nie została wdrożona automatycznie.
 
 ## Lokalnie i źródła Godota
@@ -74,12 +87,12 @@ Nie dołączono nowego APK.
 
 ## Weryfikacja
 
-Bieżący raport: `docs/qa_0.8.18/ui25/summary.json`.
-Weryfikacja obejmuje dedykowane usługi NPC, przypisanie i odrodzenie,
-bezpieczne przystanie, logowanie, limit kont oraz zachowanie szkół czarodzieja.
-Przeglądarka jest sprawdzana z osobną bazą i testowym dostawcą Google.
-Logowania na produkcyjnej domenie z prawdziwym kontem Google nie wykonano;
-wdrożenie wymaga konfiguracji opisanej wyżej.
+Bieżący raport: `docs/qa_0.8.18/ui27/summary.json`.
+Weryfikacja obejmuje publiczny HTML i metadane, canonical, sitemap, robots,
+ustawienia adresu i weryfikacji, logowanie oraz wygląd na komputerze i telefonie.
+Przeglądarka używa osobnej bazy i testowego dostawcy Google. Nie wykonano
+logowania prawdziwym kontem ani publikacji na produkcyjnym serwerze.
+Wcześniejsze raporty, w tym `ui26/`, pozostają dołączone.
 
 Poprzednie aktualizacje: [UI_23 — promocja i demony](docs/UI_23_PROMOTION_DEMONS.md), [UI_22 — konta Google](docs/UI_22_GOOGLE_ACCOUNTS.md), [UI_21 — czary](docs/UI_21_SPELL_EFFECTS.md),
 [UI_20 — kontynent i łupy](docs/UI_20_WORLD.md), [UI_19](docs/UI_19_WORLD.md).

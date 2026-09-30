@@ -1,0 +1,55 @@
+UI_28 final browser UI JavaScript validation
+
+Test command: node --test tests/test_skills_ui28.cjs tests/test_training_refresh_ui08.cjs tests/test_casters_0814.cjs tests/test_level_up.cjs
+Modules: 4; test cases: 33 (10 new UI_28 + 23 regression).
+✔ first druid path does not require a master (1.263675ms)
+✔ reselection requires master (0.160837ms)
+✔ dead, combat, transformed and non-druid cannot pick path (0.149462ms)
+✔ simple and martial labels; no third/exotic fallback (0.346184ms)
+✔ proficient weapon has no redundant affirmative proficiency row (0.179896ms)
+✔ missing weapon training shown once, does not subtract from actual attack twice (0.250701ms)
+✔ personalized zero spell bonus overrides staff nominal focus bonus for noncasters (0.245037ms)
+✔ mastery lock independent of proficiency (0.177181ms)
+✔ armor shows actual wearer AC and warns about missing training (0.261634ms)
+✔ untrained shield explicitly denies AC bonus (0.374971ms)
+✔ tooltip text remains text not injected HTML (0.50643ms)
+✔ shared staff and bow artwork follows type rather than former class restriction (0.243622ms)
+✔ untrained armor warning renders the message, not its CSS class (0.282499ms)
+✔ single line only contains name and the gained HP (1.381755ms)
+✔ each saving throw can be shown independently (0.213552ms)
+✔ movement delta retains its units and decimal comma (0.204912ms)
+✔ spell unlock is a gain, not before and after (0.324793ms)
+✔ compact owner state preserves pending receipts until changed (1.275776ms)
+✔ authoritative empty queue clears receipt history (0.667539ms)
+✔ point-buy consumes exactly27 weighted points and a legal3-point background (4.408493ms)
+✔ point-buy stale confirmation rejects an already chosen build, death, combat and forms (0.38914ms)
+✔ ASI permits +2 or +1/+1 with actual total cap and shared unspent budget (0.523019ms)
+✔ ASI sends expected_spent for replay protection rather than trusting a cached counter (1.489338ms)
+✔ each skill choice uses only its own authoritative remaining pool and options (0.266623ms)
+✔ origin feat has its own one-time pool, independent of higher-level ASI (0.199897ms)
+✔ checks use server eligibility and completed routes remain reusable without awarding a second result (0.352746ms)
+✔ ability tests are reported as ST and success or failure, never weapon misses (0.580625ms)
+✔ existing unspent ability choices remind on login without a pending level-up receipt (0.557563ms)
+✔ ability reminder dismissal is per character and never fabricates an available choice (0.391004ms)
+✔ druid 15 can confirm after combat expires while the stat selector retains focus (31.987637ms)
+✔ spent points and a feat removed from the latest snapshot disable the focused form (6.23865ms)
+✔ missing or no-longer-eligible stat never enables confirmation (4.621085ms)
+✔ fresh death, transformation and combat gates remain authoritative without reconnecting (6.179858ms)
+ℹ tests 33
+ℹ suites 0
+ℹ pass 33
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 211.324558
+
+Test exit code: 0
+
+Syntax checks (6 files):
+node --check web/skills_ui.js -> exit 0
+node --check web/character_sheet.js -> exit 0
+node --check web/caster_ui.js -> exit 0
+node --check web/level_up.js -> exit 0
+node --check web/game.js -> exit 0
+node --check web/runtime.js -> exit 0

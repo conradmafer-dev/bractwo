@@ -1,8 +1,8 @@
 """Owner-only character sheet; all bonuses use the actual combat calculations."""
 try:
-    from . import combat_rules as rules, dnd_content as dnd, fighter_rules as fighter, martial_rules as martial
+    from . import combat_rules as rules, dnd_content as dnd, fighter_rules as fighter, martial_rules as martial, skill_rules, ability_rules
 except ImportError:
-    import combat_rules as rules, dnd_content as dnd, fighter_rules as fighter, martial_rules as martial
+    import combat_rules as rules, dnd_content as dnd, fighter_rules as fighter, martial_rules as martial, skill_rules, ability_rules
 
 DAMAGE_NAMES = {'acid':'Kwas','bludgeoning':'Obuchowe','cold':'Zimno','fire':'Ogień',
     'force':'Moc','lightning':'Błyskawice','necrotic':'Nekrotyczne','piercing':'Kłute',
@@ -14,7 +14,7 @@ def build(p):
     for key,name in DAMAGE_NAMES.items():
         resistances.append(dict(type=key,name=name,multiplier=rules.resistance_multiplier(p,key)))
     gear=rules.gear;caster=rules.caster
-    return dict(training=gear.training_sheet(p),caster=caster.sheet(p),ability_modifiers={k:rules.ability_modifier(p,k) for k in rules.attributes(p)},
+    return dict(skills=skill_rules.sheet(p),ability_build=ability_rules.sheet(p),training=gear.training_sheet(p),caster=caster.sheet(p),ability_modifiers={k:rules.ability_modifier(p,k) for k in rules.attributes(p)},
         saving_throws={k:rules.save_bonus(p,k) for k in rules.attributes(p)},magic_items=rules.magic_items.sheet(p),
         proficient_saves=list(p.spec['saves']),spell_attack_bonus=rules.spell_bonus(p),
         attack_ability=rules.attack_ability(p),spell_ability=rules.spell_ability(p),

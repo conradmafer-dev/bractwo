@@ -41,11 +41,25 @@ def weapon_autoattack(p):
 def effective_level(p): return min(20,max(1,1+int(p.level)//5))
 def proficiency(p): return 2+(effective_level(p)-1)//4
 
-def attributes(p):
-    scores=dict(p.spec['attributes'])
-    scores[p.spec['primary']]=min(20,scores[p.spec['primary']]+2*(p.level>=20)+2*(p.level>=40))
+def base_attributes(p):
+    try:from . import ability_rules
+    except ImportError:import ability_rules
+    return ability_rules.base_scores(p)
+
+
+def own_attributes(p):
+    """Permanent scores; transformations must not change the character's HP."""
+    scores=base_attributes(p)
+    # Only saved, pre-UI_28 level-up receipts replay their historical auto bonus.
+    if getattr(p,'_legacy_auto_attributes',False):
+        scores[p.spec['primary']]=min(20,scores[p.spec['primary']]+2*(p.level>=20)+2*(p.level>=40))
     for ability,amount in gear.feat_ability_bonuses(p).items():
         scores[ability]=min(20,scores[ability]+amount)
+    return scores
+
+
+def attributes(p):
+    scores=own_attributes(p)
     scores.update(caster.form_spec(p).get('attributes',{}))
     scores.update(environment.polymorph(p).get('attributes',{}))
     return scores
@@ -104,7 +118,7 @@ def save_bonus(p,ability='dexterity'):
 def legacy_max_hp(p):
     """Pre-UI_12 totals, retained for save migration and historical receipts."""
     # Wild Shape retains the druid's own maximum HP, even with a beast's CON.
-    con=(min(20,p.spec['attributes']['constitution']+gear.feat_ability_bonuses(p).get('constitution',0))-10)//2
+    con=(own_attributes(p)['constitution']-10)//2
     return (p.spec['hit_die']+con+((p.level-1)*(p.spec['hit_die']//2+1+con))//5+p.mastery.get('vitality',0)*2
             +(2*effective_level(p) if gear.has_feat(p,'tough') else 0))
 
@@ -115,7 +129,7 @@ def max_hp(p):
     # The first interval is 1 -> 5 (four advances), then 5 -> 10 -> ... -> 95.
     # Round the accumulated gain once; individual level gains never lose fractions.
     level=max(1,min(95,int(p.level)))
-    con=(min(20,p.spec['attributes']['constitution']+gear.feat_ability_bonuses(p).get('constitution',0))-10)//2
+    con=(own_attributes(p)['constitution']-10)//2
     die=p.spec['hit_die'];gain=max(1,die//2+1+con)
     numerator,denominator=(level-1,4) if level<5 else (level,5)
     return max(1,die+con)+numerator*gain//denominator+(2*effective_level(p) if gear.has_feat(p,'tough') else 0)

@@ -6,3 +6,9 @@ RAILWAY_DEPLOYMENT_DRAINING_SECONDS=30
 # Bez tej konfiguracji logowanie pozostaje zablokowane.
 GOOGLE_CLIENT_ID=WPISZ_CLIENT_ID.apps.googleusercontent.com
 GOOGLE_AUTH_ORIGIN=https://TWOJA-DOMENA-GRY
+
+# UI_27: adres SEO (opcjonalny; domyslnie ponizszy adres Railway).
+PUBLIC_SITE_URL=https://bractwo.up.railway.app
+# Opcjonalnie: wlasny kod content z tagu HTML Google Search Console.
+# GOOGLE_SITE_VERIFICATION=KOD_Z_SEARCH_CONSOLE
+# Nie zmieniaj istniejacego GOOGLE_CLIENT_ID ani bazy podczas aktualizacji SEO.

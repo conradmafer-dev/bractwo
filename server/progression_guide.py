@@ -57,6 +57,15 @@ def catalog():
                 if class_id=='knight':
                     delta=rules.effective_level(after)-rules.effective_level(before)
                     if delta:details.append(f'Drugi oddech +{delta} do leczenia.')
+            if level==1:
+                details.append('C → Cechy: wybierz cechy za 27 punktów. C → Atuty: wybierz atut pochodzenia. C → Umiejętności: wybierz biegłości klasy i dwie biegłości pochodzenia.')
+            if level in rules.gear.feat_levels(after):
+                titles.append('Rozwój cech lub atut')
+                details.append('Jeden wybór: +2 do cechy albo +1 do dwóch cech (limit 20), lub atut. C → Cechy / Atuty.')
+            if level==5 and class_id in ('mage','ranger'):
+                details.append('C → Umiejętności: wybierz jedną ekspertyzę w posiadanej biegłości.'+(' Uczony obejmuje umiejętności wiedzy.' if class_id=='mage' else ''))
+            if level==40 and class_id=='ranger':
+                details.append('C → Umiejętności: wybierz dwie kolejne ekspertyzy.')
             if class_id=='knight' and level==1:
                 details.append('Wybierz jeden styl walki w C → Atuty. Mistrzostwa: miecz długi, miecz dwuręczny, młot dwuręczny. Kolczuga i tarcza na start.')
             if level==8:details.append('Rejsy i możliwość odblokowania PvP poza osadami.')

@@ -87,10 +87,14 @@ def movement_speed(actor,speed,surface=1):
     movement_cost=float(cost.get('feet',0))*6.4/3 if active(actor,'tree_movement_cost') else 0
     return max(0,speed*surface-movement_cost)
 
-def public(actor):
+def public(actor,private=False):
     now=getattr(actor,'current_wall_time',0);water=effective_water_info(actor)['water']
-    return dict(in_water=water,submerged=bool(getattr(actor,'submerged',False)),flight=flying(actor),
+    result=dict(in_water=water,submerged=bool(getattr(actor,'submerged',False)),flight=flying(actor),
         breath_remaining=max(0,round(getattr(actor,'breath_until',now)-now,1)) if getattr(actor,'submerged',False) else 0)
+    if private:
+        resolver=getattr(actor,'_environment_hide_resolver',None)
+        if callable(resolver):result['hide']=resolver(actor)
+    return result
 
 class EnvironmentGame:
     def environment_fields(self):return (*getattr(self,'spell_fields',()),*getattr(self,'circle_spell_fields',()))
@@ -98,6 +102,91 @@ class EnvironmentGame:
     def environment_bind(self,actor):
         # Runtime only: positions and Control Water modes must be read live.
         actor._environment_water_resolver=self.environment_water_info
+        actor._environment_hide_resolver=self.environment_hide_public
+
+    def environment_reveal(self,p,reason=''):
+        hidden=conditions(p).pop('hidden',None)
+        if hidden and reason and hasattr(p,'class_id'):self.caster_message(p,reason)
+        return bool(hidden)
+
+    def environment_hide_cover(self,p):
+        # Runtime adaptation: a solid obstacle within 40 units supplies a place
+        # to crouch, but enemies must ALSO lack line of sight. Fog is heavy
+        # obscurement. Blindness on the hider alone is never suitable cover.
+        if self.environment_obscured(p,False):return True
+        for cx in range(int((p.x-40)//256),int((p.x+40)//256)+1):
+            for cy in range(int((p.y-40)//256),int((p.y+40)//256)+1):
+                for o in self.obstacle_cells.get((p.floor,cx,cy),()):
+                    if o.get('type') not in ('house','mill','wall','rock','mountain','grove','ruin','canyon','terrace'):continue
+                    dx=max(o['x']-p.x,0,p.x-o['x']-o['w']);dy=max(o['y']-p.y,0,p.y-o['y']-o['h'])
+                    if math.hypot(dx,dy)<=40:return True
+        return False
+
+    def environment_hide_observers(self,p):
+        seen=set()
+        for e in self.nearby_enemies(p,1450):
+            if e.id in seen or not e.alive or e.hp<=0 or not same_floor(e,p):continue
+            seen.add(e.id)
+            if math.hypot(e.x-p.x,e.y-p.y)<=max(768,enemy_spec(e).get('aggro',0)):
+                yield e
+
+    def environment_hide_reason(self,p):
+        if not p.alive:return 'Ukrywanie wymaga żywej postaci.'
+        if actions_blocked(p,self.now()):return 'Obecny stan uniemożliwia ukrycie.'
+        if p.pvp_combat_until>self.now():return 'Ukrywanie przed potworami jest niedostępne podczas walki PvP.'
+        if p.attack_cooldown_until>self.now():return 'Zaczekaj na następną akcję.'
+        if not self.environment_hide_cover(p):return 'Podejdź do osłony albo wejdź w gęstą mgłę.'
+        if any(self.environment_raw_can_see(e,p) for e in self.environment_hide_observers(p)):
+            return 'Potwór cię widzi. Najpierw zejdź z jego linii wzroku.'
+        return ''
+
+    def environment_hide_public(self,p):
+        hidden=conditions(p).get('hidden',{})
+        active_hidden=hidden.get('until',0)>self.now()
+        reason='' if active_hidden else self.environment_hide_reason(p)
+        return dict(active=active_hidden,available=active_hidden or not reason,reason=reason,
+                    dc=hidden.get('dc') if active_hidden else 15,remaining=None,scope='pve')
+
+    def environment_hide_tick(self,p):
+        hidden=conditions(p).get('hidden',{})
+        if hidden.get('until',0)<=self.now():return
+        if not p.alive or actions_blocked(p,self.now()) or p.pvp_combat_until>self.now():
+            self.environment_reveal(p,'Ukrycie zostało przerwane.');return
+        if not self.environment_hide_cover(p):
+            self.environment_reveal(p,'Wyjście zza osłony zdradza twoją pozycję.');return
+        hidden['until']=self.now()+86400  # session condition; never saved
+        for e in self.environment_hide_observers(p):
+            if self.environment_raw_can_see(e,p):
+                self.environment_reveal(p,'Potwór dostrzegł cię poza osłoną.');return
+            distance=math.hypot(e.x-p.x,e.y-p.y)
+            # Hearing reaches 30 feet, and does not pass solid walls. Nearby
+            # pursuers Search once per turn, spending their attack action.
+            if distance>192 or not self.line_clear(e,p) or active(e,'deafened',self.now()):continue
+            spec=enemy_spec(e)
+            bonus=spec.get('perception_bonus',spec.get('saves',{}).get('wisdom',0))
+            passive=spec.get('passive_perception',10+bonus)
+            if passive>=hidden['dc']:
+                self.environment_reveal(p,'Potwór usłyszał cię i odnalazł kryjówkę.');return
+            pursuing=e.chase_id==p.id or e.attacker_id==p.id
+            if not pursuing or e.ready>self.time or getattr(e,'_hide_search_until',0)>self.now():continue
+            if actions_blocked(e,self.now()):continue
+            e._hide_search_until=self.now()+3;e.ready=max(e.ready,self.time+3)
+            if self.combat_rng.randint(1,20)+bonus>=hidden['dc']:
+                self.environment_reveal(p,'Poszukujący cię potwór odnalazł kryjówkę.');return
+
+    def begin_action(self,p,bonus=False):
+        if getattr(p,'_hide_casting',False):self.environment_reveal(p,'Rzucanie czaru zdradza kryjówkę.')
+        return super().begin_action(p,bonus=bonus)
+
+    def hit_enemy(self,p,*args,**kwargs):
+        result=super().hit_enemy(p,*args,**kwargs)
+        if result is not None:self.environment_reveal(p)
+        return result
+
+    def hit_player(self,source,*args,**kwargs):
+        result=super().hit_player(source,*args,**kwargs)
+        if result is not None and result.get('check')=='attack':self.environment_reveal(source)
+        return result
 
     def environment_submerge(self,actor):
         self.environment_bind(actor)
@@ -166,6 +255,10 @@ class EnvironmentGame:
 
     def blocked_for(self,actor,x,y,radius=18):
         self.environment_bind(actor)
+        # Inland swimming, flight and Control Water intentionally bypass river
+        # collision. The ocean is a separate map boundary: island journeys use
+        # boats, and neither normal movement nor a forced push may cross it.
+        if actor.floor==0 and content.WATER_MAP.ocean_blocked(x,y,radius):return True
         if not getattr(actor,'_environment_forced',False) and not flying(actor):
             trapped=conditions(actor).get('whirlpool',{});escape=conditions(actor).get('whirlpool_escape',{})
             if trapped.get('until',0)>self.now() and not (escape.get('until',0)>self.now() and escape.get('field_id')==trapped.get('field_id')):
@@ -173,6 +266,40 @@ class EnvironmentGame:
                     if field.get('id')==trapped.get('field_id') and field.get('until',0)>self.now():
                         if math.hypot(x-field['x'],y-field['y'])>math.hypot(actor.x-field['x'],actor.y-field['y'])+.001:return True
         return self.blocked(x,y,radius,floor=actor.floor,ignore_water=True,ignore_low=flying(actor))
+
+    def environment_recover_shore(self,p):
+        """Rescue a saved offshore position only after combat has ended.
+
+        Choose nearby dry coast rather than granting a free trip to a bound
+        city. The marker is runtime-only and is reconstructed on every login.
+        """
+        if not getattr(p,'_shore_recovery_pending',False) or not p.alive:return False
+        if max(p.combat_until,p.pvp_combat_until)>self.now():return False
+        if p.floor or not content.WATER_MAP.ocean_blocked(p.x,p.y,18):
+            p._shore_recovery_pending=False
+            return False
+        origin=(p.x,p.y)
+        x,y=content.GEOGRAPHY.nearest(*origin,clearance=32)
+        candidates=[(x,y)]
+        for radius in (32,64,128,256,512,1024,2048):
+            for i in range(16):
+                angle=i*math.tau/16
+                candidates.append((x+math.cos(angle)*radius,y+math.sin(angle)*radius))
+        destination=next((point for point in sorted(candidates,key=lambda q:math.dist(origin,q))
+                          if not self.blocked(*point,floor=0)),None)
+        if destination is None:
+            # Authored ports are guaranteed dry and reachable. This fallback
+            # also handles a coast whose nearest tile is hidden behind cliffs.
+            destination=next(((port['x'],port['y']) for port in sorted(content.PORTS,
+                              key=lambda port:math.hypot(port['x']-origin[0],port['y']-origin[1]))
+                              if not self.blocked(port['x'],port['y'],floor=0)),None)
+        if destination is None:return False
+        p.x,p.y=destination
+        p.dx=p.dy=0;p.input_time=-10;p.submerged=False
+        p.world_revision=getattr(content,'WORLD_REVISION',20)
+        p._shore_recovery_pending=False
+        self.caster_message(p,'Przywrócono postać z morza na najbliższy dostępny brzeg. Między wyspami kursują łodzie.')
+        return True
 
     def environment_obscured(self,actor,include_blind=True):
         if include_blind and active(actor,'blind',self.now()):return True
@@ -182,7 +309,7 @@ class EnvironmentGame:
             if (spec.get('obscure') or field.get('key') in ('fog_cloud','sleet_storm','stinking_cloud')) and math.hypot(actor.x-field['x'],actor.y-field['y'])<=field.get('radius',128):return True
         return False
 
-    def environment_can_see(self,a,b):
+    def environment_raw_can_see(self,a,b):
         if not same_floor(a,b) or not self.line_clear(a,b):return False
         spec=enemy_spec(a) if not hasattr(a,'class_id') else caster.form_spec(a)
         reach=float(spec.get('blindsight',0))*6.4
@@ -198,6 +325,15 @@ class EnvironmentGame:
                 if segment_distance(field['x'],field['y'],(a.x,a.y),(b.x,b.y))<=field.get('radius',128):return False
         return True
 
+    def environment_can_see(self,a,b):
+        # PvE only: positions stay public to other players and hidden never
+        # grants an advantage, protection or targeting immunity against them.
+        if not hasattr(a,'class_id') and hasattr(b,'class_id') and active(b,'hidden',self.now()):
+            spec=enemy_spec(a)
+            reach=max(spec.get('blindsight',0),spec.get('truesight',0))*6.4
+            if math.hypot(a.x-b.x,a.y-b.y)>reach or not self.line_clear(a,b):return False
+        return self.environment_raw_can_see(a,b)
+
     def environment_attack_flags(self,source,target):
         now=self.now();see=self.environment_can_see(source,target);seen=self.environment_can_see(target,source)
         dis=not see or any(active(source,k,now) for k in ('poisoned','web_restrained','elemental_restrained','stinking_poison'))
@@ -206,6 +342,9 @@ class EnvironmentGame:
         if active(target,'blur',now) and not spec.get('blindsight') and not spec.get('truesight') and not self.wizard_third_eye(source):dis=True
         bolt=conditions(target).pop('guiding_bolt',{})
         adv=adv or bolt.get('until',0)>now
+        # Retain the already computed benefit for this roll, then reveal before
+        # damage riders can trigger a second weapon attack (e.g. Horde Breaker).
+        self.environment_reveal(source)
         return dis,adv
 
     def environment_adjust_damage(self,source,target,result,dice,melee=False):
@@ -243,7 +382,27 @@ class EnvironmentGame:
 
     async def cast_spell(self,p,*args,**kwargs):
         if actions_blocked(p,self.now()):return await self.notice(p,'Ten stan uniemożliwia wykonywanie akcji.')
-        return await super().cast_spell(p,*args,**kwargs)
+        prior=getattr(p,'_hide_casting',False);p._hide_casting=True
+        try:return await super().cast_spell(p,*args,**kwargs)
+        finally:p._hide_casting=prior
+
+    async def cast_circle_spell(self,p,*args,**kwargs):
+        prior=getattr(p,'_hide_casting',False);p._hide_casting=True
+        try:return await super().cast_circle_spell(p,*args,**kwargs)
+        finally:p._hide_casting=prior
+
+    async def _cast_circle_spell(self,p,*args,**kwargs):
+        # Queued circle spells execute this core entry directly, bypassing
+        # both public cast methods when the next action becomes available.
+        prior=getattr(p,'_hide_casting',False);p._hide_casting=True
+        try:return await super()._cast_circle_spell(p,*args,**kwargs)
+        finally:p._hide_casting=prior
+
+    async def start_caster_channel(self,p,*args,**kwargs):
+        before=getattr(p,'casting_channel',None)
+        result=await super().start_caster_channel(p,*args,**kwargs)
+        if p.casting_channel and p.casting_channel is not before:self.environment_reveal(p,'Rozpoczęcie rytuału zdradza kryjówkę.')
+        return result
 
     async def dnd_attack(self,p,*args,**kwargs):
         if actions_blocked(p,self.now()):return
@@ -266,15 +425,19 @@ class EnvironmentGame:
 
     def environment_ability_check(self,actor,ability,dc,skill=''):
         try:
-            from . import combat_rules as rules
+            from . import combat_rules as rules, skill_rules
         except ImportError:
-            import combat_rules as rules
+            import combat_rules as rules, skill_rules
         now=self.now();dis=active(actor,'poisoned',now) or active(actor,'stinking_poison',now) or self.martial_frightened(actor)
+        if hasattr(actor,'class_id') and ability in ('strength','dexterity'):
+            dis=dis or rules.gear.armor_penalty(actor)
         if skill=='stealth' and hasattr(actor,'class_id') and not getattr(actor,'form',''):
             dis=dis or rules.equipped_item(actor,'armor').get('stealth_disadvantage',False)
         adv=active(actor,'foresight',now)
         bonus=rules.ability_modifier(actor,ability) if hasattr(actor,'class_id') else enemy_spec(actor).get('saves',{}).get(ability,0)
-        if skill in getattr(actor,'skill_proficiencies',()):bonus+=rules.proficiency(actor)
+        if hasattr(actor,'class_id') and skill in skill_rules.SKILLS:
+            bonus=skill_rules.bonus(actor,skill,ability=ability)
+        elif skill in getattr(actor,'skill_proficiencies',()):bonus+=rules.proficiency(actor)
         bonus-=getattr(actor,'exhaustion',0)*2
         # Cosmic Omen is committed before the D20, not after seeing its result.
         bonus+=self.circle_roll_adjustment(actor,'ability',ability=ability)
@@ -293,7 +456,19 @@ class EnvironmentGame:
         finally:target._environment_forced=prior
 
     async def environment_action(self,p,action,enabled=None,enemy_id=None,target_id=None):
+        if action=='unhide':self.environment_reveal(p);return
         if not p.alive or actions_blocked(p,self.now()):return
+        if action=='hide':
+            if active(p,'hidden',self.now()):return
+            reason=self.environment_hide_reason(p)
+            if reason:return await self.notice(p,reason)
+            self.cancel_rest(p);self.cancel_channel(p,'');self.stop_auto(p);self.begin_action(p)
+            result=self.environment_ability_check(p,'dexterity',15,'stealth')
+            if not result['saved']:return await self.notice(p,'Nie udało się ukryć. Możesz spróbować ponownie w następnej turze.')
+            p.buffs['hidden']=dict(until=self.now()+86400,dc=result['total'],pve=True)
+            self.environment_hide_tick(p)
+            if active(p,'hidden',self.now()):await self.notice(p,f'Ukrycie przed potworami · ST wykrycia {result["total"]}. Inni gracze nadal cię widzą.')
+            return
         if action in ('study','search'):
             if p.attack_cooldown_until>self.now():return
             if action=='study':
@@ -344,9 +519,11 @@ class EnvironmentGame:
 
     def tick_dnd(self,dt):
         for actor in (*self.players.values(),*self.enemies.values()):self.environment_bind(actor)
+        for p in self.players.values():self.environment_recover_shore(p)
         super().tick_dnd(dt)
         now=self.now()
         for p in self.players.values():
+            self.environment_hide_tick(p)
             if incapacitated(p,now):
                 self.cancel_rest(p);self.cancel_channel(p);self.break_concentration(p);self.stop_auto(p)
             if not getattr(p,'submerged',False):continue

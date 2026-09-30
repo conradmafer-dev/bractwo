@@ -18,7 +18,7 @@
    if(!Array.isArray(selection)||selection.length!==2||selection.some(a=>!feat.abilities?.includes(a)))return 'Przydziel oba punkty cech.';
    const allocation={};for(const a of selection)allocation[a]=(allocation[a]||0)+1;
    if(Object.entries(allocation).some(([a,n])=>Number(p.attributes?.[a]||0)+n>20))return 'Cecha nie może przekroczyć 20. Wybierz inny podział punktów.';
-  }else if(!['tough','savage_attacker'].includes(feat.id)&&!feat.abilities?.includes(selection))return 'Wybierz dostępną cechę poniżej 20.';
+  }else if(feat.abilities?.length&&!feat.abilities.includes(selection))return 'Wybierz dostępną cechę poniżej 20.';
   return '';
  }
  function trainingSelection(row){const selects=Array.from(row.querySelectorAll('select'));return row.dataset.abilityPoints==='2'?selects.map(s=>s.value):selects[0]?.value||'';}
@@ -236,6 +236,7 @@
  }
  function feats(parent,p,h){
   const c=p.character_sheet?.caster||{},tr=p.character_sheet?.training||{};
+  if(!['general','training'].includes(h.featSection)){
   if(p.class_id==='knight')root.BractwoFighterUI.feats(parent,p,h);
   if(p.class_id==='druid'){
    const box=node('section',undefined,'caster-orders');box.append(node('h3','Ścieżka druida'));
@@ -257,12 +258,17 @@
   if(p.rest_resources?.length){const box=node('section',undefined,'rest-resource-list');box.append(node('h3','Zasoby odnawiane odpoczynkiem'));for(const resource of p.rest_resources){const chip=node('p',`${resource.name}: ${resource.remaining}/${resource.maximum}${resource.recovery?' · '+resource.recovery:''}`);chip.dataset.restResource=resource.id;box.append(chip);}parent.append(box);}
   if(c.forms?.length){const box=node('section',undefined,'caster-forms');box.append(node('h3','Postacie zwierzęce'));
    for(const f of c.forms){const b=button('',()=>h.cast('wild_shape_'+f.id),!f.unlocked||!p.alive||(!p.form&&!hasShapeUse(p)));b.dataset.form=f.id;b.className='caster-form'+(f.unlocked?'':' locked');const art=['mammoth','elephant','giant_scorpion','polar_bear','eagle'].includes(f.id)?'assets/creatures/'+f.id+'.svg':h.state?.().world?.spells?.['wild_shape_'+f.id]?.icon||'assets/spells/wild_shape_'+(['wolf','cat','black_bear','bear'].includes(f.id)?f.id:'bear')+'.svg';b.append(image(art),node('strong',p.form?'Powrót z przemiany':f.name),node('small',f.unlocked?`KP ${f.ac} · +${f.temp_hp} tymczasowych HP`:`Poziom ${f.level}`));box.append(b);}parent.append(box);}
+  }
+  if(h.featSection==='class')return;
+  if(h.featSection!=='general'){
   const train=node('section',undefined,'training-owned');train.append(node('h3','Wyszkolenie'));
-  for(const t of tr.granted||[]){const item=node('div',undefined,'training-chip');item.append(image(t.icon),node('span',t.name));item.title=t.sources.join(' · ');train.append(item);}parent.append(train);
+  for(const t of tr.granted||[]){const item=node('div',undefined,'training-chip');item.append(image(t.icon),node('span',t.name));item.title=t.sources.join(' · ');train.append(item);}parent.append(train);}
+  if(h.featSection==='training')return;
   if(tr.chosen?.length){const row=node('section',undefined,'training-selected');row.append(node('h3','Wybrane atuty'));for(const f of tr.chosen)row.append(node('p',trainingSummary(f)));parent.append(row);}
   const available=node('section',undefined,'training-available');available.append(node('h3','Atuty'+(tr.points?' · dostępne wybory: '+tr.points:'')));
   if(!tr.points)available.append(node('small','Wybory na poziomach '+(tr.levels||[]).join(', ')+'.'));
-  const options=tr.options||[];
+  const options=(tr.options||[]).filter(f=>h.featSection!=='general'||f.id!=='ability_score_improvement');
+  if(h.featSection==='general')available.append(node('small','Atut i rozwój cech korzystają ze wspólnej puli wyborów. Cechy zwiększysz w zakładce Cechy → Rozwój.'));
   for(const f of options){const row=node('article',undefined,'training-option');row.dataset.feat=f.id;row.dataset.abilityPoints=String(f.ability_points||1);row.append(image(f.icon));const text=node('div');text.append(node('strong',f.name),node('small',f.description));row.append(text);
    const current=()=>h.state?.().player||p,key=String(p.id)+':'+f.id,saved=trainingChoices.get(key),pickers=node('div',undefined,'training-pickers');
    if(f.ability_points===2)pickers.append(node('small','Wybierz tę samą cechę dwa razy (+2) albo dwie różne (+1 i +1).'));
@@ -275,7 +281,7 @@
    }
    if(pickers.childNodes.length)text.append(pickers);
    text.append(node('small','','training-reason'));
-   row.append(button('Wybierz',()=>{const latest=current(),feat=latest.character_sheet?.training?.options?.find(option=>option.id===f.id),selection=trainingSelection(row);if(!trainingReason(latest,feat,selection))h.send({type:'training_feat',feat:f.id,...(Array.isArray(selection)?{abilities:selection}:{ability:selection})});}));available.append(row);}
+   row.append(button('Wybierz',()=>{const latest=current(),feat=latest.character_sheet?.training?.options?.find(option=>option.id===f.id),selection=trainingSelection(row);if(!trainingReason(latest,feat,selection))h.send({type:'training_feat',feat:f.id,...(Number.isInteger(latest.character_sheet.training.spent)?{expected_spent:latest.character_sheet.training.spent}:{}),...(Array.isArray(selection)?{abilities:selection}:{ability:selection})});}));available.append(row);}
   if(!options.length)available.append(node('p','Brak dostępnych atutów. Niewydane wybory pozostają zapisane.','sheet-hint'));
   parent.append(available);syncTraining(parent,p,h);
  }

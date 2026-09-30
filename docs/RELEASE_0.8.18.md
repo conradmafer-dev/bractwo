@@ -122,3 +122,8 @@ Chrome potwierdził logowanie, dostępność panelu odpoczynku w rozmiarach 734 
 Osobny test przeglądarkowy rzeczywistego DOM i CSS zaliczył 4 kontrole: środek joysticka z widocznym zadaniem, dotykowe przeciąganie po odblokowaniu, ponowne zablokowanie i reset oraz przeciąganie myszą na komputerze. Podczas tej kontroli poprawiono uchwyt zasłaniający zamknięcie menu; ponowny przebieg sprawdził końcową wersję CSS. Test działał bez serwera i nie zastępuje testu całej rozgrywki.
 
 Źródła możliwości przeglądarek: [MDN: instalowanie PWA](https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Guides/Making_PWAs_installable), [MDN: Fullscreen API](https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API), [Apple: aplikacja ze strony w Safari](https://support.apple.com/en-lamr/guide/iphone/iphea86e5236/ios).
+
+
+## UI_28 — cechy, umiejętności i wybrzeża
+
+Nowy rozwój cech, biegłości D&D i 18 wydarzeń, ukrycie PvE, poprawka kolizji oceanu oraz osobne kategorie karty postaci. [Szczegóły](UI_28_CECHY_UMIEJETNOSCI.md). Raport `qa_0.8.18/ui28/summary.json`: 270 unikalnych testów Python, 33 JS i 15 sprawdzeń przeglądarkowych. Wdrożenie serwera i klienta razem; zachować bazę.

@@ -46,11 +46,24 @@ GENERAL_FEATS = {
     'martial_weapon_training': dict(name='Szkolenie w broni żołnierskiej', grants=['martial_weapons'], requires=[], abilities=['strength','dexterity'], description='Biegłość w broni żołnierskiej. +1 Siła lub Zręczność.'),
     'tough': dict(name='Twardy', grants=[], requires=[], abilities=[], category='origin', description='Maksymalne HP zwiększone o 2 za każdy poziom D&D (poziomy Bractwa przeliczone ×5).', icon='assets/feats/tough.svg'),
     'savage_attacker': dict(name='Zacięty atak', grants=[], requires=[], abilities=[], category='origin', description='Raz na turę, po trafieniu bronią, rzucasz jej kośćmi obrażeń dwa razy i wybierasz lepszy zestaw.', icon='assets/feats/savage_attacker.svg'),
+    'skilled': dict(name='Wszechstronny', grants=[], requires=[], abilities=[], category='origin', repeatable=True, description='Wybierz biegłość w trzech kolejnych umiejętnościach. Atut można wybrać ponownie; nie zwiększa cech.', icon='assets/feats/skilled.svg'),
     'ability_score_improvement': dict(name='Rozwój cech', grants=[], requires=[], abilities=['strength','dexterity','constitution','intelligence','wisdom','charisma'], repeatable=True, ability_points=2, description='+2 do jednej cechy albo +1 do dwóch cech, maksymalnie 20.', icon='assets/feats/ability_score_improvement.svg'),
     'heavy_armor_master': dict(name='Mistrz ciężkiego pancerza', grants=[], requires=['heavy_armor'], abilities=['strength','constitution'], description='+1 Siła lub Kondycja, maksymalnie 20. W ciężkim pancerzu obrażenia obuchowe, kłute i cięte od trafiających ataków są zmniejszone o premię z biegłości.', icon='assets/feats/heavy_armor_master.svg'),
     'medium_armor_master': dict(name='Mistrz średniego pancerza', grants=[], requires=['medium_armor'], abilities=['strength','dexterity'], description='+1 Siła lub Zręczność, maksymalnie 20. Przy Zręczności co najmniej 16 średni pancerz uwzględnia do +3 do KP ze Zręczności zamiast +2.', icon='assets/feats/medium_armor_master.svg'),
 }
-FEAT_LEVELS = (15,35,55,75)  # tabletop class 4/8/12/16; existing growth retained
+FEAT_LEVELS = (15,35,55,75,90)  # D&D 2024 class 4/8/12/16/19.
+FIGHTER_FEAT_LEVELS = (15,25,35,55,65,75,90)  # Fighter also gets 6 and 14.
+FEAT_RULES_VERSION = 1
+MAX_FEAT_CHOICES = len(FIGHTER_FEAT_LEVELS)
+ORIGIN_FEATS = tuple(k for k,v in GENERAL_FEATS.items() if v.get('category')=='origin')
+
+
+def feat_levels(p):
+    return FIGHTER_FEAT_LEVELS if p.class_id=='knight' else FEAT_LEVELS
+
+
+def feat_entitlement(p):
+    return sum(p.level>=n for n in feat_levels(p))
 
 
 def _rules():
@@ -70,6 +83,7 @@ def _training(p):
     if p.class_id=='druid' and getattr(p,'primal_order','')=='warden':
         for key in ('martial_weapons','medium_armor'):result.setdefault(key,[]).append('Strażnik')
     pending=set(getattr(p,'training_feats',{}));active=set()
+    if getattr(p,'origin_feat','') in ORIGIN_FEATS:pending.add('origin_'+p.origin_feat)
     for _ in range(len(GENERAL_FEATS)):
         ready=[k for k in pending if feat_key(k) in GENERAL_FEATS and all(r in result for r in GENERAL_FEATS[feat_key(k)]['requires'])]
         if not ready:break
@@ -87,9 +101,13 @@ def feat_key(instance):
     """Repeatable choices retain string keys and values in existing save files."""
     if not isinstance(instance,str):return ''
     if instance in GENERAL_FEATS:return instance
-    prefix='ability_score_improvement_'
-    suffix=instance[len(prefix):] if instance.startswith(prefix) else ''
-    return 'ability_score_improvement' if suffix in {str(n) for n in range(2,len(FEAT_LEVELS)+1)} else ''
+    if instance.startswith('origin_') and instance[7:] in ORIGIN_FEATS:return instance[7:]
+    for key,spec in GENERAL_FEATS.items():
+        if not spec.get('repeatable'):continue
+        prefix=key+'_'
+        suffix=instance[len(prefix):] if instance.startswith(prefix) else ''
+        if suffix in {str(n) for n in range(2,MAX_FEAT_CHOICES+1)}:return key
+    return ''
 
 
 def feat_allocations(key,value):
@@ -103,8 +121,47 @@ def feat_allocations(key,value):
 
 def sanitize_feats(p):
     raw=getattr(p,'training_feats',{})
-    p.training_feats={k:v for k,v in raw.items() if feat_allocations(k,v) is not None} if isinstance(raw,dict) else {}
+    p.training_feats={k:v for k,v in raw.items() if isinstance(k,str) and not k.startswith('origin_') and feat_allocations(k,v) is not None} if isinstance(raw,dict) else {}
+    if getattr(p,'origin_feat','') not in ORIGIN_FEATS:p.origin_feat=''
     return p.training_feats
+
+
+def migrate_advancement(p):
+    """Keep earned choices and archive surplus legacy data, never grant free ASIs.
+
+    Old primary-score increases were derived from level rather than persisted.
+    Their removal is disclosed; existing manually selected feats keep their slots.
+    Archiving records a choice for the owner without leaving its bonus active.
+    """
+    version=getattr(p,'feat_rules_version',0)
+    if type(version) is int and version>=FEAT_RULES_VERSION:
+        sanitize_feats(p)
+        return False
+    raw=getattr(p,'training_feats',{})
+    raw=raw if isinstance(raw,dict) else {}
+    p.training_feats=raw
+    sanitize_feats(p)
+    previous_hp=max(1,_rules().max_hp(p))
+    fraction=max(0,min(1,getattr(p,'hp',previous_hp)/previous_hp))
+    kept={};archive={}
+    for key,value in raw.items():
+        valid=isinstance(key,str) and not key.startswith('origin_') and feat_allocations(key,value) is not None
+        if valid and len(kept)<feat_entitlement(p):kept[key]=value
+        else:
+            archive[str(key)[:100]]=dict(value=value if isinstance(value,str) else '',
+                reason='Wybór ponad limit poziomu.' if valid else 'Nieprawidłowy dawny wybór.')
+    p.training_feats=kept
+    p.feat_legacy_choices=archive
+    notes=[]
+    if p.level>=20:
+        notes.append('Usunięto dawny automatyczny wzrost głównej cechy na poziomach 20 i 40. Rozwój cech i atuty korzystają teraz ze wspólnej puli wyborów D&D; zachowano wcześniej wybrane atuty.')
+    if archive:
+        notes.append('Dawne wybory ponad limit lub nieprawidłowe zapisano poniżej bez aktywnych premii. Prawidłowy atut możesz wybrać ponownie, gdy zdobędziesz wolny wybór.')
+    p.feat_migration_notice=' '.join(notes)
+    p.feat_rules_version=FEAT_RULES_VERSION
+    if hasattr(p,'hp'):p.hp=_rules().max_hp(p)*fraction
+    p._level_up_cache=None
+    return True
 
 
 def feat_ability_bonuses(p):
@@ -182,19 +239,39 @@ def check_equip(p,item):
     return ''
 
 
-def feat_points(p):return max(0,sum(p.level>=n for n in FEAT_LEVELS)-len(getattr(p,'training_feats',{})))
+def feat_points(p):return max(0,feat_entitlement(p)-len(getattr(p,'training_feats',{})))
 
 
 def feat_eligible(p,key):
     s=GENERAL_FEATS.get(key)
-    if not s or not s.get('repeatable') and key in getattr(p,'training_feats',{}):return False
+    if not s or not s.get('repeatable') and (key in getattr(p,'training_feats',{}) or getattr(p,'origin_feat','')==key):return False
+    if key=='skilled':
+        try:from . import skill_rules
+        except ImportError:import skill_rules
+        if not skill_rules.can_add_skilled(p):return False
+    if s['abilities']:
+        scores=_rules().own_attributes(p)
+        if sum(max(0,20-scores[a]) for a in s['abilities'])<s.get('ability_points',1):return False
     known=training_sources(p)
     return (not s['grants'] or any(g not in known for g in s['grants'])) and all(r in known for r in s['requires'])
 
 
-def select_feat(p,key,ability='',abilities=None):
+def select_origin_feat(p,key):
+    """The initial Origin feat is its own one-time grant, never an ASI point."""
+    if not isinstance(key,str) or key not in ORIGIN_FEATS:return 'Wybierz atut pochodzenia.'
+    if getattr(p,'origin_feat',''):return 'Atut pochodzenia został już wybrany.'
+    if not GENERAL_FEATS[key].get('repeatable') and key in getattr(p,'training_feats',{}):return 'Masz już ten atut. Wybierz inny atut pochodzenia.'
+    if key=='skilled' and not feat_eligible(p,key):return 'Za mało nowych umiejętności na trzy biegłości tego atutu.'
+    if getattr(p,'form',''):return 'Zakończ przemianę przed wyborem atutu.'
+    p.origin_feat=key
+    return ''
+
+
+def select_feat(p,key,ability='',abilities=None,expected_spent=None):
     """Validate the whole allocation before spending a point; return error or ''."""
     if not isinstance(key,str) or key not in GENERAL_FEATS:return 'Nieznany atut.'
+    if expected_spent is not None and (type(expected_spent) is not int or expected_spent!=len(getattr(p,'training_feats',{}))):
+        return 'Ten wybór został już rozliczony. Sprawdź aktualną pulę rozwoju.'
     if feat_points(p)<1 or not feat_eligible(p,key):return 'Ten atut jest już posiadany, zbędny albo niedostępny.'
     if getattr(p,'form',''):return 'Zakończ przemianę przed wyborem atutu.'
     spec=GENERAL_FEATS[key]
@@ -202,18 +279,23 @@ def select_feat(p,key,ability='',abilities=None):
         if not isinstance(abilities,(list,tuple)) or not all(isinstance(a,str) for a in abilities):return 'Wybierz właściwe cechy.'
         ability='+'.join(abilities)
     # A single ASI ability is a convenient request for +2 to that ability.
-    if spec.get('ability_points')==2 and isinstance(ability,str) and ability in spec['abilities']:ability=ability+'+'+ability
+    if abilities is None and spec.get('ability_points')==2 and isinstance(ability,str) and ability in spec['abilities']:ability=ability+'+'+ability
     allocation=feat_allocations(key,ability)
     if allocation is None:return 'Wybierz właściwe cechy dla tego atutu.'
-    scores=_rules().attributes(p)
+    scores=_rules().own_attributes(p)
     if any(scores[a]+n>20 for a,n in allocation.items()):return 'Atut nie może zwiększyć cechy powyżej 20.'
     instance=key
     if spec.get('repeatable'):
-        for n in range(1,len(FEAT_LEVELS)+1):
+        for n in range(1,MAX_FEAT_CHOICES+1):
             instance=key if n==1 else key+'_'+str(n)
             if instance not in p.training_feats:break
         else:return 'Nie masz wolnego wyboru tego atutu.'
     p.training_feats[instance]=ability
+    # Archive is a history ledger, not a second pool of usable points.
+    for old_key,old in list(getattr(p,'feat_legacy_choices',{}).items()):
+        if feat_key(old_key)==key and isinstance(old,dict) and old.get('value')==ability:
+            del p.feat_legacy_choices[old_key]
+            break
     return ''
 
 
@@ -222,14 +304,25 @@ def granted_rows(p):
 
 
 def training_sheet(p):
-    scores=_rules().attributes(p)
+    scores=_rules().own_attributes(p)
     def row(key,value=None):
         base=feat_key(key);spec=GENERAL_FEATS[base]
         data=dict(spec,id=key,feat_id=base,icon=spec.get('icon') or f"assets/feats/{spec['grants'][0]}.svg",min_level=15)
         data['abilities']=[a for a in spec['abilities'] if scores[a]<20]
         if value is not None:data.update(ability=value,allocation=feat_allocations(key,value) or {},active=key in active_feats(p))
         return data
-    return dict(granted=granted_rows(p),points=feat_points(p),levels=list(FEAT_LEVELS),
+    archived=[dict(id=k,name=GENERAL_FEATS.get(feat_key(k),{}).get('name',k),reason=v.get('reason','Dawny wybór.'))
+              for k,v in getattr(p,'feat_legacy_choices',{}).items() if isinstance(v,dict)]
+    origin=getattr(p,'origin_feat','')
+    origin_chosen=row('origin_'+origin,'') if origin in ORIGIN_FEATS else None
+    if origin_chosen:origin_chosen['min_level']=1
+    origin_options=[] if origin_chosen else [row(k) for k in ORIGIN_FEATS if feat_eligible(p,k)]
+    for option in origin_options:option['min_level']=1
+    return dict(granted=granted_rows(p),points=feat_points(p),levels=list(feat_levels(p)),
+        dnd_levels=[1+n//5 for n in feat_levels(p)],earned=feat_entitlement(p),spent=len(getattr(p,'training_feats',{})),score_cap=20,
+        migration_notice=getattr(p,'feat_migration_notice',''),archived=archived,
+        origin=dict(chosen=origin_chosen,options=origin_options,points=0 if origin_chosen else 1),
+        advancement_note='Rozwój cech (+2 albo +1/+1) i atut zużywają ten sam wybór. Na poziomie 90 można wybrać atut z dostępnego katalogu; epickie dary nie są jeszcze dostępne.',
         chosen=[row(k,v) for k,v in getattr(p,'training_feats',{}).items() if feat_key(k)],
         options=[row(k) for k in GENERAL_FEATS if feat_eligible(p,k)],
         armor_penalty=armor_penalty(p),weapon_proficient=proficient(p),
@@ -322,6 +415,8 @@ def public_item(p,item):
 
 def _preview_signature(p):
     return (p.class_id,p.level,getattr(p,'promoted',False),getattr(p,'wizard_school',''),getattr(p,'primal_order',''),tuple(sorted(getattr(p,'training_feats',{}).items())),
+        getattr(p,'origin_feat',''),
+        tuple(sorted(_rules().base_attributes(p).items())),
         getattr(p,'weapon_grip','one'),getattr(p,'fighting_style',''),p.form,
         tuple(sorted(p.mastery.items())),tuple(sorted(p.equipment.items())),tuple(v.get('uid','') for v in getattr(p,'magic_attunements',[]) if isinstance(v,dict)),
         tuple((i.get('uid'),i.get('template')) for i in p.inventory if i.get('uid') in p.equipment.values()),

@@ -297,8 +297,12 @@ class OceanWaterMap:
 
     def is_ocean(self,x,y):return self.geography.land(x,y) is None
 
+    def ocean_blocked(self,x,y,radius=18):
+        """The coast remains a travel boundary even for swimmers and flyers."""
+        return self.geography.land(x,y,max(0,radius)) is None
+
     def blocked(self,x,y,radius=18):
-        return self.geography.land(x,y,max(0,radius)) is None or self.rivers.blocked(x,y,radius)
+        return self.ocean_blocked(x,y,radius) or self.rivers.blocked(x,y,radius)
 
 
 class ContinentSurfaceMap(SurfaceMap):

@@ -25,8 +25,8 @@
       card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.stopPropagation();}});
       layer.append(card);cards.set(event.id,card);return card;
     }
-    function actionButton(a){const b=button(a.label||'Wybierz',()=>h.open(a.tab==='feats'?'feats':'stats'),'level-up-action');b.dataset.kind=a.kind;b.dataset.original=a.label||'Wybierz';return b;}
-    function actions(){for(const card of cards.values())for(const b of card.querySelectorAll('[data-kind]')){const assigned=(b.dataset.kind==='mastery'&&!(player?.mastery_points>0))||(b.dataset.kind==='training_feat'&&!(player?.character_sheet?.training?.points>0));b.disabled=assigned;b.textContent=assigned?'Przydzielono':b.dataset.original;}}
+    function actionButton(a){const b=button(a.label||'Wybierz',()=>h.open(['abilities','feats','skills','stats'].includes(a.tab)?a.tab:'stats',a.section||(a.kind==='skill_expertise'?'training':a.kind==='mastery'?'mastery':undefined)),'level-up-action');b.dataset.kind=a.kind;b.dataset.original=a.label||'Wybierz';return b;}
+    function actions(){for(const card of cards.values())for(const b of card.querySelectorAll('[data-kind]')){const assigned=(b.dataset.kind==='mastery'&&!(player?.mastery_points>0))||(b.dataset.kind==='training_feat'&&!(player?.character_sheet?.training?.points>0))||(b.dataset.kind==='skill_expertise'&&!(player?.character_sheet?.skills?.choices?.find(pool=>pool.source==='expertise')?.remaining>0));b.disabled=assigned;b.textContent=assigned?'Przydzielono':b.dataset.original;}}
     function layout(toNewest=false){
       panel.hidden=cards.size===0;if(panel.hidden)return;
       const narrow=innerWidth<560,height=viewport.clientHeight,width=viewport.clientWidth;

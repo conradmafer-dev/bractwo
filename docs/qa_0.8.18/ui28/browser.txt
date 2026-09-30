@@ -1,0 +1,18 @@
+PASS Point-buy dropdowns enforce 27 points; valid permanent build saves and updates real attributes
+PASS Initial Origin feat is chosen through the real control and saved separately from ASI
+PASS All 18 skills render; fighter selects 2 class and 2 background proficiencies with computed bonuses
+PASS At Bractwo 15 the level 4 D&D choice increases Strength +2 and consumes one shared feat choice
+PASS Fighter extra level 25 choice supports split +1/+1 and respects the 20 cap
+PASS Six main tabs separate Abilities and Feats; seven Stats categories render only the selected information
+PASS Feats Class retains fighter style and martial choices; general Feats does not duplicate ASI controls
+PASS World E interaction resolves a real seeded D20 check and awards gold once; duplicate request gives no second reward
+PASS Unlocked route remains usable in reverse through the Skills panel without another reward
+PASS Existing character receives an unspent development reminder after login; its button opens ability growth
+PASS Spending the available development choice removes the reminder
+PASS Mobile Skills panel exposes Hide with explicit PvE-only visibility explanation
+PASS Build,origin,proficiencies,ASI and challenge claims survive reconnect; skills and stats fit 390px
+PASS Wizard Scholar expertise unlocks at Bractwo 5, doubles proficiency, and choices fit 320px
+PASS No browser JavaScript errors or missing local assets
+Exit code: 0
+JavaScript errors: 0
+Missing local assets: 0
