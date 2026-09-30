@@ -1,0 +1,15 @@
+{
+  "ui_revision": "UI_22",
+  "sha256": {
+    "server/server.py": "69fdcfe91119986ea59996d66665af304841b8f5f3f64df6f14da199d6db31d2",
+    "server/google_auth.py": "2465ba158a961eb6d9f89838cb3fa3a4bfaba2180fb7ced2a481c0ebffdfae26",
+    "server/google_accounts.py": "2c8f92b935839421129f03f562a12e8d1e63605e38957900bf7c0b07392c20b4",
+    "web/game.js": "f73147acceb3261447d3481d9a5aa947f91217bbf92926cd03673dc2e452cedc",
+    "web/google_auth.js": "054dcef9a9a026649493545fc354351648e50ebb8f5a46b8528a6a7463e96758",
+    "web/google_auth.css": "5605529184c56766ae74aa318f570fc31d62629fadf8bbda54f02ac3e1ebc69a",
+    "web/index.html": "7a697df264ba352383f9395813bbdc014981459df53ca89a1b59fc0dd1d4d028",
+    "web/sw.js": "af786a9f7f3657056fe8577022179e9c592e634013ec83c4707a766e42b0a1d3",
+    "requirements.txt": "e061577c012bf983c530d64addcfd129c686c9c7d5e63129799dc145f19612ef",
+    "server/requirements.txt": "e061577c012bf983c530d64addcfd129c686c9c7d5e63129799dc145f19612ef"
+  }
+}

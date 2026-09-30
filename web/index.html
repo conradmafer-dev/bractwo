@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="app_shell.css">
   <link rel="stylesheet" href="hotbar_ui.css">
   <link rel="stylesheet" href="adventure_ui.css">
+  <link rel="stylesheet" href="google_auth.css">
 </head>
 <body>
   <canvas id="world" aria-label="Otwarty świat Bractwa — Pogranicze"></canvas>
@@ -37,26 +38,42 @@
       <div class="eyebrow">ŚCIEŻKI POGRANICZA</div>
       <h2>Twoja droga przez Pogranicze.</h2>
       <p class="muted">Rozwijaj postać bez limitu poziomów.<br>Postęp i wyposażenie są zapisywane.</p>
-      <div class="tabs" role="tablist" aria-label="Rodzaj konta">
-        <button id="loginTab" class="active" type="button" role="tab" aria-selected="true">Mam postać</button>
-        <button id="registerTab" type="button" role="tab" aria-selected="false">Nowa postać</button>
-      </div>
-      <form id="authForm">
-        <label for="nameInput">Imię postaci</label>
-        <input id="nameInput" name="username" autocomplete="username" minlength="3" maxlength="20" required placeholder="Twoje imię">
-        <label for="passwordInput">Hasło</label>
-        <input id="passwordInput" name="password" type="password" autocomplete="current-password" minlength="8" maxlength="128" required placeholder="Co najmniej 8 znaków">
-        <fieldset id="classPicker" class="class-picker" hidden><legend>Wybierz klasę — wybór jest stały</legend>
-          <button type="button" data-class="knight" class="class-option selected" aria-pressed="true"><span>⚔</span><strong>Rycerz</strong><small>Miecz · dodatkowe ataki</small></button>
-          <button type="button" data-class="ranger" class="class-option" aria-pressed="false"><span>➶</span><strong>Łowca</strong><small>Łuk · wilczy towarzysz</small></button>
-          <button type="button" data-class="mage" class="class-option" aria-pressed="false"><span>✧</span><strong>Czarodziej</strong><small>Sztuczki · I krąg od 1.</small></button>
-          <button type="button" data-class="druid" class="class-option" aria-pressed="false"><span>❋</span><strong>Druid</strong><small>Walka wręcz · I krąg od 1.</small></button>
-        </fieldset>
-        <details class="server-settings"><summary>Adres serwera</summary><label class="sr-only" for="serverInput">WebSocket serwera</label><input id="serverInput" type="url" spellcheck="false" placeholder="ws://127.0.0.1:8080/ws"><p>Lokalnie: WS. W internecie: szyfrowane WSS.</p></details>
+      <section id="googleSignIn" class="google-sign-in" aria-label="Logowanie przez Google">
+        <div id="googleButton" class="google-button"></div>
+        <p id="googleStatus" class="google-status" role="status" aria-live="polite">Przygotowywanie logowania Google…</p>
+        <button id="googleRetry" class="google-secondary" type="button" hidden>Spróbuj ponownie</button>
+        <section id="googleAccount" hidden aria-label="Twoje postacie">
+          <div class="google-roster-heading"><h3>Twoje postacie</h3><span id="googleCharacterCount">0 / 4</span></div>
+          <div id="googleCharacters" class="google-characters"></div>
+          <p id="googleAccountHint" class="google-help"></p>
+          <div id="googleCharacterActions" class="google-character-actions">
+            <button id="googleNewCharacter" class="google-secondary" type="button">Stwórz nową postać</button>
+            <button id="googleClaimCharacter" class="google-secondary" type="button">Dodaj dotychczasową postać</button>
+          </div>
+          <form id="googleProfile" hidden>
+            <h3 id="googleProfileTitle">Nowa postać</h3>
+            <label for="googleName">Imię postaci</label>
+            <input id="googleName" name="google-character" autocomplete="off" minlength="3" maxlength="20" required placeholder="Imię twojej postaci">
+            <div id="googlePasswordRow" hidden>
+              <label for="googlePassword">Dotychczasowe hasło do tej postaci</label>
+              <input id="googlePassword" name="google-claim-password" type="password" autocomplete="current-password" minlength="8" maxlength="128">
+              <p class="google-help">Potwierdź, że to twoja postać. Jej postęp i wyposażenie zostaną zachowane. Od teraz wejdziesz do niej przez Google.</p>
+            </div>
+            <fieldset id="googleClassPicker" class="class-picker"><legend>Wybierz klasę — wybór jest stały</legend>
+              <button type="button" data-class="knight" class="class-option selected" aria-pressed="true"><span>⚔</span><strong>Rycerz</strong><small>Miecz · dodatkowe ataki</small></button>
+              <button type="button" data-class="ranger" class="class-option" aria-pressed="false"><span>➶</span><strong>Łowca</strong><small>Łuk · wilczy towarzysz</small></button>
+              <button type="button" data-class="mage" class="class-option" aria-pressed="false"><span>✧</span><strong>Czarodziej</strong><small>Sztuczki · I krąg od 1.</small></button>
+              <button type="button" data-class="druid" class="class-option" aria-pressed="false"><span>❋</span><strong>Druid</strong><small>Walka wręcz · I krąg od 1.</small></button>
+            </fieldset>
+            <button id="googleContinue" class="primary" type="submit">Stwórz postać i wyrusz <span>↗</span></button>
+            <button id="googleProfileBack" class="google-secondary" type="button">Wróć do wyboru postaci</button>
+          </form>
+          <button id="googleCancel" class="google-secondary" type="button">Zmień konto Google</button>
+        </section>
         <p id="authError" class="auth-error" role="alert"></p>
-        <button id="connectButton" class="primary" type="submit">Wejdź do doliny <span>↗</span></button>
-      </form>
-      <div class="auth-foot"><span class="status-dot"></span> MAGIA I ŻYWIOŁY 0.8.18 · UI_21 · KOMPUTER I TELEFON</div>
+        <p id="googleIntro" class="google-help">Zaloguj się przez Google. Do jednego konta możesz przypisać maksymalnie 4 postacie.</p>
+      </section>
+      <div class="auth-foot"><span class="status-dot"></span> BRACTWO 0.8.18 · UI_22 · KOMPUTER I TELEFON</div>
     </section>
   </main>
 
@@ -144,6 +161,7 @@
   <script src="app_shell.js"></script>
   <script src="hotbar_ui.js"></script>
   <script src="adventure_ui.js"></script>
+  <script src="google_auth.js"></script>
   <script src="game.js"></script>
 </body>
 </html>

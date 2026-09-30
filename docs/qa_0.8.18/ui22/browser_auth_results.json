@@ -1,0 +1,65 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Desktop requires Google and hides the old password-only login"
+    },
+    {
+      "name": "Legacy password-only WebSocket entry is blocked even with the correct password"
+    },
+    {
+      "name": "Empty verified Google account creates its first character and enters through production WS"
+    },
+    {
+      "name": "Google email, profile name and subject are absent from public game packets and ranking"
+    },
+    {
+      "name": "In-game logout closes the play session and obtains a fresh Google nonce"
+    },
+    {
+      "name": "Returning Google account selects and loads its saved character on a 430px touch viewport"
+    },
+    {
+      "name": "Four saved characters fill the mobile roster; both UI and direct WS reject fifth creation and legacy claim",
+      "characters": 4,
+      "mobileWidth": 430,
+      "scrollWidth": 430
+    },
+    {
+      "name": "A different verified Google account cannot select someone else’s character"
+    },
+    {
+      "name": "Claiming a legacy character requires its password after Google verification and preserves level/progress"
+    },
+    {
+      "name": "Claimed legacy character appears in the same Google account’s next login roster"
+    },
+    {
+      "name": "Expired server ticket produces google_retry, clears the roster and recovers through a fresh Google login"
+    },
+    {
+      "name": "Changing Google account clears the roster and password fields and requests a fresh challenge"
+    },
+    {
+      "name": "A stale SDK callback after account change is ignored without a verification request"
+    },
+    {
+      "name": "Cancelled Google popup and empty callback keep login usable; retry succeeds"
+    },
+    {
+      "name": "Rejected Google credential shows a readable mobile error and a successful fresh retry"
+    },
+    {
+      "name": "Missing Google configuration fails closed with an explicit mobile message and no password fallback"
+    },
+    {
+      "name": "Blocked Google SDK shows a readable mobile error and reloads successfully after retry"
+    }
+  ],
+  "errors": [],
+  "limits": [
+    "Real production HTTP/WS app on loopback with isolated in-memory SQLite. Only Google SDK and signature verifier are replaced in explicit QA tooling.",
+    "Actual Google account consent, Google signature verification over the network and production OAuth Client ID are not verified here.",
+    "Headless Chromium 430px touch and 1440px desktop simulation, not a physical Android device."
+  ]
+}

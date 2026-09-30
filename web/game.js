@@ -13,14 +13,14 @@
   };
   let world = { width:3200,height:2304,spawn:{x:560,y:1180},obstacles:[],zones:[],river:{x:1500,y:0,w:180,h:2304,bridge_y:1080,bridge_h:150},merchant:{x:680,y:1180,name:"Kupiec"},safe_zone:{x:560,y:1180,radius:260},classes:{},pvp_rules:{min_level:8} };
   let snapshot = { players: [], enemies: [], world: {}, time: 0 };
-  let myId = null, me = null, socket = null, playing = false, createAccount = false, connecting = false;
+  let myId = null, me = null, socket = null, playing = false, connecting = false;
   let connectionSerial = 0, loginTimer = null, lastSnapshotAt = 0, ground = null;
   let viewport = { w: innerWidth, h: innerHeight, dpr: 1 }, camera = { x: 660, y: 1080, scale: 1 };
   let visuals = new Map(), particles = [], lastFrame = performance.now(), nextAttackAt = 0;
   const heldKeys = new Set();
   const joystick = { x: 0, y: 0, pointer: null };
   let attackPointer = null, attackHeld = false, blurPaused = false;
-  let nearby = null, selectedClass = "knight", selectedTarget = null, selectedWorldPoint = null, pendingInvite = null;
+  let nearby = null, selectedTarget = null, selectedWorldPoint = null, pendingInvite = null;
   let inventorySignature = "", playersSignature = "", legacyPrompted = false, lastTargetWarning = 0;
   let panelMode = "inventory", questSignature = "", activeGoal = null, trackedQuestId = null;
   let groundChunks=new Map(), expansionTab='growth', expansionSignature='', selectedRune='fire', atlasMode='nearby', navigationGoal=null;
@@ -41,50 +41,13 @@
   function readRemembered(key) { try { return localStorage.getItem(key) || ""; } catch (_) { return ""; } }
   function remember(key, value) { try { localStorage.setItem(key, value); } catch (_) { /* private browsing */ } }
   const defaultServer = location.protocol === "file:" ? "ws://127.0.0.1:8080/ws" : `${location.protocol === "https:" ? "wss:" : "ws:"}//${location.host}/ws`;
-  ui.nameInput.value = readRemembered("bractwo.username");
-  // A saved address is useful for the standalone file; a served client follows its own server.
-  ui.serverInput.value = location.protocol === "file:" ? readRemembered("bractwo.server") || defaultServer : defaultServer;
-
-  function setMode(create) {
-    createAccount = create; ui.classPicker.hidden = !create;
-    ui.loginTab.classList.toggle("active", !create); ui.registerTab.classList.toggle("active", create);
-    ui.loginTab.setAttribute("aria-selected", String(!create)); ui.registerTab.setAttribute("aria-selected", String(create));
-    ui.passwordInput.autocomplete = create ? "new-password" : "current-password";
-    ui.connectButton.replaceChildren(document.createTextNode(create ? "Stwórz postać i wyrusz" : "Wejdź do doliny"));
-    const arrow = document.createElement("span"); arrow.textContent = "↗"; ui.connectButton.append(arrow);
-    ui.authError.textContent = "";
-  }
-  ui.loginTab.addEventListener("click", () => setMode(false));
-  ui.registerTab.addEventListener("click", () => setMode(true));
-  for (const button of document.querySelectorAll("#classPicker [data-class]")) button.addEventListener("click", () => {
-    selectedClass = button.dataset.class;
-    for (const option of ui.classPicker.querySelectorAll("[data-class]")) {
-      option.classList.toggle("selected", option.dataset.class === selectedClass);
-      option.setAttribute("aria-pressed", String(option.dataset.class === selectedClass));
-    }
-  });
-  for (const original of ui.classPicker.querySelectorAll("[data-class]")) {
+  let googleAuth = null;
+  for (const original of ui.googleClassPicker.querySelectorAll("[data-class]")) {
     const button = original.cloneNode(true); button.classList.remove("selected"); button.removeAttribute("aria-pressed");
     button.addEventListener("click", () => { resetControls(); send({type:"choose_class",class_id:button.dataset.class}); });
     ui.legacyChoices.append(button);
   }
-  if (!ui.nameInput.value) setMode(true);
-
-  function validateServer(raw) {
-    let url;
-    try { url = new URL(raw.trim()); } catch (_) { throw new Error("Wpisz pełny adres serwera, np. ws://127.0.0.1:8080/ws."); }
-    if (!["ws:", "wss:"].includes(url.protocol)) throw new Error("Adres musi zaczynać się od ws:// lub wss://.");
-    const host = url.hostname.toLowerCase();
-    const octets = host.split(".").map(Number);
-    const ipv4 = /^\d{1,3}(\.\d{1,3}){3}$/.test(host) && octets.every((value) => value >= 0 && value <= 255);
-    const privateIPv4 = ipv4 && (octets[0] === 127 || octets[0] === 10 || (octets[0] === 192 && octets[1] === 168) || (octets[0] === 172 && octets[1] >= 16 && octets[1] <= 31) || (octets[0] === 169 && octets[1] === 254));
-    const local = host === "localhost" || host.endsWith(".localhost") || host === "[::1]" || host.endsWith(".local") || privateIPv4 || /^\[f[cd][0-9a-f]{2}:/.test(host);
-    if (url.protocol !== "wss:" && !local) throw new Error("Połączenie z serwerem w internecie wymaga wss://, aby chronić hasło.");
-    if (location.protocol === "https:" && url.protocol !== "wss:") throw new Error("Ta strona działa przez HTTPS. Użyj adresu wss://.");
-    if (url.username || url.password || url.hash) throw new Error("Adres serwera nie może zawierać danych logowania ani fragmentu #.");
-    return url.href;
-  }
-  function busy(value) { connecting = value; ui.connectButton.disabled = value; ui.loginTab.disabled = value; ui.registerTab.disabled = value; }
+  function busy(value) { connecting = value; googleAuth?.setBusy(value); }
   function send(packet) { if (socket && socket.readyState === WebSocket.OPEN) {
       if (selectedEnemy && ['ability','rune_use'].includes(packet.type)) packet = {...packet, enemy_id:selectedEnemy};
       socket.send(JSON.stringify(packet));
@@ -96,23 +59,26 @@
     while (ui.noticeFeed.children.length > (viewport.h < 500 ? 1 : viewport.w < 560 ? 2 : 3)) ui.noticeFeed.firstChild.remove();
     setTimeout(() => { item.classList.add("fade"); setTimeout(() => item.remove(), 1300); }, type === "chat" ? 12000 : 7500);
   }
-  ui.authForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (connecting) return;
-    let address;
-    try { address = validateServer(ui.serverInput.value); } catch (error) { ui.authError.textContent = error.message; return; }
-    const name = ui.nameInput.value.trim(), password = ui.passwordInput.value;
-    if (!name || password.length < 8) { ui.authError.textContent = "Podaj imię i hasło mające co najmniej 8 znaków."; return; }
+  function startConnection(hello) {
+    if (connecting || playing) return;
+    if (hello?.type !== 'hello_google' || !globalThis.BractwoGoogleAuth?.sameOriginServer(defaultServer, location)) {
+      ui.authError.textContent = "Otwórz grę pod adresem jej serwera i zaloguj się przez Google."; return;
+    }
+    const address = defaultServer;
     const serial = ++connectionSerial;
     if (socket) socket.close();
-    resetControls(); busy(true); ui.authError.textContent = "Łączenie z doliną…";
-    remember("bractwo.username", name); remember("bractwo.server", address);
-    try { socket = new WebSocket(address); } catch (_) { busy(false); ui.authError.textContent = "Nie udało się rozpocząć połączenia. Sprawdź adres serwera."; return; }
-    const activeSocket = socket;
+    resetControls(); busy(true); ui.authError.textContent = "";
+    try { socket = new WebSocket(address); } catch (_) {
+      busy(false); ui.authError.textContent = "Nie udało się rozpocząć połączenia z grą.";
+      googleAuth?.connectionError(ui.authError.textContent, 'google_retry'); return;
+    }
+    const activeSocket = socket; let authFailed = false;
     activeSocket.addEventListener("open", () => {
       if (serial !== connectionSerial) return;
-      send({ type: "hello", name, password, create: createAccount, class_id:selectedClass, compact_state:true });
-      ui.authError.textContent = createAccount ? "Tworzenie postaci…" : "Wczytywanie postaci…";
+      send(hello);
+      // Clear credentials from the socket listener closure immediately after transmission.
+      if (hello.password) hello.password = ''; hello.ticket = '';
+      ui.authError.textContent = "";
     });
     activeSocket.addEventListener("message", (event) => {
       if (serial !== connectionSerial) return;
@@ -132,7 +98,7 @@
         updateRules();
         snapshot = { players: [], enemies: [], world: {}, time: 0 }; visuals.clear(); particles = []; effects.clear(); seenEffects.clear(); floatingTexts = []; me = null;
         camera.x = world.spawn?.x || 560; camera.y = world.spawn?.y || 1180;
-        buildStaticIndex(); buildGround(); fpsMeter.reset(); ui.passwordInput.value = ""; ui.authError.textContent = "";
+        buildStaticIndex(); buildGround(); fpsMeter.reset(); googleAuth?.success(); ui.authError.textContent = "";
         ui.authScreen.hidden = true; ui.gameUI.hidden = false; ui.disconnectPanel.hidden = true; ui.deathPanel.hidden = true;
         ui.noticeFeed.replaceChildren(); ui.connectionStatus.innerHTML = "<i></i> ONLINE";
         lastSnapshotAt = performance.now();
@@ -144,7 +110,11 @@
         receiveState(packet);
       } else if (packet.type === "error") {
         if (playing) notice(packet.text || "Nie można teraz wykonać tej czynności.", "error");
-        else { clearTimeout(loginTimer); ui.authError.textContent = packet.text || "Logowanie nie powiodło się."; busy(false); activeSocket.close(); }
+        else {
+          clearTimeout(loginTimer); authFailed = true; busy(false);
+          ui.authError.textContent = packet.text || "Logowanie nie powiodło się.";
+          googleAuth?.connectionError(ui.authError.textContent, packet.code); activeSocket.close();
+        }
       } else if (packet.type === "party_invite") {
         pendingInvite = packet; ui.inviteText.textContent = `${packet.name || "Gracz"} zaprasza cię do drużyny.`;
         ui.partyInvite.hidden = false;
@@ -156,25 +126,35 @@
       }
     });
     activeSocket.addEventListener("error", () => {
-      if (serial === connectionSerial && !playing) ui.authError.textContent = "Brak połączenia. Sprawdź, czy serwer działa i czy adres jest poprawny.";
+      if (serial === connectionSerial && !playing) {
+        ui.authError.textContent = "Brak połączenia. Sprawdź, czy serwer gry działa.";
+      }
     });
     activeSocket.addEventListener("close", () => {
       if (serial !== connectionSerial) return;
       clearTimeout(loginTimer); busy(false); resetControls(); restUI?.close();
       if (playing) { playing = false; ui.disconnectPanel.hidden = false; ui.connectionStatus.textContent = "ROZŁĄCZONO"; }
-      else if (!ui.authError.textContent || ui.authError.textContent.includes("…")) ui.authError.textContent = "Połączenie zostało zamknięte. Spróbuj ponownie.";
+      else if (!authFailed) {
+        if (!ui.authError.textContent || ui.authError.textContent.includes("…")) ui.authError.textContent = "Połączenie zostało zamknięte. Spróbuj ponownie.";
+        googleAuth?.connectionError(ui.authError.textContent, 'google_retry');
+      }
+      if (hello.password) hello.password = ''; hello.ticket = '';
     });
     clearTimeout(loginTimer);
     loginTimer = setTimeout(() => {
-      if (serial === connectionSerial && !playing) { ui.authError.textContent = "Serwer nie odpowiedział. Sprawdź adres i spróbuj ponownie."; busy(false); activeSocket.close(); }
+      if (serial === connectionSerial && !playing) { ui.authError.textContent = "Serwer nie odpowiedział. Spróbuj ponownie."; busy(false); activeSocket.close(); }
     }, 12000);
+  }
+  googleAuth = globalThis.BractwoGoogleAuth?.mount({
+    server:defaultServer, canStart:() => !playing && !connecting, connect:startConnection
   });
+  if (!googleAuth) ui.authError.textContent = "Nie udało się uruchomić logowania Google. Odśwież stronę.";
 
   function backToLogin() {
     resetControls(); restUI?.close(); ++connectionSerial; clearTimeout(loginTimer);
     if (socket) socket.close(); socket = null; playing = false; busy(false); me = null;
-    ui.authScreen.hidden = false; ui.gameUI.hidden = true; ui.passwordInput.value = ""; ui.authError.textContent = "";
-    setMode(false); ui.passwordInput.focus();
+    ui.authScreen.hidden = false; ui.gameUI.hidden = true; ui.authError.textContent = "";
+    googleAuth?.logout();
   }
   $("logoutButton").addEventListener("click", backToLogin);
   $("reconnectButton").addEventListener("click", backToLogin);
@@ -1730,7 +1710,7 @@
   function refreshRanking(){
     if(playing)return;const serial=++rankingRequest;
     try{
-      const address=validateServer(ui.serverInput.value);if(rankingSocket)rankingSocket.close();
+      const address=defaultServer;if(rankingSocket)rankingSocket.close();
       const ws=rankingSocket=new WebSocket(address);ui.rankingList.textContent='Wczytywanie rankingu…';
       const timeout=setTimeout(()=>{ws.close();if(serial===rankingRequest&&ui.rankingList.textContent==='Wczytywanie rankingu…')ui.rankingList.textContent='Ranking niedostępny — sprawdź serwer.';},8000);
       ws.addEventListener('open',()=>ws.send(JSON.stringify({type:'ranking'})));
@@ -1740,9 +1720,8 @@
         if(!ui.rankingList.children.length)ui.rankingList.textContent='Świat czeka na pierwszego bohatera.';ws.close();
       });
       ws.addEventListener('error',()=>{if(serial===rankingRequest)ui.rankingList.textContent='Ranking niedostępny — sprawdź serwer.';});
-    }catch(_){ui.rankingList.textContent='Podaj adres serwera, by zobaczyć ranking.';}
+    }catch(_){ui.rankingList.textContent='Ranking niedostępny — sprawdź połączenie.';}
   }
-  ui.serverInput.addEventListener('change',refreshRanking);
   setTimeout(refreshRanking,150);setInterval(refreshRanking,30000);
 
   requestAnimationFrame(frame);

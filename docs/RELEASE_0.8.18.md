@@ -96,6 +96,10 @@ Przy braku połączenia aplikacja pokazuje osobną stronę z możliwością pono
 
 ## Aktualizacja na Railway / GitHub
 
+**UI_22:** przed wdrożeniem skonfiguruj obowiązkowe logowanie Google zgodnie
+z [instrukcją kont Google](UI_22_GOOGLE_ACCOUNTS.md). Stare logowanie hasłem
+jest wyłączone; jedna tożsamość Google ma maksymalnie cztery postacie.
+
 1. Rozpakuj paczkę **RAILWAY_GITHUB_READY**. `Dockerfile`, `run.py`, `server` i `web` muszą znajdować się bezpośrednio w głównym katalogu repozytorium.
 2. Podmień pliki projektu, zachowując katalog `.git` oraz dotychczasowy wolumen i bazę graczy. Do repozytorium trafiają rozpakowane pliki, nie sam ZIP.
 3. Zatwierdź i wyślij zmiany z GitHub Desktop. Jeśli Railway śledzi tę gałąź, wdroży nową wersję zgodnie z konfiguracją projektu.

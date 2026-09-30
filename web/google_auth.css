@@ -1,0 +1,24 @@
+.google-sign-in{margin:18px 0 0;min-width:0}
+.google-button{display:flex;justify-content:center;min-height:44px;max-width:100%;overflow:hidden}
+.google-button:empty{min-height:0}
+.google-button[inert]{opacity:.6;pointer-events:none}
+.google-status,.google-help{font:11px/1.5 system-ui,sans-serif;color:#c0ceb9;margin:9px 0;overflow-wrap:anywhere}
+.google-status:empty{display:none}
+.google-status.error{color:#ffba9a}
+.google-secondary{display:block;margin:10px auto 0;padding:8px 5px;border:0;background:transparent;text-decoration:underline;text-underline-offset:3px;color:#d5c492;font:12px/1.4 system-ui,sans-serif}
+.google-roster-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.google-roster-heading h3,#googleProfile h3{font:normal 21px/1.2 Georgia,serif;margin:12px 0 8px}
+#googleCharacterCount{font:12px system-ui,sans-serif;color:#d5c492;white-space:nowrap}
+.google-characters{display:grid;gap:8px;margin:9px 0}
+.google-character{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:5px 8px;text-align:left;padding:12px;background:#102920;border:1px solid #b6cfa450;border-radius:6px;min-height:64px}
+.google-character:hover,.google-character:focus-visible{border-color:#d3b56b;background:#33452e}
+.google-character strong{font:600 14px system-ui,sans-serif;overflow-wrap:anywhere}
+.google-character span{font:11px system-ui,sans-serif;color:#bccbb6}
+.google-character b{grid-column:2;grid-row:1/3;align-self:center;font:600 12px system-ui,sans-serif;color:#e6cc8b;white-space:nowrap}
+.google-character-actions{display:flex;flex-wrap:wrap;gap:4px 12px}
+.google-character-actions .google-secondary{margin:0;padding:8px 0;text-align:left}
+#googleProfile{border-top:1px solid #b6cfa42b;margin-top:12px;padding-top:2px}
+#googleProfile .class-picker{margin-top:12px}
+#googleProfile input{min-width:0}
+#googleProfile .google-help{font-size:10px}
+@media(max-width:359px){.google-button{min-height:40px}.google-character{padding:10px}.google-character strong{font-size:13px}}

@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "tests": 117,
+  "complete": true,
+  "checks": [
+    {
+      "module": "test_google_auth_ui22",
+      "tests": 24,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.449
+    },
+    {
+      "module": "test_google_account_constraints_ui22",
+      "tests": 8,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 10.068
+    },
+    {
+      "module": "test_google_security_ui22",
+      "tests": 9,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.38
+    },
+    {
+      "module": "test_spell_vfx_events_ui21",
+      "tests": 10,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.346
+    },
+    {
+      "module": "test_spell_fixes_ui20",
+      "tests": 9,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.072
+    },
+    {
+      "module": "test_druid_circle_spells_0818",
+      "tests": 17,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 2.021
+    },
+    {
+      "module": "test_druid_circles_0818",
+      "tests": 9,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.037
+    },
+    {
+      "module": "test_guiding_bolt_growth_ui17",
+      "tests": 16,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.61
+    },
+    {
+      "module": "test_transport_ui20",
+      "tests": 2,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.377
+    },
+    {
+      "module": "test_loot_economy_ui20",
+      "tests": 7,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.87
+    },
+    {
+      "module": "test_expedition_ui20",
+      "tests": 6,
+      "passed": true,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 0.347
+    }
+  ],
+  "scope": "UI22 signed-token verification, account constraints/security, unchanged spells/VFX/transport/loot/dungeons. Old password-login-dependent suites excluded pending dedicated updates."
+}

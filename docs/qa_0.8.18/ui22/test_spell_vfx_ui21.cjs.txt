@@ -1,0 +1,15 @@
+✔ Call Lightning is one received strike; a persistent field never repeats bolts with elapsed wall time (4.309612ms)
+✔ All visual families remain finite and balance canvas state at event endpoints (52.744932ms)
+✔ Area fill and final outline retain the exact authoritative ground circle (1.52806ms)
+✔ Bigger fields and malformed shot counts cannot increase the draw workload without bound (3.510414ms)
+✔ Star arrow and both movement spells route through their actual endpoints (0.27606ms)
+✔ Upcast binding and party water breathing draw only all transmitted recipients (0.961549ms)
+✔ Other effect kinds remain delegated without changing the canvas (0.124515ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 140.20985

@@ -1,0 +1,37 @@
+PASS: HTTP health reports Bractwo 0.8.18 UI_22
+PASS: All shipped web files and icons served byte-for-byte
+PASS: Save files and server source are not served over HTTP
+PASS: Legacy username/password registration cannot bypass mandatory Google
+PASS: Create and enter as wizard using Google-authenticated WebSocket
+PASS: Two separate clients share the same world
+PASS: Server executes an actual first-circle spell
+PASS: Arcane Recovery completes short rest, restores mana and consumes its long-rest resource
+PASS: Hotbar update round-trips through the real game server
+PASS: SIGTERM closes connected clients and exits cleanly within draining budget
+PASS: SQLite integrity check after shutdown
+PASS: Last hotbar change, actual spell history and used Recovery persist on shutdown
+PASS: Restart snapshots the existing save before opening the game
+PASS: Pre-start backup includes both accounts
+PASS: Same account logs in after process restart with its saved settings
+PASS: Used Arcane Recovery remains spent after the real process restart
+PASS: Public ranking works after restart
+PASS: Second shutdown exits successfully
+
+Server log:
+2026-09-30 01:55:01,107 INFO Bractwo 0.8.18 | 0.0.0.0:55043 | baza: /tmp/bractwo-railway-qa-x75cfmv9/world.sqlite3
+======== Running on http://0.0.0.0:55043 ========
+(Press CTRL+C to quit)
+2026-09-30 01:55:11,867 INFO Zapisano stan gry; zamykam polaczenia.
+2026-09-30 01:55:21,947 INFO Kopia przed startem: /tmp/bractwo-railway-qa-x75cfmv9/backups/bractwo-20260929T235521947168Z.sqlite3
+2026-09-30 01:55:22,031 INFO Bractwo 0.8.18 | 0.0.0.0:58057 | baza: /tmp/bractwo-railway-qa-x75cfmv9/world.sqlite3
+======== Running on http://0.0.0.0:58057 ========
+(Press CTRL+C to quit)
+2026-09-30 01:55:22,246 INFO Zapisano stan gry; zamykam polaczenia.
+
+{
+  "checks": 18,
+  "passed": 18,
+  "aiohttp": "3.13.5",
+  "python": "3.12.14",
+  "scope": "local TCP/WebSocket with signed Google fixtures; not live Google or Railway"
+}

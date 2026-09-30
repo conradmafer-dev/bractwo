@@ -1,3 +1,8 @@
 PORT=8080
 BRACTWO_DB_PATH=/data/world.sqlite3
 RAILWAY_DEPLOYMENT_DRAINING_SECONDS=30
+
+# UI_22: wpisz rzeczywisty Client ID i dokladny origin gry (bez sciezki).
+# Bez tej konfiguracji logowanie pozostaje zablokowane.
+GOOGLE_CLIENT_ID=WPISZ_CLIENT_ID.apps.googleusercontent.com
+GOOGLE_AUTH_ORIGIN=https://TWOJA-DOMENA-GRY

@@ -25,6 +25,8 @@ try:
     from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     from . import continent_world, adventure_content, expedition_content
     from .adventure_combat import AdventureGame
+    from .google_accounts import GoogleAccountGame
+    from .google_auth import GoogleAuthService, register_routes as register_google_routes
     from .combat_rules import CombatRounds
     from .dnd_game import DNDGame
     from . import dnd_content
@@ -44,6 +46,8 @@ except ImportError:
     import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     import continent_world, adventure_content, expedition_content
     from adventure_combat import AdventureGame
+    from google_accounts import GoogleAccountGame
+    from google_auth import GoogleAuthService, register_routes as register_google_routes
     from combat_rules import CombatRounds
     from dnd_game import DNDGame
     import dnd_content
@@ -662,19 +666,21 @@ class Enemy:
                 "attack_until": self.attack_until, "facing": self.facing, "armor_class": spec["armor_class"], "attack_bonus": spec["attack_bonus"], "damage_dice": combat_rules.dice_text(spec["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
 
 
-class Game(AdventureGame,EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
+class Game(GoogleAccountGame,AdventureGame,EnvironmentGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
     def __init__(self, db_path, clock=None):
         self.clock = clock or time.time
         self.rng = random.Random()
         self.combat_rng = random.Random()  # independent from loot and world generation
         self.db = sqlite3.connect(str(db_path))
         self.db.execute("PRAGMA journal_mode=WAL")
+        self.db.execute("PRAGMA foreign_keys=ON")
         self.db.executescript("""
           CREATE TABLE IF NOT EXISTS accounts(id INTEGER PRIMARY KEY, name TEXT NOT NULL,
             name_key TEXT UNIQUE NOT NULL, salt BLOB NOT NULL, password_hash BLOB NOT NULL, data TEXT NOT NULL);
           CREATE TABLE IF NOT EXISTS shared(id INTEGER PRIMARY KEY CHECK(id=1), data TEXT NOT NULL);
           CREATE TABLE IF NOT EXISTS boss_rewards(player_id INTEGER PRIMARY KEY);
         """)
+        self.init_google_accounts()
         # Old relic flags and boss claims never gate the new game.
         self.flags = {"bridge_open": True, "trail_open": True, "event_active": True, "boss_defeated": False}
         self.players, self.enemies, self.parties, self.invites = {}, {}, {}, {}
@@ -877,49 +883,17 @@ class Game(AdventureGame,EnvironmentGame,DruidCircleSpells,DruidCircleGame,Caste
         return hashlib.scrypt(password.encode(), salt=salt, n=16384, r=8, p=1, dklen=32)
 
     async def hello(self, ws, data):
-        if any(p.ws is ws for p in self.players.values()):
-            return await self.error(ws, "Jesteś już zalogowany.")
-        name, password, create = data.get("name"), data.get("password"), data.get("create")
-        class_id = data.get("class_id", "knight")
-        if (not isinstance(name, str) or not re.fullmatch(r"[\w -]{3,20}", name, re.UNICODE)
-                or name != name.strip() or not isinstance(password, str) or not 8 <= len(password) <= 128
-                or type(create) is not bool):
-            return await self.error(ws, "Nazwa: 3–20 liter/cyfr. Hasło: 8–128 znaków.")
-        if create and (not isinstance(class_id, str) or class_id not in CLASSES):
-            return await self.error(ws, "Wybierz jedną z czterech klas.")
-        row = self.db.execute("SELECT id,name,salt,password_hash FROM accounts WHERE name_key=?", (name.casefold(),)).fetchone()
-        salt = secrets.token_bytes(16) if create else (row[2] if row else bytes(16))
-        hashed = await asyncio.to_thread(self.password_hash, password, salt)
-        if ws.closed:
-            return
-        if create:
-            if len(self.players) >= MAX_PLAYERS:
-                return await self.error(ws, "Świat jest pełny. Spróbuj za chwilę.")
-            p = Player("", name, ws, class_id=class_id)
-            p.hp, p.mana = p.max_hp, p.max_mana
-            self.starter(p)
-            try:
-                with self.db:
-                    cur = self.db.execute("INSERT INTO accounts(name,name_key,salt,password_hash,data) VALUES(?,?,?,?,?)",
-                                          (name, name.casefold(), salt, hashed, json.dumps(p.save_data())))
-                pid = str(cur.lastrowid)
-                p.id = pid
-            except sqlite3.IntegrityError:
-                return await self.error(ws, "Ta nazwa jest zajęta. Wybierz Zaloguj lub inną nazwę.")
-        else:
-            if not row or not hmac.compare_digest(hashed, row[3]):
-                return await self.error(ws, "Nieprawidłowa nazwa lub hasło.")
-            pid = str(row[0])
-            p = self.players.get(pid)
-            if p and not p.disconnected:
-                return await self.error(ws, "To konto jest już w grze. Wyloguj je na drugim urządzeniu.")
-            if p is None:
-                if len(self.players) >= MAX_PLAYERS:
-                    return await self.error(ws, "Świat jest pełny. Spróbuj za chwilę.")
-                # Hash work yielded; always read fresh save after the active-session check.
-                saved = json.loads(self.db.execute("SELECT data FROM accounts WHERE id=?", (pid,)).fetchone()[0])
-                p = self.load_player(pid, row[1], ws, saved)
-            p.ws = ws
+        # UI22: passwords can prove ownership of an old character only after
+        # Google verification. They are never an independent login method.
+        await self.send(ws, {"type": "error", "code": "google_required",
+            "text": "Wejdź przez Google, a następnie wybierz lub przypisz postać."})
+
+    async def complete_login(self, ws, p, data):
+        # All identity, ownership and capacity checks happen before this call.
+        # Bind synchronously before the first send, including a reconnect while
+        # the old character is still retained in combat.
+        pid = str(p.id)
+        p.ws = ws
         self.cancel_rest(p, "")
         p.pvp_safety, p.dx, p.dy, p.input_time = True, 0, 0, -10
         self.players[pid] = p
@@ -1781,6 +1755,11 @@ class Game(AdventureGame,EnvironmentGame,DruidCircleSpells,DruidCircleGame,Caste
 
 async def websocket(request):
     game = request.app["game"]
+    google_auth = request.app["google_auth"]
+    if not google_auth.enabled:
+        raise web.HTTPServiceUnavailable(text="Logowanie Google nie jest jeszcze skonfigurowane.")
+    if request.headers.getall("Origin", []) != [google_auth.allowed_origin]:
+        raise web.HTTPForbidden(text="Połącz się przez stronę gry.")
     if len(game.connections)>=MAX_CONNECTIONS:
         raise web.HTTPServiceUnavailable(text="Serwer jest pełny.")
     ws = web.WebSocketResponse(heartbeat=20,max_msg_size=MAX_MESSAGE)
@@ -1824,7 +1803,7 @@ async def websocket(request):
                 if bad>=5:
                     break
                 continue
-            if isinstance(data,dict) and data.get("type")=="hello":
+            if isinstance(data,dict) and data.get("type") in ("hello", "hello_google"):
                 if len(game.auth_attempts)>1024:
                     game.auth_attempts={k:v for k,v in game.auth_attempts.items() if v and v[-1]>now-60}
                 attempts=game.auth_attempts.setdefault(peer,deque())
@@ -1835,7 +1814,11 @@ async def websocket(request):
                     continue
                 attempts.append(now)
             try:
-                await game.on_packet(ws,data)
+                if isinstance(data,dict) and data.get("type")=="hello_google":
+                    await game.hello_google(ws,data,google_auth,
+                        request.cookies.get(google_auth.cookie_name,""),request.headers.get("Origin",""))
+                else:
+                    await game.on_packet(ws,data)
             except (TypeError,ValueError,OverflowError,KeyError):
                 await game.error(ws,"Nieprawidłowe dane komendy.")
                 bad+=1
@@ -1860,25 +1843,30 @@ async def lifecycle(app):
     game.db.close()
 
 
-def create_app(db_path="world.sqlite3", clock=None):
+def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app=web.Application(client_max_size=MAX_MESSAGE)
     app["game"]=Game(db_path, clock=clock)
+    app["google_auth"]=google_auth_service if google_auth_service is not None else GoogleAuthService.from_env()
+    register_google_routes(app,app["google_auth"],account_info=app["game"].google_account_info)
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_21","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_22","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
     web_dir=Path(__file__).resolve().parents[1]/"web"
-    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
+    for route,filename in [("/","index.html"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():
                 raise web.HTTPNotFound()
             headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"}
+            if filename == "index.html":
+                headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+                headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
             if filename == "manifest.webmanifest":
                 headers["Content-Type"] = "application/manifest+json"
             elif filename == "sw.js":

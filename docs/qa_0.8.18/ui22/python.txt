@@ -1,0 +1,193 @@
+test_google_auth_ui22
+test_exact_localhost_and_https_config (test_google_auth_ui22.GoogleConfigAndRateTests.test_exact_localhost_and_https_config) ... ok
+test_missing_partial_or_invalid_config_is_disabled (test_google_auth_ui22.GoogleConfigAndRateTests.test_missing_partial_or_invalid_config_is_disabled) ... ok
+test_origin_and_custom_header_required_without_proxy_trust (test_google_auth_ui22.GoogleConfigAndRateTests.test_origin_and_custom_header_required_without_proxy_trust) ... ok
+test_rotating_cookies_cannot_bypass_peer_rate_limit (test_google_auth_ui22.GoogleConfigAndRateTests.test_rotating_cookies_cannot_bypass_peer_rate_limit) ... ok
+test_single_browser_has_own_lower_rate_limit_and_recovers (test_google_auth_ui22.GoogleConfigAndRateTests.test_single_browser_has_own_lower_rate_limit_and_recovers) ... ok
+test_config_start_cookie_and_roster_response (test_google_auth_ui22.GoogleHTTPTests.test_config_start_cookie_and_roster_response) ... ok
+test_cross_origin_missing_header_and_content_type_are_rejected (test_google_auth_ui22.GoogleHTTPTests.test_cross_origin_missing_header_and_content_type_are_rejected) ... ok
+test_disabled_route_fails_closed_without_leaking_client_id (test_google_auth_ui22.GoogleHTTPTests.test_disabled_route_fails_closed_without_leaking_client_id) ... ok
+test_http_accepts_signed_credential_larger_than_ws_size (test_google_auth_ui22.GoogleHTTPTests.test_http_accepts_signed_credential_larger_than_ws_size) ... ok
+test_https_cookie_is_host_only_secure (test_google_auth_ui22.GoogleHTTPTests.test_https_cookie_is_host_only_secure) ... ok
+test_invalid_json_and_large_chunked_body_rejected (test_google_auth_ui22.GoogleHTTPTests.test_invalid_json_and_large_chunked_body_rejected) ... ok
+test_certificate_transport_rejects_arbitrary_urls (test_google_auth_ui22.GoogleSignedTokenTests.test_certificate_transport_rejects_arbitrary_urls) ... ok
+test_challenge_and_ticket_expire_with_monotonic_clock (test_google_auth_ui22.GoogleSignedTokenTests.test_challenge_and_ticket_expire_with_monotonic_clock) ... ok
+test_inflight_verification_is_bounded (test_google_auth_ui22.GoogleSignedTokenTests.test_inflight_verification_is_bounded) ... ok
+test_multiple_tab_challenges_remain_bounded_without_locking_out_browser (test_google_auth_ui22.GoogleSignedTokenTests.test_multiple_tab_challenges_remain_bounded_without_locking_out_browser) ... ok
+test_network_failure_never_discloses_credential_or_exception_text (test_google_auth_ui22.GoogleSignedTokenTests.test_network_failure_never_discloses_credential_or_exception_text) ... ok
+test_no_cookie_and_other_browser_are_rejected_before_google_verifier (test_google_auth_ui22.GoogleSignedTokenTests.test_no_cookie_and_other_browser_are_rejected_before_google_verifier) ... ok
+test_non_string_and_oversize_credentials_cannot_hit_verifier (test_google_auth_ui22.GoogleSignedTokenTests.test_non_string_and_oversize_credentials_cannot_hit_verifier) ... ok
+test_pending_store_has_a_hard_limit (test_google_auth_ui22.GoogleSignedTokenTests.test_pending_store_has_a_hard_limit) ... ok
+test_same_signed_token_cannot_replay_into_fresh_challenge (test_google_auth_ui22.GoogleSignedTokenTests.test_same_signed_token_cannot_replay_into_fresh_challenge) ... ok
+test_simultaneous_replay_only_verifies_once (test_google_auth_ui22.GoogleSignedTokenTests.test_simultaneous_replay_only_verifies_once) ... ok
+test_valid_signature_produces_only_subject_and_one_time_bound_ticket (test_google_auth_ui22.GoogleSignedTokenTests.test_valid_signature_produces_only_subject_and_one_time_bound_ticket) ... ok
+test_wrong_audience_issuer_nonce_times_and_subject_are_rejected (test_google_auth_ui22.GoogleSignedTokenTests.test_wrong_audience_issuer_nonce_times_and_subject_are_rejected) ... ok
+test_wrong_signature_is_rejected_and_burns_challenge (test_google_auth_ui22.GoogleSignedTokenTests.test_wrong_signature_is_rejected_and_burns_challenge) ... ok
+
+----------------------------------------------------------------------
+Ran 24 tests in 0.329s
+
+OK
+
+test_google_account_constraints_ui22
+test_cancelled_claim_keeps_worker_slot_until_scrypt_thread_finishes (test_google_account_constraints_ui22.ClaimWorkerLimits.test_cancelled_claim_keeps_worker_slot_until_scrypt_thread_finishes) ... ok
+test_failed_fifth_mapping_rolls_back_new_character (test_google_account_constraints_ui22.GoogleDatabaseConstraints.test_failed_fifth_mapping_rolls_back_new_character) ... ok
+test_foreign_keys_reject_unknown_google_and_character (test_google_account_constraints_ui22.GoogleDatabaseConstraints.test_foreign_keys_reject_unknown_google_and_character) ... ok
+test_four_offline_saves_count_after_schema_reinitialization (test_google_account_constraints_ui22.GoogleDatabaseConstraints.test_four_offline_saves_count_after_schema_reinitialization) ... ok
+test_private_roster_uses_live_progress_and_exposes_no_subject (test_google_account_constraints_ui22.GoogleDatabaseConstraints.test_private_roster_uses_live_progress_and_exposes_no_subject) ... ok
+test_replace_cannot_transfer_an_owned_character (test_google_account_constraints_ui22.GoogleDatabaseConstraints.test_replace_cannot_transfer_an_owned_character) ... ok
+test_update_cannot_move_character_to_another_google_account (test_google_account_constraints_ui22.GoogleDatabaseConstraints.test_update_cannot_move_character_to_another_google_account) ... ok
+test_update_cannot_substitute_a_different_character (test_google_account_constraints_ui22.GoogleDatabaseConstraints.test_update_cannot_substitute_a_different_character) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 9.978s
+
+OK
+
+test_google_security_ui22
+test_claim_cannot_exceed_character_limit (test_google_security_ui22.GoogleAccountSecurity.test_claim_cannot_exceed_character_limit) ... ok
+test_concurrent_claim_has_exactly_one_google_owner_and_preserves_progress (test_google_security_ui22.GoogleAccountSecurity.test_concurrent_claim_has_exactly_one_google_owner_and_preserves_progress) ... ok
+test_concurrent_create_cap_counts_persisted_characters_without_orphans (test_google_security_ui22.GoogleAccountSecurity.test_concurrent_create_cap_counts_persisted_characters_without_orphans) ... ok
+test_online_character_not_replaced_and_old_socket_cleanup_is_safe (test_google_security_ui22.GoogleAccountSecurity.test_online_character_not_replaced_and_old_socket_cleanup_is_safe) ... ok
+test_other_google_cannot_select_owned_character (test_google_security_ui22.GoogleAccountSecurity.test_other_google_cannot_select_owned_character) ... ok
+test_password_login_and_registration_cannot_bypass_google (test_google_security_ui22.GoogleAccountSecurity.test_password_login_and_registration_cannot_bypass_google) ... ok
+test_wrong_origin_cookie_and_replayed_ticket_cannot_authenticate (test_google_security_ui22.GoogleAccountSecurity.test_wrong_origin_cookie_and_replayed_ticket_cannot_authenticate) ... ok
+test_wrong_password_does_not_claim_or_change_save (test_google_security_ui22.GoogleAccountSecurity.test_wrong_password_does_not_claim_or_change_save) ... ok
+test_missing_null_and_duplicate_origin_headers_are_rejected (test_google_security_ui22.GoogleWebSocketOriginSecurity.test_missing_null_and_duplicate_origin_headers_are_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.376s
+
+OK
+
+test_spell_vfx_events_ui21
+test_call_lightning_recast_is_only_one_immediate_strike (test_spell_vfx_events_ui21.SpellEvents.test_call_lightning_recast_is_only_one_immediate_strike) ... ok
+test_circle_field_snapshot_identity_age_and_one_real_initial_tick (test_spell_vfx_events_ui21.SpellEvents.test_circle_field_snapshot_identity_age_and_one_real_initial_tick) ... ok
+test_concentration_end_removes_field_and_prevents_future_tick (test_spell_vfx_events_ui21.SpellEvents.test_concentration_end_removes_field_and_prevents_future_tick) ... ok
+test_ground_area_center_is_selected_point_not_first_victim (test_spell_vfx_events_ui21.SpellEvents.test_ground_area_center_is_selected_point_not_first_victim) ... ok
+test_metadata_only_dispatch_uses_no_rng_or_combat_mutation (test_spell_vfx_events_ui21.SpellEvents.test_metadata_only_dispatch_uses_no_rng_or_combat_mutation) ... ok
+test_moonbeam_one_tick_for_actual_victims_no_extra_or_empty_hits (test_spell_vfx_events_ui21.SpellEvents.test_moonbeam_one_tick_for_actual_victims_no_extra_or_empty_hits) ... ok
+test_spike_growth_records_each_real_movement_damage_resolution (test_spell_vfx_events_ui21.SpellEvents.test_spike_growth_records_each_real_movement_damage_resolution) ... ok
+test_star_arrow_has_a_targeted_event_for_actual_shot (test_spell_vfx_events_ui21.SpellEvents.test_star_arrow_has_a_targeted_event_for_actual_shot) ... ok
+test_thunderwave_square_matches_real_width (test_spell_vfx_events_ui21.SpellEvents.test_thunderwave_square_matches_real_width) ... ok
+test_tree_stride_teleport_captures_departure_before_moving (test_spell_vfx_events_ui21.SpellEvents.test_tree_stride_teleport_captures_departure_before_moving) ... ok
+
+----------------------------------------------------------------------
+Ran 10 tests in 1.344s
+
+OK
+
+test_spell_fixes_ui20
+test_auto_target_excludes_dead_other_floor_out_of_range_and_obstructed (test_spell_fixes_ui20.GuidingBoltTargets.test_auto_target_excludes_dead_other_floor_out_of_range_and_obstructed) ... ok
+test_auto_target_never_selects_player_or_spends_without_monster (test_spell_fixes_ui20.GuidingBoltTargets.test_auto_target_never_selects_player_or_spends_without_monster) ... ok
+test_automatic_search_keeps_circle_option_mapping_intact (test_spell_fixes_ui20.GuidingBoltTargets.test_automatic_search_keeps_circle_option_mapping_intact) ... ok
+test_hotbar_cast_without_selection_hits_nearest_monster_once (test_spell_fixes_ui20.GuidingBoltTargets.test_hotbar_cast_without_selection_hits_nearest_monster_once) ... ok
+test_invalid_explicit_or_locked_target_does_not_redirect_or_spend (test_spell_fixes_ui20.GuidingBoltTargets.test_invalid_explicit_or_locked_target_does_not_redirect_or_spend) ... ok
+test_locked_target_has_priority_over_nearer_enemy (test_spell_fixes_ui20.GuidingBoltTargets.test_locked_target_has_priority_over_nearer_enemy) ... ok
+test_manual_target_has_priority_over_nearer_enemy_and_lock (test_spell_fixes_ui20.GuidingBoltTargets.test_manual_target_has_priority_over_nearer_enemy_and_lock) ... ok
+test_queued_untargeted_cast_acquires_when_action_becomes_ready (test_spell_fixes_ui20.GuidingBoltTargets.test_queued_untargeted_cast_acquires_when_action_becomes_ready) ... ok
+test_web_catalogue_icons_are_served_and_match_native_assets (test_spell_fixes_ui20.SpellIllustrations.test_web_catalogue_icons_are_served_and_match_native_assets) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.070s
+
+OK
+
+test_druid_circle_spells_0818
+test_breaking_concentration_restores_polymorph_without_old_temp_hp (test_druid_circle_spells_0818.CircleSpells.test_breaking_concentration_restores_polymorph_without_old_temp_hp) ... ok
+test_catalogue_covers_every_bonus_without_global_unlocks (test_druid_circle_spells_0818.CircleSpells.test_catalogue_covers_every_bonus_without_global_unlocks) ... ok
+test_elemental_does_not_apply_initial_and_repeat_damage_same_tick (test_druid_circle_spells_0818.CircleSpells.test_elemental_does_not_apply_initial_and_repeat_damage_same_tick) ... ok
+test_field_damage_once_per_turn_and_concentration_removes_field (test_druid_circle_spells_0818.CircleSpells.test_field_damage_once_per_turn_and_concentration_removes_field) ... ok
+test_guidance_skill_applies_repeatedly_only_to_chosen_skill (test_druid_circle_spells_0818.CircleSpells.test_guidance_skill_applies_repeatedly_only_to_chosen_skill) ... ok
+test_guiding_bolt_grants_one_attack_advantage_and_free_use_commits_once (test_druid_circle_spells_0818.CircleSpells.test_guiding_bolt_grants_one_attack_advantage_and_free_use_commits_once) ... ok
+test_hold_paralyzes_then_save_releases_without_recasting (test_druid_circle_spells_0818.CircleSpells.test_hold_paralyzes_then_save_releases_without_recasting) ... ok
+test_invalid_payload_and_protected_target_do_not_spend_resources (test_druid_circle_spells_0818.CircleSpells.test_invalid_payload_and_protected_target_do_not_spend_resources) ... ok
+test_pack_movement_requires_actual_owner_movement_and_stays_once_per_turn (test_druid_circle_spells_0818.CircleSpells.test_pack_movement_requires_actual_owner_movement_and_stays_once_per_turn) ... ok
+test_permanent_wall_survives_reload_and_damage_is_saved (test_druid_circle_spells_0818.CircleSpells.test_permanent_wall_survives_reload_and_damage_is_saved) ... ok
+test_polymorph_keeps_hp_and_ends_when_temp_hp_is_exhausted (test_druid_circle_spells_0818.CircleSpells.test_polymorph_keeps_hp_and_ends_when_temp_hp_is_exhausted) ... ok
+test_queued_spell_keeps_selected_options (test_druid_circle_spells_0818.CircleSpells.test_queued_spell_keeps_selected_options) ... ok
+test_ray_of_sickness_poison_does_not_roll_a_second_save (test_druid_circle_spells_0818.CircleSpells.test_ray_of_sickness_poison_does_not_roll_a_second_save) ... ok
+test_sleep_two_saves_and_damage_wakes (test_druid_circle_spells_0818.CircleSpells.test_sleep_two_saves_and_damage_wakes) ... ok
+test_thunderwave_cube_includes_corners_and_pushes_failed_save (test_druid_circle_spells_0818.CircleSpells.test_thunderwave_cube_includes_corners_and_pushes_failed_save) ... ok
+test_water_breathing_ritual_is_free_and_requires_completed_channel (test_druid_circle_spells_0818.CircleSpells.test_water_breathing_ritual_is_free_and_requires_completed_channel) ... ok
+test_web_terrain_slows_owner_and_concentration_clears_it (test_druid_circle_spells_0818.CircleSpells.test_web_terrain_slows_owner_and_concentration_clears_it) ... ok
+
+----------------------------------------------------------------------
+Ran 17 tests in 2.020s
+
+OK
+
+test_druid_circles_0818
+test_bonus_spell_access_and_natural_recovery_commits_once (test_druid_circles_0818.CircleRules.test_bonus_spell_access_and_natural_recovery_commits_once) ... ok
+test_higher_beast_forms_have_progressive_cr_and_actual_poison (test_druid_circles_0818.CircleRules.test_higher_beast_forms_have_progressive_cr_and_actual_poison) ... ok
+test_land_aid_damage_heal_and_invalid_target_no_resource (test_druid_circles_0818.CircleRules.test_land_aid_damage_heal_and_invalid_target_no_resource) ... ok
+test_level_mapping_and_shape_resources (test_druid_circles_0818.CircleRules.test_level_mapping_and_shape_resources) ... ok
+test_moon_teleport_and_single_extra_damage_per_turn (test_druid_circles_0818.CircleRules.test_moon_teleport_and_single_extra_damage_per_turn) ... ok
+test_omen_reaction_respects_floor_range_and_uses (test_druid_circles_0818.CircleRules.test_omen_reaction_respects_floor_range_and_uses) ... ok
+test_scorpion_grapple_releases_without_action (test_druid_circles_0818.CircleRules.test_scorpion_grapple_releases_without_action) ... ok
+test_sea_aura_damage_and_push_share_wild_shape_resource (test_druid_circles_0818.CircleRules.test_sea_aura_damage_and_push_share_wild_shape_resource) ... ok
+test_star_dragon_and_chalice_have_real_effects (test_druid_circles_0818.CircleRules.test_star_dragon_and_chalice_have_real_effects) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 1.036s
+
+OK
+
+test_guiding_bolt_growth_ui17
+test_actual_award_publishes_positive_receipt_and_extra_free_use (test_guiding_bolt_growth_ui17.LiveCastingUnchanged.test_actual_award_publishes_positive_receipt_and_extra_free_use) ... ok
+test_dismissed_level_panel_does_not_reappear (test_guiding_bolt_growth_ui17.LiveCastingUnchanged.test_dismissed_level_panel_does_not_reappear) ... ok
+test_explicit_second_circle_remains_available_and_unchanged (test_guiding_bolt_growth_ui17.LiveCastingUnchanged.test_explicit_second_circle_remains_available_and_unchanged) ... ok
+test_highest_paid_cast_still_costs_50_at_level_20 (test_guiding_bolt_growth_ui17.LiveCastingUnchanged.test_highest_paid_cast_still_costs_50_at_level_20) ... ok
+test_live_auto_still_prefers_free_base_cast_when_available (test_guiding_bolt_growth_ui17.LiveCastingUnchanged.test_live_auto_still_prefers_free_base_cast_when_available) ... ok
+test_a_real_negative_delta_is_not_abs_converted_or_hidden (test_guiding_bolt_growth_ui17.PermanentGrowth.test_a_real_negative_delta_is_not_abs_converted_or_hidden) ... ok
+test_all_later_levels_follow_paid_spell_progression (test_guiding_bolt_growth_ui17.PermanentGrowth.test_all_later_levels_follow_paid_spell_progression) ... ok
+test_charges_and_choices_do_not_change_gains_map_access_is_respected (test_guiding_bolt_growth_ui17.PermanentGrowth.test_charges_and_choices_do_not_change_gains_map_access_is_respected) ... ok
+test_exact_reported_level_20_case_is_a_positive_gain (test_guiding_bolt_growth_ui17.PermanentGrowth.test_exact_reported_level_20_case_is_a_positive_gain) ... ok
+test_existing_open_receipt_recomputes_without_changing_id_or_save (test_guiding_bolt_growth_ui17.PermanentGrowth.test_existing_open_receipt_recomputes_without_changing_id_or_save) ... ok
+test_land_free_cast_toggle_does_not_hide_highest_paid_progression (test_guiding_bolt_growth_ui17.PermanentGrowth.test_land_free_cast_toggle_does_not_hide_highest_paid_progression) ... ok
+test_next_upgrade_is_positive_and_independent_of_live_resources (test_guiding_bolt_growth_ui17.PermanentGrowth.test_next_upgrade_is_positive_and_independent_of_live_resources) ... ok
+test_projection_does_not_modify_player_or_shared_catalogue (test_guiding_bolt_growth_ui17.PermanentGrowth.test_projection_does_not_modify_player_or_shared_catalogue) ... ok
+test_projection_is_the_highest_useful_paid_circle (test_guiding_bolt_growth_ui17.PermanentGrowth.test_projection_is_the_highest_useful_paid_circle) ... ok
+test_receipt_is_stable_after_resources_rest_and_power_choice_change (test_guiding_bolt_growth_ui17.PermanentGrowth.test_receipt_is_stable_after_resources_rest_and_power_choice_change) ... ok
+test_unlocked_spell_cap_has_no_fabricated_future_bonus (test_guiding_bolt_growth_ui17.PermanentGrowth.test_unlocked_spell_cap_has_no_fabricated_future_bonus) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 0.609s
+
+OK
+
+test_transport_ui20
+test_every_route_accepts_level_one_and_exact_fare (test_transport_ui20.TransportUI20.test_every_route_accepts_level_one_and_exact_fare) ... ok
+test_real_locks_do_not_charge_or_teleport (test_transport_ui20.TransportUI20.test_real_locks_do_not_charge_or_teleport) ... ok
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.376s
+
+OK
+
+test_loot_economy_ui20
+test_all_shops_have_small_mundane_priced_assortments (test_loot_economy_ui20.LootEconomy.test_all_shops_have_small_mundane_priced_assortments) ... ok
+test_brzezina_server_rejects_removed_magic_even_with_enough_gold (test_loot_economy_ui20.LootEconomy.test_brzezina_server_rejects_removed_magic_even_with_enough_gold) ... ok
+test_each_ring_has_visible_effects_in_browser_and_current_snapshot (test_loot_economy_ui20.LootEconomy.test_each_ring_has_visible_effects_in_browser_and_current_snapshot) ... ok
+test_every_magic_and_authored_advanced_item_has_a_real_source (test_loot_economy_ui20.LootEconomy.test_every_magic_and_authored_advanced_item_has_a_real_source) ... ok
+test_final_drop_tables_and_source_probabilities_are_consistent (test_loot_economy_ui20.LootEconomy.test_final_drop_tables_and_source_probabilities_are_consistent) ... ok
+test_new_bosses_and_undead_have_contextual_level_appropriate_rare_equipment (test_loot_economy_ui20.LootEconomy.test_new_bosses_and_undead_have_contextual_level_appropriate_rare_equipment) ... ok
+test_ring_drop_probability_and_personal_discovery_use_same_table (test_loot_economy_ui20.LootEconomy.test_ring_drop_probability_and_personal_discovery_use_same_table) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.870s
+
+OK
+
+test_expedition_ui20
+test_boss_attacks_are_telegraphed_and_have_phases (test_expedition_ui20.ExpeditionCombat.test_boss_attacks_are_telegraphed_and_have_phases) ... ok
+test_custom_contact_damage_and_ranged_projectiles (test_expedition_ui20.ExpeditionCombat.test_custom_contact_damage_and_ranged_projectiles) ... ok
+test_revenant_uses_existing_undead_fortitude (test_expedition_ui20.ExpeditionCombat.test_revenant_uses_existing_undead_fortitude) ... ok
+test_connected_playable_crypts_and_guardian_arenas (test_expedition_ui20.ExpeditionWorld.test_connected_playable_crypts_and_guardian_arenas) ... ok
+test_monsters_assets_and_quest_chain (test_expedition_ui20.ExpeditionWorld.test_monsters_assets_and_quest_chain) ... ok
+test_three_extensive_distinct_floors_with_return_routes (test_expedition_ui20.ExpeditionWorld.test_three_extensive_distinct_floors_with_return_routes) ... ok
+
+----------------------------------------------------------------------
+Ran 6 tests in 0.343s
+
+OK

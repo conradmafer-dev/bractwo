@@ -1,0 +1,47 @@
+{
+  "version": "0.8.18",
+  "ui_revision": "UI_22",
+  "world_revision": 20,
+  "based_on": "BRACTWO_0.8.18_UI_21_FULL_SOURCE.zip",
+  "finished_at_utc": "2026-09-29T23:56:53.342426+00:00",
+  "status": "PASS_WITH_EXTERNAL_CONFIGURATION_REQUIRED",
+  "features": [
+    "Mandatory Google login; legacy password-only entry disabled",
+    "Up to four persisted characters per Google subject, enforced transactionally in SQLite",
+    "Existing character claim after Google verification and old password proof",
+    "Signed token verification, nonce, one-use browser-bound tickets and rate/concurrency limits"
+  ],
+  "results": {
+    "python_unique_tests": 140,
+    "javascript_tests": 64,
+    "browser_checks": 17,
+    "browser_javascript_exceptions": 0,
+    "real_process_restart_checks": 18,
+    "syntax_passed": true
+  },
+  "reports": [
+    "python.json",
+    "python.txt",
+    "javascript.json",
+    "browser_auth_results.json",
+    "BROWSER_QA.md",
+    "hosting.json",
+    "hosting.txt",
+    "hosting_smoke.txt",
+    "syntax.json",
+    "release_files.json"
+  ],
+  "limits": [
+    "Actual Google account sign-in and production OAuth settings were not tested; local signed RSA fixtures and a separate browser provider fixture were used.",
+    "Requires GOOGLE_CLIENT_ID and GOOGLE_AUTH_ORIGIN plus matching Google Authorized JavaScript origins before deployment. Missing configuration denies login.",
+    "No deployment to Railway or live database changes were made.",
+    "Headless Chromium desktop/touch emulation is not a physical device test.",
+    "Selected regression suites passed; historical password-login network fixtures outside this change are listed in hosting.json and are not claimed passing.",
+    "Native Godot sources retain their historical login and cannot enter the UI22 server; this release targets the browser/PWA.",
+    "Google accounts and the four-character limit reduce abuse but do not prevent multiple Google accounts or provide DDoS protection."
+  ],
+  "fixture_corrections": [
+    "Updated the service-worker cache fixture to preserve UI22 and delete historical caches. Initial stale-fixture failure retained.",
+    "Updated hosting tests to Google authentication and current existing rest semantics; full process smoke uses the actual compact browser protocol. Details in hosting.json."
+  ]
+}

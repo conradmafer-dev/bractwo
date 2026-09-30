@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "file": "server/server.py",
+      "passed": true
+    },
+    {
+      "file": "server/google_auth.py",
+      "passed": true
+    },
+    {
+      "file": "server/google_accounts.py",
+      "passed": true
+    },
+    {
+      "file": "tools/package_0818.py",
+      "passed": true
+    },
+    {
+      "file": "web/game.js",
+      "passed": true
+    },
+    {
+      "file": "web/google_auth.js",
+      "passed": true
+    },
+    {
+      "file": "web/sw.js",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+UI22 hosting and Google account restart verification: PASS
+
+tests/test_railway.py: 18/18 PASS
+tests/test_app_shell_http_0818.py: 5/5 PASS
+tests/test_google_security_ui22.py: 9/9 PASS
+tests/smoke_railway.py: 18/18 PASS (real local process restart)
+
+Individual suites may overlap the main Python report.
+
+Smoke checks:
+- HTTP health reports Bractwo 0.8.18 UI_22
+- All shipped web files and icons served byte-for-byte
+- Save files and server source are not served over HTTP
+- Legacy username/password registration cannot bypass mandatory Google
+- Create and enter as wizard using Google-authenticated WebSocket
+- Two separate clients share the same world
+- Server executes an actual first-circle spell
+- Arcane Recovery completes short rest, restores mana and consumes its long-rest resource
+- Hotbar update round-trips through the real game server
+- SIGTERM closes connected clients and exits cleanly within draining budget
+- SQLite integrity check after shutdown
+- Last hotbar change, actual spell history and used Recovery persist on shutdown
+- Restart snapshots the existing save before opening the game
+- Pre-start backup includes both accounts
+- Same account logs in after process restart with its saved settings
+- Used Arcane Recovery remains spent after the real process restart
+- Public ranking works after restart
+- Second shutdown exits successfully
+
+Fixture updates and limits:
+- Historical smoke expected Bractwo 0.8.17, anonymous password login and immediate Arcane Recovery with a 180-second cooldown. UI22 health/auth expectations were updated; the stale Recovery fixture now verifies the existing short-rest completion and persistent long-rest resource. No gameplay production code was changed.
+- The UI20 continent cold import exceeded the historical ten-second readiness budget; only startup readiness was raised to thirty seconds. Shutdown still must complete in fifteen seconds.
+- The old smoke requested full snapshots and left its second client unread, delaying state observations. The final fixture uses the actual browser owner-delta protocol and consumes both clients. Full gameplay, save and restart assertions pass.
+- The subprocess uses the real Google token verifier with locally RSA-signed fixtures and a test-only public-key certificate transport. Production run.py has no fixture login or certificate override. No real Google account, deployed Railway service or credentials were used.
+- Suite totals are reported individually; tests/test_google_security_ui22.py may also appear in the main Python QA report and should not be double-counted.
+
+Remaining historical fixtures:
+- tests/test_first_circle.py: FirstCircleNetwork.test_registered_full_casters_receive_level_one_catalogue_and_state needs an explicit Google auth fixture.
+- tests/test_pvp_magic.py: PVPWebSocket setup needs an explicit Google auth fixture.
+- tests/test_dnd.py: NetworkRules.test_registration_and_ws_ranking and test_unauthed_hotbar_is_rejected need explicit Google auth/Origin fixtures.
+- tests/test_dnd.py: NetworkRules.test_health_version and tests/test_loot_088.py: HTTPAssets.test_health_new_assets_and_route_registration still contain historical 0.8.17 health literals; left outside this assigned change.
+
+Full process output: hosting_smoke.txt

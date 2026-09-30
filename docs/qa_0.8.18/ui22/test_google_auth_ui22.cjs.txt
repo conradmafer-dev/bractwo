@@ -1,0 +1,14 @@
+✔ Google tickets may enter only the exact same-origin game socket (1.021337ms)
+✔ local HTTP development follows its own port; downloaded HTML cannot use Google (0.197454ms)
+✔ new Google characters need nickname/class and never transmit a password (0.749764ms)
+✔ claiming a legacy character requires its current password and omits class changes (0.439633ms)
+✔ profile builder rejects legacy login mode and missing proof of Google authentication (0.18884ms)
+✔ profile builder rejects invalid nicknames or unknown class IDs before opening a socket (0.218394ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 83.236557

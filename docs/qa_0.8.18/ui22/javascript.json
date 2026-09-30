@@ -1,0 +1,42 @@
+{
+  "passed": true,
+  "tests": 64,
+  "checks": [
+    {
+      "script": "test_google_auth_ui22.cjs",
+      "passed": true,
+      "tests": 6
+    },
+    {
+      "script": "test_app_shell.cjs",
+      "passed": true,
+      "tests": 9
+    },
+    {
+      "script": "test_client_runtime.cjs",
+      "passed": true,
+      "tests": 19
+    },
+    {
+      "script": "test_spell_vfx.cjs",
+      "passed": true,
+      "tests": 11
+    },
+    {
+      "script": "test_circle_vfx_ui21.cjs",
+      "passed": true,
+      "tests": 8
+    },
+    {
+      "script": "test_vfx_visibility_ui21.cjs",
+      "passed": true,
+      "tests": 4
+    },
+    {
+      "script": "test_spell_vfx_ui21.cjs",
+      "passed": true,
+      "tests": 7
+    }
+  ],
+  "fixture_changes": "Updated obsolete cache fixture to include current UI22 cache and require both older caches to be deleted; current and unrelated caches must remain. Initial failure retained in test_app_shell.initial.txt."
+}

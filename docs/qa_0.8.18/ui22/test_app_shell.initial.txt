@@ -1,0 +1,40 @@
+✔ fullscreen is requested by a click and browser events synchronize every control (3.06961ms)
+✔ fullscreen denial opens dismissible help, stops movement and permits retry (1.320161ms)
+✔ iPhone without fullscreen receives honest Add to Home Screen instructions (0.95589ms)
+✔ accepted install prompt does not falsely report completed installation (1.000696ms)
+✔ dismissed install consumes the prompt and the next click offers manual help (1.010071ms)
+✔ standalone mode hides install affordances and worker only registers on secure origins (1.079514ms)
+✖ worker precaches only disconnected page and icons, and preserves unrelated caches (2.532022ms)
+✔ worker never intercepts game code, API, credential POST or cross-origin requests (0.958333ms)
+✔ navigation loads fresh HTML online and falls back to disconnected page offline (1.633106ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 8
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 87.225553
+
+✖ failing tests:
+
+test at tests/test_app_shell.cjs:147:1
+✖ worker precaches only disconnected page and icons, and preserves unrelated caches (2.532022ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    [
+      'bractwo-app-shell-0.8.17',
+  +   'bractwo-app-shell-0.8.18'
+    ]
+  
+      at TestContext.<anonymous> (/workspace/scratch/238fd4f9c68c/full/Bractwo_0.8.18/tests/test_app_shell.cjs:150:10)
+      at async Test.run (node:internal/test_runner/test:1389:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ 'bractwo-app-shell-0.8.17', 'bractwo-app-shell-0.8.18' ],
+    expected: [ 'bractwo-app-shell-0.8.17' ],
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
