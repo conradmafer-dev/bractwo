@@ -1,0 +1,52 @@
+BRACTWO KRAIN — UI_32 FIX6 — MAŁY PANEL RZUTÓW
+
+To mała aktualizacja wyglądu, NIE pełny projekt.
+Zmieniony plik: web/hud_layout.css
+
+WDROŻENIE
+1. Wypakuj ZIP i zachowaj kopię dotychczasowego web/hud_layout.css.
+2. Podmień wyłącznie web/hud_layout.css w repozytorium bractwo.
+   Nie usuwaj całego folderu web. Nie wgrywaj samego ZIP-a jako aktualizacji gry.
+3. Zatwierdź i wyślij zmianę na GitHub, tak jak poprzednie aktualizacje.
+4. Po wdrożeniu na Railway odśwież grę. Na komputerze użyj Ctrl+F5.
+   Jeżeli telefon pokazuje stary wygląd, usuń z pamięci podręcznej przeglądarki
+   zapisane pliki strony i otwórz ją ponownie.
+
+Nie podmieniaj index.html ani server.py. Ta poprawka nie wymaga resetu gry,
+zmiany bazy danych, postaci, ustawień Google ani parametrów Railway.
+Nie zmienia mechaniki rzutów, obrażeń, atutów, czasu wyświetlania ani zapisów.
+
+ZMIANY
+- Rzuty mają własną ograniczoną szerokość zamiast szerokości całego paska powiadomień.
+- Na telefonie w poziomie: mała karta u góry po prawej, obok przycisków menu.
+  Otwarta minimapa otrzymuje osobne miejsce. W pionie karta jest węższa i po prawej.
+- Typ kości, oba wyniki, zaznaczenie wybranego rzutu i obliczenie sumy zostają.
+  Wybrany wynik ma kolorowe tło i znak ✓ zamiast długiego napisu.
+- Długie zestawienia i dodatkowe strzały przewijają się w małej karcie.
+  Nie powiększają jej na kolejną część ekranu.
+- Rozmiary na telefonie korzystają z istniejącej jednostki --mobile-unit.
+  Nie dodano powiększenia po przejściu do pełnego ekranu.
+- Pozostałe panele, wydarzenia UI_32 i układ paska umiejętności są zachowane.
+
+BAZA
+Repozytorium: conradmafer-dev/bractwo, gałąź main.
+Git blob oryginalnego web/hud_layout.css:
+a43a52856fe9789f1e7ea922de3d8786d65ba2f0
+Plik źródłowy odczytano przez podłączony GitHub; jego kopię zweryfikowano
+sumą Git. Zmieniony jest tylko blok stylów panelu rzutów.
+
+SPRAWDZENIA I OGRANICZENIA
+- 144 przypadki układu w Chromium: rzut z atutem, dodatkowy strzał,
+  zwykły atak, leczenie, długie kości i odpoczynek; widoki mobilne i komputerowe,
+  z minimapą i bez niej. Rozdzielczości od 320×640 do 1920×1080.
+- 24 dodatkowe przypadki pionowe z widocznym obszarem statusów.
+- Sprawdzone granice karty, brak poziomego przepełnienia, przewijanie długich
+  wyników, stan hidden oraz stałość wymiarów w teście pełnego ekranu.
+- Testy używają izolowanego odwzorowania struktury panelu z runtime.js oraz
+  odpowiadających mu reguł CSS. To NIE test całej gry po zalogowaniu i NIE test
+  na fizycznym telefonie. Nie sprawdzono wszystkich możliwych przesunięć okien.
+- Przykładowy zestaw ze zrzutu w teście 1056×480 zajmuje 246×82 jednostki CSS.
+  Rzeczywiste wymiary zależą od skali interfejsu i widoku urządzenia.
+
+Paczka została przygotowana i sprawdzona lokalnie.
+NIE została wysłana na GitHub ani wdrożona na Railway.

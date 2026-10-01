@@ -1,0 +1,9 @@
+{
+  "changed_file": "web/hud_layout.css",
+  "base_git_blob": "a43a52856fe9789f1e7ea922de3d8786d65ba2f0",
+  "sha256": "74efe7da40977b508c5ca6a4e5a9bb0cc16c96fb1f5b5b49a113764788c4d831",
+  "changes": "CSS only; combat panel styles only",
+  "deployed": false,
+  "layout_tests": 144,
+  "additional_portrait_tests": 24
+}
