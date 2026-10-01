@@ -127,49 +127,124 @@
 /* 0.8.17: queued F command is accepted, not disabled by the shared action. */
 .action-dock #abilityButton.queued { outline: 2px solid var(--gold); filter: none; }
 
-/* UI31 FIX4: real damage-roll receipts, contained in the existing combat HUD. */
+/* UI_32 FIX6: bounded roll receipt, independent from the wide notice feed.
+   This changes presentation only. Both rolls, bonuses and further results stay
+   in the DOM; long receipts scroll inside the small card, never grow over play.
+   --mobile-unit is shared with the existing normal/fullscreen HUD. */
 #gameUI #combatRoll.has-roll-breakdown {
-  display: block; -webkit-line-clamp: unset; overflow: visible;
-  padding: 6px 8px; font-size: 11px; line-height: 1.3;
+  --roll-unit: 1px;
+  position: fixed;
+  left: auto;
+  right: max(228px, calc(env(safe-area-inset-right) + 210px));
+  top: max(118px, calc(env(safe-area-inset-top) + 106px));
+  bottom: auto;
+  width: calc(264 * var(--roll-unit));
+  max-width: calc(100vw - 32px);
+  min-width: 0;
+  height: auto;
+  max-height: min(calc(112 * var(--roll-unit)), 26vh);
+  max-height: min(calc(112 * var(--roll-unit)), 26dvh);
+  display: block;
+  box-sizing: border-box;
+  -webkit-line-clamp: unset;
+  overflow-x: hidden;
+  overflow-y: auto;
+  margin: 0;
+  padding: calc(4 * var(--roll-unit)) calc(6 * var(--roll-unit));
+  border-left: calc(2 * var(--roll-unit)) solid var(--gold);
+  border-radius: calc(3 * var(--roll-unit));
+  background: #142b23e8;
+  font: calc(11 * var(--roll-unit))/1.25 system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  pointer-events: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: #b1ac78 transparent;
+  animation: none;
+  z-index: 6;
 }
-#combatRoll .savage-receipt { min-width: 0; }
-#combatRoll .savage-heading { display: flex; gap: 8px; align-items: baseline; }
-#combatRoll .savage-heading strong { color: var(--gold); white-space: nowrap; }
-#combatRoll .savage-target { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; opacity: .86; }
-#combatRoll .savage-hit { font-size: 10px; margin: 2px 0 4px; overflow-wrap: anywhere; }
-#combatRoll .savage-attempts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
-#combatRoll .savage-attempt { display: flex; flex-wrap: wrap; gap: 3px 6px; align-items: center; min-width: 0; border: 1px solid #b3b28a55; border-radius: 4px; padding: 4px 6px; background: #11251ce6; }
-#combatRoll .savage-attempt.selected { border-color: var(--gold); background: #495331; }
-#combatRoll .savage-attempt-name { font-size: 10px; opacity: .85; white-space: nowrap; }
-#combatRoll .savage-dice { font-size: 12px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
-#combatRoll .savage-choice { font-size: 9px; color: var(--gold); white-space: nowrap; }
-#combatRoll .savage-result { margin-top: 4px; font-size: 10px; overflow-wrap: anywhere; }
-#combatRoll.has-savage-roll .combat-current-result { border-top: 1px solid #b3b28a44; margin-top: 5px; padding-top: 4px; font-size: 10px; overflow-wrap: anywhere; }
-#gameUI .notice-feed:has(#combatRoll.has-roll-breakdown) { max-height: none; }
-#gameUI.mobile-hud .notice-feed:has(#combatRoll.has-roll-breakdown) {
-  max-height: none; top: auto; bottom: calc(var(--mobile-bottom) + calc(116 * var(--mobile-unit, 1px)));
+#gameUI #combatRoll[hidden] { display: none !important; }
+#gameUI #combatRoll .savage-receipt { min-width: 0; }
+#gameUI #combatRoll .savage-heading {
+  display: flex; gap: calc(5 * var(--roll-unit)); align-items: baseline;
+  margin: 0 0 calc(1 * var(--roll-unit));
+}
+#gameUI #combatRoll .savage-heading strong,
+#gameUI #combatRoll .combat-result-heading { color: var(--gold); font-size: inherit; }
+#gameUI #combatRoll .savage-heading strong { white-space: nowrap; }
+#gameUI #combatRoll .savage-target {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; opacity: .86;
+}
+#gameUI #combatRoll .savage-hit,
+#gameUI #combatRoll .combat-result-line,
+#gameUI #combatRoll .savage-result {
+  font-size: calc(10 * var(--roll-unit)); line-height: 1.25;
+  margin: calc(1 * var(--roll-unit)) 0;
+  overflow-wrap: anywhere;
+}
+#gameUI #combatRoll .savage-attempts {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(4 * var(--roll-unit)); margin: calc(2 * var(--roll-unit)) 0;
+}
+#gameUI #combatRoll .savage-attempt {
+  display: flex; flex-wrap: wrap; align-items: baseline;
+  gap: 0 calc(4 * var(--roll-unit)); min-width: 0;
+  padding: calc(1 * var(--roll-unit)) calc(3 * var(--roll-unit));
+  border: 0; border-radius: calc(2 * var(--roll-unit));
+  background: transparent;
+}
+#gameUI #combatRoll .savage-attempt.selected { background: #495331; }
+#gameUI #combatRoll .savage-attempt-name {
+  font-size: calc(9 * var(--roll-unit)); opacity: .8; white-space: nowrap;
+}
+#gameUI #combatRoll .savage-dice {
+  font-size: calc(11 * var(--roll-unit)); overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+/* Keep the full accessible text, but the visual selection needs only a tick. */
+#gameUI #combatRoll .savage-choice { font-size: 0; line-height: 0; }
+#gameUI #combatRoll .savage-attempt.selected .savage-choice::after {
+  content: '✓'; font-size: calc(11 * var(--roll-unit)); line-height: 1;
+  color: var(--gold);
+}
+#gameUI #combatRoll .savage-result { font-weight: 600; }
+#gameUI #combatRoll .combat-result-heading {
+  display: block; margin: 0 0 calc(1 * var(--roll-unit));
+  overflow-wrap: anywhere;
+}
+#gameUI #combatRoll.has-savage-roll .combat-current-result {
+  border-top: 1px solid #b3b28a44;
+  margin-top: calc(3 * var(--roll-unit)); padding-top: calc(3 * var(--roll-unit));
+  font-size: inherit; overflow-wrap: anywhere;
+}
+#gameUI.mobile-hud #combatRoll.has-roll-breakdown {
+  --roll-unit: var(--mobile-unit, 1px);
+  top: var(--mobile-top, 8px); bottom: auto; left: auto;
+  right: calc(var(--mobile-right, 8px) + calc(52 * var(--roll-unit)));
+  width: calc(246 * var(--roll-unit));
+  max-width: max(100px, calc(100vw - var(--mobile-left, 8px) - var(--mobile-right, 8px) - calc(280 * var(--roll-unit))));
+}
+/* The minimap, when opened, retains its own place alongside the menu. */
+#gameUI.mobile-hud:has(#hudRightRail:not([hidden]) #minimapCard:not([hidden])) #combatRoll.has-roll-breakdown {
+  right: calc(var(--mobile-right, 8px) + calc(160 * var(--roll-unit)));
+  max-width: max(100px, calc(100vw - var(--mobile-left, 8px) - var(--mobile-right, 8px) - calc(388 * var(--roll-unit))));
 }
 @media (max-width: 700px) and (orientation: portrait) {
-  #gameUI.mobile-hud .notice-feed:has(#combatRoll.has-roll-breakdown) {
-    bottom: calc(var(--mobile-bottom) + calc(236 * var(--mobile-unit, 1px)));
+  #gameUI.mobile-hud #combatRoll.has-roll-breakdown,
+  #gameUI.mobile-hud:has(#hudRightRail:not([hidden]) #minimapCard:not([hidden])) #combatRoll.has-roll-breakdown {
+    top: calc(var(--mobile-top, 8px) + calc(174 * var(--roll-unit)));
+    bottom: auto; left: auto; right: var(--mobile-right, 8px);
+    width: calc(246 * var(--roll-unit));
+    max-width: calc(50vw - var(--mobile-right, 8px) - 16px);
   }
-}
-@media (max-height: 540px) and (orientation: landscape) {
-  #gameUI:not(.mobile-hud) .notice-feed:has(#combatRoll.has-roll-breakdown) { top: auto; bottom: 144px; }
-}
-
-/* UI31 FIX5: actual faces first, numeric arithmetic second, for every result. */
-#gameUI #combatRoll.has-roll-breakdown {
-  max-height: min(42vh, 330px); overflow-x: hidden; overflow-y: auto;
-  pointer-events: auto; overscroll-behavior: contain; touch-action: pan-y;
-  scrollbar-width: thin; font-variant-numeric: tabular-nums;
-}
-#combatRoll .combat-result-heading { display: block; color: var(--gold); margin-bottom: 3px; overflow-wrap: anywhere; }
-#combatRoll .combat-result-line { margin: 2px 0; overflow-wrap: anywhere; }
-#combatRoll .savage-result { font-size: 11px; }
-#combatRoll .savage-hit { margin: 2px 0; }
-@media (min-width: 1101px) and (min-height: 541px) {
-  #gameUI .notice-feed:has(#combatRoll.has-roll-breakdown) { width: 355px; }
+  #gameUI.mobile-hud #combatRoll .savage-attempts { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  #gameUI.mobile-hud:has(#effectsPanel:not([hidden])) #combatRoll.has-roll-breakdown,
+  #gameUI.mobile-hud:has(#hudRightRail:not([hidden]) #minimapCard:not([hidden])):has(#effectsPanel:not([hidden])) #combatRoll.has-roll-breakdown {
+    top: calc(var(--mobile-top, 8px) + calc(244 * var(--roll-unit)));
+  }
 }
 
 /* UI_32. Contextual, non-modal world conversations. No fullscreen blockers. */
