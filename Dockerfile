@@ -11,6 +11,8 @@ RUN python -m pip install --no-cache-dir -r requirements.txt
 # Explicit copies prevent saves, secrets and test accounts entering the image.
 COPY server/ ./server/
 COPY web/ ./web/
+COPY tools/precompress_web.py ./tools/precompress_web.py
+RUN python tools/precompress_web.py web
 COPY run.py LICENSE-SRD.txt ./
 
 EXPOSE 8080

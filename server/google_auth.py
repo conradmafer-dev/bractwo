@@ -322,8 +322,8 @@ async def _read_json(request):
     return payload
 
 
-def register_routes(app, service: GoogleAuthService, account_info=None):
-    """Register routes; ``account_info(sub)`` returns the verified account roster."""
+def register_routes(app, service: GoogleAuthService, account_info=None, on_verified=None):
+    """Register routes; optional synchronous hook runs only after verification."""
     async def config(request):
         payload = {"enabled": service.enabled}
         if service.enabled:
@@ -349,7 +349,10 @@ def register_routes(app, service: GoogleAuthService, account_info=None):
             payload, identity = await service.verify(data.get("challenge"), data.get("credential"),
                                                       request.cookies.get(service.cookie_name))
             payload["account"] = account_info(identity.sub) if account_info else {"characters": [], "max_characters": 4}
-            return web.json_response(payload, headers=_HEADERS)
+            response = web.json_response(payload, headers=_HEADERS)
+            if on_verified is not None:
+                on_verified(request, response, identity)
+            return response
         except AuthError as exc:
             return web.json_response({"error": exc.code, "message": exc.message}, status=exc.status, headers=_HEADERS)
 
