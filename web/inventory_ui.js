@@ -111,12 +111,12 @@
   function close(){panel.hidden=true;hide();if(focus?.isConnected&&focus.getClientRects().length)focus.focus({preventScroll:true});}
   function open(npc){focus=document.activeElement;merchantId=npc?.id||(npc?'starter_merchant':h.state().player?.merchant?.id)||'';tab='buy';h.prepare?.();panel.hidden=false;signature='';render();tabs.firstChild.focus({preventScroll:true});}
   function render(){if(panel.hidden)return;const {player:p,world:w}=h.state();if(!p)return;const seller=merchantId==='starter_merchant'?w.merchant:(w.npcs||[]).find(n=>n.id===merchantId);const trade=!!seller&&p.hp>0&&!(p.combat_remaining>0)&&(p.floor||0)===(seller.floor||0)&&Math.hypot(p.x-seller.x,p.y-seller.y)<=(seller.radius||150);
-    const key=JSON.stringify([tab,p.inventory,p.equipment,p.gold,p.level,p.alive,trade,p.item_previews,merchantId]);if(key===signature)return;signature=key;
+    const key=JSON.stringify([tab,p.inventory,p.equipment,p.gold,p.level,p.alive,trade,p.item_previews,p.shop_prices,merchantId]);if(key===signature)return;signature=key;
     header.firstChild.textContent=seller?.name||'Kupiec';
    summary.textContent=`Złoto: ${p.gold} · `+(trade?'Wybierz przedmiot.':'Handel tylko przy kupcu, poza walką.');foot.firstChild.disabled=!p.alive;
    for(const b of tabs.children){b.classList.toggle('active',b.dataset.tradeTab===tab);b.setAttribute('aria-selected',String(b.dataset.tradeTab===tab));}
    const scroll=body.scrollTop;body.replaceChildren();
-    let items=tab==='buy'?Object.entries(w.items||{}).filter(([key,spec])=>Number.isFinite(spec.price)&&seller?.stock?.includes(key)).map(([key,spec])=>({...spec,template:key,preview:p.item_previews?.[key]})):p.inventory.filter(i=>!Object.values(p.equipment||{}).includes(i.uid));
+    let items=tab==='buy'?Object.entries(w.items||{}).filter(([key,spec])=>Number.isFinite(spec.price)&&seller?.stock?.includes(key)).map(([key,spec])=>({...spec,template:key,price:p.shop_prices?.[key]??spec.price,preview:p.item_previews?.[key]})):p.inventory.filter(i=>!Object.values(p.equipment||{}).includes(i.uid));
    items=items.filter(item=>item.slot!=='potion'||item.potion_kind==='health');
    for(const item of items){const row=node('article',undefined,'merchant-item');row.dataset.template=item.template;
     const img=node('img');img.src=item.icon||'assets/equipment/empty.svg';img.alt='';row.append(img);

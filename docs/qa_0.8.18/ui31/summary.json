@@ -1,0 +1,60 @@
+{
+  "ui_revision": "UI_31",
+  "base": "UI_30_LOWISKA_POTWOROW",
+  "feature_checks": "passed",
+  "new_feats": 10,
+  "initial_catalog_size": 7,
+  "initial_level": 1,
+  "python_final": {
+    "passed": 140,
+    "subtests_passed": 58,
+    "failed": 0,
+    "report": "python_final.txt"
+  },
+  "new_feat_tests_included": 22,
+  "javascript_final": {
+    "passed": 343,
+    "failed": 0,
+    "report": "javascript_final.txt"
+  },
+  "chromium_dom": {
+    "passed_scenarios": 7,
+    "widths": [
+      1440,
+      390,
+      320
+    ],
+    "report": "browser_dom_results.json",
+    "transport": "Python browser binding to real Game.on_packet, not HTTP/WebSocket"
+  },
+  "syntax": {
+    "python_compileall_server": "passed",
+    "changed_js_node_check": "passed"
+  },
+  "historical_broad_suite": {
+    "fully_passed": false,
+    "selected_early_run": {
+      "passed": 135,
+      "failed": 5,
+      "subtests_passed": 55
+    },
+    "failures_reproduced_on_unmodified_ui30": true,
+    "reports": [
+      "python_regression.txt",
+      "ui30_baseline_python_failures.txt"
+    ],
+    "notes": "Old potion catalog expectations and empty class_ids in school/circle-only spell fixtures. Not introduced by this patch."
+  },
+  "javascript_fixture_updates": [
+    "Inline training tests now validate paginated picker; native focus covered by Chromium DOM test.",
+    "Arcane Recovery tests use existing short-rest remaining-resource fields instead of removed 0.8.15 combat cooldown.",
+    "Service worker test expects old UI27 cache to be removed when UI31 is active."
+  ],
+  "limitations": [
+    "Live Google login and physical devices not tested.",
+    "Full HTTP browser navigation blocked by managed browser URL policy; no policy changed.",
+    "No Railway deployment.",
+    "No Godot/Android build.",
+    "Full historical Python suite not certified; additional google.auth test dependency is absent in this environment."
+  ]
+}

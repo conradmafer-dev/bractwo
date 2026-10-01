@@ -159,7 +159,7 @@ def bonus(p, skill_id, ability=None):
     trained = skill_id in selected['class'] + selected['background'] + selected['skilled']
     multiplier = 2 if skill_id in selected['expertise'] else int(trained)
     rules = _rules()
-    return rules.ability_modifier(p, chosen_ability) + multiplier * rules.proficiency(p)
+    return rules.ability_modifier(p, chosen_ability) + multiplier * rules.proficiency(p) + rules.gear.feat_rules.skill_bonus(p,skill_id)
 
 
 def _options(p, source, selected, grants):
@@ -206,7 +206,7 @@ def sheet(p):
     proficiency = rules.proficiency(p)
     rows = []
     for key, spec in SKILLS.items():
-        value = ability_modifiers[spec['ability']] + proficiency * (2 if key in expert else int(key in known))
+        value = ability_modifiers[spec['ability']] + proficiency * (2 if key in expert else int(key in known)) + rules.gear.feat_rules.skill_bonus(p,key)
         rows.append(dict(id=key, **spec, ability_name=ABILITY_NAMES[spec['ability']],
                          bonus=value, passive=10 + value, proficient=key in known, expertise=key in expert,
                          sources=[SOURCE_NAMES[source] for source in SOURCES if key in selected[source]]))

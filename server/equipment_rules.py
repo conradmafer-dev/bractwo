@@ -5,6 +5,8 @@ category. Class training is not the purchased General Feat and never grants its
 ability increase. Sources are merged, so training cannot be acquired twice.
 """
 import copy
+try: from . import feat_rules
+except ImportError: import feat_rules
 
 ALL_CLASSES = ['knight', 'ranger', 'mage', 'druid']
 TRAINING = {
@@ -51,6 +53,8 @@ GENERAL_FEATS = {
     'heavy_armor_master': dict(name='Mistrz ciężkiego pancerza', grants=[], requires=['heavy_armor'], abilities=['strength','constitution'], description='+1 Siła lub Kondycja, maksymalnie 20. W ciężkim pancerzu obrażenia obuchowe, kłute i cięte od trafiających ataków są zmniejszone o premię z biegłości.', icon='assets/feats/heavy_armor_master.svg'),
     'medium_armor_master': dict(name='Mistrz średniego pancerza', grants=[], requires=['medium_armor'], abilities=['strength','dexterity'], description='+1 Siła lub Zręczność, maksymalnie 20. Przy Zręczności co najmniej 16 średni pancerz uwzględnia do +3 do KP ze Zręczności zamiast +2.', icon='assets/feats/medium_armor_master.svg'),
 }
+GENERAL_FEATS.update(feat_rules.NEW_FEATS)
+
 FEAT_LEVELS = (15,35,55,75,90)  # D&D 2024 class 4/8/12/16/19.
 FIGHTER_FEAT_LEVELS = (15,25,35,55,65,75,90)  # Fighter also gets 6 and 14.
 FEAT_RULES_VERSION = 1
@@ -242,6 +246,13 @@ def check_equip(p,item):
 def feat_points(p):return max(0,feat_entitlement(p)-len(getattr(p,'training_feats',{})))
 
 
+def eligible_abilities(p,key):
+    spec=GENERAL_FEATS[key];scores=_rules().own_attributes(p)
+    abilities=[a for a in spec['abilities'] if scores[a]<20]
+    if key=='resilient':abilities=[a for a in abilities if a not in feat_rules.save_proficiencies(p)]
+    return abilities
+
+
 def feat_eligible(p,key):
     s=GENERAL_FEATS.get(key)
     if not s or not s.get('repeatable') and (key in getattr(p,'training_feats',{}) or getattr(p,'origin_feat','')==key):return False
@@ -249,6 +260,8 @@ def feat_eligible(p,key):
         try:from . import skill_rules
         except ImportError:import skill_rules
         if not skill_rules.can_add_skilled(p):return False
+    if s.get('spellcasting') and p.class_id not in ('mage','druid','ranger'):return False
+    if key=='resilient' and not eligible_abilities(p,key):return False
     if s['abilities']:
         scores=_rules().own_attributes(p)
         if sum(max(0,20-scores[a]) for a in s['abilities'])<s.get('ability_points',1):return False
@@ -263,6 +276,7 @@ def select_origin_feat(p,key):
     if not GENERAL_FEATS[key].get('repeatable') and key in getattr(p,'training_feats',{}):return 'Masz już ten atut. Wybierz inny atut pochodzenia.'
     if key=='skilled' and not feat_eligible(p,key):return 'Za mało nowych umiejętności na trzy biegłości tego atutu.'
     if getattr(p,'form',''):return 'Zakończ przemianę przed wyborem atutu.'
+    if p.level<1 or not getattr(p,'class_chosen',True):return 'Najpierw wybierz klasę postaci.'
     p.origin_feat=key
     return ''
 
@@ -282,6 +296,7 @@ def select_feat(p,key,ability='',abilities=None,expected_spent=None):
     if abilities is None and spec.get('ability_points')==2 and isinstance(ability,str) and ability in spec['abilities']:ability=ability+'+'+ability
     allocation=feat_allocations(key,ability)
     if allocation is None:return 'Wybierz właściwe cechy dla tego atutu.'
+    if key=='resilient' and any(a not in eligible_abilities(p,key) for a in allocation):return 'Masz już biegłość w tych rzutach obronnych.'
     scores=_rules().own_attributes(p)
     if any(scores[a]+n>20 for a,n in allocation.items()):return 'Atut nie może zwiększyć cechy powyżej 20.'
     instance=key
@@ -308,7 +323,7 @@ def training_sheet(p):
     def row(key,value=None):
         base=feat_key(key);spec=GENERAL_FEATS[base]
         data=dict(spec,id=key,feat_id=base,icon=spec.get('icon') or f"assets/feats/{spec['grants'][0]}.svg",min_level=15)
-        data['abilities']=[a for a in spec['abilities'] if scores[a]<20]
+        data['abilities']=eligible_abilities(p,base) if value is None else list(spec['abilities'])
         if value is not None:data.update(ability=value,allocation=feat_allocations(key,value) or {},active=key in active_feats(p))
         return data
     archived=[dict(id=k,name=GENERAL_FEATS.get(feat_key(k),{}).get('name',k),reason=v.get('reason','Dawny wybór.'))
@@ -321,7 +336,7 @@ def training_sheet(p):
     return dict(granted=granted_rows(p),points=feat_points(p),levels=list(feat_levels(p)),
         dnd_levels=[1+n//5 for n in feat_levels(p)],earned=feat_entitlement(p),spent=len(getattr(p,'training_feats',{})),score_cap=20,
         migration_notice=getattr(p,'feat_migration_notice',''),archived=archived,
-        origin=dict(chosen=origin_chosen,options=origin_options,points=0 if origin_chosen else 1),
+        origin=dict(chosen=origin_chosen,options=origin_options,points=0 if origin_chosen else int(p.level>=1 and getattr(p,'class_chosen',True))),
         advancement_note='Rozwój cech (+2 albo +1/+1) i atut zużywają ten sam wybór. Na poziomie 90 można wybrać atut z dostępnego katalogu; epickie dary nie są jeszcze dostępne.',
         chosen=[row(k,v) for k,v in getattr(p,'training_feats',{}).items() if feat_key(k)],
         options=[row(k) for k in GENERAL_FEATS if feat_eligible(p,k)],

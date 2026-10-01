@@ -443,6 +443,9 @@ def configure(content, classes, potions):
 # Small client-independent status catalogue. Timers are sent by the server,
 # including public enemy/PvP target effects; no account or owner IDs are exposed.
 STATUS_SPECS = {
+    'feat_slasher_slow': dict(name='Siekacz · spowolnienie', icon='⌁', description='Szybkość mniejsza o 10 stóp na turę przez 3 sekundy. Efekt nie sumuje się.', harmful=True),
+    'feat_slasher_disadvantage': dict(name='Siekacz · osłabione ataki', icon='×', description='Utrudnienie ataków przez 3 sekundy po krytyku Siekacza.', harmful=True),
+    'feat_crusher_exposed': dict(name='Miażdżyciel · odsłonięcie', icon='◎', description='Ataki przeciw temu celowi mają przewagę przez 3 sekundy.', harmful=True),
     'hidden': dict(name='Ukrycie · PvE', icon='◐', description='Ukrycie przed potworami. Inni gracze nadal cię widzą. Atak, czar, mówienie, wykrycie lub opuszczenie osłony kończą ukrycie.', harmful=False),
     'longstrider': dict(name='Długonogi', icon='»', description='+10 stóp szybkości. Atak nie przerywa. Bez koncentracji.', harmful=False),
     'shillelagh': dict(name='Magiczna laska', icon='♧', description='Laska używa Mądrości i wzmocnionej kości obrażeń.', harmful=False),

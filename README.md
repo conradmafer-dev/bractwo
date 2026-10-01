@@ -1,4 +1,12 @@
-# Bractwo Krain 0.8.18 UI_30 — łowiska potworów
+# Bractwo Krain 0.8.18 UI_31 — atuty
+
+Dodano **10 nowych atutów**: cztery początkowe i sześć późniejszych. Od poziomu 1
+postać wybiera jeden z siedmiu atutów początkowych w osobnym oknie z opisem
+i potwierdzeniem. Istniejące postacie zachowują wybory i mogą odebrać niewykorzystany
+pierwszy atut. Późniejsza pula cech/atutów pozostaje wspólna. Nie wymaga resetu.
+[Zasady, lista atutów, testy i wdrożenie UI_31](docs/UI_31_ATUTY.md).
+
+## Zachowana zawartość wcześniejszych aktualizacji
 
 Nowe układy przeciwników wiążą potwory z lokalnym terenem: czaty, obozowiska, watahy, legowiska i dziedzińce ruin. Mieszkańcy mają różne pozycje na podejściu, bokach i w głębi łowiska. Aktualizacja przestawia istniejących przeciwników; zachowuje ich liczbę, statystyki i łupy oraz układ początku gry.
 [Szczegóły i sprawdzenia UI_30](docs/UI_30_LOWISKA_POTWOROW.md).

@@ -1,0 +1,7 @@
+PASS Level1: seven options, pagination, no spend on preview, one keyboard-confirmed packet saves real origin choice
+PASS General feat at15 gives real Dexterity bonus and consumes the shared later advancement budget
+PASS 390px: saved starter retained, Resilient filters class save proficiency and commits a valid +1 Wisdom choice
+PASS Regular feat sheet lists three owned feats, not unavailable catalog choices
+PASS 320px: long description remains inside viewport, Escape cancels without spending, healer saves and reloads at1
+PASS Live combat state disables confirmation and unlocks after combat; closing does not grant or consume a feat
+PASS No JavaScript errors while mounting production UI or processing real server responses

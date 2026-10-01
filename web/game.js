@@ -151,7 +151,7 @@
   if (!googleAuth) ui.authError.textContent = "Nie udało się uruchomić logowania Google. Odśwież stronę.";
 
   function backToLogin() {
-    resetControls(); restUI?.close(); ++connectionSerial; clearTimeout(loginTimer);
+    globalThis.BractwoFeatUI?.close();resetControls(); restUI?.close(); ++connectionSerial; clearTimeout(loginTimer);
     if (socket) socket.close(); socket = null; playing = false; busy(false); me = null;
     ui.authScreen.hidden = false; ui.gameUI.hidden = true; ui.authError.textContent = "";
     googleAuth?.logout();
@@ -289,7 +289,7 @@
     updateEffects(target);
     updatePotionButtons();
     updateQuestTracker(); updateBattleList();
-    characterSheet?.render();merchantPanel?.render();adventurePanel?.render();servicePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();martialPrompt?.sync();advancementPrompt?.sync();
+    characterSheet?.render();merchantPanel?.render();adventurePanel?.render();servicePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();martialPrompt?.sync();advancementPrompt?.sync();globalThis.BractwoFeatUI?.sync(me);
     if(!ui.sidePanel.hidden){if(panelMode==="inventory")renderInventory();else if(panelMode==="journal")renderJournal();else if(panelMode==="progression")renderExpansion();else renderPlayers();}
   }
   function nearestSkillChallenge(){
@@ -475,7 +475,7 @@
       else if(item.slot!=="trophy"){const equip=actionButton("Załóż",()=>send({type:"equip",uid:item.uid}),!validClass||!validLevel||me.hp<=0);equip.dataset.equip=item.uid;equip.dataset.action="equip";equip.dataset.uid=item.uid;actions.append(equip);}
       const sell=actionButton("Sprzedaj",()=>send({type:"sell",uid:item.uid}),!trading||equipped);sell.dataset.sell=item.uid;sell.dataset.action="sell";sell.dataset.uid=item.uid;sell.title=equipped?"Najpierw zdejmij przedmiot":near?"Sprzedaj kupcowi":"Sprzedaż przy kupcu w osadzie";actions.append(sell);row.append(actions);ui.inventoryList.append(row);
     }
-    const prices=world.merchant.prices||world.potion_prices||{};
+    const prices=me.shop_prices||world.merchant.prices||world.potion_prices||{};
     for(const [key,id]of[["health_potion","healthPrice"]]){const amount=prices[key];ui[id].textContent=typeof amount==="number"?`${amount} zł`:"Cena podana przez kupca";}
     ui.merchantHint.textContent=near&&!trading?"Trwa walka. Poczekaj na wygaśnięcie blokady, aby handlować.":near?"Jesteś przy kupcu. Kupuj mikstury i sprzedawaj niezałożony sprzęt.":"Podejdź do kupca w osadzie, aby handlować.";
     ui.buyHealth.disabled=!trading||Number(me.gold)<Number(prices.health_potion??Infinity);ui.restButton.disabled=!me.alive;
@@ -515,7 +515,7 @@
     return {x:me.x+dx/length*192,y:me.y+dy/length*192,floor:me.floor||0};
   }
   function typing() { const active=document.activeElement; return ["INPUT", "TEXTAREA", "SELECT"].includes(active?.tagName) && !["button", "checkbox", "radio"].includes(active?.type) || !!active?.isContentEditable; }
-  function canControl() { return playing && me && me.hp > 0 && !document.hidden && !blurPaused && ui.disconnectPanel.hidden && ui.legacyClassPanel.hidden && !mobileHud?.blocksControls() && !restUI?.blocksControls() && !appShell?.blocksControls() && !typing(); }
+  function canControl() { return !globalThis.BractwoFeatUI?.visible && playing && me && me.hp > 0 && !document.hidden && !blurPaused && ui.disconnectPanel.hidden && ui.legacyClassPanel.hidden && !mobileHud?.blocksControls() && !restUI?.blocksControls() && !appShell?.blocksControls() && !typing(); }
   function resetControls() {
     cancelPointTarget(); hotbarMenu?.close();
     heldKeys.clear(); joystick.x = 0; joystick.y = 0; joystick.pointer = null; attackPointer = null; attackHeld = false;
@@ -604,6 +604,7 @@
   canvas.addEventListener('contextmenu',event=>{if(pendingPointTarget){event.preventDefault();cancelPointTarget();}});
   // Enter opens chat, while layout/app controls retain native keyboard activation.
   addEventListener("keydown",event=>{
+    if(globalThis.BractwoFeatUI?.visible){if(event.code==="Escape"){event.preventDefault();globalThis.BractwoFeatUI.close();}return;}
     if(!playing||mobileHud?.blocksControls()||restUI?.blocksControls()||appShell?.blocksControls())return;
     if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton, #hotbarGroupMenu button, .hotbar-group-toggle'))return;
     if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
@@ -618,7 +619,7 @@
       if(!event.repeat){if(document.activeElement===ui.chatInput)submitChat();else openChat();}return;
     }
     if(typing()){
-      if(event.code==="Escape"){event.preventDefault();closeChat();}
+      if(event.code==="Escape"){event.preventDefault();if(globalThis.BractwoFeatUI?.visible){globalThis.BractwoFeatUI.close();return;}closeChat();}
       return;
     }
     if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].includes(event.code)||Runtime.hotbarSlotForCode(event.code)>=0)event.preventDefault();
@@ -1692,7 +1693,7 @@
   levelUpPanels=globalThis.BractwoLevelUp.create({send,ready:()=>playing&&socket?.readyState===WebSocket.OPEN,open:(tab,section)=>characterSheet.open(tab,section)});
   let fighterPrompt=null,casterPrompt=null,martialPrompt=null,advancementPrompt=null;
   characterSheet=globalThis.BractwoCharacterSheet.create({
-    state:()=>({player:me,world,skill_challenges:snapshot.skill_challenges}),navigate:site=>{navigateTo(site,site.name);characterSheet.close();},send,cast,gate:spellGate,mana:spellMana,nearMaster:()=>!!nearbyService("master"),
+    state:()=>({player:me,world,skill_challenges:snapshot.skill_challenges}),stop:resetControls,navigate:site=>{navigateTo(site,site.name);characterSheet.close();},send,cast,gate:spellGate,mana:spellMana,nearMaster:()=>!!nearbyService("master"),
     selectedAlly:()=>snapshot.players.find(q=>String(q.id)===String(selectedTarget)&&q.hp>0&&me?.party_id&&q.party_id===me.party_id)||null,
     targetPoint,
     beginPointAction,
@@ -1712,7 +1713,7 @@
     character:tab=>characterSheet.open(tab),conversation:npc=>adventurePanel.open(npc),
     prepare:()=>{resetControls();closeChat();adventurePanel?.close();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   hudWindows=globalThis.BractwoWindows.create({stop:resetControls,levelLayout:()=>levelUpPanels?.layout()});
-  advancementPrompt=globalThis.BractwoSkillsUI.createPrompt({player:()=>me,session:()=>connectionSerial,open:tab=>characterSheet.open(tab)});
+  advancementPrompt=globalThis.BractwoSkillsUI.createPrompt({player:()=>me,session:()=>connectionSerial,open:(tab,section)=>characterSheet.open(tab,section),pick:mode=>globalThis.BractwoFeatUI.open(mode,me,{state:()=>({player:me,world}),send,stop:resetControls})});
   fighterPrompt=globalThis.BractwoFighterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab,'class')});
   casterPrompt=globalThis.BractwoCasterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab,'class')});
   martialPrompt=globalThis.BractwoMartialUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab,'class')});

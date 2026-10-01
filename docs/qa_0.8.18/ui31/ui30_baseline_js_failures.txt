@@ -1,0 +1,274 @@
+TAP version 13
+# Subtest: fullscreen is requested by a click and browser events synchronize every control
+ok 1 - fullscreen is requested by a click and browser events synchronize every control
+  ---
+  duration_ms: 3.252321
+  type: 'test'
+  ...
+# Subtest: fullscreen denial opens dismissible help, stops movement and permits retry
+ok 2 - fullscreen denial opens dismissible help, stops movement and permits retry
+  ---
+  duration_ms: 2.175882
+  type: 'test'
+  ...
+# Subtest: iPhone without fullscreen receives honest Add to Home Screen instructions
+ok 3 - iPhone without fullscreen receives honest Add to Home Screen instructions
+  ---
+  duration_ms: 0.831831
+  type: 'test'
+  ...
+# Subtest: accepted install prompt does not falsely report completed installation
+ok 4 - accepted install prompt does not falsely report completed installation
+  ---
+  duration_ms: 0.73814
+  type: 'test'
+  ...
+# Subtest: dismissed install consumes the prompt and the next click offers manual help
+ok 5 - dismissed install consumes the prompt and the next click offers manual help
+  ---
+  duration_ms: 0.819993
+  type: 'test'
+  ...
+# Subtest: standalone mode hides install affordances and worker only registers on secure origins
+ok 6 - standalone mode hides install affordances and worker only registers on secure origins
+  ---
+  duration_ms: 0.932783
+  type: 'test'
+  ...
+# Subtest: worker precaches only disconnected page and icons, and preserves unrelated caches
+not ok 7 - worker precaches only disconnected page and icons, and preserves unrelated caches
+  ---
+  duration_ms: 2.169032
+  type: 'test'
+  location: '/mnt/data/bractwo_ui30_baseline/tests/test_app_shell.cjs:147:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+        'bractwo-app-shell-0.8.17',
+        'bractwo-app-shell-0.8.18',
+        'bractwo-app-shell-0.8.18-ui25',
+        'bractwo-app-shell-0.8.18-ui26',
+    +   'bractwo-app-shell-0.8.18-ui27'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'bractwo-app-shell-0.8.17'
+    1: 'bractwo-app-shell-0.8.18'
+    2: 'bractwo-app-shell-0.8.18-ui25'
+    3: 'bractwo-app-shell-0.8.18-ui26'
+  actual:
+    0: 'bractwo-app-shell-0.8.17'
+    1: 'bractwo-app-shell-0.8.18'
+    2: 'bractwo-app-shell-0.8.18-ui25'
+    3: 'bractwo-app-shell-0.8.18-ui26'
+    4: 'bractwo-app-shell-0.8.18-ui27'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui30_baseline/tests/test_app_shell.cjs:150:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: worker never intercepts game code, API, credential POST or cross-origin requests
+ok 8 - worker never intercepts game code, API, credential POST or cross-origin requests
+  ---
+  duration_ms: 0.79123
+  type: 'test'
+  ...
+# Subtest: navigation loads fresh HTML online and falls back to disconnected page offline
+ok 9 - navigation loads fresh HTML online and falls back to disconnected page offline
+  ---
+  duration_ms: 0.828266
+  type: 'test'
+  ...
+# Subtest: Recovery is ready in combat and during main action cooldown
+not ok 10 - Recovery is ready in combat and during main action cooldown
+  ---
+  duration_ms: 7.432478
+  type: 'test'
+  location: '/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:4:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage()))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:4:72)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: Recovery remains ready while moving
+not ok 11 - Recovery remains ready while moving
+  ---
+  duration_ms: 1.229438
+  type: 'test'
+  location: '/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:5:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage({dx:1,dy:-1})))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:5:48)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: Recovery is also ready outside combat
+not ok 12 - Recovery is also ready outside combat
+  ---
+  duration_ms: 0.483588
+  type: 'test'
+  location: '/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:6:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage({combat_remaining:0,pvp_combat_remaining:0})))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:6:50)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Full mana disables Recovery
+ok 13 - Full mana disables Recovery
+  ---
+  duration_ms: 0.843969
+  type: 'test'
+  ...
+# Subtest: Fractional missing mana enables Recovery
+not ok 14 - Fractional missing mana enables Recovery
+  ---
+  duration_ms: 0.448174
+  type: 'test'
+  location: '/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage({mana:39.5})))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:8:53)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Cooldown and bonus action disable Recovery
+ok 15 - Cooldown and bonus action disable Recovery
+  ---
+  duration_ms: 0.119189
+  type: 'test'
+  ...
+# Subtest: Only living mage in normal form can use Recovery
+ok 16 - Only living mage in normal form can use Recovery
+  ---
+  duration_ms: 0.198979
+  type: 'test'
+  ...
+# Subtest: A ritual in progress must be cancelled first
+ok 17 - A ritual in progress must be cancelled first
+  ---
+  duration_ms: 0.087812
+  type: 'test'
+  ...
+# Subtest: Concentration and armor do not block Recovery
+not ok 18 - Concentration and armor do not block Recovery
+  ---
+  duration_ms: 0.676147
+  type: 'test'
+  location: '/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:12:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(mage({concentration:'wall_of_fire',character_sheet:{training:{armor_penalty:true},caster:{channel:{}}}})))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:12:58)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: Readiness does not mutate client state
+not ok 19 - Readiness does not mutate client state
+  ---
+  duration_ms: 1.298132
+  type: 'test'
+  location: '/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:13:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    The expression evaluated to a falsy value:
+    
+      assert(canRecover(p))
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (/mnt/data/bractwo_ui30_baseline/tests/test_arcane_recovery_0815.cjs:13:98)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 12
+# fail 7
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 70.37426

@@ -295,8 +295,11 @@ class DruidCircleGame:
         if damage <= 0 or p.concentration_until <= self.now(): return
         dc = max(10, math.floor(damage/2))
         bonus = rules.save_bonus(p, 'constitution') + self.circle_roll_adjustment(p, 'concentration', ability='constitution')
-        raw = self.combat_rng.randint(1, 20); roll = max(raw, circles.roll_floor(p, 'constitution', 'concentration'))
-        result = dict(check='concentration', roll=roll, rolls=[raw], bonus=bonus, total=roll+bonus, defense=dc, saved=roll+bonus >= dc, hit=False, damage=0, damage_dice='')
+        advantage=rules.gear.has_feat(p,'war_caster')
+        rolls=[self.combat_rng.randint(1,20) for _ in range(2 if advantage else 1)]
+        roll=max(max(rolls),circles.roll_floor(p,'constitution','concentration'))
+        result = dict(check='concentration', roll=roll, rolls=rolls, advantage=advantage, bonus=bonus, total=roll+bonus, defense=dc, saved=roll+bonus >= dc, hit=False, damage=0, damage_dice='')
+        if rules.gear.feat_rules.lucky_save(p,result,self.combat_rng):self._circle_save(p)
         self.report_roll(p, p, result, 'Koncentracja', p)
         if not result['saved']: self.break_concentration(p)
 

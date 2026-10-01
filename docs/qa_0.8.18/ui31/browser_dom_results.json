@@ -1,0 +1,63 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "Level1: seven options, pagination, no spend on preview, one keyboard-confirmed packet saves real origin choice",
+      "layout": {
+        "x": 420,
+        "y": 190.7734375,
+        "right": 1020,
+        "bottom": 709.2265625,
+        "width": 1440,
+        "height": 900,
+        "client": 598,
+        "scroll": 598
+      }
+    },
+    {
+      "name": "General feat at15 gives real Dexterity bonus and consumes the shared later advancement budget"
+    },
+    {
+      "name": "390px: saved starter retained, Resilient filters class save proficiency and commits a valid +1 Wisdom choice",
+      "layout": {
+        "x": 12,
+        "y": 147.7578125,
+        "right": 378,
+        "bottom": 696.2421875,
+        "width": 390,
+        "height": 844,
+        "client": 364,
+        "scroll": 364
+      }
+    },
+    {
+      "name": "Regular feat sheet lists three owned feats, not unavailable catalog choices"
+    },
+    {
+      "name": "320px: long description remains inside viewport, Escape cancels without spending, healer saves and reloads at1",
+      "layout": {
+        "x": 12,
+        "y": 51.796875,
+        "right": 308,
+        "bottom": 516.203125,
+        "width": 320,
+        "height": 568,
+        "client": 294,
+        "scroll": 294
+      }
+    },
+    {
+      "name": "Live combat state disables confirmation and unlocks after combat; closing does not grant or consume a feat"
+    },
+    {
+      "name": "No JavaScript errors while mounting production UI or processing real server responses"
+    }
+  ],
+  "errors": [],
+  "limits": [
+    "Local DOM in headless Chromium; production scripts and styles, real Game.on_packet and save/load with in-memory SQLite.",
+    "Browser-to-Python binding replaces HTTP/WebSocket; no live Google login, physical device, full world render or Railway test.",
+    "The separate end-to-end HTTP browser runner could not run here: managed Chromium blocks URL navigation. No browser policy was changed."
+  ],
+  "chromium": "144.0.7559.96"
+}

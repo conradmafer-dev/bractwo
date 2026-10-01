@@ -1,0 +1,11 @@
+{
+  "ok": false,
+  "checks": [],
+  "errors": [],
+  "failedAssets": [],
+  "limits": [
+    "Isolated loopback HTTP/WebSocket server, in-memory database, fake Google verifier, fixture-set levels and paused monster AI. Production choices and save handlers execute unchanged.",
+    "Headless Chromium at 1440x900, touch390x844 and touch320x568. No physical-device, live Google login or Railway deployment test."
+  ],
+  "failure": "page.goto: net::ERR_BLOCKED_BY_ADMINISTRATOR at http://127.0.0.1:8775/\nCall log:\n  - navigating to \"http://127.0.0.1:8775/\", waiting until \"networkidle\"\n\n    at open (/mnt/data/bractwo_work/Bractwo_0.8.18/tools/browser_ui31.cjs:28:11)\n    at async main (/mnt/data/bractwo_work/Bractwo_0.8.18/tools/browser_ui31.cjs:34:8)"
+}

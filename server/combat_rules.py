@@ -111,7 +111,7 @@ def armor_class(p):
 def save_bonus(p,ability='dexterity'):
     if getattr(p,'is_companion',False):return max(2,p.attack_bonus) if ability in ('strength','dexterity') else 1
     if environment.polymorph(p):return caster.form_spec(p).get('saves',{}).get(ability,ability_modifier(p,ability))
-    base=ability_modifier(p,ability)+(proficiency(p) if ability in p.spec['saves'] else 0)
+    base=ability_modifier(p,ability)+(proficiency(p) if ability in gear.feat_rules.save_proficiencies(p) else 0)
     if p.form:base=max(base,caster.form_spec(p).get('saves',{}).get(ability,base))
     return base+circles.save_bonus(p,ability)+magic_items.effect(p,'protection')+(2 if ability=='dexterity' and (active_buff(p,'nature_sanctuary') or active_buff(p,'wizard_shelter')) else 0)-getattr(p,'exhaustion',0)*2
 
@@ -214,6 +214,7 @@ def begin_feat_turn(p,now):
     if now>=getattr(p,'_feat_turn_until',0):
         p._feat_turn_until=now+ROUND_SECONDS
         p._savage_attack_used=False
+        p._piercer_used=p._slasher_used=p._crusher_used=False
 
 
 def savage_attacker_damage(p,result,rng,now):
@@ -361,6 +362,7 @@ class CombatRounds:
         self.environment_adjust_damage(p,enemy,result,dice,melee)
         if not spell:
             savage_attacker_damage(p,result,self.combat_rng,self.now())
+            gear.feat_rules.weapon_damage(p,result,self.combat_rng,self.now())
             self.fighter_adjust_damage(p,result)
         if spell:self.wizard_adjust_spell_attack(p,enemy,result,dice)
         self.circle_adjust_damage(p,enemy,result,weapon=not spell)
@@ -370,6 +372,7 @@ class CombatRounds:
         if result['hit'] or result.get('graze') or result.get('potent_cantrip'):
             self.add_hunters_mark(p,enemy,result)
             result['damage']=self.environment_damage_enemy(enemy,result['damage'],p,result['damage_type'],result.get('damage_components'),critical=result.get('critical',False));self.remember_attacker(enemy,p)
+        gear.feat_rules.weapon_riders(self,p,enemy,result,spell)
         self.report_roll(p,enemy,result,action,p)
         self.martial_after_weapon_hit(p,enemy,result,spell)
         return result
@@ -391,6 +394,7 @@ class CombatRounds:
                 damage_type=result.get('damage_type','bludgeoning'),damage_components=result.get('damage_components'),
                 is_attack=result.get('check')=='attack' and bool(result.get('hit')),source=source,is_spell=result.get('is_spell',False))
             result['damage']=round(before-target.hp-getattr(target,'temp_hp',0),1)
+        if owner is source:gear.feat_rules.weapon_riders(self,source,target,result,result.get('is_spell',False))
         self.report_roll(source,target,result,action,owner)
         if owner is source:self.martial_after_weapon_hit(source,target,result,result.get('is_spell',False))
         self.martial_after_incoming_attack(source,target,result)
@@ -440,6 +444,7 @@ class CombatRounds:
             if spell:self.wizard_adjust_spell_attack(source,target,result,chosen)
             if pvp and not spell:
                 savage_attacker_damage(source,result,self.combat_rng,self.now())
+                gear.feat_rules.weapon_damage(source,result,self.combat_rng,self.now())
                 self.fighter_adjust_damage(source,result)
         result['damage_type']=kind
         result['is_spell']=bool(spell)

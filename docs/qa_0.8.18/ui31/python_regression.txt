@@ -1,0 +1,69 @@
+............................................ [ 11%]
+.................................................. [ 23%]
+.....F...................F................FF.F
+=================================== FAILURES ===================================
+______ Catalog.test_catalog_rewards_and_authored_loot_only_expose_health _______
+
+self = <test_health_potions_0818.Catalog testMethod=test_catalog_rewards_and_authored_loot_only_expose_health>
+
+    def test_catalog_rewards_and_authored_loot_only_expose_health(self):
+        self.assertEqual(set(POTIONS), {'health_potion', 'health_potion_2', 'health_potion_3', 'health_potion_4'})
+        self.assertFalse(any(inv.retired_potion(key) for key in ITEMS))
+        self.assertTrue(all(ITEMS[key]['potion_kind'] == 'health' for key in POTIONS))
+        self.assertEqual(MERCHANT['prices'], {'health_potion': 15})
+        for quest in QUESTS:
+            self.assertTrue(set(quest['reward'].get('potions', {})).issubset(POTIONS))
+        for kind, spec in ENEMY_TYPES.items():
+            entries = [entry for entry in spec['loot']['entries'] if entry['kind'] == 'potion']
+>           self.assertEqual(len(entries), 0 if kind in loot_content.NO_POTIONS else 1)
+E           AssertionError: 0 != 1
+
+tests/test_health_potions_0818.py:33: AssertionError
+_________________________ PVPMagic.test_catalogue_blur _________________________
+
+self = <test_pvp_magic.PVPMagic testMethod=test_catalogue_blur>
+
+    async def check(self):
+>       s=dnd.SPELLS[key];p,q=self.duel(s['class_ids'][0]);self.g.combat_rng=base.Dice(10,3)
+                                        ^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/test_pvp_magic.py:450: IndexError
+___________________ PVPMagic.test_catalogue_conjure_animals ____________________
+
+self = <test_pvp_magic.PVPMagic testMethod=test_catalogue_conjure_animals>
+
+    async def check(self):
+>       s=dnd.SPELLS[key];p,q=self.duel(s['class_ids'][0]);self.g.combat_rng=base.Dice(10,3)
+                                        ^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/test_pvp_magic.py:450: IndexError
+__________________ PVPMagic.test_catalogue_conjure_elemental ___________________
+
+self = <test_pvp_magic.PVPMagic testMethod=test_catalogue_conjure_elemental>
+
+    async def check(self):
+>       s=dnd.SPELLS[key];p,q=self.duel(s['class_ids'][0]);self.g.combat_rng=base.Dice(10,3)
+                                        ^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/test_pvp_magic.py:450: IndexError
+____________________ PVPMagic.test_catalogue_control_water _____________________
+
+self = <test_pvp_magic.PVPMagic testMethod=test_catalogue_control_water>
+
+    async def check(self):
+>       s=dnd.SPELLS[key];p,q=self.duel(s['class_ids'][0]);self.g.combat_rng=base.Dice(10,3)
+                                        ^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/test_pvp_magic.py:450: IndexError
+=========================== short test summary info ============================
+FAILED tests/test_health_potions_0818.py::Catalog::test_catalog_rewards_and_authored_loot_only_expose_health - AssertionError: 0 != 1
+FAILED tests/test_pvp_magic.py::PVPMagic::test_catalogue_blur - IndexError: list index out of range
+FAILED tests/test_pvp_magic.py::PVPMagic::test_catalogue_conjure_animals - IndexError: list index out of range
+FAILED tests/test_pvp_magic.py::PVPMagic::test_catalogue_conjure_elemental - IndexError: list index out of range
+FAILED tests/test_pvp_magic.py::PVPMagic::test_catalogue_control_water - IndexError: list index out of range
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 5 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+5 failed, 135 passed, 55 subtests passed in 31.26s

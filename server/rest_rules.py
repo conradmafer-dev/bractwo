@@ -6,7 +6,7 @@ except ImportError:
 
 NAMES = {'hit_dice':'Kości zdrowia', 'arcane_recovery':'Odzyskanie mocy',
          'second_wind':'Drugi oddech', 'action_surge':'Zryw akcji',
-         'animal_companion':'Przywołanie towarzysza'}
+         'animal_companion':'Przywołanie towarzysza', 'lucky':'Szczęściarz'}
 
 def state(p):
     if not isinstance(getattr(p,'rest_resources',None),dict):p.rest_resources={}
@@ -14,6 +14,10 @@ def state(p):
 
 def maximum(p,key):
     level=caster.effective_level(p)
+    if key=='lucky':
+        try:from . import equipment_rules as gear
+        except ImportError:import equipment_rules as gear
+        return 2+(level-1)//4 if gear.has_feat(p,'lucky') else 0
     if key=='hit_dice':return level
     if key=='arcane_recovery':return int(p.class_id=='mage')
     if key=='second_wind':return 2+int(level>=4)+int(level>=10) if p.class_id=='knight' else 0
@@ -65,7 +69,7 @@ def finish(p,kind,rng,recover=True):
             import combat_rules as rules
         con=(rules.own_attributes(p)['constitution']-10)//2
         while p.hp<p.max_hp and spend(p,'hit_dice'):
-            used+=1;p.hp=min(p.max_hp,p.hp+max(0,rng.randint(1,p.spec['hit_die'])+con))
+            used+=1;p.hp=min(p.max_hp,p.hp+max(0,rules.gear.feat_rules.rest_die(p,rng)+con))
         restore(p,'second_wind',1);restore(p,'action_surge')
         if recover and p.mana<p.max_mana and spend(p,'arcane_recovery'):
             p.mana=min(p.max_mana,p.mana+caster.recovery_amount(p))

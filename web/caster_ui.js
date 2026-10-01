@@ -10,7 +10,8 @@
  function canChoose(p,nearMaster){return p.class_id==='druid'&&!!p.alive&&!p.form&&!(p.combat_remaining>0)&&(!p.character_sheet?.caster?.order||!!nearMaster);}
  function trainingReason(p,feat,selection){
   if(!p?.alive)return 'Atut wybierzesz po odrodzeniu.';
-  if(p.form)return 'Atut wybierzesz po zakończeniu przemiany.';
+  if(p.class_chosen===false)return 'Najpierw wybierz profesję.';
+  if(p.form||p.polymorph)return 'Atut wybierzesz po zakończeniu przemiany.';
   if(p.combat_remaining>0)return 'Atut wybierzesz po zakończeniu walki.';
   if(!(p.character_sheet?.training?.points>0))return 'Brak dostępnego wyboru atutu.';
   if(!feat)return 'Ten atut nie jest już dostępny.';
@@ -264,26 +265,14 @@
   const train=node('section',undefined,'training-owned');train.append(node('h3','Wyszkolenie'));
   for(const t of tr.granted||[]){const item=node('div',undefined,'training-chip');item.append(image(t.icon),node('span',t.name));item.title=t.sources.join(' · ');train.append(item);}parent.append(train);}
   if(h.featSection==='training')return;
-  if(tr.chosen?.length){const row=node('section',undefined,'training-selected');row.append(node('h3','Wybrane atuty'));for(const f of tr.chosen)row.append(node('p',trainingSummary(f)));parent.append(row);}
-  const available=node('section',undefined,'training-available');available.append(node('h3','Atuty'+(tr.points?' · dostępne wybory: '+tr.points:'')));
-  if(!tr.points)available.append(node('small','Wybory na poziomach '+(tr.levels||[]).join(', ')+'.'));
-  const options=(tr.options||[]).filter(f=>h.featSection!=='general'||f.id!=='ability_score_improvement');
-  if(h.featSection==='general')available.append(node('small','Atut i rozwój cech korzystają ze wspólnej puli wyborów. Cechy zwiększysz w zakładce Cechy → Rozwój.'));
-  for(const f of options){const row=node('article',undefined,'training-option');row.dataset.feat=f.id;row.dataset.abilityPoints=String(f.ability_points||1);row.append(image(f.icon));const text=node('div');text.append(node('strong',f.name),node('small',f.description));row.append(text);
-   const current=()=>h.state?.().player||p,key=String(p.id)+':'+f.id,saved=trainingChoices.get(key),pickers=node('div',undefined,'training-pickers');
-   if(f.ability_points===2)pickers.append(node('small','Wybierz tę samą cechę dwa razy (+2) albo dwie różne (+1 i +1).'));
-   for(let i=0;i<(f.abilities?.length?(f.ability_points===2?2:1):0);i++){
-    const select=node('select');select.setAttribute('aria-label',f.name+(f.ability_points===2?' · punkt '+(i+1):' · cecha'));
-    for(const a of f.abilities)select.append(new Option('+1 '+(abilityNames[a]||a),a));
-    const remembered=Array.isArray(saved)?saved[i]:saved;if(f.abilities.includes(remembered))select.value=remembered;
-    else if(i===1&&Number(p.attributes?.[select.value]||0)>=19){const other=f.abilities.find(a=>a!==select.value);if(other)select.value=other;}
-    select.addEventListener('change',()=>{trainingChoices.set(key,trainingSelection(row));syncTraining(parent,current(),h);});pickers.append(select);
-   }
-   if(pickers.childNodes.length)text.append(pickers);
-   text.append(node('small','','training-reason'));
-   row.append(button('Wybierz',()=>{const latest=current(),feat=latest.character_sheet?.training?.options?.find(option=>option.id===f.id),selection=trainingSelection(row);if(!trainingReason(latest,feat,selection))h.send({type:'training_feat',feat:f.id,...(Number.isInteger(latest.character_sheet.training.spent)?{expected_spent:latest.character_sheet.training.spent}:{}),...(Array.isArray(selection)?{abilities:selection}:{ability:selection})});}));available.append(row);}
-  if(!options.length)available.append(node('p','Brak dostępnych atutów. Niewydane wybory pozostają zapisane.','sheet-hint'));
-  parent.append(available);syncTraining(parent,p,h);
+  const owned=[...(tr.origin?.chosen?[tr.origin.chosen]:[]),...(tr.chosen||[])];
+  if(owned.length){const row=node('section',undefined,'training-selected');row.append(node('h3','Wybrane atuty'));for(const f of owned){const item=node('article',undefined,'training-owned-feat');item.append(image(f.icon),node('strong',trainingSummary(f)),node('p',f.description));row.append(item);}parent.append(row);}
+  const available=node('section',undefined,'training-available');
+  if(tr.origin?.points>0)available.append(button('Wybierz pierwszy atut · poziom 1',()=>root.BractwoFeatUI.open('origin',h.state?.().player||p,h)));
+  if(tr.points>0){available.append(node('h3','Dostępne wybory rozwoju: '+tr.points),button('Wybierz atut',()=>root.BractwoFeatUI.open('general',h.state?.().player||p,h)));}
+  available.append(node('small','Kolejne wybory: '+(tr.levels||[]).join(', ')+'. Atuty i cechy korzystają ze wspólnej puli; pierwszy atut jest osobny.'));
+  parent.append(available);
+
  }
  function createPrompt(h){const p=node('section',undefined,'fighter-choice caster-choice');p.id='casterChoice';p.hidden=true;
   const head=node('header'),title=node('strong'),description=node('p'),choose=button('Wybierz',()=>h.open('feats'));head.append(title,button('×',close));p.append(head,description,choose);
@@ -294,5 +283,5 @@
   function sync(){const x=h.player(),kind=pending(x);let hidden=!kind;if(x){hidden=hidden||closed.has(key(x));try{hidden=hidden||localStorage.getItem(key(x))==='1';}catch{}}p.hidden=hidden;title.textContent=kind==='school'?'Szkoła czarodzieja':kind==='circle'?'Krąg druida':'Ścieżka druida';description.textContent=kind==='school'?'Promocja odblokowała wybór szkoły magii. Poznaj cztery szkoły i wybierz jedną.':kind==='circle'?'Wybierz krąg Ziemi, Księżyca, Morza lub Gwiazd.':'Strażnik czy Mistyk natury?';choose.textContent=kind==='school'?'Wybierz szkołę':kind==='circle'?'Wybierz krąg':'Wybierz ścieżkę';}
   return{sync};
  }
- root.BractwoCasterUI={feats,actions,createPrompt,canChoose,canRecover,hasShapeUse,syncTraining,syncCircle,syncSchool};if(typeof module!=='undefined')module.exports={canChoose,canRecover,hasShapeUse,trainingReason,trainingSummary,circleReason,schoolReason,schoolTargetAllowed,portentAvailable};
+ root.BractwoCasterUI={trainingReason,feats,actions,createPrompt,canChoose,canRecover,hasShapeUse,syncTraining,syncCircle,syncSchool};if(typeof module!=='undefined')module.exports={canChoose,canRecover,hasShapeUse,trainingReason,trainingSummary,circleReason,schoolReason,schoolTargetAllowed,portentAvailable};
 })(globalThis);

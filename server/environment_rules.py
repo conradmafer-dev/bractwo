@@ -85,6 +85,7 @@ def movement_speed(actor,speed,surface=1):
     # Tree Stride spends ten feet of this turn's movement budget.
     cost=conditions(actor).get('tree_movement_cost',{})
     movement_cost=float(cost.get('feet',0))*6.4/3 if active(actor,'tree_movement_cost') else 0
+    if active(actor,'feat_slasher_slow') and not active(actor,'freedom') and not magic_items.effect(actor,'free_action'):movement_cost+=10*6.4/3
     return max(0,speed*surface-movement_cost)
 
 def public(actor,private=False):
@@ -341,7 +342,8 @@ class EnvironmentGame:
         spec=enemy_spec(source) if not hasattr(source,'class_id') else caster.form_spec(source)
         if active(target,'blur',now) and not spec.get('blindsight') and not spec.get('truesight') and not self.wizard_third_eye(source):dis=True
         bolt=conditions(target).pop('guiding_bolt',{})
-        adv=adv or bolt.get('until',0)>now
+        adv=adv or bolt.get('until',0)>now or active(target,'feat_crusher_exposed',now)
+        dis=dis or active(source,'feat_slasher_disadvantage',now)
         # Retain the already computed benefit for this roll, then reveal before
         # damage riders can trigger a second weapon attack (e.g. Horde Breaker).
         self.environment_reveal(source)
@@ -421,7 +423,10 @@ class EnvironmentGame:
         if self.is_player_target(target) and ability in ('strength','dexterity'):dis=dis or rules.gear.armor_penalty(target)
         advantage=active(target,'foresight',self.now()) or ability=='strength' and active(target,'conjure_animals_strength',self.now())
         if getattr(self,'_wizard_spell_source',None) is not None:advantage=advantage or self.wizard_spell_save_advantage(target)
-        return rules.roll_save(self.combat_rng,bonus,dc,damage,half,advantage=advantage,disadvantage=dis,fixed_roll=self.wizard_save_portent(target))
+        result=rules.roll_save(self.combat_rng,bonus,dc,damage,half,advantage=advantage,disadvantage=dis,fixed_roll=self.wizard_save_portent(target))
+        if rules.gear.feat_rules.lucky_save(target,result,self.combat_rng,damage):
+            with self.db:self.save_player(target)
+        return result
 
     def environment_ability_check(self,actor,ability,dc,skill=''):
         try:

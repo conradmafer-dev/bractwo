@@ -375,6 +375,9 @@ class Player:
     exhaustion: int = 0
     _feat_turn_until: float = 0
     _savage_attack_used: bool = False
+    _piercer_used: bool = False
+    _slasher_used: bool = False
+    _crusher_used: bool = False
     caster_rules_version: int = 0
     legacy_medium_grace: bool = False
     casting_channel: dict = field(default_factory=dict)
@@ -490,7 +493,7 @@ class Player:
         if freedom:surface=max(1.0,surface)
         slow=0.0 if combat_rules.active_buff(self,'restrained') else .25 if combat_rules.active_buff(self,'growth') else .5 if combat_rules.active_buff(self,'slow') else 1.0
         if combat_rules.active_buff(self,"prone"):return 0
-        speed=(self.base_speed*(caster_rules.form_spec(self).get('speed',30)/30 if self.form else 1)-equipment_rules.armor_speed_penalty(self)+(dnd_content.LONGSTRIDER_SPEED_BONUS if combat_rules.active_buff(self,'longstrider') else 0))*(1.2 if self.premium_demo_until > self.current_wall_time else 1)*(1.15 if self.wind_until > self.current_wall_time else 1)*(1.0 if freedom else slow)
+        speed=(self.base_speed*(caster_rules.form_spec(self).get('speed',30)/30 if self.form else 1)-equipment_rules.armor_speed_penalty(self)+equipment_rules.feat_rules.speed_bonus(self)+(dnd_content.LONGSTRIDER_SPEED_BONUS if combat_rules.active_buff(self,'longstrider') else 0))*(1.2 if self.premium_demo_until > self.current_wall_time else 1)*(1.15 if self.wind_until > self.current_wall_time else 1)*(1.0 if freedom else slow)
         return environment_rules.movement_speed(self,max(0,speed-self.exhaustion*5*100/30),surface)
 
     @property
@@ -571,6 +574,7 @@ class Player:
                 from character_sheet import build as sheet_data
             result['character_sheet'] = sheet_data(self)
             result['item_previews'] = equipment_rules.shop_previews(self)
+            result['shop_prices'] = equipment_rules.feat_rules.shop_prices(self,ITEMS)
             result['spell_profiles'] = spell_scaling.client_profiles(self)
             result.update(level_up.pending(self))
             if self._hotbar_level != dnd_content.hotbar_signature(self):dnd_content.sync_hotbar(self)
@@ -637,7 +641,7 @@ class Player:
             "ability_build", "skill_training", "skill_progress", "origin_feat",
             "feat_rules_version", "feat_legacy_choices", "feat_migration_notice",
             "world_revision", "magic_items_version", "magic_attunements",
-            "wizard_school", "wizard_school_state", "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "exhaustion",
+            "wizard_school", "wizard_school_state", "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "_piercer_used", "_slasher_used", "_crusher_used", "exhaustion",
             "martial_archetype", "martial_state",
             "fighting_style", "weapon_grip", "fighter_rules_version",
             "level_up_batches", "rules_version", "mana_rules_version", "hp_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
@@ -1418,7 +1422,8 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
             seller = merchant_at(p, data.get("npc_id"))
             if not seller or kind_id not in seller.get("stock", []):
                 return await self.notice(p, "Ten kupiec nie sprzedaje takiego towaru. Sprawdź jego miejscowy asortyment.")
-            if spec is None or "price" not in spec or p.level < spec.get("min_level",1) or p.gold < spec["price"]:
+            price=equipment_rules.feat_rules.purchase_price(p,spec) if spec else 0
+            if spec is None or "price" not in spec or p.level < spec.get("min_level",1) or p.gold < price:
                 return await self.notice(p,"Nieznany towar, za niski poziom lub za mało złota.")
             if spec.get("slot") == "potion":
                 if not inventory_rules.add(p,kind_id,1,make_item,INVENTORY_CAP):
@@ -1426,7 +1431,7 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
             else:
                 if len(p.inventory)>=INVENTORY_CAP:return await self.notice(p,"Zwolnij miejsce w plecaku.")
                 p.inventory.append(make_item(kind_id))
-            p.gold -= spec["price"]
+            p.gold -= price
         elif kind == "potion":
             if "slot" in data and data["slot"] != "q":
                 return
@@ -1444,6 +1449,7 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
             self.begin_action(p, bonus=True)
             inventory_rules.consume(p, kind_id)
             restored = combat_rules.roll_damage(self.combat_rng,spec["dice"]) if "dice" in spec else {"damage":spec["restore"],"damage_dice":str(spec["restore"]),"damage_rolls":[]}
+            if attr=="hp":equipment_rules.feat_rules.potion_healing(p,restored)
             amount=min(maximum-getattr(p,attr),restored["damage"])
             setattr(p, attr, getattr(p, attr)+amount)
             self.report_roll(p,p,{**restored,"check":"healing","hit":True,"healing":amount,"damage":0},spec["name"],p)
@@ -1944,7 +1950,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_30","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_31","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):
