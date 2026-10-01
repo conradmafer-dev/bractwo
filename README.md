@@ -8,6 +8,11 @@ pierwszy atut. Późniejsza pula cech/atutów pozostaje wspólna. Nie wymaga res
 
 ## Zachowana zawartość wcześniejszych aktualizacji
 
+**[Zagraj w Bractwo Krain](https://bractwo.up.railway.app/)** — polska gra RPG
+online w przeglądarce na komputerze i telefonie. Wybierz rycerza, łowcę,
+czarodzieja lub druida, odkrywaj świat i wyruszaj na wyprawy w drużynie.
+Do gry potrzebujesz konta Google i połączenia z internetem.
+
 Nowe układy przeciwników wiążą potwory z lokalnym terenem: czaty, obozowiska, watahy, legowiska i dziedzińce ruin. Mieszkańcy mają różne pozycje na podejściu, bokach i w głębi łowiska. Aktualizacja przestawia istniejących przeciwników; zachowuje ich liczbę, statystyki i łupy oraz układ początku gry.
 [Szczegóły i sprawdzenia UI_30](docs/UI_30_LOWISKA_POTWOROW.md).
 
@@ -22,10 +27,15 @@ Naprawiono chodzenie po oceanie; przeprawy odbywają się łodziami.
 [Zasady, sterowanie i migracja UI_28](docs/UI_28_CECHY_UMIEJETNOSCI.md).
 
 
-Nowa publiczna strona przedstawia klasy, świat i rozgrywkę przed logowaniem.
-Zawiera przesłany zrzut gry, polskie metadane, podgląd linku, canonical,
-mapę witryny i opcjonalną weryfikację Google Search Console.
-[Instrukcja wdrożenia i zgłoszenia do Google](docs/UI_27_SEO.md).
+Publiczna strona przedstawia klasy, świat i rozgrywkę przed logowaniem.
+Poradniki rozpoczęcia gry, wyboru klasy i wypraw mają osobne adresy,
+metadane i linki w mapie witryny. Strona korzysta z kompresji zasobów
+przy budowie obrazu oraz wstrzymuje rysowanie świata przed wejściem do gry.
+[Zmiany SEO, weryfikacja i zgłoszenie do Google](docs/SEO_IMPROVEMENTS.md).
+Galeria pokazuje sześć kadrów z gry, a sekcja mechanik opisuje adaptację D&D.
+Komentarze są publiczne; pisanie i usuwanie własnych wpisów wymaga logowania.
+Serwer sprawdza własność postaci, filtruje wulgaryzmy i ogranicza spam.
+[Galeria i komentarze — działanie oraz testy](docs/KOMENTARZE_I_GALERIA.md).
 
 Wejście do gry wymaga logowania przez Google. Jedno konto Google może mieć
 maksymalnie **4 postacie**, wliczając postacie offline i przypisane stare zapisy.

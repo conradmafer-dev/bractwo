@@ -1,0 +1,35 @@
+#authScreen .landing-comments { padding: 44px 0; border-top: 1px solid var(--landing-line); scroll-margin-top: 28px; }
+#authScreen .comments-intro { max-width: 680px; }
+#authScreen .comments-intro h2 { margin: 10px 0 16px; }
+#authScreen .comments-intro p, #authScreen .comments-hint { color: var(--landing-muted); }
+#authScreen .comments-intro p { margin-bottom: 16px; }
+#authScreen .comments-link { color: var(--landing-gold); text-decoration: underline; text-underline-offset: 3px; }
+#authScreen .comments-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 20px 0; }
+#authScreen .landing-comments button { min-height: 44px; padding: 8px 16px; font: 600 13px/1.5 system-ui, sans-serif; border: 1px solid #bda77877; border-radius: 3px; background: #21372a; color: #f0d6a5; cursor: pointer; }
+#authScreen .landing-comments button:hover { background: #304b39; }
+#authScreen .landing-comments button:disabled { opacity: .6; cursor: wait; }
+#authScreen .landing-comments :is(button, input, textarea, select):focus-visible { outline: 2px solid var(--landing-gold); outline-offset: 3px; }
+#authScreen .comment-form { display: grid; gap: 10px; max-width: 740px; margin: 24px 0; padding: 24px; background: #22372a88; border: 1px solid var(--landing-line); border-radius: 4px; }
+#authScreen .comment-form label { font-size: 13px; font-weight: 600; color: var(--landing-ink); }
+#authScreen .comment-form :is(select, textarea) { width: 100%; min-width: 0; padding: 12px; background: #0d2118; color: var(--landing-ink); border: 1px solid #9ea88977; border-radius: 3px; font: 15px/1.6 system-ui, sans-serif; }
+#authScreen .comment-form select { max-width: 340px; min-height: 44px; }
+#authScreen .comment-form textarea { min-height: 140px; resize: vertical; touch-action: auto; }
+#authScreen .comment-form .comments-hint { font-size: 12px; line-height: 1.6; }
+#authScreen .comment-count { text-align: right; color: var(--landing-muted); font-size: 12px; }
+#authScreen #commentSubmit { justify-self: start; background: #dfc18a; color: #17291e; }
+#authScreen #commentsStatus { min-height: 1.7em; margin: 12px 0; color: #c9e3bb; }
+#authScreen #commentsStatus.comments-error { color: #ffc09f; }
+#authScreen .comments-list { list-style: none; padding: 0; margin: 0; max-width: 900px; }
+#authScreen .comment-item { border-top: 1px solid var(--landing-line); padding: 22px 0; }
+#authScreen .comment-item header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px 24px; flex-wrap: wrap; }
+#authScreen .comment-item strong { color: var(--landing-gold); overflow-wrap: anywhere; }
+#authScreen .comment-item time { color: var(--landing-muted); font-size: 12px; }
+#authScreen .comment-item .comment-body { margin-top: 10px; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.75; color: var(--landing-ink); }
+#authScreen .comment-item .comment-delete { margin-top: 12px; padding: 6px 10px; font-size: 12px; font-weight: 400; }
+#authScreen .comments-empty { padding: 20px 0; color: var(--landing-muted); }
+#authScreen .landing-comments [hidden] { display: none !important; }
+@media (max-width: 600px) {
+  #authScreen .comment-form { padding: 16px; }
+  #authScreen .comment-form :is(select, textarea) { font-size: 16px; }
+  #authScreen .landing-comments { padding: 32px 0; }
+}
