@@ -1,0 +1,141 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "name": "dialogue, stable button, viewport",
+      "width": 1440,
+      "height": 900,
+      "geometry": {
+        "left": 1008,
+        "top": 162,
+        "right": 1418,
+        "bottom": 769.203125,
+        "overflow": 0
+      }
+    },
+    {
+      "name": "potion real WebSocket and completion",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "reopen completed scene, no duplicate reward",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "name": "dialogue, stable button, viewport",
+      "width": 390,
+      "height": 844,
+      "geometry": {
+        "left": 10,
+        "top": 143.71875,
+        "right": 380,
+        "bottom": 724,
+        "overflow": 0
+      }
+    },
+    {
+      "name": "potion real WebSocket and completion",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "name": "reopen completed scene, no duplicate reward",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "name": "dialogue, stable button, viewport",
+      "width": 320,
+      "height": 568,
+      "geometry": {
+        "left": 10,
+        "top": 50,
+        "right": 310,
+        "bottom": 473,
+        "overflow": 0
+      }
+    },
+    {
+      "name": "potion real WebSocket and completion",
+      "width": 320,
+      "height": 568
+    },
+    {
+      "name": "reopen completed scene, no duplicate reward",
+      "width": 320,
+      "height": 568
+    },
+    {
+      "name": "dialogue, stable button, viewport",
+      "width": 844,
+      "height": 390,
+      "geometry": {
+        "left": 374,
+        "top": 12,
+        "right": 744,
+        "bottom": 372,
+        "overflow": 0
+      }
+    },
+    {
+      "name": "potion real WebSocket and completion",
+      "width": 844,
+      "height": 390
+    },
+    {
+      "name": "reopen completed scene, no duplicate reward",
+      "width": 844,
+      "height": 390
+    },
+    {
+      "name": "E opens real scene",
+      "scene": "scout_first_aid"
+    },
+    {
+      "name": "healing spell receipt in dialogue"
+    },
+    {
+      "name": "E opens real scene",
+      "scene": "mill_tangled_pouch"
+    },
+    {
+      "name": "skill check receipt in dialogue"
+    },
+    {
+      "name": "E opens real scene",
+      "scene": "guard_extortionist"
+    },
+    {
+      "name": "E opens real scene",
+      "scene": "bridge_watch"
+    },
+    {
+      "name": "E opens real scene",
+      "scene": "camp_dispatches"
+    },
+    {
+      "name": "E opens real scene",
+      "scene": "dawn_arcane_seal"
+    },
+    {
+      "name": "E opens real scene",
+      "scene": "grove_herbs"
+    },
+    {
+      "name": "E opens real scene",
+      "scene": "birch_pack_animal"
+    }
+  ],
+  "page_errors": [],
+  "server_errors": [],
+  "limitations": [
+    "Loopback test login and an in-memory SQLite database; no Google or Railway requests.",
+    "The complete game client uses an in-process browser binding to a real Python loopback WebSocket; event packets enter unchanged Game.on_packet.",
+    "Browser URL navigation is blocked by the environment. HTML, CSS, scripts and images are injected from the local workspace; browser security policies are unchanged.",
+    "Hostile monsters are disabled in this UI test, separate from server tests of combat restrictions.",
+    "No physical Android device. Public comments, SEO and unrelated gallery assets are not under test."
+  ],
+  "chromium": "144.0.7559.96"
+}

@@ -160,7 +160,7 @@ class DruidCircleGame:
         self.report_roll(p, target, dict(result, check='healing', hit=True, healing=amount, damage=0), 'Gwiezdny Kielich', p)
         self._circle_save(target)
 
-    def circle_roll_adjustment(self, actor, kind='attack', target=None, ability=None):
+    def circle_roll_adjustment(self, actor, kind='attack', target=None, ability=None, receipt=None):
         """Call before the d20, so an omen cannot be chosen after the outcome."""
         if not getattr(actor, 'alive', False): return 0
         for owner in sorted(self.players.values(), key=lambda q: str(q.id)):
@@ -178,6 +178,8 @@ class DruidCircleGame:
                 if self.is_player_target(actor): self.begin_pvp_hostility(owner, actor)
                 else: self.remember_attacker(actor, owner)
             self._circle_save(owner)
+            if receipt is not None:
+                receipt.append(dict(name='Kosmiczny omen', sides=6, rolls=[abs(delta)], sign=1 if delta>0 else -1))
             return delta
         return 0
 
@@ -192,6 +194,7 @@ class DruidCircleGame:
             components.append(dict(type=rider['damage_type'], damage=extra['damage']))
             result['damage'] += extra['damage']; result['damage_dice'] += ' + ' + rules.dice_text(rider['dice'])
             result['beast_extra_rolls'] = extra['damage_rolls']
+            rules.record_damage_roll(result, extra, 'Cios przemiany')
         if circles.circle(p) != 'moon' or p.level < 65 or not circles.wild_shape_active(p): return
         rt = circles.runtime(p); now = self.now()
         rules.begin_feat_turn(p, now)
@@ -202,6 +205,7 @@ class DruidCircleGame:
         components.append(dict(type='radiant', damage=extra['damage']))
         result['damage'] += extra['damage']; result['damage_dice'] += ' + 2k10 (Księżyc)'
         result['lunar_rolls'] = extra['damage_rolls']
+        rules.record_damage_roll(result, extra, 'Księżyc')
 
     def _circle_target_size(self, target):
         if self.is_player_target(target):
@@ -268,9 +272,10 @@ class DruidCircleGame:
             if hasattr(self, 'environment_ability_check'):
                 success = self.environment_ability_check(p, ability, grip['dc'], 'athletics' if ability == 'strength' else 'acrobatics')['saved']
             else:
-                bonus = rules.ability_modifier(p, ability)+self.circle_roll_adjustment(p, 'ability', ability=ability)
+                check_draws=[]
+                bonus = rules.ability_modifier(p, ability)+self.circle_roll_adjustment(p, 'ability', ability=ability, receipt=check_draws)
                 roll = self.combat_rng.randint(1, 20); success = roll+bonus >= grip['dc']
-                self.report_roll(p, p, dict(check='ability', roll=roll, rolls=[roll], bonus=bonus, total=roll+bonus, defense=grip['dc'], saved=success, hit=False, damage=0, damage_dice=''), 'Wyrwanie z chwytu', p)
+                self.report_roll(p, p, dict(check='ability', roll=roll, rolls=[roll], check_extra_rolls=check_draws, bonus=bonus, total=roll+bonus, defense=grip['dc'], saved=success, hit=False, damage=0, damage_dice=''), 'Wyrwanie z chwytu', p)
             if success:
                 p.buffs.pop('grappled', None)
                 if p.buffs.get('restrained', {}).get('spell_id') == 'beast_grapple': p.buffs.pop('restrained', None)
@@ -294,11 +299,13 @@ class DruidCircleGame:
     def concentration_damage(self, p, damage):
         if damage <= 0 or p.concentration_until <= self.now(): return
         dc = max(10, math.floor(damage/2))
-        bonus = rules.save_bonus(p, 'constitution') + self.circle_roll_adjustment(p, 'concentration', ability='constitution')
+        check_draws=[]
+        bonus = rules.save_bonus(p, 'constitution') + self.circle_roll_adjustment(p, 'concentration', ability='constitution', receipt=check_draws)
         advantage=rules.gear.has_feat(p,'war_caster')
         rolls=[self.combat_rng.randint(1,20) for _ in range(2 if advantage else 1)]
         roll=max(max(rolls),circles.roll_floor(p,'constitution','concentration'))
         result = dict(check='concentration', roll=roll, rolls=rolls, advantage=advantage, bonus=bonus, total=roll+bonus, defense=dc, saved=roll+bonus >= dc, hit=False, damage=0, damage_dice='')
+        if check_draws:result['check_extra_rolls']=check_draws
         if rules.gear.feat_rules.lucky_save(p,result,self.combat_rng):self._circle_save(p)
         self.report_roll(p, p, result, 'Koncentracja', p)
         if not result['saved']: self.break_concentration(p)

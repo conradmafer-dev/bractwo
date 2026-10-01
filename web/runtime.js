@@ -195,22 +195,233 @@
     const s=spellProfile(spec,player);
     return s?.kind==='martial_feature'?`${s.armed?'ON':'OFF'} ${s.uses_remaining??0}/${s.uses_maximum??0}`:'';
   }
+  // One presentation for every resolved roll. These functions never roll dice,
+  // infer a missing face from the final total, or recalculate combat outcomes.
+  const finite = n => typeof n === 'number' && Number.isFinite(n);
+  const number = n => finite(n) ? String(Math.round(n * 100) / 100).replace('.', ',') : '—';
+  const sum = a => a.reduce((n, v) => n + v, 0);
+  const validDice = a => Array.isArray(a) && a.length <= 200 && a.every(n => Number.isInteger(n) && n >= 1 && n <= 1000);
+  function diceResult(values, sides) {
+    if (!validDice(values) || !values.length || !Number.isInteger(sides) || sides < 1 || values.some(n => n > sides)) return '';
+    return `${values.length}k${sides} = ${values.map(number).join(' + ')}${values.length > 1 ? ' = ' + number(sum(values)) : ''}`;
+  }
+  function numericFormula(parts) {
+    if (!parts.length || !parts.every(finite)) return '';
+    return number(parts[0]) + parts.slice(1).filter(n => n !== 0).map(n => ` ${n < 0 ? '−' : '+'} ${number(Math.abs(n))}`).join('');
+  }
+  function baseDie(roll) {
+    const match = /^\s*(\d+)k(\d+)(?:\s*([+−-])\s*(\d+))?/i.exec(roll?.damage_dice || '');
+    return {sides: Number.isInteger(roll?.damage_sides) ? roll.damage_sides : match ? Number(match[2]) : null,
+      modifier: finite(roll?.damage_modifier) ? roll.damage_modifier : match ? (match[3] === '-' || match[3] === '−' ? -1 : 1) * Number(match[4] || 0) : null};
+  }
+  function checkOutcome(roll) {
+    if (roll.check === 'ability') return roll.saved ? 'sukces' : 'niepowodzenie';
+    if (roll.check === 'escape') return roll.saved ? 'uwolnienie' : 'pnącza trzymają';
+    if (roll.check === 'concentration') return roll.saved ? 'koncentracja utrzymana' : 'koncentracja przerwana';
+    if (roll.check === 'save') return roll.action?.includes('Powalenie') ? (roll.saved ? 'utrzymana równowaga' : 'powalenie')
+      : roll.saved ? (roll.save_half || roll.potent_cantrip ? 'obrona · połowa' : 'obrona · brak obrażeń') : 'nieudana obrona';
+    return roll.graze ? 'pudło · Draśnięcie' : roll.illusory_self ? 'iluzja' : roll.shielded && !roll.hit ? 'TARCZA' : roll.critical ? 'KRYTYK' : roll.hit ? 'trafienie' : 'PUDŁO';
+  }
+  function checkRollLines(roll) {
+    if (!roll || !['attack', 'save', 'ability', 'escape', 'concentration'].includes(roll.check)) return [];
+    const lines = [], saving = roll.check !== 'attack';
+    if (roll.automatic_failure) return ['Obrona: automatyczne niepowodzenie'];
+    const faces = validDice(roll.rolls) && roll.rolls.length ? roll.rolls : Number.isInteger(roll.roll) && roll.roll >= 1 && roll.roll <= 20 ? [roll.roll] : [];
+    if (!faces.length) return [checkOutcome(roll)];
+    const beforeLucky = roll.lucky ? roll.lucky_previous : roll.roll;
+    if (roll.portent) lines.push(`Przepowiednia: 1k20 = ${number(roll.roll)}`);
+    else if (faces.length === 1) lines.push(`Rzut: ${diceResult(faces, 20)}`);
+    else {
+      // Choose only the result the server recorded, including ties.
+      const chosen = faces.indexOf(beforeLucky);
+      lines.push(`${roll.disadvantage ? 'Utrudnienie' : roll.advantage ? 'Przewaga' : 'Rzuty'}: ` + faces.map((v, i) => `1k20 = ${number(v)}${i === chosen ? ' ✓ wybrany' : ''}`).join(' / '));
+    }
+    if (!roll.portent && !faces.includes(beforeLucky) && finite(beforeLucky)) lines.push(`Wynik: ${number(roll.disadvantage ? Math.min(...faces) : Math.max(...faces))} → ${number(beforeLucky)}`);
+    if (roll.lucky && Number.isInteger(roll.lucky_roll)) lines.push(`Szczęściarz: 1k20 = ${number(roll.lucky_roll)}${roll.roll === roll.lucky_roll && roll.lucky_roll > roll.lucky_previous ? ' ✓ wybrany' : ' · pozostaje ' + number(roll.lucky_previous)}`);
+    const bonusDice = (Array.isArray(roll.check_extra_rolls) ? roll.check_extra_rolls : []).filter(g => g && diceResult(g.rolls, g.sides));
+    for (const g of bonusDice) lines.push(`${g.name || 'Premia'}: ${diceResult(g.rolls, g.sides)}${g.sign === -1 ? ' (odejmij)' : ''}`);
+    const rolledBonus = sum(bonusDice.map(g => sum(g.rolls) * (g.sign === -1 ? -1 : 1)));
+    const bonus = finite(roll.bonus) ? roll.bonus : 0;
+    const parts = [roll.roll, bonus - rolledBonus, ...bonusDice.map(g => sum(g.rolls) * (g.sign === -1 ? -1 : 1))];
+    const label = roll.check === 'attack' ? 'Trafienie' : roll.check === 'ability' ? 'Test' : roll.check === 'concentration' ? 'Koncentracja' : 'Obrona';
+    if (finite(roll.roll) && finite(roll.total) && finite(roll.defense)) {
+      const calculated = sum(parts), formula = numericFormula(parts);
+      // A server adjustment may change total separately (e.g. Precision). Never
+      // print a false equality if an older receipt lacks its component dice.
+      lines.push(`${label}: ${formula}${Math.abs(calculated - roll.total) < .001 ? '' : ' = ' + number(calculated) + ' · po premii'} → ${number(roll.total)} / ${saving ? 'ST' : 'KP'} ${number(roll.defense)} · ${checkOutcome(roll)}`);
+    } else lines.push(checkOutcome(roll));
+    return lines;
+  }
+  function damageRollDetails(roll) {
+    if (!roll) return null;
+    const base = baseDie(roll), savage = savageAttackDetails(roll);
+    const dice = validDice(roll.damage_rolls) && roll.damage_rolls.length ? roll.damage_rolls
+      : savage ? savage.sets[savage.chosen].scored : [];
+    const groups = [];
+    if (dice.length && diceResult(dice, base.sides)) {
+      const raw = validDice(roll.raw_damage_rolls) && roll.raw_damage_rolls.length === dice.length ? roll.raw_damage_rolls : dice;
+      groups.push({name: roll.damage_maximized ? 'Maksymalne kości' : 'Rzut', sides: base.sides, dice, raw, modifier: base.modifier ?? 0, base: true});
+    }
+    const explicit = Array.isArray(roll.extra_damage_rolls) ? roll.extra_damage_rolls : [];
+    let complete = true;
+    for (const g of explicit) {
+      if (!g || !diceResult(g.rolls, g.sides)) {complete = false;continue;}
+      groups.push({name: (g.name || 'Dodatkowe obrażenia') + (g.maximized ? ' · maksimum' : ''), sides: g.sides, dice: g.rolls, raw: g.rolls, modifier: finite(g.modifier) ? g.modifier : 0});
+    }
+    // Existing saved receipts remain readable. These are recorded dice, not
+    // reconstructed outcomes; unfamiliar extra pools only show the final total.
+    if (!explicit.length) {
+      for (const [key, name, sides] of [['mark_rolls','Znak łowcy',6],['lunar_rolls','Księżyc',10],['colossus_rolls','Pogromca kolosów',8]]) {
+        if (validDice(roll[key]) && roll[key].length) groups.push({name,sides,dice:roll[key],raw:roll[key],modifier:0});
+      }
+      for (const key of ['extra_rolls','beast_extra_rolls','superiority_rolls']) if (validDice(roll[key]) && roll[key].length && !(key === 'superiority_rolls' && roll.martial_maneuver === 'precision')) complete = false;
+    }
+    // A constant heal or damage effect has no invented die roll.
+    const constant = !dice.length && /^\s*\d+(?:[.,]\d+)?\s*$/.test(roll.damage_dice || '') ? Number(roll.damage_dice.replace(',', '.')) : null;
+    if (!groups.length && constant === null && !(Array.isArray(roll.damage_rolls) && !roll.damage_rolls.length && finite(base.modifier))) return null;
+    const fixed = groups.some(g => g.base) ? 0 : constant ?? base.modifier ?? 0;
+    const parts = groups.length ? [] : [fixed];
+    if (groups.length && fixed) parts.push(fixed);
+    for (const g of groups) {
+      const value = sum(g.dice) + g.modifier;
+      // Negative healing bonuses are clamped for each independent pool.
+      if (value < 0) parts.push(0);
+      else {parts.push(sum(g.dice));if (g.modifier) parts.push(g.modifier);}
+    }
+    return {groups,parts,total:sum(parts),complete};
+  }
+  function damageRollLines(roll, skipBase = false) {
+    if (!roll || !['attack','save','automatic','healing'].includes(roll.check)) return [];
+    if (roll.immune) return ['Obrażenia: 0 · niewrażliwość'];
+    if (roll.shielded && !roll.hit) return [];
+    if (roll.check === 'attack' && !roll.hit && !roll.graze && !roll.potent_cantrip) return [];
+    const healing = roll.check === 'healing', label = healing ? 'Leczenie' : 'Obrażenia';
+    const final = healing ? roll.healing : roll.damage;
+    if (!finite(final)) return [];
+    const lines = [], details = damageRollDetails(roll);
+    if (roll.rest_rolls?.length) {
+      const draws = roll.rest_rolls.filter(g => g && diceResult([g.value],g.sides));
+      for (const [i,g] of draws.entries()) {
+        lines.push(`Kość ${i+1}: 1k${g.sides} = ${number(g.first)}${finite(g.reroll) ? ' · Uzdrowiciel: 1k'+g.sides+' = '+number(g.reroll)+' ✓ wybrany' : ''} · ${numericFormula([g.value,g.modifier])} → ${number(g.potential)}`);
+      }
+      if (draws.length === roll.rest_rolls.length) {
+        const parts=draws.map(g=>g.potential),total=sum(parts);
+        lines.push(parts.length>1 ? `${label}: ${numericFormula(parts)} → ${number(total)}` : `${label}: ${number(total)}`);
+        if(Math.abs(total-final)>.001)lines.push(`Odzyskano: ${number(final)} zdrowia (do pełna)`);
+      } else lines.push(`${label}: +${number(final)} zdrowia`);
+      return lines;
+    }
+    if (details) {
+      for (const g of details.groups) {
+        if (g.base && skipBase) continue;
+        const adjusted = g.raw.some((v,i)=>v!==g.dice[i]);
+        lines.push(`${g.name}: ${diceResult(g.raw,g.sides)}${adjusted ? ' → '+g.dice.map(number).join(' + ')+(g.dice.length>1?' = '+number(sum(g.dice)):'')+' (styl walki)' : ''}`);
+      }
+      if (Array.isArray(roll.piercer_reroll) && roll.piercer_reroll.length === 2) {
+        const sides = baseDie(roll).sides;
+        if (diceResult([roll.piercer_reroll[0]],sides) && diceResult([roll.piercer_reroll[1]],sides)) lines.push(`Przebijacz: 1k${sides} = ${number(roll.piercer_reroll[0])} → 1k${sides} = ${number(roll.piercer_reroll[1])}`);
+      }
+      if (Number.isInteger(roll.piercer_critical) && diceResult([roll.piercer_critical],baseDie(roll).sides)) lines.push(`Przebijacz · krytyk: ${diceResult([roll.piercer_critical],baseDie(roll).sides)}`);
+      if (details.complete) {
+        lines.push(details.parts.slice(1).some(n=>n!==0) ? `${label}: ${numericFormula(details.parts)} → ${number(details.total)}` : `${label}: ${number(details.total)}`);
+        if(finite(roll.parry_roll)&&finite(roll.parry_sides))lines.push(`Parowanie: 1k${roll.parry_sides} = ${number(roll.parry_roll)} · ${numericFormula([roll.parry_roll,roll.parry_modifier||0])} → ${number(Math.max(0,roll.parry_roll+(roll.parry_modifier||0)))} · blokuje ${number(roll.parry_reduction)} obr.`);
+        if (Math.abs(final-details.total) > .001) lines.push(healing ? `Odzyskano: ${number(final)} zdrowia (do pełna)` : `Po obronie i pozostałych efektach: ${number(final)} obr.`);
+      } else lines.push(`${label}: ${number(final)}${healing ? ' zdrowia' : ' obr.'}`);
+    } else {
+      if(roll.damage_dice && /k\d+/.test(roll.damage_dice))lines.push(`Kości: ${roll.damage_dice}`);
+      lines.push(`${label}: ${healing ? '+' : ''}${number(final)}${healing ? ' zdrowia' : ' obr.'}`);
+    }
+    return lines;
+  }
+
+  // Display receipts from the server. No dice are rolled in the browser.
+  function savageAttackDetails(roll) {
+    if (!roll?.id || roll.check !== 'attack' || !roll.hit || roll.savage_attacker !== true) return null;
+    const valid = sets => Array.isArray(sets) && sets.length === 2 && sets.every(set =>
+      Array.isArray(set) && set.length > 0 && set.length <= 24 &&
+      set.every(n => Number.isInteger(n) && n >= 1 && n <= 100)) && sets[0].length === sets[1].length;
+    const raw = roll.savage_damage_rolls;
+    if (!valid(raw) || ![0, 1].includes(roll.savage_chosen)) return null;
+    const scored = valid(roll.savage_scored_rolls) && roll.savage_scored_rolls[0].length === raw[0].length
+      ? roll.savage_scored_rolls : raw;
+    return {chosen: roll.savage_chosen, sets: raw.map((dice, index) => ({
+      dice: [...dice], scored: [...scored[index]], total: scored[index].reduce((a, b) => a + b, 0),
+      adjusted: dice.some((n, i) => n !== scored[index][i]), selected: index === roll.savage_chosen
+    }))};
+  }
+  function savageDiceText(set, sides) {
+    const raw = set.dice.join(' + '), scored = set.scored.join(' + ');
+    const prefix = Number.isInteger(sides) ? `${set.dice.length}k${sides} = ` : '';
+    return prefix + (set.adjusted ? `${raw} → ${scored}` : raw) + (set.dice.length > 1 ? ` = ${set.total}` : '');
+  }
+  function savageAttackSummary(roll) {
+    const details = savageAttackDetails(roll);
+    return details ? 'Zacięty atak: ' + details.sets.map((set, i) =>
+      `Rzut ${i + 1}: ${savageDiceText(set, baseDie(roll).sides)}${set.selected ? ' ✓ wybrany' : ''}`).join(' / ') : '';
+  }
+  function combatNoticeEntries(player, simulationTime) {
+    if (!player) return [];
+    const latest = player.last_roll?.id ? player.last_roll : null;
+    const recent = (Array.isArray(player.combat_log) ? player.combat_log.slice(-8) : []).filter(roll =>
+      roll?.id && Number.isFinite(roll.time) && Number.isFinite(simulationTime) &&
+      simulationTime >= roll.time && simulationTime - roll.time < 8);
+    if (latest) recent.push(latest);
+    // A later shot or a saving throw must not erase the two damage sets.
+    // Limit the HUD to the newest feat receipt plus the latest result.
+    const savage = recent.filter(roll => savageAttackDetails(roll)).sort((a, b) =>
+      (Number(a.time) || 0) - (Number(b.time) || 0)).at(-1);
+    return savage ? [savage, ...(latest && String(latest.id) !== String(savage.id) ? [latest] : [])]
+      : latest ? [latest] : [];
+  }
+  const combatNoticeCache = new WeakMap();
+  function renderCombatNotice(host, player, simulationTime, session = '') {
+    if (!host) return;
+    const entries = combatNoticeEntries(player, simulationTime);
+    const signature = JSON.stringify([player?.id ?? null, session, entries]);
+    if (combatNoticeCache.get(host) === signature) return;
+    combatNoticeCache.set(host, signature);
+    if (host.hidden !== !entries.length) host.hidden = !entries.length;
+    host.classList.toggle('has-savage-roll', entries.some(roll => savageAttackDetails(roll)));
+    host.classList.toggle('has-roll-breakdown', !!entries.length);
+    host.replaceChildren();
+    const doc = host.ownerDocument;
+    const node = (tag, cls, text) => {const n = doc.createElement(tag);n.className = cls;if (text !== undefined) n.textContent = text;return n;};
+    for (const roll of entries) {
+      const details = savageAttackDetails(roll);
+      if (!details) {
+        const card=node('div','combat-current-result');
+        card.append(node('strong','combat-result-heading',[roll.action,roll.target_name].filter(Boolean).join(' · ')));
+        for(const text of [...checkRollLines(roll),...damageRollLines(roll)])card.append(node('div','combat-result-line',text));
+        if(roll.check==='ward')card.append(node('div','combat-result-line',`Osłona pochłonęła: ${number(roll.absorbed)} obr.`));
+        host.append(card);continue;
+      }
+      const box = node('div', 'savage-receipt');box.dataset.rollId = String(roll.id);
+      const header = node('div', 'savage-heading');
+      header.append(node('strong', '', 'Zacięty atak'), node('span', 'savage-target', roll.target_name || roll.action || 'Cel'));
+      box.append(header);
+      for(const text of checkRollLines(roll))box.append(node('div','savage-hit',text));
+      const attempts = node('div', 'savage-attempts');
+      details.sets.forEach((set, i) => {
+        const attempt = node('div', 'savage-attempt' + (set.selected ? ' selected' : ''));
+        attempt.dataset.attempt = String(i + 1);attempt.dataset.selected = String(set.selected);
+        attempt.append(node('span', 'savage-attempt-name', `Rzut ${i + 1}`),
+          node('b', 'savage-dice', savageDiceText(set, baseDie(roll).sides)),
+          node('span', 'savage-choice', set.selected ? '✓ wybrany' : ''));
+        attempts.append(attempt);
+      });
+      box.append(attempts);
+      for(const text of damageRollLines(roll,true))box.append(node('div','savage-result',text));
+      box.title = combatSummary(roll);
+      host.append(box);
+    }
+  }
   function combatSummary(roll) {
-    if (!roll || !roll.id) return "";
-    const who=roll.target_name||'',name=roll.action||'';
-    if(roll.check==='save'&&roll.action?.includes('Powalenie'))return `${name} · ${who}: k20 ${roll.roll} + ${roll.bonus} / ST ${roll.defense} · ${roll.saved?'utrzymana równowaga':'powalenie'}`;
-    if(roll.graze)return `${name} · ${who}: pudło · Draśnięcie → ${roll.damage} obr.`;
-    if(roll.check==='healing')return `${name} · ${who}: ${roll.damage_dice} → +${Math.round(roll.healing||0)}`;
-    if(roll.check==='automatic')return `${name} · ${who}: ${roll.damage_dice||''} → ${roll.immune?'odporność':roll.damage+' obr.'}`;
-    const rolls=roll.rolls||[roll.roll];
-    const die=roll.disadvantage||roll.advantage?`k20 [${rolls.join(', ')}] → ${roll.roll}`:`k20 ${roll.roll}`;
-    const saving=roll.check==='save'||roll.check==='concentration'||roll.check==='escape'||roll.check==='ability';
-    const check=`${die} ${roll.bonus<0?'−':'+'} ${Math.abs(roll.bonus||0)} = ${roll.total} / ${saving?'ST':'KP'} ${roll.defense}`;
-    if(roll.check==='ability')return `${name}: ${check} · ${roll.saved?'sukces':'niepowodzenie'}`;
-    if(roll.check==='escape')return `${name} · ${who}: ${check} · ${roll.saved?'uwolnienie':'pnącza trzymają'} · akcja zużyta`;
-    if(roll.check==='concentration')return `${check} · koncentracja ${roll.saved?'utrzymana':'przerwana'}`;
-    const result=roll.check==='save'?(roll.saved?(roll.save_half?'obrona · połowa':'obrona · brak obrażeń'):'nieudana obrona'):roll.shielded?'TARCZA':roll.critical?'KRYTYK':roll.hit?'trafienie':'PUDŁO';
-    return `${name} · ${who}: ${check} · ${result}${roll.hit?` · ${roll.damage_dice} → ${roll.damage} obr.`:''}`;
+    if (!roll || !roll.id) return '';
+    const heading=[roll.action,roll.target_name].filter(Boolean).join(' · ');
+    const savage=savageAttackSummary(roll);
+    const lines=[...checkRollLines(roll),...(savage?[savage]:[]),...damageRollLines(roll,!!savage)];
+    if(roll.check==='ward')lines.push(`Osłona pochłonęła: ${number(roll.absorbed)} obr.`);
+    return [heading,...lines].filter(Boolean).join(' · ');
   }
   // Manual touch scrolling works even while another finger owns the joystick.
   // Keep taps on their button; capture the pointer only once it becomes a swipe.
@@ -321,7 +532,7 @@
     }
     return right+100>=view.left&&left-100<=view.right&&bottom+100>=view.top&&top-360<=view.bottom;
   }
-  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, effectVisible, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, displayHotbar, hotbarGroupForSpell, spellCostText, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, martialHotbarLabel, combatSummary, bindTouchTap, bindTouchScroll };
+  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, effectVisible, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, displayHotbar, hotbarGroupForSpell, spellCostText, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, martialHotbarLabel, combatSummary, diceResult, numericFormula, checkRollLines, damageRollDetails, damageRollLines, savageAttackDetails, savageAttackSummary, combatNoticeEntries, renderCombatNotice, bindTouchTap, bindTouchScroll };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BractwoRuntime = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

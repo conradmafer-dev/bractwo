@@ -501,6 +501,7 @@ class DNDGame(RangerMagic):
                 extra = self.wizard_spell_roll_damage(p,s,s['extra_dice'],empower=False)
                 components.append({'type':s['extra_type'], 'damage':extra['damage']})
                 damage['damage'] += extra['damage'];damage['damage_dice'] += ' + '+extra['damage_dice'];damage['extra_rolls'] = extra['damage_rolls']
+                rules.record_damage_roll(damage, extra, 'Dodatkowe obrażenia')
             if s.get('save'):
                 result = self.spell_target_save(p,target,s['save'],rules.spell_dc(p),damage,s.get('save_half',False))
                 result['save_ability'] = s['save']

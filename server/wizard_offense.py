@@ -158,8 +158,9 @@ class WizardOffense:
         if damage <= 0 or p.concentration_until <= self.now(): return
         fixed = self.wizard_take_portent(p, 'self_save')
         if fixed is None: return super().concentration_damage(p, damage)
-        bonus = rules.save_bonus(p, 'constitution') + self.circle_roll_adjustment(p, 'concentration', ability='constitution')
+        check_draws=[]
+        bonus = rules.save_bonus(p, 'constitution') + self.circle_roll_adjustment(p, 'concentration', ability='constitution', receipt=check_draws)
         dc = max(10, int(damage//2)); saved = fixed+bonus >= dc
         self.report_roll(p, p, dict(check='concentration', roll=fixed, rolls=[fixed], bonus=bonus, total=fixed+bonus,
-            defense=dc, saved=saved, hit=False, damage=0, damage_dice='', portent=True), 'Koncentracja', p)
+            defense=dc, saved=saved, hit=False, damage=0, damage_dice='', portent=True,check_extra_rolls=check_draws), 'Koncentracja', p)
         if not saved: self.break_concentration(p)

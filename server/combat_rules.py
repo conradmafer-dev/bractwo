@@ -206,7 +206,16 @@ def dice_text(dice):
 def roll_damage(rng,dice,critical=False,maximize=False):
     n,s,m=dice
     rolls=[s if maximize else rng.randint(1,s) for _ in range(n*(2 if critical else 1))]
-    return {'damage':max(0,sum(rolls)+m),'damage_dice':dice_text(dice),'damage_rolls':rolls,'damage_modifier':m}
+    return {'damage':max(0,sum(rolls)+m),'damage_dice':dice_text(dice),'damage_rolls':rolls,'damage_modifier':m,'damage_sides':s,'damage_maximized':bool(maximize)}
+
+
+def record_damage_roll(result, rolled, name):
+    """Copy an already resolved extra pool for display, without another RNG call."""
+    entry = dict(name=name, sides=rolled.get('damage_sides'),
+                 rolls=list(rolled.get('damage_rolls', [])),
+                 modifier=rolled.get('damage_modifier', 0))
+    if rolled.get('damage_maximized'):entry['maximized']=True
+    result['extra_damage_rolls'] = [*result.get('extra_damage_rolls', []), entry]
 
 
 def begin_feat_turn(p,now):
@@ -233,6 +242,11 @@ def savage_attacker_damage(p,result,rng,now):
     chosen=second if selected else first
     result.update(savage_attacker=True,savage_damage_rolls=[first,second],savage_chosen=selected,
                   damage_rolls=chosen,damage=max(0,sum(chosen)+result.get('damage_modifier',modifier)))
+    # UI receipt only: keep both scored sets as well as the original dice.
+    # Great Weapon Fighting can select a lower raw sum; the client must not
+    # recompute the winner or pretend these are additional attack rolls.
+    result['savage_scored_rolls'] = [[max(3,r) if great_weapon else r for r in rolls]
+                                      for rolls in (first,second)]
     p._savage_attack_used=True
 
 def roll_attack(rng,bonus,ac,dice,disadvantage=False,advantage=False,fixed_roll=None,maximize=False,critical_threshold=20):
@@ -335,6 +349,7 @@ class CombatRounds:
             components=result.setdefault('damage_components',[{'type':result['damage_type'],'damage':result['damage']}])
             components.append({'type':'force','damage':mark['damage']})
             result['damage']+=mark['damage'];result['damage_dice']+=' + 1k6 (Znak)';result['mark_rolls']=mark['damage_rolls']
+            record_damage_roll(result, mark, 'Znak łowcy')
 
     def report_roll(self,source,target,result,action,owner=None):
         fx=self.combat_effect(source,'combat_roll',target,duration=1.4)
@@ -353,10 +368,12 @@ class CombatRounds:
         advantage=active_buff(p,'foresight') or self.enemy_condition(enemy,'restrained') or self.enemy_condition(enemy,'blind')
         fdis,fadv=self.fighter_roll_flags(p,enemy)
         edis,eadv=self.environment_attack_flags(p,enemy)
-        bonus=(spell_bonus(p) if spell else attack_bonus(p))+self.circle_roll_adjustment(p,'attack',target=enemy)-getattr(p,'exhaustion',0)*2
+        check_draws=[]
+        bonus=(spell_bonus(p) if spell else attack_bonus(p))+self.circle_roll_adjustment(p,'attack',target=enemy,receipt=check_draws)-getattr(p,'exhaustion',0)*2
         result=roll_attack(self.combat_rng,bonus,spec['armor_class'],dice,disadvantage or fdis or edis or (not spell and gear.weapon_disadvantage(p)),advantage or fadv or eadv or self.caster_attack_advantage(p,enemy),
             fixed_roll=self.wizard_take_portent(p,'attack'),maximize=spell and self.wizard_maximize_spell(p,getattr(p,'_wizard_damage_spec',{})),
             critical_threshold=self.martial_critical_threshold(p,spell))
+        if check_draws:result['check_extra_rolls']=check_draws
         result['damage_type']=damage_kind or damage_type(p)
         self.martial_precision(p,enemy,result,dice,spell)
         self.environment_adjust_damage(p,enemy,result,dice,melee)
@@ -426,13 +443,15 @@ class CombatRounds:
                 bonus=spec['attack_bonus']
             fdis,fadv=self.fighter_roll_flags(source,target)
             edis,eadv=self.environment_attack_flags(source,target)
-            bonus+=self.circle_roll_adjustment(source,'attack',target=target)-getattr(source,'exhaustion',0)*2
+            check_draws=[]
+            bonus+=self.circle_roll_adjustment(source,'attack',target=target,receipt=check_draws)-getattr(source,'exhaustion',0)*2
             decoy_dis=self.wizard_attack_disadvantage(target)
             dis=bool(dis or decoy_dis)
             result=roll_attack(self.combat_rng,bonus,armor_class(target),chosen,dis or edis or active_buff(target,'foresight') or fdis,adv or fadv or eadv,
                 fixed_roll=self.wizard_take_portent(source,'attack') if pvp else None,
                 maximize=spell and self.wizard_maximize_spell(source,getattr(source,'_wizard_damage_spec',{})),
                 critical_threshold=self.martial_critical_threshold(source,spell) if pvp else 20)
+            if check_draws:result['check_extra_rolls']=check_draws
             result['damage_type']=kind
             if pvp:self.martial_precision(source,target,result,chosen,spell)
             self.environment_adjust_damage(source,target,result,chosen,melee if melee is not None else (gear.melee(source) if pvp else not spec.get('projectile')))

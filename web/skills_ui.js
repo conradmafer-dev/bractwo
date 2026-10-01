@@ -35,12 +35,19 @@
   else return;parent.append(box);}
 
  function abilities(parent,p,h){advancement(parent,p,h);abilityBuild(parent,p,h);origin(parent,p,h);sync(parent,p,h);}
- function challenges(parent,p,h){const data=h.state?.().skill_challenges||{},box=node('section','sheet-challenges');box.append(node('h3','sheet-section-title',`Wyzwania w pobliżu · ukończone ${data.completed_count||0}/${data.total||0}`));const entries=[...(data.nearby||[])].sort((a,b)=>Number(a.completed)-Number(b.completed)||a.distance-b.distance);if(!entries.length)box.append(node('p','sheet-hint','Wędruj i wypatruj złotych znaków kości w świecie. Podejdź do takiego miejsca i naciśnij E lub przycisk interakcji.'));
-  for(const e of entries){const row=node('article','sheet-challenge'+(e.completed?' completed':''));row.dataset.skillChallenge=e.id;const skill=p.character_sheet?.skills?.skills?.find(s=>s.id===e.skill),head=node('div','sheet-section-row');head.append(node('strong','',e.name),node('span','sheet-skill-bonus',`ST ${e.dc}`));row.append(head,node('p','',e.description),node('small','',`${skill?.name||e.skill} · 1k20${signed(skill?.bonus||0)} · ${Math.ceil(e.distance/32)} pól od ciebie${e.min_level>1?' · poziom '+e.min_level:''}`));if(e.reward_hint)row.append(node('small','sheet-challenge-reward',e.reward_hint));const reason=node('p','sheet-choice-reason');reason.dataset.challengeReason='';const use=button(e.completed?(e.repeatable?'Skorzystaj z przejścia':'Ukończono'):'Wykonaj próbę',()=>{const latest=current(h,p),fresh=h.state?.().skill_challenges?.nearby?.find(x=>x.id===e.id);if(!challengeReason(latest,fresh)){use.disabled=true;h.send({type:'skill_challenge',challenge_id:e.id});}});use.dataset.challengeConfirm=e.id;row.append(reason,use);if(e.completed&&e.result)row.append(node('p','sheet-hint',e.result));if(h.navigate&&(!e.completed||e.repeatable))row.append(button('Wyznacz kierunek',()=>h.navigate(e)));box.append(row);}parent.append(box);
+ function challenges(parent,p,h){
+  const box=node('section','sheet-challenges'),data=h.state?.().skill_challenges||{nearby:[]};
+  box.append(node('h3','',`Wydarzenia · ukończono ${data.completed_count||0}/${data.total||0}`));
+  const entries=(data.nearby||[]).filter(e=>e.discovered||e.distance<=230).slice().sort((a,b)=>Number(a.completed)-Number(b.completed)||a.distance-b.distance);
+  if(!entries.length)box.append(node('p','sheet-hint','Wypatruj ludzi potrzebujących pomocy, porzuconych zapasów i śladów przy drodze. Podejdź i naciśnij E albo kliknij wydarzenie.'));
+  for(const e of entries){const row=node('article','sheet-challenge'+(e.completed?' completed':''));row.dataset.worldEventLink=e.id;row.append(node('strong','',e.name),node('p','',e.completed?e.aftermath:e.description));
+   row.append(button(e.completed?'Przypomnij wydarzenie':'Przyjrzyj się',()=>h.openEvent?.(e)));
+   if(h.navigate&&!e.completed)row.append(button('Wyznacz kierunek',()=>h.navigate(e)));box.append(row);
+  }parent.append(box);
  }
- function skills(parent,p,h,section='list'){const s=p.character_sheet?.skills;if(!s){parent.append(node('p','sheet-hint','Oczekiwanie na umiejętności postaci…'));return;}const summary=node('div','sheet-skill-intro');summary.append(node('h3','',`Umiejętności · premia z biegłości ${signed(s.proficiency_bonus)}`),node('p','sheet-hint',s.description||'Test umiejętności: 1k20 + modyfikator cechy + biegłość, jeśli ją posiadasz. Ekspertyza podwaja premię z biegłości.'));if(section==='list')summary.append(button('Pokaż wyzwania w pobliżu',()=>h.open?.('skills','challenges')));const expertise=s.choices?.find(pool=>pool.source==='expertise');if(section==='training'&&expertise&&!(expertise.remaining>0))summary.append(node('p','sheet-hint',expertise.description));parent.append(summary);
+ function skills(parent,p,h,section='list'){const s=p.character_sheet?.skills;if(!s){parent.append(node('p','sheet-hint','Oczekiwanie na umiejętności postaci…'));return;}const summary=node('div','sheet-skill-intro');summary.append(node('h3','',`Umiejętności · premia z biegłości ${signed(s.proficiency_bonus)}`),node('p','sheet-hint',s.description||'Test umiejętności: 1k20 + modyfikator cechy + biegłość, jeśli ją posiadasz. Ekspertyza podwaja premię z biegłości.'));if(section==='list')summary.append(button('Wydarzenia w pobliżu',()=>h.open?.('skills','challenges')));const expertise=s.choices?.find(pool=>pool.source==='expertise');if(section==='training'&&expertise&&!(expertise.remaining>0))summary.append(node('p','sheet-hint',expertise.description));parent.append(summary);
   if(section==='list'&&p.environment?.hide){const box=node('section','sheet-skill-choice'),b=button('',()=>{const latest=current(h,p),hide=latest.environment?.hide;if(latest.alive&&(hide?.active||hide?.available)){b.disabled=true;h.send({type:'environment_action',action:hide.active?'unhide':'hide'});}});b.dataset.hideAction='';box.append(node('strong','','Skradanie się przed potworami'),node('p','sheet-hint','Ukryj się przy osłonie lub we mgle. Test Zręczności (Skradanie), ST 15. Ukrycie działa na potwory; inni gracze nadal cię widzą.'),b);const reason=node('p','sheet-choice-reason');reason.dataset.hideReason='';box.append(reason);parent.append(box);}
-  const roll=p.last_roll;if(section==='challenges'&&roll?.check==='ability'){const skill=s.skills?.find(x=>x.id===roll.skill);parent.append(node('p','sheet-hint',`Ostatni test · ${skill?.name||abilityNames[roll.ability]||'Umiejętność'}: ${roll.roll}${signed(roll.bonus)} = ${roll.total} przeciw ST ${roll.defense} · ${roll.saved?'sukces':'niepowodzenie'}.`));}
+  const roll=p.last_roll;if(section==='challenges'&&roll?.check==='ability'){const skill=s.skills?.find(x=>x.id===roll.skill);parent.append(node('p','sheet-hint',`Ostatni test · ${skill?.name||abilityNames[roll.ability]||'Umiejętność'}: ${root.BractwoRuntime?.checkRollLines(roll).join(' · ')||('1k20 = '+roll.roll+' · '+roll.roll+signed(roll.bonus)+' → '+roll.total+' / ST '+roll.defense+' · '+(roll.saved?'sukces':'niepowodzenie'))}`));}
   if(section==='training'){let pending=0;for(const pool of s.choices||[]){if(!(pool.remaining>0))continue;pending+=pool.remaining;const box=node('section','sheet-skill-choice');box.dataset.skillSource=pool.source;box.append(node('strong','',`${pool.name} · pozostało ${pool.remaining}/${pool.total}`),node('p','sheet-hint',pool.description));const key=String(p.id)+':'+pool.source,select=node('select'),controls=node('div','sheet-skill-choice-controls');select.setAttribute('aria-label',pool.name);select.append(new Option('Wybierz umiejętność…',''));for(const item of pool.options||[])select.append(new Option(`${item.name} · ${item.ability_name}`,item.id));select.value=skillPicks.get(key)||'';select.addEventListener('change',()=>{skillPicks.set(key,select.value);sync(parent,current(h,p),h);});const confirm=button(pool.source==='expertise'?'Wybierz ekspertyzę':'Wybierz biegłość',()=>{const latest=current(h,p),id=skillPicks.get(key);if(!skillReason(latest,pool.source,id)){confirm.disabled=true;h.send({type:'skill_train',source:pool.source,skill_id:id});}});confirm.dataset.skillConfirm=pool.source;const reason=node('p','sheet-choice-reason');reason.dataset.skillReason='';controls.append(select,confirm);box.append(controls,reason);parent.append(box);}if(!pending)parent.append(node('p','sheet-hint','Wszystkie dostępne biegłości zostały wybrane. Atut Wszechstronny pozwala nauczyć się trzech kolejnych.'));}
   if(section==='list'){const grid=node('div','sheet-skill-grid');for(const skill of s.skills||[]){const row=node('article','sheet-skill'+(skill.expertise?' expert':skill.proficient?' proficient':''));row.dataset.skill=skill.id;const head=node('div','sheet-skill-head');head.append(node('strong','',skill.name),node('b','sheet-skill-bonus',signed(skill.bonus)));row.append(head,node('small','sheet-skill-state',`${skill.ability_name} · ${skill.expertise?'Ekspertyza':skill.proficient?'Biegłość':'Bez biegłości'}`),node('p','',skill.description));if(skill.sources?.length)row.append(node('small','',skill.sources.join(' · ')));if(skill.id==='perception')row.append(node('small','',`Pasywna Percepcja: ${skill.passive}`));grid.append(row);}parent.append(grid);}if(section==='challenges')challenges(parent,p,h);sync(parent,p,h);
  }
@@ -59,4 +66,135 @@
  }
 
  const api={abilities,advancement,abilityBuild,origin,skills,sync,choiceReason,buildCost,buildReason,asiReason,skillReason,challengeReason,trainingPacket,originReason,reminderState,originReminderState,createPrompt};root.BractwoSkillsUI=api;if(typeof module!=='undefined')module.exports=api;
+})(globalThis);
+
+/* UI_32: small world scenes, not map markers. The server owns every outcome. */
+(function(root){'use strict';
+ const ui=root.BractwoSkillsUI,TAU=Math.PI*2;
+ function drawEvent(g,site,state={},time=0){
+  if(!site?.scene)return;
+  const done=!!state.completed,phase=time+(site.x||0)*.01;
+  const rect=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),w,h);};
+  const oval=(x,y,rx,ry,c)=>{g.fillStyle=c;g.beginPath();g.ellipse(x,y,rx,ry,0,0,TAU);g.fill();};
+  const line=(points,c,w=2)=>{g.strokeStyle=c;g.lineWidth=w;g.beginPath();points.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();};
+  const poly=(points,c)=>{g.fillStyle=c;g.beginPath();points.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();};
+  const stone=(x,y,w=22)=>{poly([[x-w,y],[x-w+4,y-13],[x+6,y-20],[x+w,y-7],[x+w-3,y+5]],'#778276');line([[x-w+5,y-11],[x+6,y-16],[x+w-5,y-6]],'#bac0a0',3);};
+  const sack=(x,y)=>{oval(x,y+7,13,6,'#172a234b');rect(x-10,y-15,20,24,'#b49a64');rect(x-8,y-17,16,5,'#decc8f');rect(x-8,y-8,5,13,'#d1bb81');line([[x-9,y-13],[x+9,y-13]],'#77603d');};
+  const bottle=(x,y)=>{rect(x-3,y-9,6,4,'#b49961');rect(x-5,y-5,10,13,'#698e80');rect(x-3,y-3,6,9,'#bbd397');rect(x-3,y-3,2,5,'#e9f3c8');};
+  const box=(x,y,open=false)=>{oval(x,y+10,25,8,'#16251b44');rect(x-22,y-14,44,27,'#775733');rect(x-20,y-12,40,22,'#a77c45');for(const xx of [-13,9])rect(x+xx,y-13,4,25,'#d2b074');line([[x-20,y],[x+20,y]],'#735636');if(open){rect(x-20,y-12,40,11,'#342f25');poly([[x-22,y-14],[x-16,y-37],[x+27,y-31],[x+22,y-13]],'#a48656');}else{rect(x-22,y-21,44,8,'#c5a269');rect(x-4,y-16,8,11,'#d6c47d');}};
+  function human(x,y,coat='#8d794b',pose='stand',guard=false){
+   const seated=pose==='sit',b=seated?Math.sin(phase*1.7)*.7:0;
+   g.save();g.translate(x,y);oval(0,5,17,6,'#192a205c');
+   if(seated){rect(-16,-3,33,8,'#414b3c');rect(10,1,22,5,'#645439');rect(22,0,7,6,'#dfd3ac');rect(31,3,6,5,'#48382d');}
+   else{rect(-9,-3,7,9,'#5b4b36');rect(4,-3,7,9,'#5b4b36');rect(-10,4,9,4,'#322e27');rect(4,4,9,4,'#322e27');}
+   const lift=seated?12:0;
+   rect(-13,-26+lift+b,26,26-lift,guard?'#718781':coat);rect(-9,-25+lift+b,18,20-lift,guard?'#b1beb0':coat);
+   rect(-8,-24+lift+b,5,15-lift,guard?'#d6decb':'#c1af7880');rect(-11,-8,23,4,'#625135');rect(-2,-8,5,4,'#d5bd77');
+   line([[-13,-22+lift+b],[-17,-11+b],[-9,-5]],guard?'#82958c':coat,5);rect(-11,-8,6,5,'#e9bd86');
+   line([[13,-22+lift+b],[16,-10+b],[10,-5]],coat,5);rect(8,-8,6,5,'#e9bd86');
+   rect(-7,-40+lift+b,15,16,'#735137');rect(-6,-37+lift+b,13,12,'#e8b784');rect(-4,-37+lift+b,6,6,'#f3d0a0');rect(-4,-31+lift+b,2,2,'#343d30');rect(3,-31+lift+b,2,2,'#343d30');rect(-1,-27+lift+b,4,1,'#a57251');
+   if(guard){rect(-9,-42+lift+b,19,7,'#94a69e');rect(-6,-46+lift+b,13,6,'#bbc9b9');rect(-1,-46+lift+b,4,7,'#ba6952');}
+   else{rect(-9,-41+lift+b,18,4,coat);rect(-6,-46+lift+b,13,6,coat);}
+   g.restore();
+  }
+  function reed(x,y){line([[x,y],[x-3,y-22]],'#52683d');line([[x,y],[x+7,y-19]],'#8d9b52');rect(x-6,y-25,5,7,'#a29155');}
+  g.save();g.translate(site.x||0,site.y||0);g.lineJoin='round';g.lineCap='round';
+  if(site.scene==='wounded_guard'){
+   oval(0,6,62,20,'#354a2838');stone(19,-3,30);
+   // A leaning river willow and low hanging fronds frame the patrol's shelter.
+   poly([[30,-10],[36,-15],[43,-68],[38,-91],[33,-89],[36,-64]],'#6b6140');line([[38,-62],[21,-83],[4,-87]],'#8c7950',6);
+   for(const [x,y]of [[6,-83],[24,-87],[44,-91],[58,-80]]){oval(x,y,21,11,'#4c713d');line([[x-7,y],[x-9,y+28],[x-13,y+37]],'#88a35a',4);line([[x+7,y],[x+5,y+20]],'#698a46',4);}
+   if(done)human(-9,6,'#816c47','stand',true);else human(-8,8,'#816c47','sit',true);
+   poly([[-48,4],[-48,-20],[-27,-21],[-25,2],[-36,12]],'#637a79');poly([[-44,-17],[-30,-17],[-30,0],[-36,7],[-43,0]],'#b3c2b2');rect(-38,-14,4,17,'#9b593f');
+   line([[-62,19],[-22,25]],'#aa8d5a',3);poly([[-61,15],[-73,17],[-61,23]],'#bac8bd');line([[-6,27],[15,30]],'#aa8d5a',3);reed(63,17);
+  }else if(site.scene==='broken_cart'){
+   oval(-4,11,67,18,'#494c2d38');line([[-59,5],[54,7]],'#816039',5);line([[-58,12],[51,15]],'#b69861',2);
+   g.save();g.translate(-5,0);if(!done)g.rotate(-.11);
+   rect(-39,-31,76,32,'#6a4c2e');for(let i=0;i<4;i++)rect(-37,-29+i*7,71,5,i%2?'#b59155':'#caa568');
+   for(const xx of[-32,27]){rect(xx,-34,5,41,'#6f5637');oval(xx,7,14,14,'#594932');oval(xx,7,10,10,'#c29e60');for(let i=0;i<6;i++){const a=i*TAU/6;line([[xx,7],[xx+10*Math.cos(a),7+10*Math.sin(a)]],'#674e31',2);}oval(xx,7,3,3,'#e0bd77');}
+   sack(-18,-32);sack(8,-34);g.restore();
+   if(!done){line([[6,18],[45,5]],'#665138',9);line([[8,15],[45,2]],'#c09c64',3);}
+   else line([[-62,23],[-37,29]],'#8b6b43',6);
+   human(64,8,'#a38b50',done?'stand':'sit');sack(49,31);
+  }else if(site.scene==='road_dispute'){
+   oval(0,7,64,18,'#54533825');human(28,12,'#668b8f');rect(36,-7,13,14,'#94704b');line([[38,-10],[43,-15],[48,-10]],'#5b4933');
+   const age=Number.isFinite(state.completed_age)?state.completed_age:60;
+   if(!done||age<4){g.save();if(done){g.translate(-Math.min(age,4)*15,-Math.min(age,4)*3);g.globalAlpha=Math.max(0,1-age/4);}human(-31,0,'#76563e');rect(-13,-22,13,10,'#ddc991');rect(-6,-18,3,3,'#a95343');g.restore();}
+   line([[-66,10],[-66,-43]],'#7f633e',5);rect(-76,-43,31,14,'#b49b65');line([[-71,-38],[-51,-38]],'#6b5534');
+  }else if(site.scene==='lost_pouch'){
+   stone(-27,9,22);stone(24,13,19);reed(-45,22);reed(39,6);line([[-15,8],[4,5],[18,19]],'#806343',4);
+   for(const [x,y]of[[-8,24],[-1,32],[-10,42]])oval(x,y,3,5,'#716f444f');
+   if(!done){rect(-9,-3,20,17,'#704c2e');rect(-7,-2,16,12,'#a67940');rect(-6,-9,13,8,'#b38d50');rect(-1,-6,5,7,'#d9bb70');
+    if(state.hint){const a=.45+Math.sin(phase*2)*.2;g.save();g.globalAlpha=a;line([[-4,-4],[6,-4]],'#fff1c6',1);line([[1,-9],[1,2]],'#fff1c6',1);g.restore();}}
+  }else if(site.scene==='stolen_supplies'){
+   poly([[-65,-5],[-26,-61],[29,-9]],'#81764f');poly([[-26,-61],[-16,-8],[29,-9]],'#5a6541');line([[-27,-61],[-70,7]],'#cbb17b',2);line([[-27,-61],[35,5]],'#cbb17b',2);
+   line([[-65,25],[29,31]],'#655138',12);line([[-62,22],[27,28]],'#a28554',4);oval(-65,25,6,6,'#c2a16a');line([[-55,26],[-18,30]],'#443f2a',2);
+   box(17,13,done);box(-25,7,done);if(!done){rect(11,-10,14,7,'#cfdbb5');line([[16,-9],[16,-4]],'#8d6c44',2);}
+   oval(60,15,15,6,'#293e2b55');rect(48,-10,25,20,'#6c6241');oval(59,-17+Math.sin(phase)*.4,12,10,'#8ea652');poly([[49,-21],[40,-24],[47,-14]],'#8ea652');poly([[67,-21],[78,-24],[70,-13]],'#8ea652');line([[51,-18],[55,-18]],'#3c502e',2);line([[62,-18],[66,-18]],'#3c502e',2);oval(61,28,9,4,'#b09a66');
+   if(!done)line([[34,8],[60,26]],'#baab7855',1);
+  }else if(site.scene==='sealed_relic'){
+   oval(0,8,68,25,'#4d5c4238');for(const [x,y]of[[-54,7],[49,-17]]){rect(x-10,y-32,22,38,'#858d78');rect(x-14,y-35,30,6,'#c6c4a1');rect(x-15,y+2,33,9,'#a6ad8f');rect(x-6,y-26,4,23,'#bec4a3');}
+   rect(-34,-26,71,43,'#657266');rect(-30,-23,63,34,'#9da789');rect(-26,-20,55,27,done?'#36483c':'#7a8b75');
+   if(done){poly([[-37,-27],[-28,-61],[45,-48],[36,-27]],'#c1c4a1');line([[-26,-55],[36,-45]],'#e1d7b0',2);}
+   else{rect(-37,-34,76,10,'#c6c9a6');for(const x of[-18,0,18]){line([[x-4,-12],[x,-21],[x+5,-12],[x,-7],[x-4,-12]],'#cfcea4',2);}if(state.hint)rect(-20,-33,5,2,'#f2dc9c');}
+   for(const [x,y]of[[-41,23],[-29,25],[40,20]]){rect(x,y,10,4,'#6a8344');rect(x+4,y-4,7,4,'#8ba358');}
+  }else if(site.scene==='herbalist'){
+   oval(-10,9,64,19,'#45533828');human(36,5,'#6e8c50','sit');oval(10,17,15,8,'#806240');line([[-3,10],[0,1],[18,1],[23,10]],'#b89a60',3);
+   for(const [i,x,y]of[[0,-51,7],[1,-29,19],[2,-6,-4],[3,-37,-13]]){line([[x,y],[x,y-18]],'#496b39',2);oval(x-5,y-10,7,3,'#7f9a4c');oval(x+5,y-15,7,3,'#a2b85b');if(!done||i>1){rect(x-2,y-22,5,6,i%2?'#c3b677':'#d4ddb0');}}
+   bottle(22,21);if(done){bottle(6,22);bottle(-5,20);}else rect(11,10,8,3,'#94b55b');stone(-66,-7,12);
+  }else if(site.scene==='frightened_pony'){
+   human(58,6,'#9e7f49');const hop=done?0:Math.max(0,Math.sin(phase*3)) * 2;
+   g.save();g.translate(-22,-hop);oval(0,16,34,9,'#26382144');for(const x of[-23,16]){rect(x,0,7,20,'#ad8051');rect(x-1,16,9,5,'#51412e');}oval(0,-4,31,17,'#b28a57');oval(-8,-8,19,11,'#d2ae76');
+   const nod=done?6:Math.sin(phase*2)*3;g.save();g.translate(25,-12+nod);poly([[-9,7],[-3,-26],[14,-27],[18,-1]],'#c49c67');oval(11,-24,13,11,'#d4b583');oval(20,-19,11,7,'#e1c495');poly([[1,-30],[0,-46],[7,-34]],'#c9a370');poly([[12,-31],[16,-44],[18,-29]],'#c9a370');rect(11,-28,3,3,'#3c342b');line([[-3,-31],[-9,-21],[-8,-1]],'#6b5035',6);line([[14,-24],[21,-14]],'#806641',2);g.restore();
+   line([[-28,-10],[-39,-6],[-41,10+Math.sin(phase*2)*2]],'#6b5035',5);rect(-12,-15,26,19,'#776f48');rect(-10,-14,22,15,'#a39962');rect(-3,-15,4,20,'#635838');g.restore();
+   line([[28,-25],[42,-9]],'#a08a5b',2);sack(65,28);sack(42,31);
+  }
+  g.restore();
+ }
+ function createEvents(h){
+  const node=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
+  const panel=node('section','world-event-panel');panel.id='worldEventPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','worldEventTitle');
+  const header=node('header','world-event-header'),title=node('h2','', '');title.id='worldEventTitle';
+  const closeButton=node('button','world-event-close','×');closeButton.type='button';closeButton.setAttribute('aria-label','Zamknij wydarzenie');closeButton.onclick=close;
+  header.append(title,closeButton);const body=node('div','world-event-body');panel.append(header,body);document.getElementById('gameUI').append(panel);
+  let id='',owner='',signature='',focus=null,pending=false,pendingUntil=0,receipt='',hintSession='',hints=new Set();
+  function close(){if(panel.hidden)return;panel.hidden=true;pending=false;signature='';h.closed?.();if(focus?.isConnected&&focus.getClientRects().length)focus.focus({preventScroll:true});}
+  function entry(){return h.state?.().skill_challenges?.nearby?.find(e=>e.id===id);}
+  function open(site){if(!site?.id)return;focus=document.activeElement;h.prepare?.();owner=String(h.state?.().player?.id);id=site.id;signature='';pending=false;panel.hidden=false;render();closeButton.focus({preventScroll:true});}
+  function render(){
+   const state=h.state?.(),p=state?.player,session=String(h.session?.()??'')+':'+String(p?.id??'');
+   if(session!==hintSession){hintSession=session;hints.clear();}
+   const hint=(state?.skill_challenges?.nearby||[]).find(e=>e.hint&&!hints.has(e.id));
+   if(hint){hints.add(hint.id);h.notice?.('Dostrzegasz: '+hint.hint);}
+   if(panel.hidden)return;
+   if(!p||!p.alive||String(p.id)!==owner){close();return;}
+   const e=entry();if(!e){close();return;}
+   const token=JSON.stringify([e.completed,e.cooldown_remaining>0,p.last_roll?.id]);
+   if(pending&&(token!==receipt||performance.now()>pendingUntil))pending=false;
+   const key=JSON.stringify([e.name,e.completed,e.description,e.dialogue,e.aftermath,e.failure,e.options,e.hint,p.last_roll?.target_name===e.name?p.last_roll.id:null,pending]);
+   if(key===signature)return;signature=key;const scroll=body.scrollTop,focused=body.contains(document.activeElement)?document.activeElement.dataset.eventAction:null;body.replaceChildren();title.textContent=e.name;
+   const canvas=node('canvas','world-event-preview');canvas.width=720;canvas.height=230;canvas.setAttribute('aria-hidden','true');const g=canvas.getContext('2d');g.scale(2,2);g.fillStyle='#203c30';g.fillRect(0,0,360,115);g.save();g.translate(180,80);g.scale(.75,.75);drawEvent(g,{...e,x:0,y:0},e,0);g.restore();body.append(canvas);
+   if(!e.completed)body.append(node('p','world-event-description',e.description));body.append(node('p','world-event-dialogue',e.completed?e.aftermath:e.dialogue));
+   if(e.hint&&!e.completed)body.append(node('p','world-event-hint',e.hint));
+   const roll=p.last_roll;if(roll?.target_name===e.name){const receiptBox=node('div','world-event-roll');receiptBox.setAttribute('aria-live','polite');if(roll.check==='ability'){for(const line of root.BractwoRuntime?.checkRollLines(roll)||[])receiptBox.append(node('div','',line));receiptBox.append(node('b','',roll.saved?'Udało się':'Nie tym razem'));}else if(roll.check==='healing')receiptBox.append(node('div','',root.BractwoRuntime?.combatSummary(roll)||'Leczenie udane'));body.append(receiptBox);}
+   if(e.completed){body.append(node('p','world-event-result',e.result),node('small','world-event-reward','Nagroda odebrana · '+e.reward_hint));}
+   else{
+    if(e.failure)body.append(node('p','world-event-failure',e.failure));
+    const actions=node('div','world-event-actions');
+    for(const option of e.options||[]){const b=node('button','world-event-action');b.type='button';b.dataset.eventAction=option.id;b.append(node('strong','',option.label));
+     const cost=option.skill_name||option.cost_hint||'';if(cost)b.append(node('small','',cost));
+     b.disabled=pending||!option.available;b.title=option.reason||'';
+     if(option.reason)b.append(node('span','world-event-lock',option.reason));
+     b.onclick=()=>{const latest=entry(),o=latest?.options?.find(o=>o.id===option.id);if(pending||!o?.available)return;receipt=JSON.stringify([latest.completed,latest.cooldown_remaining>0,h.state().player?.last_roll?.id]);pending=true;pendingUntil=performance.now()+2500;h.send({type:'skill_challenge',challenge_id:id,action_id:o.id});signature='';render();};actions.append(b);
+    }body.append(actions);if(pending)body.append(node('p','world-event-working','Działasz…'));
+    body.append(node('small','world-event-reward',e.reward_hint));
+   }
+   const leave=node('button','world-event-leave',e.completed?'Ruszaj dalej':'Odejdź');leave.type='button';leave.onclick=close;body.append(leave);body.scrollTop=scroll;
+   if(focused)body.querySelector('[data-event-action="'+focused+'"]')?.focus({preventScroll:true});
+  }
+  panel.addEventListener('keydown',e=>{if(e.code==='Escape'||e.code==='KeyE'){e.preventDefault();e.stopPropagation();close();}else if(['Enter','Space'].includes(e.code))e.stopPropagation();});
+  for(const event of ['pointerdown','touchstart','wheel'])panel.addEventListener(event,e=>e.stopPropagation());
+  return {open,close,render,get visible(){return !panel.hidden;},get element(){return panel;}};
+ }
+ ui.drawEvent=drawEvent;ui.createEvents=createEvents;
 })(globalThis);

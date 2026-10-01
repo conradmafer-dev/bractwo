@@ -1,0 +1,130 @@
+TAP version 13
+# Subtest: scene wounded_guard uses balanced, finite canvas commands
+ok 1 - scene wounded_guard uses balanced, finite canvas commands
+  ---
+  duration_ms: 5.887416
+  type: 'test'
+  ...
+# Subtest: scene wounded_guard changes visibly after completion
+ok 2 - scene wounded_guard changes visibly after completion
+  ---
+  duration_ms: 4.272998
+  type: 'test'
+  ...
+# Subtest: scene broken_cart uses balanced, finite canvas commands
+ok 3 - scene broken_cart uses balanced, finite canvas commands
+  ---
+  duration_ms: 0.383866
+  type: 'test'
+  ...
+# Subtest: scene broken_cart changes visibly after completion
+ok 4 - scene broken_cart changes visibly after completion
+  ---
+  duration_ms: 0.83323
+  type: 'test'
+  ...
+# Subtest: scene road_dispute uses balanced, finite canvas commands
+ok 5 - scene road_dispute uses balanced, finite canvas commands
+  ---
+  duration_ms: 0.307161
+  type: 'test'
+  ...
+# Subtest: scene road_dispute changes visibly after completion
+ok 6 - scene road_dispute changes visibly after completion
+  ---
+  duration_ms: 0.861398
+  type: 'test'
+  ...
+# Subtest: scene lost_pouch uses balanced, finite canvas commands
+ok 7 - scene lost_pouch uses balanced, finite canvas commands
+  ---
+  duration_ms: 1.320691
+  type: 'test'
+  ...
+# Subtest: scene lost_pouch changes visibly after completion
+ok 8 - scene lost_pouch changes visibly after completion
+  ---
+  duration_ms: 0.226331
+  type: 'test'
+  ...
+# Subtest: scene stolen_supplies uses balanced, finite canvas commands
+ok 9 - scene stolen_supplies uses balanced, finite canvas commands
+  ---
+  duration_ms: 0.545641
+  type: 'test'
+  ...
+# Subtest: scene stolen_supplies changes visibly after completion
+ok 10 - scene stolen_supplies changes visibly after completion
+  ---
+  duration_ms: 1.101496
+  type: 'test'
+  ...
+# Subtest: scene sealed_relic uses balanced, finite canvas commands
+ok 11 - scene sealed_relic uses balanced, finite canvas commands
+  ---
+  duration_ms: 0.206596
+  type: 'test'
+  ...
+# Subtest: scene sealed_relic changes visibly after completion
+ok 12 - scene sealed_relic changes visibly after completion
+  ---
+  duration_ms: 0.261095
+  type: 'test'
+  ...
+# Subtest: scene herbalist uses balanced, finite canvas commands
+ok 13 - scene herbalist uses balanced, finite canvas commands
+  ---
+  duration_ms: 0.712678
+  type: 'test'
+  ...
+# Subtest: scene herbalist changes visibly after completion
+ok 14 - scene herbalist changes visibly after completion
+  ---
+  duration_ms: 0.750041
+  type: 'test'
+  ...
+# Subtest: scene frightened_pony uses balanced, finite canvas commands
+ok 15 - scene frightened_pony uses balanced, finite canvas commands
+  ---
+  duration_ms: 0.533099
+  type: 'test'
+  ...
+# Subtest: scene frightened_pony changes visibly after completion
+ok 16 - scene frightened_pony changes visibly after completion
+  ---
+  duration_ms: 0.293907
+  type: 'test'
+  ...
+# Subtest: new scenes never draw a dice number or a completed tick
+ok 17 - new scenes never draw a dice number or a completed tick
+  ---
+  duration_ms: 1.919607
+  type: 'test'
+  ...
+# Subtest: all scene renderers are distinct, not reused markers
+ok 18 - all scene renderers are distinct, not reused markers
+  ---
+  duration_ms: 1.171016
+  type: 'test'
+  ...
+# Subtest: game routes interactions into conversations and retains real feat/result helpers
+ok 19 - game routes interactions into conversations and retains real feat/result helpers
+  ---
+  duration_ms: 1.316267
+  type: 'test'
+  ...
+# Subtest: event renderer is bundled in an existing served script, not a missing import
+ok 20 - event renderer is bundled in an existing served script, not a missing import
+  ---
+  duration_ms: 0.560145
+  type: 'test'
+  ...
+1..20
+# tests 20
+# suites 0
+# pass 20
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 109.246793

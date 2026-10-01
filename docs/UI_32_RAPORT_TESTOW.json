@@ -1,0 +1,111 @@
+{
+  "release": "Bractwo Krain 0.8.18 UI_32 — wydarzenia",
+  "artifact_type": "Aktualizacja do istniejącego repozytorium UI_31 z galerią i komentarzami; nie pełne źródła.",
+  "status": "Lokalne testy zakresu aktualizacji zakończone powodzeniem. Nie wdrożono na Railway.",
+  "base": {
+    "full_source": "BRACTWO_KRAIN_0.8.18_UI_31_ATUTY_FULL_SOURCE.zip",
+    "cumulative_overlay": "BRACTWO_UI31_FIX5_CZYTELNE_RZUTY.zip",
+    "observed_github_main": "3e248527345a9aacc7bb11ea4f0ff800153c6c96",
+    "deployment": "nie wykonano",
+    "production_accounts": "nie używano"
+  },
+  "changes": {
+    "old_markers": 18,
+    "world_events": 8,
+    "runtime_files": 18,
+    "individual_save_outcomes": true,
+    "reset_required": false,
+    "new_script_or_css_routes_required": false,
+    "real_potion_consumption": true,
+    "actual_cure_wounds_cost_and_roll": true
+  },
+  "tests": {
+    "python_selected_regression": {
+      "run": 147,
+      "pass": 147,
+      "includes_world_events": 29,
+      "scope": [
+        "zdarzenia",
+        "umiejętności",
+        "atuty",
+        "Rozbijacz hord",
+        "rzuty i ich dane",
+        "specjalizacje wojownika i łowcy"
+      ]
+    },
+    "python_final_world_events_rerun": {
+      "run": 29,
+      "pass": 29,
+      "note": "Podzbiór powtórzony po końcowych poprawkach; nie dodawać do 147 jako niezależnej liczby."
+    },
+    "node_regression": {
+      "run": 401,
+      "pass": 401,
+      "new_world_event_tests": 20
+    },
+    "node_final_world_event_rerun": {
+      "run": 20,
+      "pass": 20,
+      "note": "Podzbiór po końcowym dopasowaniu grafiki; nie dodawać do 401."
+    },
+    "browser": {
+      "scenario_checks": 22,
+      "pass": 22,
+      "viewport_sizes": [
+        [
+          1440,
+          900
+        ],
+        [
+          390,
+          844
+        ],
+        [
+          320,
+          568
+        ],
+        [
+          844,
+          390
+        ]
+      ],
+      "all_eight_scenes_opened": true,
+      "close_button_not_covered": true,
+      "stable_buttons_between_snapshots": true,
+      "actual_action_packets": "Przechodzą do lokalnego Game.on_packet przez testowy most i gniazdo WebSocket Pythona.",
+      "page_errors": [],
+      "server_errors": []
+    },
+    "syntax": "AST wszystkich plików Python i node --check skryptów w paczce: OK.",
+    "preservation": "Niezmieniane pliki wykonawcze FIX5 porównano bajtowo. Zachowano ostatnie poprawki atutów i rzutów."
+  },
+  "limitations": [
+    "Nie wykonano wdrożenia Railway, testu prawdziwego logowania Google ani testu na fizycznym urządzeniu Android.",
+    "Starszy FULL_SOURCE nie zawiera osobnego modułu komentarzy dodanego później na GitHubie. Do importu klasy Game w testach użyto testowej atrapy tego modułu. Nie korzystano z niej do testowania produkcyjnych tras create_app; nie trafia jako moduł do server/ w paczce.",
+    "Pierwsze próby całości testów Node zatrzymały dwa pliki zależne od brakującego modułu komentarzy. Po zastosowaniu jawnego, wyłącznie testowego importu atrapy wszystkie 401 testów zakończyły się powodzeniem. Ten zakres nie weryfikuje działania komentarzy, galerii ani SEO.",
+    "Nawigacja URL Chromium jest zablokowana przez środowisko. Nie zmieniano jego polityk; HTML/CSS/JS i ikony wczytano bezpośrednio z lokalnych plików, a pakiety gry podłączono przez testowy most do lokalnego serwera.",
+    "Przy zamykaniu części kontekstów testowych Playwright zapisał ostrzeżenia TargetClosedError dla zakończonego połączenia. Nie wystąpiły pageerror ani błędy serwera podczas scenariuszy gry. Szczegóły zachowano w logu narzędzia.",
+    "W testach interfejsu wyłączono wrogie potwory. Ograniczenia interakcji podczas walki i dla zmienionych stanów sprawdzano osobno testami serwera.",
+    "Sceny są osobistymi spotkaniami przypisanymi do postaci, nie losowymi globalnymi wydarzeniami. Stare ukończenia grupowane są bez ponownego rozdawania nagród."
+  ],
+  "runtime_files": [
+    "server/combat_rules.py",
+    "server/dnd_game.py",
+    "server/druid_circle_game.py",
+    "server/environment_rules.py",
+    "server/equipment_rules.py",
+    "server/feat_rules.py",
+    "server/martial_combat.py",
+    "server/martial_rules.py",
+    "server/rest_rules.py",
+    "server/server.py",
+    "server/skill_content.py",
+    "server/skill_game.py",
+    "server/wizard_offense.py",
+    "web/character_sheet.js",
+    "web/game.js",
+    "web/hud_layout.css",
+    "web/runtime.js",
+    "web/skills_ui.js"
+  ]
+}

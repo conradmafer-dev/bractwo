@@ -368,6 +368,7 @@ class EnvironmentGame:
             extra=rules.roll_damage(self.combat_rng,(2,6,0),result.get('critical',False))
             result.setdefault('damage_components',[dict(type=result.get('damage_type','bludgeoning'),damage=result['damage'])]).append(dict(type='radiant',damage=extra['damage']))
             result['damage']+=extra['damage'];result['damage_dice']+=' + 2k6 promienistych'
+            rules.record_damage_roll(result, extra, 'Światło księżyca')
 
     def environment_damage_enemy(self,target,amount,source=None,damage_type='bludgeoning',components=None,critical=False):
         spec=enemy_spec(target)
@@ -417,18 +418,20 @@ class EnvironmentGame:
             import combat_rules as rules
         if ability in ('strength','dexterity') and any(active(target,k,self.now()) for k in ('paralyzed','unconscious','stunned')):
             return dict(damage,check='save',saved=False,hit=True,critical=False,roll=0,rolls=[],total=0,bonus=0,defense=dc,automatic_failure=True,save_half=half)
-        bonus=self.target_save_bonus(target,ability)+self.circle_roll_adjustment(target,'save',ability=ability)
+        check_draws=[]
+        bonus=self.target_save_bonus(target,ability)+self.circle_roll_adjustment(target,'save',ability=ability,receipt=check_draws)
         dis=ability=='dexterity' and any(active(target,k,self.now()) for k in ('restrained','web_restrained','elemental_restrained'))
         dis=dis or ability=='constitution' and getattr(target,'_shatter_save_disadvantage',False)
         if self.is_player_target(target) and ability in ('strength','dexterity'):dis=dis or rules.gear.armor_penalty(target)
         advantage=active(target,'foresight',self.now()) or ability=='strength' and active(target,'conjure_animals_strength',self.now())
         if getattr(self,'_wizard_spell_source',None) is not None:advantage=advantage or self.wizard_spell_save_advantage(target)
         result=rules.roll_save(self.combat_rng,bonus,dc,damage,half,advantage=advantage,disadvantage=dis,fixed_roll=self.wizard_save_portent(target))
+        if check_draws:result['check_extra_rolls']=check_draws
         if rules.gear.feat_rules.lucky_save(target,result,self.combat_rng,damage):
             with self.db:self.save_player(target)
         return result
 
-    def environment_ability_check(self,actor,ability,dc,skill=''):
+    def environment_ability_check(self,actor,ability,dc,skill='',*,action_name=None,target=None):
         try:
             from . import combat_rules as rules, skill_rules
         except ImportError:
@@ -445,13 +448,19 @@ class EnvironmentGame:
         elif skill in getattr(actor,'skill_proficiencies',()):bonus+=rules.proficiency(actor)
         bonus-=getattr(actor,'exhaustion',0)*2
         # Cosmic Omen is committed before the D20, not after seeing its result.
-        bonus+=self.circle_roll_adjustment(actor,'ability',ability=ability)
+        check_draws=[]
+        bonus+=self.circle_roll_adjustment(actor,'ability',ability=ability,receipt=check_draws)
         rolls=[self.combat_rng.randint(1,20) for _ in range(2 if adv!=dis else 1)]
         roll=max(max(rolls) if adv and not dis else min(rolls),circles.roll_floor(actor,ability,'ability'))
         guidance=conditions(actor).get('guidance',{})
-        if guidance.get('until',0)>now and guidance.get('skill')==skill:bonus+=self.combat_rng.randint(1,4)
+        guidance_roll = None
+        if guidance.get('until',0)>now and guidance.get('skill')==skill:
+            guidance_roll = self.combat_rng.randint(1,4);bonus += guidance_roll
         result=dict(check='ability',roll=roll,rolls=rolls,bonus=bonus,total=roll+bonus,defense=dc,saved=roll+bonus>=dc,hit=False,damage=0,damage_dice='',ability=ability,skill=skill)
-        self.report_roll(actor,actor,result,skill or ability,actor if self.is_player_target(actor) else None)
+        if guidance_roll is not None:
+            check_draws.append(dict(name='Wskazówki', sides=4, rolls=[guidance_roll], sign=1))
+        if check_draws:result['check_extra_rolls']=check_draws
+        self.report_roll(actor,target or actor,result,action_name or skill or ability,actor if self.is_player_target(actor) else None)
         return result
 
     def environment_forced_move(self,target,dx,dy):

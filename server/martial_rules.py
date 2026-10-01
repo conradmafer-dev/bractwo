@@ -23,7 +23,7 @@ MANEUVERS = {
 }
 PREY = {
     'colossus_slayer': dict(name='Pogromca kolosów', english='Colossus Slayer', description='Raz na turę, gdy trafisz bronią cel, który przed trafieniem miał mniej niż maksymalne HP: +1k8 obrażeń. Działa niezależnie od rozmiaru celu.'),
-    'horde_breaker': dict(name='Rozbijacz hord', english='Horde Breaker', description='Raz w swojej turze po ataku bronią wykonujesz dodatkowy atak tą samą bronią na innego przeciwnika do 5 stóp od pierwszego i w zasięgu broni. Dodatkowy cel podlega ochronie PvP.'),
+    'horde_breaker': dict(name='Rozbijacz hord', english='Horde Breaker', description='Raz na 3 sekundy po ataku bronią automatycznie atakujesz jeszcze jednego przeciwnika obok celu, w odległości do 1 pola. Działa także z łukiem. Drugi przeciwnik musi być w zasięgu broni; dodatkowy atak może chybić.'),
     'giant_killer': dict(name='Zabójca olbrzymów', english='Giant Killer', description='Reakcja po ataku widocznego przeciwnika Dużego lub większego w odległości do 5 stóp: kontratak bronią, niezależnie od trafienia przeciwnika.'),
 }
 

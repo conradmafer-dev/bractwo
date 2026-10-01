@@ -10,7 +10,7 @@ import math
 
 NEW_FEATS = {
     'alert': dict(name='Czujny', category='origin', abilities=[],
-        description='Dodajesz premię z biegłości do testów i pasywnej Percepcji, także gdy masz już biegłość. Adaptacja czujności do gry bez inicjatywy.'),
+        description='Zwiększa Percepcję o premię z biegłości. Pomaga dostrzegać szczegóły i wskazówki w otoczeniu.'),
     'crafter': dict(name='Rzemieślnik', category='origin', abilities=[],
         description='Towary u kupców kosztują o 20% mniej (cena zaokrąglana w górę). Nie zmienia cen sprzedaży, usług ani run.'),
     'healer': dict(name='Uzdrowiciel', category='origin', abilities=[],
@@ -84,10 +84,14 @@ def potion_healing(p,result):
     return result
 
 
-def rest_die(p,rng):
+def rest_die(p,rng,receipt=None):
     rules,gear,rest=_modules()
-    value=rng.randint(1,p.spec['hit_die'])
-    return rng.randint(1,p.spec['hit_die']) if value==1 and gear.has_feat(p,'healer') else value
+    first=rng.randint(1,p.spec['hit_die'])
+    reroll=rng.randint(1,p.spec['hit_die']) if first==1 and gear.has_feat(p,'healer') else None
+    value=reroll if reroll is not None else first
+    if receipt is not None:
+        receipt.update(first=first,reroll=reroll,value=value,sides=p.spec['hit_die'])
+    return value
 
 
 def lucky_save(p,result,rng,damage=None):

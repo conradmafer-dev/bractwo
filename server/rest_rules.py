@@ -55,7 +55,7 @@ def migrate(p,now):
 
 def finish(p,kind,rng,recover=True):
     """Returns an auditable summary; mutate only after a completed rest."""
-    hp0,mana0=p.hp,p.mana;used=0
+    hp0,mana0=p.hp,p.mana;used=0;draws=[]
     if kind=='long':
         p.hp,p.mana=p.max_hp,p.max_mana
         for key in NAMES:restore(p,key)
@@ -69,11 +69,15 @@ def finish(p,kind,rng,recover=True):
             import combat_rules as rules
         con=(rules.own_attributes(p)['constitution']-10)//2
         while p.hp<p.max_hp and spend(p,'hit_dice'):
-            used+=1;p.hp=min(p.max_hp,p.hp+max(0,rules.gear.feat_rules.rest_die(p,rng)+con))
+            used+=1
+            draw={};value=rules.gear.feat_rules.rest_die(p,rng,draw)
+            potential=max(0,value+con)
+            draw.update(modifier=con,potential=potential)
+            draws.append(draw);p.hp=min(p.max_hp,p.hp+potential)
         restore(p,'second_wind',1);restore(p,'action_surge')
         if recover and p.mana<p.max_mana and spend(p,'arcane_recovery'):
             p.mana=min(p.max_mana,p.mana+caster.recovery_amount(p))
-    return dict(hp=round(p.hp-hp0,1),mana=round(p.mana-mana0,1),hit_dice=used)
+    return dict(hp=round(p.hp-hp0,1),mana=round(p.mana-mana0,1),hit_dice=used,rolls=draws)
 
 def sheet(p):
     rows = [dict(id=key,name=name,remaining=remaining(p,key),maximum=maximum(p,key),

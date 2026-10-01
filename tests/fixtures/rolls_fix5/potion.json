@@ -1,0 +1,93 @@
+{
+  "id": "1",
+  "last_roll": {
+    "id": "fx3",
+    "kind": "combat_roll",
+    "source_id": "1",
+    "target_id": "1",
+    "floor": 0,
+    "x": 1100,
+    "y": 1180,
+    "target_x": 1100,
+    "target_y": 1180,
+    "time": 0.0,
+    "duration": 1.4,
+    "radius": 0,
+    "damage": 0,
+    "damage_dice": "2k4+2",
+    "damage_rolls": [
+      4,
+      4
+    ],
+    "damage_modifier": 2,
+    "damage_sides": 4,
+    "damage_maximized": false,
+    "check": "healing",
+    "hit": true,
+    "healing": 9,
+    "action": "Mikstura zdrowia · mała",
+    "target_name": "Test1",
+    "expires_at": 1008.0
+  },
+  "combat_log": [
+    {
+      "id": "fx2",
+      "kind": "combat_roll",
+      "source_id": "1",
+      "target_id": "1",
+      "floor": 0,
+      "x": 1100,
+      "y": 1180,
+      "target_x": 1100,
+      "target_y": 1180,
+      "time": 0.0,
+      "duration": 1.4,
+      "radius": 0,
+      "damage": 0,
+      "damage_dice": "2k8+3",
+      "damage_rolls": [
+        4,
+        4
+      ],
+      "damage_modifier": 3,
+      "damage_sides": 8,
+      "damage_maximized": false,
+      "check": "healing",
+      "hit": true,
+      "healing": 1,
+      "action": "Leczenie ran",
+      "target_name": "Test1",
+      "expires_at": 1008.0
+    },
+    {
+      "id": "fx3",
+      "kind": "combat_roll",
+      "source_id": "1",
+      "target_id": "1",
+      "floor": 0,
+      "x": 1100,
+      "y": 1180,
+      "target_x": 1100,
+      "target_y": 1180,
+      "time": 0.0,
+      "duration": 1.4,
+      "radius": 0,
+      "damage": 0,
+      "damage_dice": "2k4+2",
+      "damage_rolls": [
+        4,
+        4
+      ],
+      "damage_modifier": 2,
+      "damage_sides": 4,
+      "damage_maximized": false,
+      "check": "healing",
+      "hit": true,
+      "healing": 9,
+      "action": "Mikstura zdrowia · mała",
+      "target_name": "Test1",
+      "expires_at": 1008.0
+    }
+  ],
+  "simulation_time": 0.0
+}

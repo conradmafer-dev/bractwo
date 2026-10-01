@@ -1,0 +1,118 @@
+{
+  "id": "1",
+  "last_roll": {
+    "id": "fx2",
+    "kind": "combat_roll",
+    "source_id": "1",
+    "target_id": "target",
+    "floor": 0,
+    "x": 1100,
+    "y": 1180,
+    "target_x": 1250,
+    "target_y": 1180,
+    "time": 0.0,
+    "duration": 1.4,
+    "radius": 0,
+    "check": "attack",
+    "rolls": [
+      15
+    ],
+    "roll": 15,
+    "bonus": 5,
+    "total": 20,
+    "defense": 11,
+    "hit": true,
+    "critical": false,
+    "disadvantage": false,
+    "advantage": false,
+    "damage": 9,
+    "damage_dice": "1k8+3",
+    "damage_rolls": [
+      6
+    ],
+    "damage_modifier": 3,
+    "damage_sides": 8,
+    "damage_maximized": false,
+    "damage_type": "piercing",
+    "savage_attacker": true,
+    "savage_damage_rolls": [
+      [
+        2
+      ],
+      [
+        6
+      ]
+    ],
+    "savage_chosen": 1,
+    "savage_scored_rolls": [
+      [
+        2
+      ],
+      [
+        6
+      ]
+    ],
+    "action": "Atak 1/1",
+    "target_name": "Ogr maczugowy",
+    "expires_at": 1008.0
+  },
+  "combat_log": [
+    {
+      "id": "fx2",
+      "kind": "combat_roll",
+      "source_id": "1",
+      "target_id": "target",
+      "floor": 0,
+      "x": 1100,
+      "y": 1180,
+      "target_x": 1250,
+      "target_y": 1180,
+      "time": 0.0,
+      "duration": 1.4,
+      "radius": 0,
+      "check": "attack",
+      "rolls": [
+        15
+      ],
+      "roll": 15,
+      "bonus": 5,
+      "total": 20,
+      "defense": 11,
+      "hit": true,
+      "critical": false,
+      "disadvantage": false,
+      "advantage": false,
+      "damage": 9,
+      "damage_dice": "1k8+3",
+      "damage_rolls": [
+        6
+      ],
+      "damage_modifier": 3,
+      "damage_sides": 8,
+      "damage_maximized": false,
+      "damage_type": "piercing",
+      "savage_attacker": true,
+      "savage_damage_rolls": [
+        [
+          2
+        ],
+        [
+          6
+        ]
+      ],
+      "savage_chosen": 1,
+      "savage_scored_rolls": [
+        [
+          2
+        ],
+        [
+          6
+        ]
+      ],
+      "action": "Atak 1/1",
+      "target_name": "Ogr maczugowy",
+      "expires_at": 1008.0
+    }
+  ],
+  "simulation_time": 0.0
+}

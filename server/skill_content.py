@@ -1,94 +1,124 @@
-"""Authored skill encounters. Checks use D&D; these places and rewards are Bractwo.
+"""Eight authored world scenes, replacing the eighteen UI_28 dice markers.
 
-Every encounter is personal and pays once. Traversal encounters then remain
-usable as short, local routes. IDs, DCs, rewards and endpoints are server data.
+Options use existing skill checks. Outcomes/rewards are personal and permanent.
+Legacy receipt IDs remain recognised, so grouped scenes cannot pay twice.
 """
 
+def check(id_, label, skill, ability, dc=10):
+    return dict(id=id_, label=label, kind='check', skill=skill, ability=ability, dc=dc)
+
+
 CHALLENGES = (
-    dict(id='mill_climb', skill='athletics', ability='strength', dc=10,
-         name='Lina na taras młyna', anchor='old_mill', offset=(150, -120), route=(150, 210),
-         description='Wespnij się po starej linie na drugi taras młyna. Po zabezpieczeniu liny przejście pozostanie dostępne.',
-         success='Mocujesz linę. Możesz odtąd korzystać z tego przejścia w obie strony.', xp=30, gold=0),
-    dict(id='camp_ledge', skill='acrobatics', ability='dexterity', dc=15,
-         name='Wąska półka przy obozie', anchor='goblin_camp', offset=(-250, 160), route=(-250, -180),
-         description='Przejdź wąską półką na tyły obozu. Sukces wyznaczy bezpieczne przejście powrotne.',
-         success='Poznajesz pewne oparcia półki. Przejście działa odtąd w obie strony.', xp=45, gold=0),
-    dict(id='mill_tangled_pouch', skill='sleight_of_hand', ability='dexterity', dc=10,
-         name='Sakwa w trybach młyna', anchor='old_mill', offset=(-95, 55),
-         description='Wyplącz porzuconą sakwę z nieruchomych, zardzewiałych trybów, nie rozsypując zawartości.',
-         success='Ostrożnie uwalniasz sakwę: znajdujesz oszczędności dawnego młynarza.', xp=25, gold=25),
-    dict(id='camp_dispatches', skill='stealth', ability='dexterity', dc=15,
-         name='Meldunki przy namiocie', anchor='goblin_camp', offset=(80, 135),
-         description='Przekradnij się między namiotami i odzyskaj skradzioną sakwę zwiadowcy. Ciężka, hałaśliwa zbroja utrudnia test.',
-         success='Wracasz niepostrzeżenie ze skradzionymi zapasami zwiadowcy.', xp=45, gold=30, potions=1),
-    dict(id='dawn_arcane_seal', skill='arcana', ability='intelligence', dc=15,
-         name='Pieczęć maga Świtu', anchor='dawn_ruins', offset=(-145, 95),
-         description='Rozpoznaj kolejność wygasłych run i otwórz skrytkę dawnego maga.',
-         success='Układasz znaki we właściwej kolejności. Skrytka zawiera zapas na wyprawę.', xp=50, gold=30, potions=1),
-    dict(id='dawn_chronicle', skill='history', ability='intelligence', dc=10,
-         name='Mozaika dawnych władców', anchor='dawn_ruins', offset=(85, -110),
-         description='Ustal kolejność władców na mozaice, by odsunąć ukrytą płytę skarbca.',
-         success='Odczytujesz chronologię dynastii. Pod płytą zachowała się sakiewka monet.', xp=35, gold=35),
-    dict(id='mill_false_bottom', skill='investigation', ability='intelligence', dc=10,
-         name='Ślady pod podłogą młyna', anchor='old_mill', offset=(65, 60),
-         description='Porównaj ślady kurzu i gwoździ. Wskaż deskę, pod którą ukryto zapasy.',
-         success='Ślady prowadzą do luźnej deski. Odkrywasz nienaruszone zapasy.', xp=30, gold=15, potions=1),
-    dict(id='grove_herbs', skill='nature', ability='intelligence', dc=10,
-         name='Zioła nad leśnym strumieniem', anchor='land_6_0', offset=(100, 80), min_level=10,
-         description='Oddziel zioła lecznicze od podobnych trujących roślin. Zielarka pozostawiła tu fiolki i przepis.',
-         success='Rozpoznajesz właściwe rośliny i przygotowujesz dwie małe mikstury zdrowia.', xp=50, gold=0, potions=2),
-    dict(id='shrine_rite', skill='religion', ability='intelligence', dc=10,
-         name='Inskrypcja Kapliczki Świetlików', anchor='marsh_shrine', offset=(-65, -100),
-         description='Odczytaj dawny obrządek pielgrzymów, by odnaleźć schowek z ich zapasami.',
-         success='Modlitwa wskazuje schowek pielgrzymów. Odnajdujesz pozostawione mikstury.', xp=35, gold=0, potions=2),
-    dict(id='birch_pack_animal', skill='animal_handling', ability='wisdom', dc=10,
-         name='Spłoszony juczny kuc', anchor='merchant_brzezina', offset=(0, 120), min_level=10,
-         description='Uspokój przestraszonego kuca i popraw zerwaną uprząż. To oswojone zwierzę potrzebuje cierpliwego opiekuna.',
-         success='Kuc uspokaja się. Wdzięczny karawaniarz przekazuje zapasy i zapłatę.', xp=45, gold=25, potions=1),
-    dict(id='scout_story', skill='insight', ability='wisdom', dc=10,
-         name='Przemilczana zasadzka', anchor='zwiadowca', offset=(70, 60),
-         description='Porozmawiaj z Borysem: jego wahanie zdradza, że ukrywa szczegół ostatniej wyprawy.',
-         success='Borys przyznaje się do utraty zwiadowczych zapasów i powierza ci rezerwę na bezpieczny powrót.', xp=25, gold=0, potions=1),
-    dict(id='scout_first_aid', skill='medicine', ability='wisdom', dc=10,
-         name='Ranny kurier przy strażnicy', anchor='strazniczka', offset=(170, -45),
-         description='Rozpoznaj uraz rannego kuriera i załóż opatrunek. Pomoc poszkodowanemu nie odnawia twoich punktów zdrowia.',
-         success='Tamujesz krwawienie kuriera. Mira wypłaca nagrodę za udzieloną pomoc.', xp=30, gold=25),
-    dict(id='bridge_watch', skill='perception', ability='wisdom', dc=10,
-         name='Błysk pod kamieniem mostu', anchor='old_bridge', offset=(95, 30),
-         description='Wypatrz słaby błysk ukrytej klamry pomiędzy kamieniami przy wschodnim przyczółku.',
-         success='Dostrzegasz zamaskowaną sakwę podróżnego i odzyskujesz jej zawartość.', xp=25, gold=20),
-    dict(id='grove_tracks', skill='survival', ability='wisdom', dc=10,
-         name='Ślady zaginionej karawany', anchor='land_6_0', offset=(-110, 70), min_level=10,
-         description='Odróżnij ślady wozu od tropów zwierząt i odnajdź zgubioną skrzynię karawany.',
-         success='Trop kończy się pod korzeniami brzozy. Odnajdujesz zgubione zapasy i drobne monety.', xp=55, gold=30, potions=1),
-    dict(id='captain_bluff', skill='deception', ability='charisma', dc=15,
-         name='Próba blefu przewoźnika', anchor='captain_brzezina', offset=(-100, -15), min_level=10,
-         description='Kapitan ćwiczy rozpoznawanie przemytników. Zagraj rolę kupca i przekonująco ukryj sprzeczność w zmyślonej historii.',
-         success='Kapitan daje się nabrać podczas umówionej próby i wypłaca obiecaną stawkę.', xp=45, gold=40),
-    dict(id='guard_extortionist', skill='intimidation', ability='charisma', dc=15,
-         name='Awanturnik przy strażnicy', anchor='strazniczka', offset=(-90, -95),
-         description='Stanowczym ostrzeżeniem nakłoń awanturnika do zwrotu wymuszonych pieniędzy. Straż nagradza pokojowe rozwiązanie.',
-         success='Awanturnik oddaje pieniądze mieszkańcom. Straż wypłaca ci nagrodę.', xp=35, gold=30),
-    dict(id='birch_performance', skill='performance', ability='charisma', dc=10,
-         name='Występ na placu Brzeziny', anchor='city_brzezina', offset=(0, 90), min_level=10,
-         description='Zaprezentuj pieśń, taniec lub opowieść podróżnym czekającym na karawanę. Organizator płaci za jeden udany występ.',
-         success='Podróżni nagradzają występ oklaskami. Otrzymujesz umówione honorarium.', xp=40, gold=35),
-    dict(id='cartographer_supplies', skill='persuasion', ability='charisma', dc=10,
-         name='Zapasy dla wyprawy Orena', anchor='kartograf', offset=(-80, 95),
-         description='Przedstaw kartografowi rzeczowy plan pierwszej wyprawy i przekonaj go do wsparcia zapasami.',
-         success='Oren przyznaje zapasy na jedną wyprawę. Otrzymujesz dwie małe mikstury zdrowia.', xp=25, gold=0, potions=2),
+    dict(id='scout_first_aid', name='Ranny strażnik', scene='wounded_guard',
+         anchor='old_bridge', offset=(-310, -365), min_level=1,
+         description='Pod wierzbą nad rzeką siedzi strażnik z ranną nogą. Obok leżą tarcza i złamana włócznia.',
+         dialogue='„Wilki dopadły mnie na patrolu… Nie zdołam wrócić z taką nogą. Pomożesz?”',
+         options=(check('bandage','Opatrz ranę','medicine','wisdom'),
+                  dict(id='potion',label='Podaj małą miksturę zdrowia',kind='potion',item='health_potion',quantity=1),
+                  dict(id='heal',label='Rzuć Leczenie ran',kind='spell',spell='cure_wounds')),
+         success='Strażnik podnosi się i dziękuje za pomoc. Otrzymujesz zapłatę za uratowanie patrolu.',
+         aftermath='„Noga już nie boli. Dziękuję — będę miał na ciebie oko, wędrowcze.”',
+         failure='Opatrunek się zsuwa. Strażnik prosi, abyś chwilę zaczekał albo podał mu lekarstwo.',
+         xp=30,gold=25, hint_dc=12,hint='Pod osłoną tarczy widzisz głębokie rozcięcie nogi. Strażnik potrzebuje opatrunku lub leczenia.'),
+    dict(id='mill_tangled_pouch', name='Zablokowany wóz młynarza', scene='broken_cart',
+         anchor='old_mill', offset=(170, 140), min_level=1,
+         legacy_ids=('mill_climb','mill_false_bottom'),
+         description='Wóz z workami mąki utknął przy młynie. Pod koło wsunęła się belka, a woźnica bezradnie szarpie za dyszel.',
+         dialogue='„Sam go nie ruszę. Podważysz koło albo wyciągniesz to drewno spod osi?”',
+         options=(check('lift','Podważ wóz','athletics','strength'),
+                  check('free','Uwolnij zaklinowaną belkę','sleight_of_hand','dexterity'),
+                  check('inspect','Znajdź przyczynę zacięcia','investigation','intelligence')),
+         success='Koło rusza, a młynarz stawia wóz na trakcie. Wdzięczny dzieli się zapasami.',
+         aftermath='„Wóz znów jest sprawny. Dzięki tobie mąka dotrze do osady.”',
+         failure='Belka nadal klinuje koło. Odsapnij przed następną próbą.',
+         xp=35,gold=25,potions=1,hint_dc=12,hint='Spod koła wystaje koniec belki — to ona blokuje wóz, nie pęknięta oś.'),
+    dict(id='guard_extortionist',name='Podejrzany poborca',scene='road_dispute',
+         anchor='strazniczka',offset=(-150,-410),min_level=1,
+         legacy_ids=('scout_story','cartographer_supplies'),
+         description='Na północnym trakcie obcy zatrzymał podróżną. Żąda opłaty za przejście, pokazując zniszczoną pieczęć.',
+         dialogue='„Myto dla straży! Płaci każdy, kto tędy przechodzi.” Podróżna spogląda na ciebie, ściskając pustą sakwę.',
+         options=(check('warn','Każ mu oddać pieniądze','intimidation','charisma',12),
+                  check('question','Wypytaj o jego rozkazy','insight','wisdom'),
+                  check('persuade','Przekonaj go, żeby odszedł','persuasion','charisma',12)),
+         success='Fałszywy poborca zwraca pieniądze i odchodzi. Podróżna wynagradza ci pomoc.',
+         aftermath='„Dobrze, że się zjawiłeś. Już mogę spokojnie ruszyć do Przystani.”',
+         failure='Obcy nie ustępuje. Przemyśl, jak go przekonać, zanim spróbujesz ponownie.',
+         xp=35,gold=30,hint_dc=13,hint='Na pieczęci brakuje znaku Przystani. Mężczyzna nie jest strażnikiem.'),
+    dict(id='bridge_watch',name='Sakwa przy przeprawie',scene='lost_pouch',
+         anchor='old_bridge',offset=(130,155),min_level=1,
+         description='Między kamieniami przy wschodnim brzegu leży zerwany pas. Coś pobłyskuje w trawie.',
+         dialogue='Mokre ślady urywają się przy głazie. W splątanych korzeniach mogło coś zostać.',
+         options=(check('spot','Przyjrzyj się trawie','perception','wisdom'),
+                  check('search','Przeszukaj kamienie','investigation','intelligence')),
+         success='Wyciągasz z korzeni zagubioną sakwę. W środku zachowały się monety.',
+         aftermath='Pozostały tylko ślady w mokrej trawie. Sakwa została już zabrana.',
+         failure='Nie znajdujesz sakwy. Daj wodzie opaść i przyjrzyj się temu miejscu ponownie.',
+         xp=25,gold=20,hint_dc=12,hint='W korzeniach miga mosiężna klamra. Tam leży zagubiona sakwa.'),
+    dict(id='camp_dispatches',name='Skradzione zapasy',scene='stolen_supplies',
+         anchor='goblin_camp',offset=(-210,180),min_level=1,
+         legacy_ids=('camp_ledge','captain_bluff'),
+         description='Na skraju obozu stoją skrzynie ze znakiem Przystani. Mały goblin drzemie obok płachty i porzuconej miski.',
+         dialogue='To zapasy skradzione zwiadowcom. Strażnik co chwila przymyka oczy, ale skrzynie stoją blisko jego posłania.',
+         options=(check('sneak','Podkradnij się do skrzyni','stealth','dexterity',12),
+                  check('bluff','Podszyj się pod posłańca','deception','charisma',12),
+                  check('balance','Przejdź po zwalonym pniu','acrobatics','dexterity',12)),
+         success='Wynosisz ocalałe zapasy. Goblin zostaje przy pustych skrzyniach.',
+         aftermath='Skrzynie są już puste. Ocalałe zapasy zabrałeś z obozu.',
+         failure='Goblin podnosi głowę. Wycofujesz się, zanim zdąży podnieść alarm.',
+         xp=45,gold=30,potions=1,hint_dc=13,hint='Sznur przy skrzyniach porusza miską obok wartownika. Tędy łatwo go obudzić.'),
+    dict(id='dawn_arcane_seal',name='Zapomniany relikwiarz',scene='sealed_relic',
+         anchor='dawn_ruins',offset=(-170,130),min_level=1,
+         legacy_ids=('dawn_chronicle','shrine_rite'),
+         description='Wśród pękniętych kolumn ocalał kamienny relikwiarz. Na pokrywie wyryto runy, korony i symbol świtu.',
+         dialogue='Trzy kamienne znaki otaczają szczelinę w pokrywie. Właściwa kolejność powinna zwolnić stary mechanizm.',
+         options=(check('runes','Odczytaj runy','arcana','intelligence',12),
+                  check('history','Rozpoznaj królewskie znaki','history','intelligence',12),
+                  check('rite','Odtwórz dawny obrządek','religion','intelligence',12)),
+         success='Kamienna pokrywa odsuwa się. Zabierasz zachowane monety i miksturę.',
+         aftermath='Relikwiarz jest otwarty. Wewnątrz pozostał tylko pył.',
+         failure='Znaki gasną, a pokrywa pozostaje zamknięta. Poczekaj przed następną próbą.',
+         xp=50,gold=35,potions=1,hint_dc=14,hint='Na najstarszej koronie ślady dotyku są wyraźniejsze niż na pozostałych znakach.'),
+    dict(id='grove_herbs',name='Zielarka z doliny',scene='herbalist',
+         anchor='land_6_0',offset=(120,100),min_level=10,
+         legacy_ids=('grove_tracks',),
+         description='Zielarka siedzi przy koszyku fiolek. Część ziół rozwiała się po ściółce, między podobnymi, trującymi roślinami.',
+         dialogue='„Potrzebuję liści o jasnych żyłkach. Pomożesz je rozpoznać albo odszukać moją zgubioną wiązkę?”',
+         options=(check('identify','Rozpoznaj lecznicze zioła','nature','intelligence'),
+                  check('track','Odszukaj rozwianą wiązkę','survival','wisdom')),
+         success='Zielarka kończy przygotowywanie lekarstw i oddaje ci dwie fiolki.',
+         aftermath='„Te zioła wystarczą na dziś. Niech lekarstwo dobrze ci służy.”',
+         failure='Rośliny są zbyt podobne. Zanim spróbujesz ponownie, uważniej obejrzyj liście.',
+         xp=50,gold=0,potions=2,hint_dc=12,hint='Właściwe liście mają jasne żyłki. Trujące rośliny rosną bliżej ciemnego kamienia.'),
+    dict(id='birch_pack_animal',name='Spłoszony kuc',scene='frightened_pony',
+         anchor='city_brzezina',offset=(335,-310),min_level=10,
+         legacy_ids=('birch_performance',),
+         description='Na drodze do Brzeziny kuc szarpie uprząż. Karawaniarz nie może zbliżyć się do rozsypanych tobołów.',
+         dialogue='„Przestraszył się wilków. Tylko spokojnie — nie ciągnij go za uzdę!”',
+         options=(check('calm','Uspokój zwierzę','animal_handling','wisdom'),
+                  check('sing','Zanuć spokojną melodię','performance','charisma',12)),
+         success='Kuc opuszcza łeb. Właściciel zapina uprząż i przekazuje ci nagrodę.',
+         aftermath='„Już spokojny. Możemy dokończyć drogę do Brzeziny.”',
+         failure='Kuc nadal się płoszy. Daj mu chwilę spokoju przed kolejnym podejściem.',
+         xp=45,gold=25,potions=1,hint_dc=12,hint='Kuc uspokaja się, gdy nikt nie napina uprzęży.'),
 )
 
-IDS = frozenset(row['id'] for row in CHALLENGES)
-FAILURE_COOLDOWN = 90
-NEARBY_DISTANCE = 1200
-INTERACTION_RADIUS = 125
+# Compatibility fields support old clients while the event client uses options.
+for _row in CHALLENGES:
+    _first=next(o for o in _row['options'] if o['kind']=='check')
+    _row.update({k:_first[k] for k in ('skill','ability','dc')})
+
+BY_ID={row['id']:row for row in CHALLENGES}
+CANONICAL={old:row['id'] for row in CHALLENGES for old in (row['id'],*row.get('legacy_ids',()))}
+IDS=frozenset(CANONICAL)
+FAILURE_COOLDOWN=90
+NEARBY_DISTANCE=1000
+INTERACTION_RADIUS=112
+HINT_DISTANCE=230
 
 
 def reward_hint(row):
-    parts = []
-    if row.get('route'):parts.append('stałe przejście w obie strony')
+    parts=[]
     if row.get('xp'):parts.append(f"{row['xp']} PD")
     if row.get('gold'):parts.append(f"{row['gold']} złota")
     if row.get('potions'):parts.append(f"mała mikstura zdrowia ×{row['potions']}")
-    return ', '.join(parts)+'; nagroda jednorazowa'
+    return ' · '.join(parts)

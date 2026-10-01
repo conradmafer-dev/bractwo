@@ -1,0 +1,34 @@
+test_all_old_claims_become_exactly_eight_completed_events (test_world_events_ui32.WorldEvents.test_all_old_claims_become_exactly_eight_completed_events) ... ok
+test_claim_survives_save_reload (test_world_events_ui32.WorldEvents.test_claim_survives_save_reload) ... ok
+test_completion_is_personal_not_global (test_world_events_ui32.WorldEvents.test_completion_is_personal_not_global) ... ok
+test_cure_wounds_respects_selected_higher_circle (test_world_events_ui32.WorldEvents.test_cure_wounds_respects_selected_higher_circle) ... ok
+test_distance_and_floor_cannot_be_forged (test_world_events_ui32.WorldEvents.test_distance_and_floor_cannot_be_forged) ... ok
+test_each_old_completed_id_prevents_new_group_reward (test_world_events_ui32.WorldEvents.test_each_old_completed_id_prevents_new_group_reward) ... ok
+test_eight_accessible_scenes_replace_all_eighteen_ids (test_world_events_ui32.WorldEvents.test_eight_accessible_scenes_replace_all_eighteen_ids) ... ok
+test_every_check_choice_resolves_its_scene (test_world_events_ui32.WorldEvents.test_every_check_choice_resolves_its_scene) ... ok
+test_failed_bandage_can_be_followed_by_paid_potion (test_world_events_ui32.WorldEvents.test_failed_bandage_can_be_followed_by_paid_potion) ... ok
+test_failed_check_can_retry_after_cooldown (test_world_events_ui32.WorldEvents.test_failed_check_can_retry_after_cooldown) ... ok
+test_failure_cooldown_prevents_reroll_via_other_check (test_world_events_ui32.WorldEvents.test_failure_cooldown_prevents_reroll_via_other_check) ... ok
+test_full_bag_prevents_reward_loss_before_check (test_world_events_ui32.WorldEvents.test_full_bag_prevents_reward_loss_before_check) ... ok
+test_guard_is_on_dry_river_bank (test_world_events_ui32.WorldEvents.test_guard_is_on_dry_river_bank) ... ok
+test_healing_spell_spends_actual_mana_and_reports_real_dice (test_world_events_ui32.WorldEvents.test_healing_spell_spends_actual_mana_and_reports_real_dice) ... ok
+test_hints_need_sight_nearness_and_living_player (test_world_events_ui32.WorldEvents.test_hints_need_sight_nearness_and_living_player) ... ok
+test_legacy_alias_packets_do_not_create_separate_claim (test_world_events_ui32.WorldEvents.test_legacy_alias_packets_do_not_create_separate_claim) ... ok
+test_level_gate_applies_to_every_choice (test_world_events_ui32.WorldEvents.test_level_gate_applies_to_every_choice) ... ok
+test_malformed_packets_cannot_change_progress (test_world_events_ui32.WorldEvents.test_malformed_packets_cannot_change_progress) ... ok
+test_malformed_saved_state_is_bounded (test_world_events_ui32.WorldEvents.test_malformed_saved_state_is_bounded) ... ok
+test_metadata_does_not_leak_personal_outcomes_or_passive_hints (test_world_events_ui32.WorldEvents.test_metadata_does_not_leak_personal_outcomes_or_passive_hints) ... ok
+test_no_potion_is_not_a_free_completion (test_world_events_ui32.WorldEvents.test_no_potion_is_not_a_free_completion) ... ok
+test_outcome_timestamp_advances_animation_without_losing_claim (test_world_events_ui32.WorldEvents.test_outcome_timestamp_advances_animation_without_losing_claim) ... ok
+test_passive_perception_with_alert_reveals_hint_but_not_reward (test_world_events_ui32.WorldEvents.test_passive_perception_with_alert_reveals_hint_but_not_reward) ... ok
+test_player_conditions_reject_without_spending_anything (test_world_events_ui32.WorldEvents.test_player_conditions_reject_without_spending_anything) ... ok
+test_potion_removed_without_healing_the_player (test_world_events_ui32.WorldEvents.test_potion_removed_without_healing_the_player) ... ok
+test_replay_and_alternate_solutions_do_not_repeat_reward (test_world_events_ui32.WorldEvents.test_replay_and_alternate_solutions_do_not_repeat_reward) ... ok
+test_scene_spacing_and_empty_town_square (test_world_events_ui32.WorldEvents.test_scene_spacing_and_empty_town_square) ... ok
+test_simultaneous_requests_only_pay_once (test_world_events_ui32.WorldEvents.test_simultaneous_requests_only_pay_once) ... ok
+test_spell_class_mana_distance_and_cooldown_are_checked (test_world_events_ui32.WorldEvents.test_spell_class_mana_distance_and_cooldown_are_checked) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 3.822s
+
+OK

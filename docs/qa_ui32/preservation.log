@@ -1,0 +1,3 @@
+Unmodified FIX5 runtime files verified byte-for-byte. Changed files: server/environment_rules.py, server/feat_rules.py, server/server.py, web/character_sheet.js, web/game.js, web/hud_layout.css, web/skills_ui.js
+Added: server/skill_content.py, server/skill_game.py
+No index.html, Google auth, comments, galleries, SEO files or database distributed.

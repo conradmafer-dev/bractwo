@@ -1,0 +1,1614 @@
+--- a/server/environment_rules.py
++++ b/server/environment_rules.py
+@@ -431,7 +431,7 @@
+             with self.db:self.save_player(target)
+         return result
+ 
+-    def environment_ability_check(self,actor,ability,dc,skill=''):
++    def environment_ability_check(self,actor,ability,dc,skill='',*,action_name=None,target=None):
+         try:
+             from . import combat_rules as rules, skill_rules
+         except ImportError:
+@@ -460,7 +460,7 @@
+         if guidance_roll is not None:
+             check_draws.append(dict(name='Wskazówki', sides=4, rolls=[guidance_roll], sign=1))
+         if check_draws:result['check_extra_rolls']=check_draws
+-        self.report_roll(actor,actor,result,skill or ability,actor if self.is_player_target(actor) else None)
++        self.report_roll(actor,target or actor,result,action_name or skill or ability,actor if self.is_player_target(actor) else None)
+         return result
+ 
+     def environment_forced_move(self,target,dx,dy):
+--- a/server/feat_rules.py
++++ b/server/feat_rules.py
+@@ -10,7 +10,7 @@
+ 
+ NEW_FEATS = {
+     'alert': dict(name='Czujny', category='origin', abilities=[],
+-        description='Dodajesz premię z biegłości do testów i pasywnej Percepcji, także gdy masz już biegłość. Adaptacja czujności do gry bez inicjatywy.'),
++        description='Zwiększa Percepcję o premię z biegłości. Pomaga dostrzegać szczegóły i wskazówki w otoczeniu.'),
+     'crafter': dict(name='Rzemieślnik', category='origin', abilities=[],
+         description='Towary u kupców kosztują o 20% mniej (cena zaokrąglana w górę). Nie zmienia cen sprzedaży, usług ani run.'),
+     'healer': dict(name='Uzdrowiciel', category='origin', abilities=[],
+--- a/server/server.py
++++ b/server/server.py
+@@ -2032,7 +2032,7 @@
+     app.router.add_get("/ws",websocket)
+ 
+     async def health(request):
+-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_31","world_revision":getattr(content,"WORLD_REVISION",20)})
++        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_32","world_revision":getattr(content,"WORLD_REVISION",20)})
+ 
+     app.router.add_get("/health",health)
+     async def ranking(request):
+--- a/server/skill_content.py
++++ b/server/skill_content.py
+@@ -1,94 +1,124 @@
+-"""Authored skill encounters. Checks use D&D; these places and rewards are Bractwo.
++"""Eight authored world scenes, replacing the eighteen UI_28 dice markers.
+ 
+-Every encounter is personal and pays once. Traversal encounters then remain
+-usable as short, local routes. IDs, DCs, rewards and endpoints are server data.
++Options use existing skill checks. Outcomes/rewards are personal and permanent.
++Legacy receipt IDs remain recognised, so grouped scenes cannot pay twice.
+ """
+ 
++def check(id_, label, skill, ability, dc=10):
++    return dict(id=id_, label=label, kind='check', skill=skill, ability=ability, dc=dc)
++
++
+ CHALLENGES = (
+-    dict(id='mill_climb', skill='athletics', ability='strength', dc=10,
+-         name='Lina na taras młyna', anchor='old_mill', offset=(150, -120), route=(150, 210),
+-         description='Wespnij się po starej linie na drugi taras młyna. Po zabezpieczeniu liny przejście pozostanie dostępne.',
+-         success='Mocujesz linę. Możesz odtąd korzystać z tego przejścia w obie strony.', xp=30, gold=0),
+-    dict(id='camp_ledge', skill='acrobatics', ability='dexterity', dc=15,
+-         name='Wąska półka przy obozie', anchor='goblin_camp', offset=(-250, 160), route=(-250, -180),
+-         description='Przejdź wąską półką na tyły obozu. Sukces wyznaczy bezpieczne przejście powrotne.',
+-         success='Poznajesz pewne oparcia półki. Przejście działa odtąd w obie strony.', xp=45, gold=0),
+-    dict(id='mill_tangled_pouch', skill='sleight_of_hand', ability='dexterity', dc=10,
+-         name='Sakwa w trybach młyna', anchor='old_mill', offset=(-95, 55),
+-         description='Wyplącz porzuconą sakwę z nieruchomych, zardzewiałych trybów, nie rozsypując zawartości.',
+-         success='Ostrożnie uwalniasz sakwę: znajdujesz oszczędności dawnego młynarza.', xp=25, gold=25),
+-    dict(id='camp_dispatches', skill='stealth', ability='dexterity', dc=15,
+-         name='Meldunki przy namiocie', anchor='goblin_camp', offset=(80, 135),
+-         description='Przekradnij się między namiotami i odzyskaj skradzioną sakwę zwiadowcy. Ciężka, hałaśliwa zbroja utrudnia test.',
+-         success='Wracasz niepostrzeżenie ze skradzionymi zapasami zwiadowcy.', xp=45, gold=30, potions=1),
+-    dict(id='dawn_arcane_seal', skill='arcana', ability='intelligence', dc=15,
+-         name='Pieczęć maga Świtu', anchor='dawn_ruins', offset=(-145, 95),
+-         description='Rozpoznaj kolejność wygasłych run i otwórz skrytkę dawnego maga.',
+-         success='Układasz znaki we właściwej kolejności. Skrytka zawiera zapas na wyprawę.', xp=50, gold=30, potions=1),
+-    dict(id='dawn_chronicle', skill='history', ability='intelligence', dc=10,
+-         name='Mozaika dawnych władców', anchor='dawn_ruins', offset=(85, -110),
+-         description='Ustal kolejność władców na mozaice, by odsunąć ukrytą płytę skarbca.',
+-         success='Odczytujesz chronologię dynastii. Pod płytą zachowała się sakiewka monet.', xp=35, gold=35),
+-    dict(id='mill_false_bottom', skill='investigation', ability='intelligence', dc=10,
+-         name='Ślady pod podłogą młyna', anchor='old_mill', offset=(65, 60),
+-         description='Porównaj ślady kurzu i gwoździ. Wskaż deskę, pod którą ukryto zapasy.',
+-         success='Ślady prowadzą do luźnej deski. Odkrywasz nienaruszone zapasy.', xp=30, gold=15, potions=1),
+-    dict(id='grove_herbs', skill='nature', ability='intelligence', dc=10,
+-         name='Zioła nad leśnym strumieniem', anchor='land_6_0', offset=(100, 80), min_level=10,
+-         description='Oddziel zioła lecznicze od podobnych trujących roślin. Zielarka pozostawiła tu fiolki i przepis.',
+-         success='Rozpoznajesz właściwe rośliny i przygotowujesz dwie małe mikstury zdrowia.', xp=50, gold=0, potions=2),
+-    dict(id='shrine_rite', skill='religion', ability='intelligence', dc=10,
+-         name='Inskrypcja Kapliczki Świetlików', anchor='marsh_shrine', offset=(-65, -100),
+-         description='Odczytaj dawny obrządek pielgrzymów, by odnaleźć schowek z ich zapasami.',
+-         success='Modlitwa wskazuje schowek pielgrzymów. Odnajdujesz pozostawione mikstury.', xp=35, gold=0, potions=2),
+-    dict(id='birch_pack_animal', skill='animal_handling', ability='wisdom', dc=10,
+-         name='Spłoszony juczny kuc', anchor='merchant_brzezina', offset=(0, 120), min_level=10,
+-         description='Uspokój przestraszonego kuca i popraw zerwaną uprząż. To oswojone zwierzę potrzebuje cierpliwego opiekuna.',
+-         success='Kuc uspokaja się. Wdzięczny karawaniarz przekazuje zapasy i zapłatę.', xp=45, gold=25, potions=1),
+-    dict(id='scout_story', skill='insight', ability='wisdom', dc=10,
+-         name='Przemilczana zasadzka', anchor='zwiadowca', offset=(70, 60),
+-         description='Porozmawiaj z Borysem: jego wahanie zdradza, że ukrywa szczegół ostatniej wyprawy.',
+-         success='Borys przyznaje się do utraty zwiadowczych zapasów i powierza ci rezerwę na bezpieczny powrót.', xp=25, gold=0, potions=1),
+-    dict(id='scout_first_aid', skill='medicine', ability='wisdom', dc=10,
+-         name='Ranny kurier przy strażnicy', anchor='strazniczka', offset=(170, -45),
+-         description='Rozpoznaj uraz rannego kuriera i załóż opatrunek. Pomoc poszkodowanemu nie odnawia twoich punktów zdrowia.',
+-         success='Tamujesz krwawienie kuriera. Mira wypłaca nagrodę za udzieloną pomoc.', xp=30, gold=25),
+-    dict(id='bridge_watch', skill='perception', ability='wisdom', dc=10,
+-         name='Błysk pod kamieniem mostu', anchor='old_bridge', offset=(95, 30),
+-         description='Wypatrz słaby błysk ukrytej klamry pomiędzy kamieniami przy wschodnim przyczółku.',
+-         success='Dostrzegasz zamaskowaną sakwę podróżnego i odzyskujesz jej zawartość.', xp=25, gold=20),
+-    dict(id='grove_tracks', skill='survival', ability='wisdom', dc=10,
+-         name='Ślady zaginionej karawany', anchor='land_6_0', offset=(-110, 70), min_level=10,
+-         description='Odróżnij ślady wozu od tropów zwierząt i odnajdź zgubioną skrzynię karawany.',
+-         success='Trop kończy się pod korzeniami brzozy. Odnajdujesz zgubione zapasy i drobne monety.', xp=55, gold=30, potions=1),
+-    dict(id='captain_bluff', skill='deception', ability='charisma', dc=15,
+-         name='Próba blefu przewoźnika', anchor='captain_brzezina', offset=(-100, -15), min_level=10,
+-         description='Kapitan ćwiczy rozpoznawanie przemytników. Zagraj rolę kupca i przekonująco ukryj sprzeczność w zmyślonej historii.',
+-         success='Kapitan daje się nabrać podczas umówionej próby i wypłaca obiecaną stawkę.', xp=45, gold=40),
+-    dict(id='guard_extortionist', skill='intimidation', ability='charisma', dc=15,
+-         name='Awanturnik przy strażnicy', anchor='strazniczka', offset=(-90, -95),
+-         description='Stanowczym ostrzeżeniem nakłoń awanturnika do zwrotu wymuszonych pieniędzy. Straż nagradza pokojowe rozwiązanie.',
+-         success='Awanturnik oddaje pieniądze mieszkańcom. Straż wypłaca ci nagrodę.', xp=35, gold=30),
+-    dict(id='birch_performance', skill='performance', ability='charisma', dc=10,
+-         name='Występ na placu Brzeziny', anchor='city_brzezina', offset=(0, 90), min_level=10,
+-         description='Zaprezentuj pieśń, taniec lub opowieść podróżnym czekającym na karawanę. Organizator płaci za jeden udany występ.',
+-         success='Podróżni nagradzają występ oklaskami. Otrzymujesz umówione honorarium.', xp=40, gold=35),
+-    dict(id='cartographer_supplies', skill='persuasion', ability='charisma', dc=10,
+-         name='Zapasy dla wyprawy Orena', anchor='kartograf', offset=(-80, 95),
+-         description='Przedstaw kartografowi rzeczowy plan pierwszej wyprawy i przekonaj go do wsparcia zapasami.',
+-         success='Oren przyznaje zapasy na jedną wyprawę. Otrzymujesz dwie małe mikstury zdrowia.', xp=25, gold=0, potions=2),
++    dict(id='scout_first_aid', name='Ranny strażnik', scene='wounded_guard',
++         anchor='old_bridge', offset=(-310, -365), min_level=1,
++         description='Pod wierzbą nad rzeką siedzi strażnik z ranną nogą. Obok leżą tarcza i złamana włócznia.',
++         dialogue='„Wilki dopadły mnie na patrolu… Nie zdołam wrócić z taką nogą. Pomożesz?”',
++         options=(check('bandage','Opatrz ranę','medicine','wisdom'),
++                  dict(id='potion',label='Podaj małą miksturę zdrowia',kind='potion',item='health_potion',quantity=1),
++                  dict(id='heal',label='Rzuć Leczenie ran',kind='spell',spell='cure_wounds')),
++         success='Strażnik podnosi się i dziękuje za pomoc. Otrzymujesz zapłatę za uratowanie patrolu.',
++         aftermath='„Noga już nie boli. Dziękuję — będę miał na ciebie oko, wędrowcze.”',
++         failure='Opatrunek się zsuwa. Strażnik prosi, abyś chwilę zaczekał albo podał mu lekarstwo.',
++         xp=30,gold=25, hint_dc=12,hint='Pod osłoną tarczy widzisz głębokie rozcięcie nogi. Strażnik potrzebuje opatrunku lub leczenia.'),
++    dict(id='mill_tangled_pouch', name='Zablokowany wóz młynarza', scene='broken_cart',
++         anchor='old_mill', offset=(170, 140), min_level=1,
++         legacy_ids=('mill_climb','mill_false_bottom'),
++         description='Wóz z workami mąki utknął przy młynie. Pod koło wsunęła się belka, a woźnica bezradnie szarpie za dyszel.',
++         dialogue='„Sam go nie ruszę. Podważysz koło albo wyciągniesz to drewno spod osi?”',
++         options=(check('lift','Podważ wóz','athletics','strength'),
++                  check('free','Uwolnij zaklinowaną belkę','sleight_of_hand','dexterity'),
++                  check('inspect','Znajdź przyczynę zacięcia','investigation','intelligence')),
++         success='Koło rusza, a młynarz stawia wóz na trakcie. Wdzięczny dzieli się zapasami.',
++         aftermath='„Wóz znów jest sprawny. Dzięki tobie mąka dotrze do osady.”',
++         failure='Belka nadal klinuje koło. Odsapnij przed następną próbą.',
++         xp=35,gold=25,potions=1,hint_dc=12,hint='Spod koła wystaje koniec belki — to ona blokuje wóz, nie pęknięta oś.'),
++    dict(id='guard_extortionist',name='Podejrzany poborca',scene='road_dispute',
++         anchor='strazniczka',offset=(-150,-410),min_level=1,
++         legacy_ids=('scout_story','cartographer_supplies'),
++         description='Na północnym trakcie obcy zatrzymał podróżną. Żąda opłaty za przejście, pokazując zniszczoną pieczęć.',
++         dialogue='„Myto dla straży! Płaci każdy, kto tędy przechodzi.” Podróżna spogląda na ciebie, ściskając pustą sakwę.',
++         options=(check('warn','Każ mu oddać pieniądze','intimidation','charisma',12),
++                  check('question','Wypytaj o jego rozkazy','insight','wisdom'),
++                  check('persuade','Przekonaj go, żeby odszedł','persuasion','charisma',12)),
++         success='Fałszywy poborca zwraca pieniądze i odchodzi. Podróżna wynagradza ci pomoc.',
++         aftermath='„Dobrze, że się zjawiłeś. Już mogę spokojnie ruszyć do Przystani.”',
++         failure='Obcy nie ustępuje. Przemyśl, jak go przekonać, zanim spróbujesz ponownie.',
++         xp=35,gold=30,hint_dc=13,hint='Na pieczęci brakuje znaku Przystani. Mężczyzna nie jest strażnikiem.'),
++    dict(id='bridge_watch',name='Sakwa przy przeprawie',scene='lost_pouch',
++         anchor='old_bridge',offset=(130,155),min_level=1,
++         description='Między kamieniami przy wschodnim brzegu leży zerwany pas. Coś pobłyskuje w trawie.',
++         dialogue='Mokre ślady urywają się przy głazie. W splątanych korzeniach mogło coś zostać.',
++         options=(check('spot','Przyjrzyj się trawie','perception','wisdom'),
++                  check('search','Przeszukaj kamienie','investigation','intelligence')),
++         success='Wyciągasz z korzeni zagubioną sakwę. W środku zachowały się monety.',
++         aftermath='Pozostały tylko ślady w mokrej trawie. Sakwa została już zabrana.',
++         failure='Nie znajdujesz sakwy. Daj wodzie opaść i przyjrzyj się temu miejscu ponownie.',
++         xp=25,gold=20,hint_dc=12,hint='W korzeniach miga mosiężna klamra. Tam leży zagubiona sakwa.'),
++    dict(id='camp_dispatches',name='Skradzione zapasy',scene='stolen_supplies',
++         anchor='goblin_camp',offset=(-210,180),min_level=1,
++         legacy_ids=('camp_ledge','captain_bluff'),
++         description='Na skraju obozu stoją skrzynie ze znakiem Przystani. Mały goblin drzemie obok płachty i porzuconej miski.',
++         dialogue='To zapasy skradzione zwiadowcom. Strażnik co chwila przymyka oczy, ale skrzynie stoją blisko jego posłania.',
++         options=(check('sneak','Podkradnij się do skrzyni','stealth','dexterity',12),
++                  check('bluff','Podszyj się pod posłańca','deception','charisma',12),
++                  check('balance','Przejdź po zwalonym pniu','acrobatics','dexterity',12)),
++         success='Wynosisz ocalałe zapasy. Goblin zostaje przy pustych skrzyniach.',
++         aftermath='Skrzynie są już puste. Ocalałe zapasy zabrałeś z obozu.',
++         failure='Goblin podnosi głowę. Wycofujesz się, zanim zdąży podnieść alarm.',
++         xp=45,gold=30,potions=1,hint_dc=13,hint='Sznur przy skrzyniach porusza miską obok wartownika. Tędy łatwo go obudzić.'),
++    dict(id='dawn_arcane_seal',name='Zapomniany relikwiarz',scene='sealed_relic',
++         anchor='dawn_ruins',offset=(-170,130),min_level=1,
++         legacy_ids=('dawn_chronicle','shrine_rite'),
++         description='Wśród pękniętych kolumn ocalał kamienny relikwiarz. Na pokrywie wyryto runy, korony i symbol świtu.',
++         dialogue='Trzy kamienne znaki otaczają szczelinę w pokrywie. Właściwa kolejność powinna zwolnić stary mechanizm.',
++         options=(check('runes','Odczytaj runy','arcana','intelligence',12),
++                  check('history','Rozpoznaj królewskie znaki','history','intelligence',12),
++                  check('rite','Odtwórz dawny obrządek','religion','intelligence',12)),
++         success='Kamienna pokrywa odsuwa się. Zabierasz zachowane monety i miksturę.',
++         aftermath='Relikwiarz jest otwarty. Wewnątrz pozostał tylko pył.',
++         failure='Znaki gasną, a pokrywa pozostaje zamknięta. Poczekaj przed następną próbą.',
++         xp=50,gold=35,potions=1,hint_dc=14,hint='Na najstarszej koronie ślady dotyku są wyraźniejsze niż na pozostałych znakach.'),
++    dict(id='grove_herbs',name='Zielarka z doliny',scene='herbalist',
++         anchor='land_6_0',offset=(120,100),min_level=10,
++         legacy_ids=('grove_tracks',),
++         description='Zielarka siedzi przy koszyku fiolek. Część ziół rozwiała się po ściółce, między podobnymi, trującymi roślinami.',
++         dialogue='„Potrzebuję liści o jasnych żyłkach. Pomożesz je rozpoznać albo odszukać moją zgubioną wiązkę?”',
++         options=(check('identify','Rozpoznaj lecznicze zioła','nature','intelligence'),
++                  check('track','Odszukaj rozwianą wiązkę','survival','wisdom')),
++         success='Zielarka kończy przygotowywanie lekarstw i oddaje ci dwie fiolki.',
++         aftermath='„Te zioła wystarczą na dziś. Niech lekarstwo dobrze ci służy.”',
++         failure='Rośliny są zbyt podobne. Zanim spróbujesz ponownie, uważniej obejrzyj liście.',
++         xp=50,gold=0,potions=2,hint_dc=12,hint='Właściwe liście mają jasne żyłki. Trujące rośliny rosną bliżej ciemnego kamienia.'),
++    dict(id='birch_pack_animal',name='Spłoszony kuc',scene='frightened_pony',
++         anchor='city_brzezina',offset=(335,-310),min_level=10,
++         legacy_ids=('birch_performance',),
++         description='Na drodze do Brzeziny kuc szarpie uprząż. Karawaniarz nie może zbliżyć się do rozsypanych tobołów.',
++         dialogue='„Przestraszył się wilków. Tylko spokojnie — nie ciągnij go za uzdę!”',
++         options=(check('calm','Uspokój zwierzę','animal_handling','wisdom'),
++                  check('sing','Zanuć spokojną melodię','performance','charisma',12)),
++         success='Kuc opuszcza łeb. Właściciel zapina uprząż i przekazuje ci nagrodę.',
++         aftermath='„Już spokojny. Możemy dokończyć drogę do Brzeziny.”',
++         failure='Kuc nadal się płoszy. Daj mu chwilę spokoju przed kolejnym podejściem.',
++         xp=45,gold=25,potions=1,hint_dc=12,hint='Kuc uspokaja się, gdy nikt nie napina uprzęży.'),
+ )
+ 
+-IDS = frozenset(row['id'] for row in CHALLENGES)
+-FAILURE_COOLDOWN = 90
+-NEARBY_DISTANCE = 1200
+-INTERACTION_RADIUS = 125
++# Compatibility fields support old clients while the event client uses options.
++for _row in CHALLENGES:
++    _first=next(o for o in _row['options'] if o['kind']=='check')
++    _row.update({k:_first[k] for k in ('skill','ability','dc')})
++
++BY_ID={row['id']:row for row in CHALLENGES}
++CANONICAL={old:row['id'] for row in CHALLENGES for old in (row['id'],*row.get('legacy_ids',()))}
++IDS=frozenset(CANONICAL)
++FAILURE_COOLDOWN=90
++NEARBY_DISTANCE=1000
++INTERACTION_RADIUS=112
++HINT_DISTANCE=230
+ 
+ 
+ def reward_hint(row):
+-    parts = []
+-    if row.get('route'):parts.append('stałe przejście w obie strony')
++    parts=[]
+     if row.get('xp'):parts.append(f"{row['xp']} PD")
+     if row.get('gold'):parts.append(f"{row['gold']} złota")
+     if row.get('potions'):parts.append(f"mała mikstura zdrowia ×{row['potions']}")
+-    return ', '.join(parts)+'; nagroda jednorazowa'
++    return ' · '.join(parts)
+--- a/server/skill_game.py
++++ b/server/skill_game.py
+@@ -1,146 +1,209 @@
+-"""Nearby skill challenges with server-owned context, checks and persistent claims."""
++"""Personal world events: visible scenes, contextual choices and durable outcomes."""
+ import math
+ from types import SimpleNamespace
+ 
+ try:
+     from . import skill_content as content, world_content as world, environment_rules, inventory_rules
++    from . import skill_rules, dnd_content, spell_scaling, combat_rules
++    from .progression import train
+ except ImportError:
+     import skill_content as content, world_content as world, environment_rules, inventory_rules
++    import skill_rules, dnd_content, spell_scaling, combat_rules
++    from progression import train
+ 
+ 
+ def progress(p, now):
+-    raw = getattr(p, 'skill_progress', {})
+-    if not isinstance(raw, dict):raw = {}
+-    completed = raw.get('completed', [])
+-    if not isinstance(completed, list):completed = []
+-    completed = list(dict.fromkeys(k for k in completed if isinstance(k, str) and k in content.IDS))
+-    cooldowns = raw.get('cooldowns', {})
+-    if not isinstance(cooldowns, dict):cooldowns = {}
+-    # Future timestamps are bounded; malformed saved state cannot block a skill
+-    # forever. Expired entries are safe to discard and cannot grant a reward.
+-    cooldowns = {k:min(now+content.FAILURE_COOLDOWN, v) for k,v in cooldowns.items()
+-                 if k in content.IDS and type(v) in (int,float) and math.isfinite(v) and v>now}
+-    p.skill_progress = dict(completed=completed, cooldowns=cooldowns)
++    """Migrate old claims by group; never refund or silently repeat their rewards."""
++    raw=getattr(p,'skill_progress',{})
++    if not isinstance(raw,dict):raw={}
++    old=[]
++    for field in ('completed','legacy_completed'):
++        values=raw.get(field,[])
++        if isinstance(values,list):old.extend(k for k in values[:256] if isinstance(k,str) and k in content.IDS)
++    completed=list(dict.fromkeys(content.CANONICAL[k] for k in old))
++    legacy=list(dict.fromkeys(k for k in old if k not in content.BY_ID))
++    cooldowns={}
++    entries=raw.get('cooldowns',{})
++    if isinstance(entries,dict):
++        for k,v in list(entries.items())[:256]:
++            if k in content.CANONICAL and type(v) in (int,float) and math.isfinite(v) and v>now:
++                key=content.CANONICAL[k]
++                cooldowns[key]=max(cooldowns.get(key,0),min(now+content.FAILURE_COOLDOWN,v))
++    resolved={}
++    records=raw.get('resolved',{})
++    if isinstance(records,dict):
++        for k,record in list(records.items())[:64]:
++            if k in completed and isinstance(record,dict):
++                at=record.get('at',0)
++                if type(at) not in (int,float) or not math.isfinite(at):at=0
++                method=record.get('method','')
++                methods={o['id'] for o in content.BY_ID[k]['options']}
++                resolved[k]=dict(at=max(0,min(now,at)),method=method if isinstance(method,str) and method in methods else '')
++    discovered=raw.get('discovered',[])
++    if not isinstance(discovered,list):discovered=[]
++    discovered=list(dict.fromkeys([k for k in discovered[:64] if isinstance(k,str) and k in content.BY_ID]+completed))
++    p.skill_progress=dict(version=2,completed=completed,legacy_completed=legacy,cooldowns=cooldowns,
++                          resolved=resolved,discovered=discovered)
+     return p.skill_progress
+ 
+ 
+ class SkillGame:
+     def skill_challenge_sites(self):
+-        cached = getattr(self, '_skill_challenge_sites', None)
++        cached=getattr(self,'_skill_challenge_sites',None)
+         if cached is not None:return cached
+-        anchors = {p['id']:p for p in (*world.LANDMARKS, *world.NPCS)}
+-
+-        def dry_point(x, y, floor):
+-            # Fixed deterministic rings, never a client-supplied destination.
+-            for radius in (0,24,48,72,96,120):
+-                for angle in range(0,360,45):
+-                    px=x+radius*math.cos(math.radians(angle));py=y+radius*math.sin(math.radians(angle))
+-                    if not self.blocked(px,py,22,floor=floor):return round(px,2),round(py,2)
+-            return None
+-
+-        sites = {}
++        anchors={p['id']:p for p in (*world.LANDMARKS,*world.NPCS)}
++        sites={}
+         for authored in content.CHALLENGES:
+             anchor=anchors.get(authored['anchor'])
+             if anchor is None:continue
+-            floor=anchor.get('floor',0);dx,dy=authored['offset']
+-            point=dry_point(anchor['x']+dx,anchor['y']+dy,floor)
++            floor=anchor.get('floor',0);dx,dy=authored['offset'];point=None
++            # Scene centre and at least one approach must both stand on dry land.
++            for radius in (0,24,48,72,96,120):
++                for angle in range(0,360,45):
++                    x=anchor['x']+dx+radius*math.cos(math.radians(angle))
++                    y=anchor['y']+dy+radius*math.sin(math.radians(angle))
++                    if self.blocked(x,y,30,floor=floor):continue
++                    if not any(not self.blocked(x+ax,y+ay,22,floor=floor)
++                               and self.line_clear(SimpleNamespace(x=x,y=y,floor=floor),SimpleNamespace(x=x+ax,y=y+ay,floor=floor))
++                               for ax,ay in ((0,70),(70,0),(-70,0),(0,-70))):continue
++                    point=(round(x,2),round(y,2));break
++                if point:break
+             if point is None:continue
+-            row=dict(authored,x=point[0],y=point[1],floor=floor,radius=content.INTERACTION_RADIUS,
+-                     min_level=authored.get('min_level',1),reward_hint=content.reward_hint(authored))
+-            if authored.get('route'):
+-                dx,dy=authored['route'];destination=dry_point(anchor['x']+dx,anchor['y']+dy,floor)
+-                if destination is None:continue
+-                row['destination']=dict(x=destination[0],y=destination[1],floor=floor)
+-            sites[row['id']]=row
++            sites[authored['id']]=dict(authored,x=point[0],y=point[1],floor=floor,
++                radius=content.INTERACTION_RADIUS,reward_hint=content.reward_hint(authored))
+         self._skill_challenge_sites=sites
+         return sites
+ 
+     @staticmethod
+     def skill_challenge_public(row):
+-        keys=('id','name','skill','ability','dc','x','y','floor','radius','min_level','description','reward_hint')
++        # Outcomes, passive hints and affordability belong to the private state.
++        keys=('id','name','scene','skill','ability','dc','x','y','floor','radius','min_level','description','dialogue','reward_hint')
+         return {key:row[key] for key in keys}
+ 
+     def skill_challenge_metadata(self):
+-        rows=[]
+-        for site in self.skill_challenge_sites().values():
+-            rows.append(self.skill_challenge_public(site))
+-            if site.get('destination'):
+-                rows.append(dict(self.skill_challenge_public(site),**site['destination'],endpoint='return',name=site['name']+' · powrót'))
+-        return rows
+-
+-    def skill_challenge_position(self,p,site,done):
+-        positions=[dict(x=site['x'],y=site['y'],floor=site['floor'])]
+-        if done and site.get('destination'):positions.append(site['destination'])
+-        candidates=[pos for pos in positions if pos['floor']==p.floor]
+-        if not candidates:return positions[0],float('inf')
+-        pos=min(candidates,key=lambda target:math.hypot(p.x-target['x'],p.y-target['y']))
+-        return pos,math.hypot(p.x-pos['x'],p.y-pos['y'])
+-
+-    def skill_challenge_reason(self,p,site,state,pos,distance):
+-        now=self.now();done=site['id'] in state['completed']
+-        if not p.alive:return 'Postać musi być żywa.'
+-        if done and not site.get('destination'):return 'Już ukończono; nagrodę odebrano.'
+-        if p.floor!=pos['floor'] or distance>site['radius']:return 'Podejdź do tego miejsca.'
+-        if not self.line_clear(p,SimpleNamespace(**pos)):return 'Podejdź bez przeszkody między tobą a miejscem.'
++        return [self.skill_challenge_public(s) for s in self.skill_challenge_sites().values()]
++
++    def skill_challenge_position(self,p,site,done=False):
++        pos={k:site[k] for k in ('x','y','floor')}
++        return pos,math.hypot(p.x-pos['x'],p.y-pos['y']) if p.floor==pos['floor'] else float('inf')
++
++    def skill_challenge_reason(self,p,site,state,pos,distance,option=None):
++        now=self.now()
++        if not p.alive or getattr(p,'disconnected',False):return 'Postać musi być żywa i połączona z grą.'
++        if site['id'] in state['completed']:return 'Już pomogłeś w tym miejscu.'
++        if p.floor!=pos['floor'] or distance>site['radius']:return 'Podejdź bliżej.'
++        if not self.line_clear(p,SimpleNamespace(**pos)):return 'Podejdź od strony, której nie zasłania przeszkoda.'
+         if environment_rules.actions_blocked(p,now):return 'Stan postaci uniemożliwia działanie.'
++        if getattr(p,'form','') or environment_rules.polymorph(p):return 'Najpierw wróć do swojej postaci.'
+         if getattr(p,'combat_until',0)>now or getattr(p,'pvp_combat_until',0)>now:return 'Najpierw zakończ walkę.'
+         if p.level<site['min_level']:return f"Wymagany poziom: {site['min_level']}."
+         if getattr(p,'attack_cooldown_until',0)>now:return 'Poczekaj na kolejną akcję.'
+-        if state['cooldowns'].get(site['id'],0)>now:return 'Przygotuj się przed ponowną próbą.'
+-        if site.get('destination') and environment_rules.immobile(p,now):return 'Najpierw uwolnij się z unieruchomienia.'
+-        if site.get('potions') and not done:
+-            if len(p.inventory)+inventory_rules.slots_needed(p,{'health_potion':site['potions']})>40:
+-                return 'Zwolnij miejsce na mikstury w plecaku.'
++        if (option is None or option['kind']=='check') and state['cooldowns'].get(site['id'],0)>now:
++            return 'Odpocznij przed kolejną próbą.'
++        if site.get('potions') and len(p.inventory)+inventory_rules.slots_needed(p,{'health_potion':site['potions']})>40:
++            return 'Zwolnij miejsce na nagrodę w plecaku.'
++        if option:
++            if option['kind']=='potion' and inventory_rules.count(p,option['item'])<option['quantity']:
++                return 'Potrzebujesz jednej małej mikstury zdrowia.'
++            if option['kind']=='spell':
++                key=option['spell']
++                if not dnd_content.spell_allowed(p,key):return 'Nie znasz Leczenia ran.'
++                spec=spell_scaling.resolve(p,key)
++                if distance>spec['range']:return 'Podejdź bliżej rannego.'
++                if now<p.spell_cooldowns.get(key,0):return 'Czar jeszcze się odnawia.'
++                mana,_=self.circle_spell_cost(p,spec)
++                if p.mana<mana:return f'Potrzebujesz {mana} many.'
+         return ''
+ 
+     def skill_challenge_state(self,p):
+         if p is None:return dict(nearby=[],completed_count=0,total=len(content.CHALLENGES))
+-        state=progress(p,self.now());rows=[]
++        now=self.now();state=progress(p,now);rows=[]
++        passive=10+skill_rules.bonus(p,'perception')-getattr(p,'exhaustion',0)*2
++        # Passive sight does not roll dice or award rewards. Blind actors cannot
++        # see hints, even if their underlying character-sheet bonus is high.
++        can_see=p.alive and not environment_rules.active(p,'blind',now)
+         for site in self.skill_challenge_sites().values():
+-            done=site['id'] in state['completed'];pos,distance=self.skill_challenge_position(p,site,done)
++            key=site['id'];done=key in state['completed'];pos,distance=self.skill_challenge_position(p,site)
+             if distance>content.NEARBY_DISTANCE:continue
+-            reason=self.skill_challenge_reason(p,site,state,pos,distance)
+-            row=dict(self.skill_challenge_public(site),**pos,distance=round(distance),completed=done,
+-                     available=not reason,reason=reason,cooldown_remaining=max(0,math.ceil(state['cooldowns'].get(site['id'],0)-self.now())),
+-                     repeatable=bool(site.get('destination')),result=site['success'] if done else '')
+-            rows.append(row)
+-        rows.sort(key=lambda row:(row['completed'] and not row['repeatable'],row['distance'],row['id']))
+-        return dict(nearby=rows,completed_count=len(state['completed']),total=len(content.CHALLENGES))
++            line=distance<=content.HINT_DISTANCE and self.line_clear(p,SimpleNamespace(**pos))
++            if can_see and line and key not in state['discovered']:state['discovered'].append(key)
++            hint=site['hint'] if can_see and line and not done and passive>=site['hint_dc'] else ''
++            options=[]
++            if not done:
++                for option in site['options']:
++                    reason=self.skill_challenge_reason(p,site,state,pos,distance,option)
++                    row=dict(option,available=not reason,reason=reason)
++                    if option['kind']=='check':
++                        row['skill_name']=skill_rules.SKILLS[option['skill']]['name']
++                        row['bonus']=skill_rules.bonus(p,option['skill'],option['ability'])
++                    elif option['kind']=='potion':row['cost_hint']='1 mała mikstura'
++                    elif option['kind']=='spell' and dnd_content.spell_allowed(p,option['spell']):
++                        mana,_=self.circle_spell_cost(p,spell_scaling.resolve(p,option['spell']))
++                        row['cost_hint']=f'{mana} many'
++                    options.append(row)
++            record=state['resolved'].get(key,{})
++            cooldown=max(0,math.ceil(state['cooldowns'].get(key,0)-now))
++            reason='' if any(o['available'] for o in options) else self.skill_challenge_reason(p,site,state,pos,distance)
++            rows.append(dict(self.skill_challenge_public(site),distance=round(distance),completed=done,
++                available=any(o['available'] for o in options),reason=reason,cooldown_remaining=cooldown,
++                repeatable=False,options=options,result=site['success'] if done else '',
++                aftermath=site['aftermath'] if done else '',failure=site['failure'] if cooldown else '',
++                hint=hint,discovered=key in state['discovered'],
++                completed_age=max(0,min(60,now-record.get('at',0))) if done else 0))
++        rows.sort(key=lambda r:(r['completed'],r['distance'],r['id']))
++        return dict(nearby=rows,completed_ids=list(state['completed']),completed_count=len(state['completed']),total=len(content.CHALLENGES))
+ 
+     async def handle_skill_challenge(self,p,data):
+         if not isinstance(data,dict):return
+         key=data.get('challenge_id')
+         if not isinstance(key,str):return
+-        site=self.skill_challenge_sites().get(key)
+-        if site is None:return await self.notice(p,'Nieznane miejsce próby umiejętności.')
++        key=content.CANONICAL.get(key,key);site=self.skill_challenge_sites().get(key)
++        if site is None:return await self.notice(p,'Nieznane wydarzenie.')
++        action=data.get('action_id')
++        if action is None:action=site['options'][0]['id']  # Old UI_31 client compatibility.
++        if not isinstance(action,str):return
++        option=next((o for o in site['options'] if o['id']==action),None)
++        if option is None:return await self.notice(p,'Ta czynność nie pasuje do wydarzenia.')
+         now=self.now();p.current_wall_time=now;state=progress(p,now)
+-        done=key in state['completed'];pos,distance=self.skill_challenge_position(p,site,done)
+-        reason=self.skill_challenge_reason(p,site,state,pos,distance)
++        pos,distance=self.skill_challenge_position(p,site)
++        reason=self.skill_challenge_reason(p,site,state,pos,distance,option)
+         if reason:return await self.notice(p,reason)
+-        destination=None
+-        if site.get('destination'):
+-            destination=(dict(x=site['x'],y=site['y'],floor=site['floor'])
+-                         if pos==site['destination'] else site['destination'])
+-            if self.blocked(destination['x'],destination['y'],22,floor=destination['floor']):
+-                return await self.notice(p,'Przejście jest chwilowo zablokowane.')
+-        # No await between validation and durable claim. Double clicks and forged
+-        # packets cannot interleave a second reward or reroll the same attempt.
+-        self.cancel_rest(p);self.cancel_channel(p,'');self.stop_auto(p);self.begin_action(p)
+-        if not done:
+-            result=self.environment_ability_check(p,site['ability'],site['dc'],site['skill'])
++        # Validation, resource consumption and claim have no await between them.
++        # One player cannot double-claim with simultaneous or replayed packets.
++        target=SimpleNamespace(**pos,id='event:'+key,name=site['name'],hp=1,max_hp=12,alive=True)
++        self.cancel_rest(p);self.cancel_channel(p,'');self.stop_auto(p)
++        p.dx=p.dy=0
++        self.begin_action(p)
++        result=None
++        if option['kind']=='check':
++            result=self.environment_ability_check(p,option['ability'],option['dc'],option['skill'],
++                                                  action_name=option['label'],target=target)
+             if not result['saved']:
+                 state['cooldowns'][key]=now+content.FAILURE_COOLDOWN
+                 with self.db:self.save_player(p)
+-                return await self.notice(p,f"{site['name']}: {result['total']} przeciw ST {site['dc']} — niepowodzenie. Ponowna próba za {content.FAILURE_COOLDOWN} s.")
++                return await self.notice(p,site['failure'])
++        elif option['kind']=='potion':
++            if not inventory_rules.consume(p,option['item'],option['quantity']):return
++            inventory_rules.sync(p,set(p.potions)|{option['item']})
++        elif option['kind']=='spell':
++            spell=option['spell'];spec=spell_scaling.resolve(p,spell)
++            mana,free_key=self.circle_spell_cost(p,spec)
++            self.spend_mana(p,mana);p.spell_cooldowns[spell]=now+spec['cooldown']
++            self.circle_commit_spell(p,spec,free_key)
++            dnd_content.record_spell_use(p,spell);train(p,'magic',max(1,mana))
++            self.environment_reveal(p,'Leczenie zdradza twoją kryjówkę.')
++            if mana>0:self.wizard_after_paid_spell(p,spell,spec)
++            heal=combat_rules.roll_damage(self.combat_rng,spec['dice'])
++            self.spell_effect(p,spell,target,spec=spec)
++            self.report_roll(p,target,dict(heal,check='healing',hit=True,healing=min(11,heal['damage']),damage=0),spec['name'],p)
++            # Player-only healing riders retain their normal targets, never a
++            # fictitious player account or a public NPC added to the player list.
++            self.circle_after_heal(p,spec,[],mana)
+         with self.db:
+-            if not done:
+-                state['completed'].append(key);state['cooldowns'].pop(key,None)
+-                self.award(p,site.get('xp',0),site.get('gold',0))
+-                if site.get('potions'):
+-                    self.grant_loot(p,[('potion','health_potion')]*site['potions'])
+-            if destination:
+-                p.x=destination['x'];p.y=destination['y'];p.dx=p.dy=0
+-                if hasattr(p,'submerged'):p.submerged=False
++            state['completed'].append(key);state['cooldowns'].pop(key,None)
++            state['resolved'][key]=dict(at=now,method=action)
++            if key not in state['discovered']:state['discovered'].append(key)
++            self.award(p,site.get('xp',0),site.get('gold',0))
++            if site.get('potions'):self.grant_loot(p,[('potion','health_potion')]*site['potions'])
+             self.save_player(p)
+-        if done:return await self.notice(p,'Korzystasz z zabezpieczonego przejścia. Nagroda została już odebrana.')
+-        return await self.notice(p,site['success']+' '+content.reward_hint(site)+'.')
++        return await self.notice(p,site['success'])
+--- a/tests/test_skill_challenges_ui28.py
++++ b/tests/test_skill_challenges_ui28.py
+@@ -1,152 +1,7 @@
+-"""World integration: actual checks, durable claims and hostile packet validation."""
+-import json
+-import unittest
+-from unittest.mock import patch
++"""The UI_28 eighteen-marker integration suite has been superseded.
+ 
+-import test_dnd as base
+-from server.server import Game, make_item, INVENTORY_CAP
+-from server import inventory_rules, skill_content
+-from server.skill_game import SkillGame, progress
+-
+-
+-class SkillChallenges(unittest.IsolatedAsyncioTestCase):
+-    player=base.GameRules.player
+-    account=base.GameRules.account
+-
+-    def setUp(self):
+-        self.clock=base.Clock()
+-        cls=Game if issubclass(Game,SkillGame) else type('SkillHarness',(SkillGame,Game),{})
+-        self.g=cls(':memory:',clock=self.clock)
+-        self.g.combat_rng=base.Dice(20,4)
+-        for e in self.g.enemies.values():e.alive=False;e.respawn_at=0
+-        self.g.legacy_enemies=[]
+-        self.addCleanup(self.g.db.close)
+-
+-    def hero(self,site_id='mill_tangled_pouch',pid='1'):
+-        p=self.player('knight',20,pid)
+-        site=self.g.skill_challenge_sites()[site_id]
+-        p.x,p.y,p.floor=site['x'],site['y'],site['floor']
+-        p.attack_cooldown_until=0;p.combat_until=p.pvp_combat_until=0
+-        return p,site
+-
+-    async def use(self,p,site,**extra):
+-        await self.g.handle_skill_challenge(p,dict(challenge_id=site['id'],**extra))
+-
+-    def test_all_eighteen_skills_have_accessible_authored_locations(self):
+-        sites=self.g.skill_challenge_sites()
+-        self.assertEqual(len(sites),18)
+-        self.assertEqual(len({s['skill'] for s in sites.values()}),18)
+-        for site in sites.values():
+-            self.assertFalse(self.g.blocked(site['x'],site['y'],22,floor=site['floor']),site['id'])
+-            destination=site.get('destination')
+-            if destination:self.assertFalse(self.g.blocked(destination['x'],destination['y'],22,floor=destination['floor']),site['id'])
+-
+-    async def test_every_skill_check_delivers_its_authored_result(self):
+-        for number,site in enumerate(self.g.skill_challenge_sites().values(),1):
+-            p,_=self.hero(site['id'],str(number));before=p.gold
+-            await self.use(p,site)
+-            self.assertIn(site['id'],p.skill_progress['completed'],site['id'])
+-            self.assertEqual(p.gold-before,site.get('gold',0),site['id'])
+-
+-    async def test_claim_is_once_and_survives_reload_with_reward(self):
+-        p,site=self.hero();self.account(p);before=p.gold
+-        await self.use(p,site)
+-        self.clock.advance(100)
+-        await self.use(p,site)
+-        self.assertEqual(p.gold,before+site['gold'])
+-        saved=json.loads(self.g.db.execute('SELECT data FROM accounts WHERE id=?',(p.id,)).fetchone()[0])
+-        self.assertIn(site['id'],saved['skill_progress']['completed'])
+-        restored=self.g.load_player(p.id,p.name,p.ws,saved)
+-        restored.x,restored.y=site['x'],site['y']
+-        await self.use(restored,site)
+-        self.assertEqual(restored.gold,p.gold)
+-
+-    async def test_failed_check_persists_cooldown_and_cannot_be_spammed(self):
+-        p,site=self.hero('camp_dispatches');self.account(p)
+-        self.g.combat_rng=base.Dice(1);before=p.gold
+-        await self.use(p,site);rolls=self.g.combat_rng.checks
+-        self.clock.advance(4)
+-        await self.use(p,site)
+-        self.assertEqual(self.g.combat_rng.checks,rolls)
+-        self.assertEqual(p.gold,before)
+-        self.assertNotIn(site['id'],p.skill_progress['completed'])
+-        saved=json.loads(self.g.db.execute('SELECT data FROM accounts WHERE id=?',(p.id,)).fetchone()[0])
+-        self.assertGreater(saved['skill_progress']['cooldowns'][site['id']],self.clock())
+-        self.clock.advance(skill_content.FAILURE_COOLDOWN)
+-        self.g.combat_rng=base.Dice(20)
+-        await self.use(p,site)
+-        self.assertIn(site['id'],p.skill_progress['completed'])
+-
+-    async def test_forged_distance_floor_dc_reward_or_skill_cannot_bypass_server(self):
+-        p,site=self.hero();before=p.gold
+-        p.x+=500
+-        await self.use(p,site,x=site['x'],dc=0,gold=99999,skill_id='persuasion')
+-        self.assertEqual(self.g.combat_rng.checks,0)
+-        p.x=site['x'];p.floor=-1
+-        await self.use(p,site,floor=0)
+-        self.assertEqual(self.g.combat_rng.checks,0)
+-        p.floor=site['floor']
+-        await self.use(p,site,dc=0,gold=99999,skill_id='persuasion')
+-        self.assertEqual(p.gold-before,site['gold'])
+-
+-    async def test_dead_incapacitated_in_combat_and_blocked_line_are_rejected(self):
+-        p,site=self.hero()
+-        p.hp=0;await self.use(p,site);p.hp=p.max_hp
+-        p.buffs['stunned']={'until':self.clock()+10};await self.use(p,site);p.buffs.clear()
+-        p.combat_until=self.clock()+10;await self.use(p,site);p.combat_until=0
+-        p.pvp_combat_until=self.clock()+10;await self.use(p,site);p.pvp_combat_until=0
+-        with patch.object(self.g,'line_clear',return_value=False):await self.use(p,site)
+-        self.assertEqual(self.g.combat_rng.checks,0)
+-        self.assertEqual(progress(p,self.clock())['completed'],[])
+-
+-    async def test_full_bag_prevents_check_and_claim_then_delivers_complete_potion_reward(self):
+-        p,site=self.hero('cartographer_supplies')
+-        p.inventory=[make_item('cloth') for _ in range(INVENTORY_CAP)]
+-        await self.use(p,site)
+-        self.assertEqual(self.g.combat_rng.checks,0)
+-        self.assertNotIn(site['id'],p.skill_progress['completed'])
+-        p.inventory.pop()
+-        await self.use(p,site)
+-        self.assertEqual(inventory_rules.count(p,'health_potion'),site['potions'])
+-        self.assertEqual(len(p.inventory),INVENTORY_CAP)
+-
+-    async def test_traversal_requires_check_then_allows_free_return_without_reward_or_reroll(self):
+-        p,site=self.hero('mill_climb');before=p.xp
+-        await self.use(p,site)
+-        self.assertEqual((p.x,p.y),(site['destination']['x'],site['destination']['y']))
+-        earned=p.xp;rolls=self.g.combat_rng.checks
+-        self.assertGreater(earned,before)
+-        self.clock.advance(4)
+-        await self.use(p,site)
+-        self.assertEqual((p.x,p.y),(site['x'],site['y']))
+-        self.assertEqual(self.g.combat_rng.checks,rolls)
+-        self.assertEqual(p.xp,earned)
+-
+-    async def test_dynamic_obstacle_at_route_destination_prevents_teleport_and_reward(self):
+-        p,site=self.hero('mill_climb');before=p.xp
+-        with patch.object(self.g,'blocked',return_value=True):await self.use(p,site)
+-        self.assertEqual((p.x,p.y),(site['x'],site['y']))
+-        self.assertEqual(self.g.combat_rng.checks,0)
+-        self.assertEqual(p.xp,before)
+-
+-    def test_snapshot_is_local_and_reports_action_conditions(self):
+-        p,site=self.hero()
+-        data=self.g.skill_challenge_state(p)
+-        target=next(s for s in data['nearby'] if s['id']==site['id'])
+-        self.assertTrue(target['available']);self.assertEqual(target['distance'],0)
+-        self.assertNotIn('grove_tracks',[s['id'] for s in data['nearby']])
+-        p.floor=-999
+-        self.assertEqual(self.g.skill_challenge_state(p)['nearby'],[])
+-
+-    async def test_malformed_packets_and_progress_are_bounded(self):
+-        p,site=self.hero()
+-        for data in (None,[],1,{'challenge_id':[]},{'challenge_id':{}},{'challenge_id':'unknown'}):
+-            await self.g.handle_skill_challenge(p,data)
+-        self.assertEqual(self.g.combat_rng.checks,0)
+-        p.skill_progress={'completed':[[],site['id'],site['id'],'unknown'],
+-                          'cooldowns':{site['id']:float('inf'),'unknown':999999999}}
+-        result=progress(p,self.clock())
+-        self.assertEqual(result['completed'],[site['id']]);self.assertEqual(result['cooldowns'],{})
+-
+-
+-if __name__=='__main__':unittest.main()
++UI_32 groups all eighteen historical IDs into eight world scenes. Its equivalent
++accessibility, reward, cooldown, persistence and packet-validation tests now live
++in test_world_events_ui32.py; skill arithmetic remains in test_skill_rules_ui28.py.
++There are deliberately no coordinate teleports or separate dice markers to test.
++"""
+--- a/tests/test_world_events_ui32.cjs
++++ b/tests/test_world_events_ui32.cjs
+@@ -0,0 +1,36 @@
++'use strict';
++const assert=require('node:assert/strict');
++const {test}=require('node:test');
++const fs=require('node:fs');
++const path=require('node:path');
++require('../web/skills_ui.js');
++const ui=globalThis.BractwoSkillsUI;
++const scenes=['wounded_guard','broken_cart','road_dispute','lost_pouch','stolen_supplies','sealed_relic','herbalist','frightened_pony'];
++function draw(scene,completed=false){
++ const commands=[];let depth=0;
++ const g=new Proxy({}, {get(target,name){if(name==='save')return()=>{depth++;commands.push(['save']);};if(name==='restore')return()=>{depth--;assert(depth>=0);commands.push(['restore']);};return(...args)=>{assert(args.every(n=>typeof n!=='number'||Number.isFinite(n)),String(name));commands.push([name,...args]);};},set(t,key,v){commands.push([key,v]);return true;}});
++ ui.drawEvent(g,{scene,x:100,y:150},{completed,completed_age:60,hint:'Wskazówka'},1.2);
++ assert.equal(depth,0,'Canvas transforms must be restored after every scene');return commands;
++}
++for(const scene of scenes){
++ test('scene '+scene+' uses balanced, finite canvas commands',()=>{assert(draw(scene).length>40);assert(draw(scene,true).length>30);});
++ test('scene '+scene+' changes visibly after completion',()=>{assert.notDeepEqual(draw(scene),draw(scene,true));});
++}
++test('new scenes never draw a dice number or a completed tick',()=>{
++ for(const scene of scenes)for(const done of[false,true])assert(!draw(scene,done).some(c=>['fillText','strokeText'].includes(c[0])));
++});
++test('all scene renderers are distinct, not reused markers',()=>{
++ assert.equal(new Set(scenes.map(s=>JSON.stringify(draw(s)))).size,8);
++});
++test('game routes interactions into conversations and retains real feat/result helpers',()=>{
++ const game=fs.readFileSync(path.join(__dirname,'../web/game.js'),'utf8');
++ assert(game.includes('createEvents('));assert(game.includes('eventPanel.open(skillSite)'));assert(game.includes('openEvent:site=>'));
++ assert(game.includes('Runtime.renderCombatNotice'));assert(game.includes('BractwoFeatUI'));
++ assert(!game.includes('drawSkillChallenge('));assert(game.includes('drawWorldEvent('));
++});
++test('event renderer is bundled in an existing served script, not a missing import',()=>{
++ const server=fs.readFileSync(path.join(__dirname,'../server/server.py'),'utf8');
++ assert(server.includes('("/skills_ui.js","skills_ui.js")'));
++ assert(server.includes('("/feat_ui.js","feat_ui.js")'));assert(server.includes('("/feat_ui.css","feat_ui.css")'));
++ assert.equal(typeof ui.createEvents,'function');
++});
+--- a/tests/test_world_events_ui32.py
++++ b/tests/test_world_events_ui32.py
+@@ -0,0 +1,222 @@
++"""UI_32 world scenes: real handlers, resource costs and old-save regression."""
++import asyncio
++import json
++import math
++import unittest
++from unittest.mock import patch
++
++import test_dnd as base
++from server.server import Game, Player, make_item, INVENTORY_CAP
++from server import skill_content as content, skill_rules, inventory_rules, spell_scaling, combat_rules
++from server.skill_game import progress
++
++class WorldEvents(unittest.IsolatedAsyncioTestCase):
++    player=base.GameRules.player
++    account=base.GameRules.account
++
++    def setUp(self):
++        self.clock=base.Clock();self.g=Game(':memory:',clock=self.clock)
++        self.g.combat_rng=base.Dice(20,4)
++        for e in self.g.enemies.values():e.alive=False;e.respawn_at=0
++        self.g.legacy_enemies=[]
++        self.addCleanup(self.g.db.close)
++
++    def hero(self,key='scout_first_aid',cls='ranger',level=20,pid='1'):
++        p=self.player(cls,level,pid);site=self.g.skill_challenge_sites()[key]
++        p.x,p.y,p.floor=site['x'],site['y']+55,site['floor']
++        p.attack_cooldown_until=0;p.combat_until=p.pvp_combat_until=0
++        return p,site
++
++    def row(self,p,key):return next(e for e in self.g.skill_challenge_state(p)['nearby'] if e['id']==key)
++    async def use(self,p,s,action=None,**extra):
++        await self.g.handle_skill_challenge(p,dict(challenge_id=s['id'],action_id=action or s['options'][0]['id'],**extra))
++
++    def test_eight_accessible_scenes_replace_all_eighteen_ids(self):
++        sites=self.g.skill_challenge_sites()
++        self.assertEqual(len(sites),8);self.assertEqual(len(content.CANONICAL),18)
++        self.assertEqual(len(set(s['scene'] for s in sites.values())),8)
++        self.assertEqual(set(skill_rules.SKILLS),{o['skill'] for s in sites.values() for o in s['options'] if o['kind']=='check'})
++        for s in sites.values():
++            self.assertFalse(self.g.blocked(s['x'],s['y'],30,floor=s['floor']),s['id'])
++            self.assertNotIn('destination',s)
++
++    def test_scene_spacing_and_empty_town_square(self):
++        sites=list(self.g.skill_challenge_sites().values())
++        for i,a in enumerate(sites):
++            self.assertGreater(math.hypot(a['x']-560,a['y']-1180),430,a['id'])
++            for b in sites[i+1:]:self.assertGreater(math.hypot(a['x']-b['x'],a['y']-b['y']),370,(a['id'],b['id']))
++
++    def test_guard_is_on_dry_river_bank(self):
++        s=self.g.skill_challenge_sites()['scout_first_aid']
++        self.assertGreater(s['x'],1300);self.assertLess(s['x'],1490)
++        self.assertFalse(self.g.blocked(s['x'],s['y'],30,floor=s['floor']))
++
++    async def test_every_check_choice_resolves_its_scene(self):
++        for index,(s,o) in enumerate(((s,o) for s in self.g.skill_challenge_sites().values() for o in s['options'] if o['kind']=='check'),1):
++            p,_=self.hero(s['id'],pid=str(index));gold=p.gold
++            await self.use(p,s,o['id'])
++            self.assertIn(s['id'],p.skill_progress['completed'],(s['id'],o['id']))
++            self.assertEqual(p.gold,gold+s.get('gold',0));self.assertEqual(p.last_roll['target_name'],s['name'])
++            self.assertEqual(p.last_roll['action'],o['label']);self.assertEqual(p.last_roll['skill'],o['skill'])
++            self.assertTrue(self.row(p,s['id'])['completed']);self.assertEqual(self.row(p,s['id'])['options'],[])
++
++    async def test_potion_removed_without_healing_the_player(self):
++        p,s=self.hero();p.hp-=4;hp=p.hp;count=inventory_rules.count(p,'health_potion');gold=p.gold
++        await self.use(p,s,'potion')
++        self.assertEqual(p.hp,hp);self.assertEqual(inventory_rules.count(p,'health_potion'),count-1)
++        self.assertEqual(p.potions['health_potion'],count-1);self.assertEqual(p.gold,gold+25)
++        self.assertEqual(p.skill_progress['resolved'][s['id']]['method'],'potion')
++
++    async def test_no_potion_is_not_a_free_completion(self):
++        p,s=self.hero();p.inventory=[i for i in p.inventory if i.get('slot')!='potion'];gold=p.gold
++        await self.use(p,s,'potion');self.assertEqual(p.gold,gold);self.assertNotIn(s['id'],progress(p,self.clock())['completed'])
++        row=self.row(p,s['id']);o=next(o for o in row['options'] if o['id']=='potion');self.assertFalse(o['available'])
++
++    async def test_healing_spell_spends_actual_mana_and_reports_real_dice(self):
++        p,s=self.hero(cls='druid');p.hp-=3;hp=p.hp;mana=p.mana;before=spell_scaling.resolve(p,'cure_wounds');cost,_=self.g.circle_spell_cost(p,before)
++        await self.use(p,s,'heal')
++        self.assertEqual(p.mana,mana-cost);self.assertEqual(p.hp,hp)
++        self.assertIn(s['id'],p.skill_progress['completed']);self.assertEqual(p.last_roll['check'],'healing')
++        self.assertEqual(p.last_roll['target_name'],s['name']);self.assertGreater(len(p.last_roll['damage_rolls']),0)
++        self.assertGreater(p.attack_cooldown_until,self.clock());self.assertIn('cure_wounds',p.spell_history)
++
++    async def test_spell_class_mana_distance_and_cooldown_are_checked(self):
++        p,s=self.hero(cls='knight');gold=p.gold
++        await self.use(p,s,'heal');self.assertEqual(p.gold,gold)
++        p.class_id='druid';p.mana=0;await self.use(p,s,'heal');self.assertEqual(p.gold,gold)
++        p.mana=p.max_mana;p.spell_cooldowns['cure_wounds']=self.clock()+10
++        await self.use(p,s,'heal');self.assertEqual(p.gold,gold)
++        p.spell_cooldowns.clear();p.y=s['y']+111
++        await self.use(p,s,'heal');self.assertEqual(p.gold,gold)
++
++    async def test_replay_and_alternate_solutions_do_not_repeat_reward(self):
++        p,s=self.hero();gold=p.gold;potions=inventory_rules.count(p,'health_potion')
++        await self.use(p,s,'bandage');self.clock.advance(100)
++        await self.use(p,s,'potion');await self.use(p,s,'heal')
++        self.assertEqual(p.gold,gold+s['gold']);self.assertEqual(inventory_rules.count(p,'health_potion'),potions)
++
++    async def test_simultaneous_requests_only_pay_once(self):
++        p,s=self.hero();gold=p.gold;count=inventory_rules.count(p,'health_potion')
++        await asyncio.gather(*(self.use(p,s,'potion') for _ in range(5)))
++        self.assertEqual(p.gold,gold+s['gold']);self.assertEqual(inventory_rules.count(p,'health_potion'),count-1)
++
++    async def test_claim_survives_save_reload(self):
++        p,s=self.hero();self.account(p);await self.use(p,s,'potion')
++        saved=json.loads(self.g.db.execute('SELECT data FROM accounts WHERE id=?',(p.id,)).fetchone()[0]);gold=p.gold
++        restored=self.g.load_player(p.id,p.name,p.ws,saved);restored.x,restored.y=s['x'],s['y']+55
++        self.clock.advance(100);await self.use(restored,s,'potion')
++        self.assertEqual(restored.gold,gold);self.assertTrue(self.row(restored,s['id'])['completed'])
++
++    async def test_each_old_completed_id_prevents_new_group_reward(self):
++        for i,(old,key) in enumerate(content.CANONICAL.items(),1):
++            p,s=self.hero(key,pid=str(i));p.skill_progress={'completed':[old]};gold=p.gold
++            await self.use(p,s)
++            self.assertEqual(p.gold,gold,(old,key));self.assertIn(key,p.skill_progress['completed'])
++            if old!=key:self.assertIn(old,p.skill_progress['legacy_completed'])
++
++    def test_all_old_claims_become_exactly_eight_completed_events(self):
++        p,s=self.hero();p.skill_progress={'completed':list(content.IDS)}
++        data=self.g.skill_challenge_state(p)
++        self.assertEqual(data['total'],8);self.assertEqual(data['completed_count'],8)
++        self.assertEqual(len(progress(p,self.clock())['completed']),8)
++
++    async def test_legacy_alias_packets_do_not_create_separate_claim(self):
++        p,s=self.hero('mill_tangled_pouch');before=p.gold
++        await self.g.handle_skill_challenge(p,{'challenge_id':'mill_climb'})
++        self.clock.advance(100)
++        await self.g.handle_skill_challenge(p,{'challenge_id':'mill_false_bottom'})
++        self.assertEqual(p.gold,before+s['gold']);self.assertEqual(p.skill_progress['completed'],[s['id']])
++
++    async def test_failure_cooldown_prevents_reroll_via_other_check(self):
++        p,s=self.hero('guard_extortionist');self.g.combat_rng=base.Dice(1);gold=p.gold
++        await self.use(p,s,'warn');draws=self.g.combat_rng.checks
++        self.clock.advance(4);await self.use(p,s,'question')
++        self.assertEqual(self.g.combat_rng.checks,draws);self.assertEqual(p.gold,gold)
++        self.assertFalse(self.row(p,s['id'])['completed']);self.assertTrue(self.row(p,s['id'])['failure'])
++
++    async def test_failed_bandage_can_be_followed_by_paid_potion(self):
++        p,s=self.hero();self.g.combat_rng=base.Dice(1);await self.use(p,s,'bandage')
++        self.clock.advance(4);count=inventory_rules.count(p,'health_potion');await self.use(p,s,'potion')
++        self.assertIn(s['id'],p.skill_progress['completed']);self.assertEqual(inventory_rules.count(p,'health_potion'),count-1)
++
++    async def test_failed_check_can_retry_after_cooldown(self):
++        p,s=self.hero();self.g.combat_rng=base.Dice(1);await self.use(p,s)
++        self.clock.advance(91);self.g.combat_rng=base.Dice(20);await self.use(p,s)
++        self.assertIn(s['id'],p.skill_progress['completed'])
++
++    async def test_player_conditions_reject_without_spending_anything(self):
++        p,s=self.hero();hp=p.hp;mana=p.mana;gold=p.gold;potions=inventory_rules.count(p,'health_potion')
++        for attr,value in [('hp',0),('form','wolf'),('combat_until',self.clock()+10),('pvp_combat_until',self.clock()+10)]:
++            old=getattr(p,attr);setattr(p,attr,value);await self.use(p,s,'potion');setattr(p,attr,old)
++        p.ws.closed=True;await self.use(p,s,'potion');p.ws.closed=False
++        p.buffs['stunned']={'until':self.clock()+10};await self.use(p,s,'potion');p.buffs.clear()
++        with patch.object(self.g,'line_clear',return_value=False):await self.use(p,s,'potion')
++        self.assertEqual((p.hp,p.mana,p.gold),(hp,mana,gold));self.assertEqual(inventory_rules.count(p,'health_potion'),potions)
++
++    async def test_distance_and_floor_cannot_be_forged(self):
++        p,s=self.hero();gold=p.gold;p.x+=1000
++        await self.use(p,s,dc=0,gold=99999,x=s['x']);self.assertEqual(p.gold,gold)
++        p.x=s['x'];p.floor=-2;await self.use(p,s,floor=0);self.assertEqual(p.gold,gold)
++
++    async def test_level_gate_applies_to_every_choice(self):
++        p,s=self.hero('birch_pack_animal',level=1)
++        for o in s['options']:await self.use(p,s,o['id'])
++        self.assertEqual(self.g.combat_rng.checks,0);self.assertEqual(progress(p,self.clock())['completed'],[])
++
++    async def test_full_bag_prevents_reward_loss_before_check(self):
++        p,s=self.hero('mill_tangled_pouch');p.inventory=[make_item('cloth') for _ in range(INVENTORY_CAP)]
++        await self.use(p,s);self.assertEqual(self.g.combat_rng.checks,0)
++        p.inventory.pop();await self.use(p,s)
++        self.assertEqual(inventory_rules.count(p,'health_potion'),1);self.assertEqual(len(p.inventory),INVENTORY_CAP)
++
++    async def test_malformed_packets_cannot_change_progress(self):
++        p,s=self.hero();gold=p.gold
++        for packet in [None,[],1,{'challenge_id':[]},{'challenge_id':{}},{'challenge_id':'unknown'},
++                       {'challenge_id':s['id'],'action_id':{}},{'challenge_id':s['id'],'action_id':'grant_reward'}]:
++            await self.g.handle_skill_challenge(p,packet)
++        self.assertEqual(p.gold,gold);self.assertEqual(self.g.combat_rng.checks,0)
++
++    def test_malformed_saved_state_is_bounded(self):
++        p,s=self.hero();p.skill_progress={'completed':[{},s['id'],s['id'],'unknown'],
++            'cooldowns':{s['id']:float('inf'),'unknown':99999},'resolved':{s['id']:{'at':float('nan'),'method':{}}},'discovered':[[]]}
++        r=progress(p,self.clock());self.assertEqual(r['completed'],[s['id']]);self.assertEqual(r['cooldowns'],{})
++        json.dumps(r,allow_nan=False)
++
++    def test_passive_perception_with_alert_reveals_hint_but_not_reward(self):
++        p,s=self.hero(cls='knight',level=1);gold=p.gold
++        # Choose the hint threshold to straddle the actual +PB from Alert.
++        base_passive=10+skill_rules.bonus(p,'perception');s['hint_dc']=base_passive+1
++        self.assertEqual(self.row(p,s['id'])['hint'],'')
++        p.origin_feat='alert';self.assertTrue(self.row(p,s['id'])['hint']);self.assertEqual(p.gold,gold)
++        self.assertEqual(self.g.combat_rng.checks,0);self.assertEqual(p.skill_progress['completed'],[])
++
++    def test_hints_need_sight_nearness_and_living_player(self):
++        p,s=self.hero();s['hint_dc']=1
++        p.x=s['x']+250;self.assertEqual(self.row(p,s['id'])['hint'],'')
++        p.x=s['x'];p.buffs['blind']={'until':self.clock()+10};self.assertEqual(self.row(p,s['id'])['hint'],'');p.buffs.clear()
++        with patch.object(self.g,'line_clear',return_value=False):self.assertEqual(self.row(p,s['id'])['hint'],'')
++        p.hp=0;self.assertEqual(self.row(p,s['id'])['hint'],'')
++
++    def test_metadata_does_not_leak_personal_outcomes_or_passive_hints(self):
++        for s in self.g.skill_challenge_metadata():
++            self.assertNotIn('completed',s);self.assertNotIn('hint',s);self.assertNotIn('success',s);self.assertIn('scene',s)
++
++    async def test_completion_is_personal_not_global(self):
++        p,s=self.hero();q,_=self.hero(pid='2');await self.use(p,s)
++        self.assertTrue(self.row(p,s['id'])['completed']);self.assertFalse(self.row(q,s['id'])['completed'])
++
++    async def test_outcome_timestamp_advances_animation_without_losing_claim(self):
++        p,s=self.hero('guard_extortionist');await self.use(p,s)
++        self.assertEqual(self.row(p,s['id'])['completed_age'],0)
++        self.clock.advance(5);self.assertEqual(self.row(p,s['id'])['completed_age'],5)
++        self.clock.advance(100);self.assertEqual(self.row(p,s['id'])['completed_age'],60)
++
++    async def test_cure_wounds_respects_selected_higher_circle(self):
++        p,s=self.hero(cls='druid',level=40)
++        # The event resolves the same profile the spellbook presents, not a fixed cost.
++        p.spell_circle_choices['cure_wounds']=3
++        spec=spell_scaling.resolve(p,'cure_wounds');mana=p.mana;cost,_=self.g.circle_spell_cost(p,spec)
++        await self.use(p,s,'heal');self.assertEqual(p.mana,mana-cost)
++        self.assertEqual(p.last_roll['damage_rolls'],[4]*spec['dice'][0])
++
++if __name__=='__main__':unittest.main()
+--- a/tools/browser_world_events_ui32.py
++++ b/tools/browser_world_events_ui32.py
+@@ -0,0 +1,200 @@
++"""Local Chromium + real Game/on_packet WebSocket event integration.
++
++A loopback-only test login replaces Google. No production accounts or saves.
++Public comments/gallery/auth are outside this test. Game JS and event handlers
++are loaded unchanged; only the unrelated login script is replaced by a fixture.
++"""
++import asyncio,base64,contextlib,json,os,re,sys,time,traceback
++from pathlib import Path
++ROOT=Path(__file__).resolve().parents[1]
++sys.path[:0]=[str(ROOT),str(ROOT/'tests')]
++# The old FULL_SOURCE upload does not contain the independent GitHub comments
++# module. This optional test-only shim is never installed as a production module.
++if os.environ.get('BRACTWO_QA_COMMENTS_SHIM')=='1':
++    import types
++    sys.modules.setdefault('server.comments',types.ModuleType('server.comments'))
++from aiohttp import web,WSMsgType,ClientSession
++from playwright.async_api import async_playwright
++from server.server import Game,Player
++from server import inventory_rules
++import test_dnd as base
++OUT=Path(os.environ.get('BRACTWO_QA_OUT',str(ROOT/'docs/qa_ui32')));OUT.mkdir(parents=True,exist_ok=True)
++report={'ok':False,'checks':[],'page_errors':[],'server_errors':[], 'limitations':[
++ 'Loopback test login and an in-memory SQLite database; no Google or Railway requests.',
++ 'The complete game client uses an in-process browser binding to a real Python loopback WebSocket; event packets enter unchanged Game.on_packet.',
++ 'Browser URL navigation is blocked by the environment. HTML, CSS, scripts and images are injected from the local workspace; browser security policies are unchanged.',
++ 'Hostile monsters are disabled in this UI test, separate from server tests of combat restrictions.',
++ 'No physical Android device. Public comments, SEO and unrelated gallery assets are not under test.']}
++def save(): (OUT/'browser_results.json').write_text(json.dumps(report,ensure_ascii=False,indent=2))
++def record(name,**data):print(name,data,flush=True);report['checks'].append({'name':name,**data});save()
++
++async def load_game(page, port, scene):
++    """Offline browser fixture; no browser navigation or policy modifications."""
++    html=(ROOT/'web/index.html').read_text()
++    scripts=re.findall(r'<script[^>]* src=["\']([^"\']+)["\'][^>]*></script>',html)
++    html=re.sub(r'<script\b[^>]*>.*?</script>','',html,flags=re.S)
++    styles=[]
++    for name in re.findall(r'<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"[^>]*>',html):
++        path=ROOT/'web'/name.lstrip('/')
++        if path.is_file():styles.append(path.read_text())
++    html=re.sub(r'<link\b[^>]*>','',html)
++    html=html.replace('</head>','<style>'+''.join(styles)+'</style></head>')
++    images={}
++    for asset in (ROOT/'web/assets').rglob('*.svg'):
++        key=asset.relative_to(ROOT/'web').as_posix()
++        images[key]='data:image/svg+xml;base64,'+base64.b64encode(asset.read_bytes()).decode()
++    html=re.sub(r'<img\b[^>]*>',lambda m:re.sub(r'src="([^"]+)"',lambda n:'src="'+images.get(n[1].lstrip('/'),'data:,')+'"',m[0]),html)
++    await page.set_content(html,wait_until='domcontentloaded')
++    await page.evaluate(r"""images=>{const desc=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');Object.defineProperty(HTMLImageElement.prototype,'src',{get:desc.get,set(value){desc.set.call(this,images[String(value).replace(/^\//,'')]||value);}});const data=new Map();Object.defineProperty(window,'localStorage',{value:{getItem:k=>data.get(k)||null,setItem:(k,v)=>data.set(k,String(v)),removeItem:k=>data.delete(k)}});window.fetch=async()=>({ok:true,json:async()=>({})});}""",images)
++    session=ClientSession();sockets={};tasks=[]
++    async def wire(source,op,num,payload=None):
++        if op=='open':
++            ws=await session.ws_connect(f'http://127.0.0.1:{port}/ws');sockets[num]=ws
++            await page.evaluate('num=>window.__sockets.get(num)._emit("open")',num)
++            async def read():
++                try:
++                    async for msg in ws:
++                        if page.is_closed():break
++                        if msg.type==WSMsgType.TEXT:await page.evaluate('([num,data])=>window.__sockets.get(num)?._emit("message",data)',[num,msg.data])
++                except Exception:
++                    if not page.is_closed():raise
++            tasks.append(asyncio.create_task(read()))
++        elif op=='send':await sockets[num].send_str(payload)
++        elif op=='close':
++            if num in sockets:await sockets[num].close()
++    await page.expose_binding('__ui32Wire',wire)
++    await page.add_script_tag(content="""window.__sockets=new Map();window.WebSocket=class extends EventTarget{static CONNECTING=0;static OPEN=1;static CLOSING=2;static CLOSED=3;constructor(url){super();this.readyState=0;this.id=window.__sockets.size+1;window.__sockets.set(this.id,this);window.__ui32Wire('open',this.id);}send(data){window.__ui32Wire('send',this.id,data);}close(){this.readyState=3;window.__ui32Wire('close',this.id);} _emit(kind,data){if(kind==='open')this.readyState=1;this.dispatchEvent(kind==='message'?new MessageEvent('message',{data}):new Event(kind));}};""")
++    fixture="globalThis.BractwoGoogleAuth={sameOriginServer:()=>true,mount(h){setTimeout(()=>h.connect({type:'hello_google',ticket:'ui32-local-test',site:"+json.dumps(scene)+"}),80);return {setBusy(){},success(){},logout(){},connectionError(){}}}};"
++    for name in scripts:
++        if name.endswith('google_auth.js'):await page.add_script_tag(content=fixture)
++        elif not name.endswith('comments.js'):
++            path=ROOT/'web'/name.lstrip('/')
++            if path.is_file():await page.add_script_tag(content=path.read_text())
++    async def cleanup():
++        print('cleanup: page',flush=True)
++        await page.close()
++        print('cleanup: tasks',flush=True)
++        for task in tasks:
++            task.cancel()
++        for task in tasks:
++            with contextlib.suppress(asyncio.CancelledError,asyncio.TimeoutError):await asyncio.wait_for(task,2)
++        print('cleanup: sockets',flush=True)
++        for ws in sockets.values():
++            with contextlib.suppress(asyncio.TimeoutError):await asyncio.wait_for(ws.close(),1)
++        await session.close()
++        print('cleanup: done',flush=True)
++    return cleanup
++
++async def main():
++    game=Game(':memory:');game.combat_rng=base.Dice(20,4)
++    for e in game.enemies.values():e.alive=False;e.respawn_at=10**12
++    game.legacy_enemies=[]
++    clients={};serial=0
++    async def asset(request):
++        path=request.match_info.get('path','') or 'index.html'
++        if path=='google_auth.js':
++            return web.Response(content_type='application/javascript',text='''globalThis.BractwoGoogleAuth={sameOriginServer:()=>true,mount(h){setTimeout(()=>h.connect({type:'hello_google',ticket:'ui32-local-test',site:new URLSearchParams(location.search).get('site')||'scout_first_aid'}),80);return {setBusy(){},success(){},logout(){},connectionError(){}}}};''')
++        if path=='comments.js':return web.Response(text='',content_type='application/javascript')
++        if path=='comments.css':return web.Response(text='',content_type='text/css')
++        resolved=(ROOT/'web'/path).resolve()
++        if not resolved.is_relative_to((ROOT/'web').resolve()) or not resolved.is_file():raise web.HTTPNotFound()
++        return web.FileResponse(resolved,headers={'Cache-Control':'no-store'})
++    async def websocket(request):
++        nonlocal serial
++        ws=web.WebSocketResponse();await ws.prepare(request);p=None
++        try:
++            async for msg in ws:
++                if msg.type!=WSMsgType.TEXT:continue
++                data=json.loads(msg.data)
++                if data.get('type')=='hello_google':
++                    if data.get('ticket')!='ui32-local-test':await ws.close();break
++                    site=game.skill_challenge_sites().get(data.get('site'))
++                    if site is None:await ws.close();break
++                    serial+=1;p=Player(str(serial),'Wędrowiec',ws,class_id='ranger',level=20,x=site['x'],y=site['y']+75,gold=100)
++                    game.starter(p);p.hp=p.max_hp;p.mana=p.max_mana;p.origin_feat='alert';p.current_wall_time=game.now()
++                    p.pending_level_ups=[];game.players[p.id]=p;clients[p.id]=p
++                    game.db.execute('INSERT INTO accounts VALUES(?,?,?,?,?,?)',(int(p.id),p.name,p.name+str(serial),b'qa',b'qa',json.dumps(p.save_data())));game.db.commit()
++                    metadata=game.metadata();metadata['spawn']={'x':p.x,'y':p.y}
++                    await ws.send_json({'type':'welcome','id':p.id,'world':metadata,'owner_deltas':False});await ws.send_json(game.snapshot(p))
++                elif p is not None:
++                    await game.on_packet(ws,data)
++        except Exception:
++            report['server_errors'].append(traceback.format_exc());save()
++        finally:
++            if p:game.players.pop(p.id,None)
++        return ws
++    async def peek(request):
++        return web.json_response({k:{'x':p.x,'y':p.y,'hp':p.hp,'mana':p.mana,'gold':p.gold,'count':inventory_rules.count(p,'health_potion'),'progress':p.skill_progress} for k,p in clients.items()})
++    app=web.Application();app.router.add_get('/ws',websocket);app.router.add_get('/qa/state',peek)
++    app.router.add_get('/ranking',lambda r:web.json_response(game.ranking()));app.router.add_get('/{path:.*}',asset)
++    runner=web.AppRunner(app);await runner.setup();site=web.TCPSite(runner,'127.0.0.1',0);await site.start();port=site._server.sockets[0].getsockname()[1]
++    async def ticks():
++        while True:
++            game.step(.1)
++            await game.broadcast_states();await asyncio.sleep(.1)
++    task=asyncio.create_task(ticks())
++    try:
++        async with async_playwright() as pw:
++            browser=await pw.chromium.launch(executable_path=os.environ.get('CHROMIUM_BIN','/usr/bin/chromium'),headless=True,args=['--no-sandbox'])
++            report['chromium']=browser.version
++            for w,h,touch in [(1440,900,False),(390,844,True),(320,568,True),(844,390,True)]:
++                print('next viewport',w,h,flush=True)
++                ctx=await browser.new_context(viewport={'width':w,'height':h},has_touch=touch,is_mobile=touch)
++                page=await ctx.new_page();page.set_default_timeout(10000);page.on('pageerror',lambda e:report['page_errors'].append(str(e)))
++                cleanup=await load_game(page,port,'scout_first_aid')
++                await page.locator('#gameUI').wait_for(state='visible');await page.wait_for_timeout(1000)
++                # Dismiss unrelated pre-existing level/feat prompts for the screenshot.
++                for sel in ['[data-advancement-dismiss]','.fighter-choice button:last-child','.caster-choice button:last-child']:
++                    loc=page.locator(sel)
++                    if await loc.count() and await loc.first.is_visible():
++                        with contextlib.suppress(Exception):await loc.first.click(timeout=300)
++                await page.screenshot(path=str(OUT/f'guard-world-{w}x{h}.png'))
++                await page.locator('#interactButton').click();await page.locator('#worldEventPanel').wait_for(state='visible')
++                assert await page.locator('#worldEventTitle').inner_text()=='Ranny strażnik'
++                assert await page.locator('[data-event-action]').count()==3
++                assert await page.locator('.world-event-close').evaluate('(e)=>{const r=e.getBoundingClientRect();return e===document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);}'), 'Another HUD control covers the event close button'
++                # A moving snapshot must not repeatedly replace a stationary button.
++                identity=await page.locator('[data-event-action="potion"]').evaluate('(e)=>{window.__sameEventButton=e;return true}')
++                await page.wait_for_timeout(450)
++                assert await page.evaluate('window.__sameEventButton===document.querySelector("[data-event-action=potion]")')
++                layout=await page.locator('#worldEventPanel').evaluate('''e=>{const r=e.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,overflow:e.querySelector('.world-event-body').scrollWidth-e.querySelector('.world-event-body').clientWidth}}''')
++                assert layout['left']>=0 and layout['top']>=0 and layout['right']<=w+1 and layout['bottom']<=h+1 and layout['overflow']<=1,layout
++                await page.screenshot(path=str(OUT/f'guard-dialogue-{w}x{h}.png'));record('dialogue, stable button, viewport',width=w,height=h,geometry=layout)
++                state_before=await (await page.request.get(f'http://127.0.0.1:{port}/qa/state')).json();pid=str(serial);before=state_before[pid]
++                # Reading/opening/cancelling cannot consume a potion.
++                await page.locator('.world-event-close').click();await page.locator('#interactButton').click()
++                state_read=await (await page.request.get(f'http://127.0.0.1:{port}/qa/state')).json()
++                assert state_read[pid]['count']==before['count']
++                await page.locator('[data-event-action="potion"]').click();await page.locator('.world-event-result').wait_for(state='visible')
++                after=(await (await page.request.get(f'http://127.0.0.1:{port}/qa/state')).json())[pid]
++                assert after['count']==before['count']-1 and after['gold']==before['gold']+25 and after['hp']==before['hp']
++                assert 'scout_first_aid' in after['progress']['completed']
++                assert await page.locator('[data-event-action]').count()==0
++                assert await page.locator('.world-event-description').count()==0
++                await page.screenshot(path=str(OUT/f'guard-complete-{w}x{h}.png'));record('potion real WebSocket and completion',width=w,height=h)
++                await page.keyboard.press('Escape');assert not await page.locator('#worldEventPanel').is_visible()
++                await page.locator('#interactButton').click();assert await page.locator('.world-event-result').is_visible()
++                after_reopen=(await (await page.request.get(f'http://127.0.0.1:{port}/qa/state')).json())[pid]
++                assert after_reopen['gold']==after['gold'];record('reopen completed scene, no duplicate reward',width=w,height=h)
++                await cleanup()
++            # Every authored scene opens from the actual game client; all check
++            # choices are covered by the deterministic server integration suite.
++            for key in game.skill_challenge_sites():
++                ctx=await browser.new_context(viewport={'width':1280,'height':800});page=await ctx.new_page();page.set_default_timeout(10000);page.on('pageerror',lambda e:report['page_errors'].append(str(e)))
++                cleanup=await load_game(page,port,key);await page.locator('#gameUI').wait_for(state='visible');await page.wait_for_timeout(500)
++                await page.keyboard.press('KeyE');await page.locator('#worldEventPanel').wait_for(state='visible');assert await page.locator('#worldEventTitle').inner_text()==game.skill_challenge_sites()[key]['name']
++                await page.screenshot(path=str(OUT/f'{key}-1280x800.png'));record('E opens real scene',scene=key)
++                if key=='scout_first_aid':
++                    await page.locator('[data-event-action="heal"]').click();await page.locator('.world-event-result').wait_for(state='visible');assert await page.locator('.world-event-roll').is_visible();record('healing spell receipt in dialogue')
++                if key=='mill_tangled_pouch':
++                    await page.locator('[data-event-action="lift"]').click();await page.locator('.world-event-result').wait_for(state='visible');assert '1k20' in await page.locator('.world-event-roll').inner_text();record('skill check receipt in dialogue')
++                await cleanup()
++            report['ok']=not report['page_errors'] and not report['server_errors'];save()
++            await browser.close()
++        assert not report['page_errors'],report['page_errors'];assert not report['server_errors'],report['server_errors']
++        report['ok']=True;save()
++    finally:
++        task.cancel()
++        with contextlib.suppress(asyncio.CancelledError):await task
++        await runner.cleanup();game.db.close();save()
++if __name__=='__main__':asyncio.run(main())
+--- a/web/character_sheet.js
++++ b/web/character_sheet.js
+@@ -158,7 +158,7 @@
+       document.getElementById('characterName').textContent=p.name;document.getElementById('characterSubtitle').textContent=`${p.profession||w.classes?.[p.class_id]?.name||''} · poziom ${p.level}`;
+       tabButtons.forEach(b=>{const active=b.dataset.characterTab===tab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
+       const scroll=content.scrollTop;content.replaceChildren();content.dataset.tab=tab;content.dataset.section=sections[tab]||'';
+-      if(tab==='inventory')equipment(p,w);else if(tab==='abilities')abilities(p);else if(tab==='stats')stats(p,w);else if(tab==='spells')spells(p,w);else if(tab==='skills'){subnav('skills',[['list','Lista'],['training','Biegłości'],['challenges','Wyzwania']]);root.BractwoSkillsUI?.skills(content,p,{...h,open},sections.skills);}else {
++      if(tab==='inventory')equipment(p,w);else if(tab==='abilities')abilities(p);else if(tab==='stats')stats(p,w);else if(tab==='spells')spells(p,w);else if(tab==='skills'){subnav('skills',[['list','Lista'],['training','Biegłości'],['challenges','Wydarzenia']]);root.BractwoSkillsUI?.skills(content,p,{...h,open},sections.skills);}else {
+         subnav('feats',[['general','Atuty'],['class','Klasa'],['origin','Pochodzenie'],['training','Wyszkolenie']]);
+         if(sections.feats==='origin')root.BractwoSkillsUI?.origin(content,p,{...h,open});else{const martial=node('div'),caster=node('div');content.append(martial,caster);if(sections.feats==='class')root.BractwoMartialUI?.feats(martial,p,h);root.BractwoCasterUI.feats(caster,p,{...h,open,featSection:sections.feats});}
+       }
+--- a/web/game.js
++++ b/web/game.js
+@@ -5,6 +5,8 @@
+   const canvas = $("world"), ctx = canvas.getContext("2d", { alpha: false });
+   const mini = $("minimap"), mctx = mini.getContext("2d");
+   const ui = Object.fromEntries(Array.from(document.querySelectorAll("[id]"), element => [element.id, element]));
++  const revisionLabel=document.querySelector('.auth-foot');
++  if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_32';
+   const classInfo = {
+     knight: {name:"Rycerz",icon:"⚔",color:"#f8d377",cape:"#cc4845",ability:"Drugi oddech",weapon:"sword"},
+     ranger: {name:"Łowca",icon:"➶",color:"#f1d99c",cape:"#9e682e",ability:"Znak łowcy",weapon:"bow"},
+@@ -27,7 +29,7 @@
+   let groundChunks=new Map(), expansionTab='growth', expansionSignature='', selectedRune='fire', atlasMode='nearby', navigationGoal=null;
+   let hotbarPage=0, hotbarMenu=null, pendingPointTarget=null;
+   let atlasView=null, atlasController=null;
+-  let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null, mobileHud=null, restUI=null, appShell=null, adventurePanel=null, servicePanel=null;
++  let characterSheet=null, levelUpPanels=null, lootPanel=null, merchantPanel=null, hudWindows=null, mobileHud=null, restUI=null, appShell=null, adventurePanel=null, servicePanel=null, eventPanel=null;
+   let effects = new Map(), seenEffects = new Map(), floatingTexts = [];
+   const touches = matchMedia("(pointer: coarse)").matches;
+   const TAU = Math.PI * 2;
+@@ -93,7 +95,7 @@
+         selectedTarget = null; selectedEnemy = null; selectedWorldPoint = null; battleRows.clear(); ui.battleEnemies.replaceChildren(); pendingInvite = null; legacyPrompted = false; expansionSignature = ""; navigationGoal = null;
+         trackedQuestId = readTrackedQuest();
+         levelUpPanels?.reset(); atlasView=null; atlasController=null;
+-        adventurePanel?.close();servicePanel?.close(); inventorySignature = ""; playersSignature = ""; ui.sidePanel.hidden = true; characterSheet?.close(); lootPanel?.close(); merchantPanel?.close(); restUI?.close(); ui.helpPanel.hidden = true;
++        eventPanel?.close();adventurePanel?.close();servicePanel?.close(); inventorySignature = ""; playersSignature = ""; ui.sidePanel.hidden = true; characterSheet?.close(); lootPanel?.close(); merchantPanel?.close(); restUI?.close(); ui.helpPanel.hidden = true;
+         ui.legacyClassPanel.hidden = true; ui.partyInvite.hidden = true; ui.chatForm.hidden = true; ui.chatInput.blur(); ui.chatInput.value = ""; questSignature = "";
+         ui.minimapCard.hidden = viewport.w < 560;
+         updateRules();
+@@ -134,7 +136,7 @@
+     });
+     activeSocket.addEventListener("close", () => {
+       if (serial !== connectionSerial) return;
+-      clearTimeout(loginTimer); busy(false); resetControls(); restUI?.close();
++      clearTimeout(loginTimer); busy(false); resetControls(); eventPanel?.close(); restUI?.close();
+       if (playing) { playing = false; stopRendering(); ui.disconnectPanel.hidden = false; ui.connectionStatus.textContent = "ROZŁĄCZONO"; }
+       else if (!authFailed) {
+         if (!ui.authError.textContent || ui.authError.textContent.includes("…")) ui.authError.textContent = "Połączenie zostało zamknięte. Spróbuj ponownie.";
+@@ -153,7 +155,7 @@
+   if (!googleAuth) ui.authError.textContent = "Nie udało się uruchomić logowania Google. Odśwież stronę.";
+ 
+   function backToLogin() {
+-    globalThis.BractwoFeatUI?.close();resetControls(); restUI?.close(); ++connectionSerial; clearTimeout(loginTimer);
++    eventPanel?.close();globalThis.BractwoFeatUI?.close();resetControls(); restUI?.close(); ++connectionSerial; clearTimeout(loginTimer);
+     if (socket) socket.close(); socket = null; playing = false; busy(false); me = null;
+     stopRendering();
+     ui.authScreen.hidden = false; ui.gameUI.hidden = true; ui.authError.textContent = "";
+@@ -279,8 +281,9 @@
+     const skillSite=nearestSkillChallenge(), nearbyNpc=nearestNpc();
+     nearby=nearestStair() || (skillSite&&(!nearbyNpc||distance(me,skillSite)<distance(me,nearbyNpc))?skillSite:nearbyNpc) || nearestSite() || (merchantNear()?nearestMerchant():null); ui.interactPrompt.hidden=!nearby || !ui.sidePanel.hidden;
+     ui.interactButton.classList.toggle("available",!!nearby);
++    ui.interactButton.querySelector("small").textContent=nearby?.skill_challenge&&["lost_pouch","sealed_relic","stolen_supplies"].includes(nearby.scene)?"Zbadaj":"Rozmawiaj";
+     ui.interactName.textContent=nearby?.name||"Mieszkańcy Przystani";
+-    ui.interactPrompt.querySelector("small").textContent=nearby?.skill_challenge?"PRÓBA UMIEJĘTNOŚCI · E":nearby?.to_floor!==undefined?"SCHODY · E":nearby?.action?"UŻYJ · E":nearby?.service==='binding_stone'?"PRZYPISANIE ODRADZANIA · E":nearby?.service?"USŁUGI · E":nearby?.id?"ROZMOWA I ZLECENIA":"HANDEL I ODPOCZYNEK";
++    ui.interactPrompt.querySelector("small").textContent=nearby?.skill_challenge?"WYDARZENIE · E":nearby?.to_floor!==undefined?"SCHODY · E":nearby?.action?"UŻYJ · E":nearby?.service==='binding_stone'?"PRZYPISANIE ODRADZANIA · E":nearby?.service?"USŁUGI · E":nearby?.id?"ROZMOWA I ZLECENIA":"HANDEL I ODPOCZYNEK";
+     ui.deathPanel.hidden=me.hp>0;
+     if(me.hp<=0){resetControls();const city=(world.cities||[]).find(c=>c.id===me.home_city)?.name||'Przystań';ui.deathText.textContent=`Miejsce odrodzenia: ${city}${me.respawn_in?` — powrót za ${Math.ceil(me.respawn_in)} s`:" — powrót…"}`;}
+     ui.chooseClassButton.hidden=me.class_chosen!==false;
+@@ -292,12 +295,12 @@
+     updateEffects(target);
+     updatePotionButtons();
+     updateQuestTracker(); updateBattleList();
+-    characterSheet?.render();merchantPanel?.render();adventurePanel?.render();servicePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();martialPrompt?.sync();advancementPrompt?.sync();globalThis.BractwoFeatUI?.sync(me);
++    eventPanel?.render();characterSheet?.render();merchantPanel?.render();adventurePanel?.render();servicePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();martialPrompt?.sync();advancementPrompt?.sync();globalThis.BractwoFeatUI?.sync(me);
+     if(!ui.sidePanel.hidden){if(panelMode==="inventory")renderInventory();else if(panelMode==="journal")renderJournal();else if(panelMode==="progression")renderExpansion();else renderPlayers();}
+   }
+   function nearestSkillChallenge(){
+     if(!me||me.hp<=0)return null;
+-    const site=(snapshot.skill_challenges?.nearby||[]).filter(s=>sameFloor(me,s)&&(!s.completed||s.repeatable)&&distance(me,s)<=(s.radius||125)).sort((a,b)=>distance(me,a)-distance(me,b))[0];
++    const site=(snapshot.skill_challenges?.nearby||[]).filter(s=>sameFloor(me,s)&&distance(me,s)<=(s.radius||125)).sort((a,b)=>distance(me,a)-distance(me,b))[0];
+     return site?{...site,skill_challenge:true}:null;
+   }
+   function nearestNpc(){
+@@ -526,18 +529,19 @@
+     if (playing) send({ type: "input", x: 0, y: 0 });
+   }
+   function talkTo(npc){
++    eventPanel?.close();
+     if(npc.service==='merchant'){merchantPanel.open(npc);return;}
+     if(globalThis.BractwoServiceUI.menus[npc.service]){servicePanel.open(npc);return;}
+     adventurePanel.open(npc);
+   }
+   function interact(){
+     if(!canControl())return;
+-    for(const panel of [servicePanel,adventurePanel,merchantPanel])if(panel?.visible){panel.close();return;}
++    for(const panel of [eventPanel,servicePanel,adventurePanel,merchantPanel])if(panel?.visible){panel.close();return;}
+     if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}
+     const npc=nearestNpc();
+     if(npc?.service==='binding_stone'){talkTo(npc);return;}
+     const skillSite=nearestSkillChallenge();
+-    if(skillSite&&(!npc||distance(me,skillSite)<distance(me,npc))&&!nearestStair()){characterSheet.open('skills','challenges');return;}
++    if(skillSite&&(!npc||distance(me,skillSite)<distance(me,npc))&&!nearestStair()){eventPanel.open(skillSite);return;}
+     const nature=(world.nature_sites||[]).find(s=>sameFloor(me,s)&&distance(me,s)<=110);
+     if(nature){send({type:'nature_interact',id:nature.id});return;}
+     if(nearestStair()){send({type:'descend'});return;}
+@@ -547,7 +551,7 @@
+   }
+   function ability(){if(canControl())cast(me.favorite_spell||world.classes?.[me.class_id]?.default_ability);}
+   function potion(item){if(playing&&me?.hp>0)send({type:"potion",item});}
+-  function toggleHelp(){servicePanel?.close();adventurePanel?.close();merchantPanel?.close();characterSheet?.close();ui.helpPanel.hidden=!ui.helpPanel.hidden;}
++  function toggleHelp(){eventPanel?.close();servicePanel?.close();adventurePanel?.close();merchantPanel?.close();characterSheet?.close();ui.helpPanel.hidden=!ui.helpPanel.hidden;}
+   function openChat(){
+     if(!playing)return; resetControls(); ui.chatForm.hidden=false;
+     ui.chatForm.parentElement.classList.add("writing"); ui.chatInput.focus({preventScroll:true});
+@@ -596,6 +600,7 @@
+     else {
+       const npc=(world.npcs||[]).find(n=>sameFloor(me,n)&&Math.hypot(n.x-x,n.y-20-y)<36);
+       if(npc)talkTo(npc);
++      else {const scene=(world.skill_challenge_catalog||[]).filter(e=>sameFloor(me,e)&&Math.abs(e.x-x)<80&&y>e.y-96&&y<e.y+40).sort((a,b)=>Math.hypot(a.x-x,a.y-y)-Math.hypot(b.x-x,b.y-y))[0];if(scene){if(distance(me,scene)<=230)eventPanel.open(scene);else notice('Podejdź bliżej, aby przyjrzeć się wydarzeniu.');}}
+       // Empty terrain does not arm a crosshair or remove the selected enemy.
+     }
+   });
+@@ -611,7 +616,8 @@
+     if(!playing||mobileHud?.blocksControls()||restUI?.blocksControls()||appShell?.blocksControls())return;
+     if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton, #hotbarGroupMenu button, .hotbar-group-toggle'))return;
+     if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
+-    if(event.target.closest?.('#adventurePanel button, #servicePanel button, #merchantPanel button')&&['Enter','Space'].includes(event.code))return;
++    if(event.target.closest?.('#adventurePanel button, #servicePanel button, #merchantPanel button, #worldEventPanel button')&&['Enter','Space'].includes(event.code))return;
++    if(eventPanel?.visible&&['Escape','KeyE'].includes(event.code)){event.preventDefault();eventPanel.close();return;}
+     if(servicePanel?.visible&&event.code==='Escape'){event.preventDefault();servicePanel.close();return;}
+     if(adventurePanel?.visible&&event.code==='Escape'){event.preventDefault();adventurePanel.close();return;}
+     if(merchantPanel?.visible&&event.code==='Escape'){event.preventDefault();merchantPanel.close();return;}
+@@ -1096,16 +1102,10 @@
+     label(`${found?'✓':'◇'} ${l.name}`,x,y-66,found?'#e3edb8':color,10);
+     if(me&&distance(me,l)<105)label(remaining?`Odnowienie ${Math.ceil(remaining)} s`:'[E] '+({cache:'Otwórz skrytkę',spring:'Napij się',wind:'Wezwij wiatr',ward:'Przyjmij osłonę'}[l.action]),x,y+30,color,11);
+   }
+-  function drawSkillChallenge(site,t){
+-    const status=snapshot.skill_challenges?.nearby?.find(s=>s.id===site.id),done=!!status?.completed;
+-    if(site.endpoint==='return'&&!done)return;
+-    const color=done?'#a8c994':'#efd085',x=site.x,y=site.y,close=me&&distance(me,site)<260;
+-    ellipse(ctx,x,y+8,22,9,'#172e2666');
+-    ctx.save();ctx.fillStyle=done?'#36533c':'#555039';ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();
+-    for(let i=0;i<6;i++){const a=-Math.PI/2+i*TAU/6,px=x+Math.cos(a)*17,py=y-10+Math.sin(a)*19;i?ctx.lineTo(px,py):ctx.moveTo(px,py);}ctx.closePath();ctx.fill();ctx.stroke();
+-    line(ctx,[[x,y-29],[x-15,y],[x+15,y],[x,y-29]],color,1);label(done?'✓':'20',x,y-9,color,10);ctx.restore();
+-    if(!done)glow(x,y-10,26,color,.05+Math.sin(t*2+x)*.015);
+-    if(close){label(site.name,x,y-44,color,10);if(distance(me,site)<=(site.radius||125)&&(!done||status?.repeatable))label(nearby?.skill_challenge&&nearby.id===site.id?'[E] Umiejętności':'[U] Umiejętności',x,y+29,color,10);}
++  function drawWorldEvent(site,t){
++    const status=snapshot.skill_challenges?.nearby?.find(s=>s.id===site.id)||{completed:snapshot.skill_challenges?.completed_ids?.includes(site.id),completed_age:60};
++    globalThis.BractwoSkillsUI.drawEvent(ctx,site,status,t);
++    if(me&&distance(me,site)<150){label(site.name,site.x,site.y-106,'#f6e5b0',10);}
+   }
+   function drawRiver(t){
+     const r=world.river;if(!r||!inView(r.x+r.w/2,camera.y,r.w))return;
+@@ -1586,7 +1586,7 @@
+       else if(entry.kind==='npc'){if(inView(o.x,o.y))objects.push({y:o.y+9,draw:()=>drawNPC(o,t)});}
+       else if(entry.kind==='merchant'){if(inView(o.x,o.y))objects.push({y:o.y+12,draw:()=>drawMerchant(t)});}
+     }
+-    for(const site of world.skill_challenge_catalog||[])if(sameFloor(me,site)&&inView(site.x,site.y))objects.push({y:site.y+9,draw:()=>drawSkillChallenge(site,t)});
++    for(const site of world.skill_challenge_catalog||[])if(sameFloor(me,site)&&inView(site.x,site.y))objects.push({y:site.y+9,draw:()=>drawWorldEvent(site,t)});
+     for(const v of visuals.values())if(sameFloor(me,v.entity)&&inView(v.x,v.y))objects.push({y:v.y+(v.kind==='p'?21:10),draw:()=>v.kind==='p'?drawPlayer(v,t):drawEnemy(v,t)});
+     for(const entry of nearbyDrawables()){
+       const o=entry.data;
+@@ -1708,30 +1708,32 @@
+   }
+   ui.hotbarPrev.addEventListener('click',()=>changeHotbarPage(-1));
+   ui.hotbarNext.addEventListener('click',()=>changeHotbarPage(1));
+-  lootPanel=globalThis.BractwoLootUI.create({world:()=>world,player:()=>me,prepare:()=>{characterSheet?.close();}});
++  lootPanel=globalThis.BractwoLootUI.create({world:()=>world,player:()=>me,prepare:()=>{eventPanel?.close();characterSheet?.close();}});
+   ui.targetLoot.addEventListener('click',()=>{const enemy=snapshot.enemies.find(e=>String(e.id)===selectedEnemy);if(enemy)lootPanel.open({...world.enemy_types?.[enemy.kind],kind:enemy.kind});});
+   levelUpPanels=globalThis.BractwoLevelUp.create({send,ready:()=>playing&&socket?.readyState===WebSocket.OPEN,open:(tab,section)=>characterSheet.open(tab,section)});
+   let fighterPrompt=null,casterPrompt=null,martialPrompt=null,advancementPrompt=null;
+   characterSheet=globalThis.BractwoCharacterSheet.create({
+-    state:()=>({player:me,world,skill_challenges:snapshot.skill_challenges}),stop:resetControls,navigate:site=>{navigateTo(site,site.name);characterSheet.close();},send,cast,gate:spellGate,mana:spellMana,nearMaster:()=>!!nearbyService("master"),
++    state:()=>({player:me,world,skill_challenges:snapshot.skill_challenges}),openEvent:site=>{characterSheet.close();eventPanel.open(site);},stop:()=>{eventPanel?.close();resetControls();},navigate:site=>{navigateTo(site,site.name);characterSheet.close();},send,cast,gate:spellGate,mana:spellMana,nearMaster:()=>!!nearbyService("master"),
+     selectedAlly:()=>snapshot.players.find(q=>String(q.id)===String(selectedTarget)&&q.hp>0&&me?.party_id&&q.party_id===me.party_id)||null,
+     targetPoint,
+     beginPointAction,
+     studyTarget:()=>selectedEnemy?{enemy_id:selectedEnemy}:selectedTarget?{target_id:selectedTarget}:null,
+     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
+-    prepare:()=>{adventurePanel?.close();servicePanel?.close();merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
++    prepare:()=>{eventPanel?.close();adventurePanel?.close();servicePanel?.close();merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
+     changed:()=>{if(me)updateHUD();}
+   });
+   merchantPanel=globalThis.BractwoInventoryUI.createMerchant({state:()=>({player:me,world}),send,rest:()=>restUI.open(),
+     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
+-    prepare:()=>{adventurePanel?.close();servicePanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
++    prepare:()=>{eventPanel?.close();adventurePanel?.close();servicePanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+   adventurePanel=globalThis.BractwoAdventureUI.create({state:()=>({player:me,world}),send,
+     trade:npc=>merchantPanel.open(npc),services:npc=>servicePanel.open(npc),
+     track:id=>{saveTrackedQuest(id);navigationGoal=null;updateHUD();},
+-    prepare:()=>{resetControls();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
++    prepare:()=>{eventPanel?.close();resetControls();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+   servicePanel=globalThis.BractwoServiceUI.create({state:()=>({player:me,world}),send,
+     character:tab=>characterSheet.open(tab),conversation:npc=>adventurePanel.open(npc),
+-    prepare:()=>{resetControls();closeChat();adventurePanel?.close();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
++    prepare:()=>{eventPanel?.close();resetControls();closeChat();adventurePanel?.close();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
++  eventPanel=globalThis.BractwoSkillsUI.createEvents({state:()=>({player:me,world,skill_challenges:snapshot.skill_challenges}),session:()=>connectionSerial,send,notice,
++    prepare:()=>{eventPanel?.close();resetControls();closeChat();clearTarget();adventurePanel?.close();servicePanel?.close();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+   hudWindows=globalThis.BractwoWindows.create({stop:resetControls,levelLayout:()=>levelUpPanels?.layout()});
+   advancementPrompt=globalThis.BractwoSkillsUI.createPrompt({player:()=>me,session:()=>connectionSerial,open:(tab,section)=>characterSheet.open(tab,section),pick:mode=>globalThis.BractwoFeatUI.open(mode,me,{state:()=>({player:me,world}),send,stop:resetControls})});
+   fighterPrompt=globalThis.BractwoFighterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab,'class')});
+@@ -1739,7 +1741,7 @@
+   martialPrompt=globalThis.BractwoMartialUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab,'class')});
+   mobileHud=globalThis.BractwoMobile.create({stop:resetControls,closeChat});
+   restUI=globalThis.BractwoRestUI.create({state:()=>({player:me,world}),send,notice,stop:resetControls,clearTarget,
+-    prepare:()=>{adventurePanel?.close();servicePanel?.close();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
++    prepare:()=>{eventPanel?.close();adventurePanel?.close();servicePanel?.close();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+   appShell=globalThis.BractwoAppShell.create({stop:()=>{resetControls();closeChat();restUI.close();}});
+   globalThis.BractwoHUDIcons.apply(document);
+   ui.closeEffectDetail.addEventListener('click',()=>{ui.effectDetail.hidden=true;});
+--- a/web/hud_layout.css
++++ b/web/hud_layout.css
+@@ -171,3 +171,54 @@
+ @media (min-width: 1101px) and (min-height: 541px) {
+   #gameUI .notice-feed:has(#combatRoll.has-roll-breakdown) { width: 355px; }
+ }
++
++/* UI_32. Contextual, non-modal world conversations. No fullscreen blockers. */
++#worldEventPanel {
++  position: absolute; right: max(22px, env(safe-area-inset-right)); top: 18%;
++  width: min(410px, calc(100% - 36px)); max-height: min(72vh, 660px);
++  display: flex; flex-direction: column; pointer-events: auto; z-index: 60;
++  border: 1px solid #a99e6880; border-radius: 9px; background: #142e26fa;
++  box-shadow: 0 12px 45px #00100ca8; color: #ece6c7; font: 13px/1.5 system-ui, sans-serif;
++}
++.world-event-header {display:flex;align-items:center;gap:10px;padding:14px 16px 10px;border-bottom:1px solid #a7b29033;}
++.world-event-header h2 {font: bold 21px/1.2 Georgia,serif;color:#ebd590;margin:0;flex:1;overflow-wrap:anywhere;}
++.world-event-close {width:36px;height:36px;flex-shrink:0;border:1px solid #a7b29055;background:#213e30;border-radius:5px;font-size:24px;}
++.world-event-body {padding:0 16px 15px;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;touch-action:pan-y;scrollbar-width:thin;}
++.world-event-preview {display:block;width:100%;height:auto;max-height:130px;object-fit:contain;border-radius:5px;margin:12px 0 10px;image-rendering:pixelated;}
++.world-event-description {color:#acbdae;margin:6px 0;font-size:12px;}
++.world-event-dialogue {margin:12px 0;font:17px/1.4 Georgia,serif;color:#f0e8c8;}
++.world-event-hint {border-left:2px solid #c2b776;padding-left:9px;color:#d7dfa5;font-size:12px;}
++.world-event-actions {display:grid;gap:7px;margin:14px 0;}
++.world-event-action {text-align:left;padding:10px 12px;min-height:45px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 9px;background:#2e4e38;border:1px solid #acb48560;border-radius:5px;font:12px/1.4 system-ui,sans-serif;}
++.world-event-action strong {flex:1 1 150px;color:#e7e9c5;}
++.world-event-action small {color:#c1cba9;}
++.world-event-action:enabled:hover {border-color:#edcf89;background:#3a5940;}
++.world-event-action:disabled {opacity:.65;}
++.world-event-lock {flex-basis:100%;font-size:11px;color:#d0bb8c;}
++.world-event-result {color:#cce5ad;margin:12px 0;}
++.world-event-reward {display:block;color:#a9b897;font-size:11px;margin:10px 0;}
++.world-event-roll {background:#0e2119a0;border-radius:4px;padding:8px 10px;font-size:11px;overflow-wrap:anywhere;}
++.world-event-roll b {color:#e7d593;}
++.world-event-failure {font-size:12px;color:#e0b895;}
++.world-event-leave {display:block;margin:10px 0 0 auto;min-height:40px;padding:7px 18px;background:#182e24;border:1px solid #a7b29055;border-radius:5px;color:#dce1bd;}
++.world-event-working {color:#e6d69e;font-size:12px;}
++@media (max-width:700px) {
++ #worldEventPanel {top:auto;bottom:max(120px,env(safe-area-inset-bottom));right:10px;width:calc(100% - 20px);max-height:calc(100dvh - 210px);}
++ .world-event-header {padding:10px 12px 8px;}
++ .world-event-header h2 {font-size:19px;}
++ .world-event-body {padding:0 12px 12px;}
++ .world-event-preview {max-height:105px;}
++ .world-event-dialogue {font-size:16px;}
++}
++@media (max-height:540px) and (orientation:landscape) {
++ #worldEventPanel {top:12px;bottom:auto;right:100px;width:min(370px,calc(100% - 170px));max-height:calc(100dvh - 30px);}
++ .world-event-preview {max-height:90px;}
++}
++
++@media (max-width:700px) and (max-height:640px) and (orientation:portrait) {
++ #worldEventPanel {bottom:95px;max-height:calc(100dvh - 145px);}
++ .world-event-preview {max-height:72px;margin-top:8px;margin-bottom:6px;}
++ .world-event-description {font-size:11px;line-height:1.3;}
++ .world-event-dialogue {font-size:14px;margin:8px 0;}
++ .world-event-hint {font-size:11px;line-height:1.35;margin:8px 0;}
++}
+--- a/web/skills_ui.js
++++ b/web/skills_ui.js
+@@ -35,10 +35,17 @@
+   else return;parent.append(box);}
+ 
+  function abilities(parent,p,h){advancement(parent,p,h);abilityBuild(parent,p,h);origin(parent,p,h);sync(parent,p,h);}
+- function challenges(parent,p,h){const data=h.state?.().skill_challenges||{},box=node('section','sheet-challenges');box.append(node('h3','sheet-section-title',`Wyzwania w pobliżu · ukończone ${data.completed_count||0}/${data.total||0}`));const entries=[...(data.nearby||[])].sort((a,b)=>Number(a.completed)-Number(b.completed)||a.distance-b.distance);if(!entries.length)box.append(node('p','sheet-hint','Wędruj i wypatruj złotych znaków kości w świecie. Podejdź do takiego miejsca i naciśnij E lub przycisk interakcji.'));
+-  for(const e of entries){const row=node('article','sheet-challenge'+(e.completed?' completed':''));row.dataset.skillChallenge=e.id;const skill=p.character_sheet?.skills?.skills?.find(s=>s.id===e.skill),head=node('div','sheet-section-row');head.append(node('strong','',e.name),node('span','sheet-skill-bonus',`ST ${e.dc}`));row.append(head,node('p','',e.description),node('small','',`${skill?.name||e.skill} · 1k20${signed(skill?.bonus||0)} · ${Math.ceil(e.distance/32)} pól od ciebie${e.min_level>1?' · poziom '+e.min_level:''}`));if(e.reward_hint)row.append(node('small','sheet-challenge-reward',e.reward_hint));const reason=node('p','sheet-choice-reason');reason.dataset.challengeReason='';const use=button(e.completed?(e.repeatable?'Skorzystaj z przejścia':'Ukończono'):'Wykonaj próbę',()=>{const latest=current(h,p),fresh=h.state?.().skill_challenges?.nearby?.find(x=>x.id===e.id);if(!challengeReason(latest,fresh)){use.disabled=true;h.send({type:'skill_challenge',challenge_id:e.id});}});use.dataset.challengeConfirm=e.id;row.append(reason,use);if(e.completed&&e.result)row.append(node('p','sheet-hint',e.result));if(h.navigate&&(!e.completed||e.repeatable))row.append(button('Wyznacz kierunek',()=>h.navigate(e)));box.append(row);}parent.append(box);
+- }
+- function skills(parent,p,h,section='list'){const s=p.character_sheet?.skills;if(!s){parent.append(node('p','sheet-hint','Oczekiwanie na umiejętności postaci…'));return;}const summary=node('div','sheet-skill-intro');summary.append(node('h3','',`Umiejętności · premia z biegłości ${signed(s.proficiency_bonus)}`),node('p','sheet-hint',s.description||'Test umiejętności: 1k20 + modyfikator cechy + biegłość, jeśli ją posiadasz. Ekspertyza podwaja premię z biegłości.'));if(section==='list')summary.append(button('Pokaż wyzwania w pobliżu',()=>h.open?.('skills','challenges')));const expertise=s.choices?.find(pool=>pool.source==='expertise');if(section==='training'&&expertise&&!(expertise.remaining>0))summary.append(node('p','sheet-hint',expertise.description));parent.append(summary);
++ function challenges(parent,p,h){
++  const box=node('section','sheet-challenges'),data=h.state?.().skill_challenges||{nearby:[]};
++  box.append(node('h3','',`Wydarzenia · ukończono ${data.completed_count||0}/${data.total||0}`));
++  const entries=(data.nearby||[]).filter(e=>e.discovered||e.distance<=230).slice().sort((a,b)=>Number(a.completed)-Number(b.completed)||a.distance-b.distance);
++  if(!entries.length)box.append(node('p','sheet-hint','Wypatruj ludzi potrzebujących pomocy, porzuconych zapasów i śladów przy drodze. Podejdź i naciśnij E albo kliknij wydarzenie.'));
++  for(const e of entries){const row=node('article','sheet-challenge'+(e.completed?' completed':''));row.dataset.worldEventLink=e.id;row.append(node('strong','',e.name),node('p','',e.completed?e.aftermath:e.description));
++   row.append(button(e.completed?'Przypomnij wydarzenie':'Przyjrzyj się',()=>h.openEvent?.(e)));
++   if(h.navigate&&!e.completed)row.append(button('Wyznacz kierunek',()=>h.navigate(e)));box.append(row);
++  }parent.append(box);
++ }
++ function skills(parent,p,h,section='list'){const s=p.character_sheet?.skills;if(!s){parent.append(node('p','sheet-hint','Oczekiwanie na umiejętności postaci…'));return;}const summary=node('div','sheet-skill-intro');summary.append(node('h3','',`Umiejętności · premia z biegłości ${signed(s.proficiency_bonus)}`),node('p','sheet-hint',s.description||'Test umiejętności: 1k20 + modyfikator cechy + biegłość, jeśli ją posiadasz. Ekspertyza podwaja premię z biegłości.'));if(section==='list')summary.append(button('Wydarzenia w pobliżu',()=>h.open?.('skills','challenges')));const expertise=s.choices?.find(pool=>pool.source==='expertise');if(section==='training'&&expertise&&!(expertise.remaining>0))summary.append(node('p','sheet-hint',expertise.description));parent.append(summary);
+   if(section==='list'&&p.environment?.hide){const box=node('section','sheet-skill-choice'),b=button('',()=>{const latest=current(h,p),hide=latest.environment?.hide;if(latest.alive&&(hide?.active||hide?.available)){b.disabled=true;h.send({type:'environment_action',action:hide.active?'unhide':'hide'});}});b.dataset.hideAction='';box.append(node('strong','','Skradanie się przed potworami'),node('p','sheet-hint','Ukryj się przy osłonie lub we mgle. Test Zręczności (Skradanie), ST 15. Ukrycie działa na potwory; inni gracze nadal cię widzą.'),b);const reason=node('p','sheet-choice-reason');reason.dataset.hideReason='';box.append(reason);parent.append(box);}
+   const roll=p.last_roll;if(section==='challenges'&&roll?.check==='ability'){const skill=s.skills?.find(x=>x.id===roll.skill);parent.append(node('p','sheet-hint',`Ostatni test · ${skill?.name||abilityNames[roll.ability]||'Umiejętność'}: ${root.BractwoRuntime?.checkRollLines(roll).join(' · ')||('1k20 = '+roll.roll+' · '+roll.roll+signed(roll.bonus)+' → '+roll.total+' / ST '+roll.defense+' · '+(roll.saved?'sukces':'niepowodzenie'))}`));}
+   if(section==='training'){let pending=0;for(const pool of s.choices||[]){if(!(pool.remaining>0))continue;pending+=pool.remaining;const box=node('section','sheet-skill-choice');box.dataset.skillSource=pool.source;box.append(node('strong','',`${pool.name} · pozostało ${pool.remaining}/${pool.total}`),node('p','sheet-hint',pool.description));const key=String(p.id)+':'+pool.source,select=node('select'),controls=node('div','sheet-skill-choice-controls');select.setAttribute('aria-label',pool.name);select.append(new Option('Wybierz umiejętność…',''));for(const item of pool.options||[])select.append(new Option(`${item.name} · ${item.ability_name}`,item.id));select.value=skillPicks.get(key)||'';select.addEventListener('change',()=>{skillPicks.set(key,select.value);sync(parent,current(h,p),h);});const confirm=button(pool.source==='expertise'?'Wybierz ekspertyzę':'Wybierz biegłość',()=>{const latest=current(h,p),id=skillPicks.get(key);if(!skillReason(latest,pool.source,id)){confirm.disabled=true;h.send({type:'skill_train',source:pool.source,skill_id:id});}});confirm.dataset.skillConfirm=pool.source;const reason=node('p','sheet-choice-reason');reason.dataset.skillReason='';controls.append(select,confirm);box.append(controls,reason);parent.append(box);}if(!pending)parent.append(node('p','sheet-hint','Wszystkie dostępne biegłości zostały wybrane. Atut Wszechstronny pozwala nauczyć się trzech kolejnych.'));}
+@@ -60,3 +67,134 @@
+ 
+  const api={abilities,advancement,abilityBuild,origin,skills,sync,choiceReason,buildCost,buildReason,asiReason,skillReason,challengeReason,trainingPacket,originReason,reminderState,originReminderState,createPrompt};root.BractwoSkillsUI=api;if(typeof module!=='undefined')module.exports=api;
+ })(globalThis);
++
++/* UI_32: small world scenes, not map markers. The server owns every outcome. */
++(function(root){'use strict';
++ const ui=root.BractwoSkillsUI,TAU=Math.PI*2;
++ function drawEvent(g,site,state={},time=0){
++  if(!site?.scene)return;
++  const done=!!state.completed,phase=time+(site.x||0)*.01;
++  const rect=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(Math.round(x),Math.round(y),w,h);};
++  const oval=(x,y,rx,ry,c)=>{g.fillStyle=c;g.beginPath();g.ellipse(x,y,rx,ry,0,0,TAU);g.fill();};
++  const line=(points,c,w=2)=>{g.strokeStyle=c;g.lineWidth=w;g.beginPath();points.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.stroke();};
++  const poly=(points,c)=>{g.fillStyle=c;g.beginPath();points.forEach(([x,y],i)=>i?g.lineTo(x,y):g.moveTo(x,y));g.closePath();g.fill();};
++  const stone=(x,y,w=22)=>{poly([[x-w,y],[x-w+4,y-13],[x+6,y-20],[x+w,y-7],[x+w-3,y+5]],'#778276');line([[x-w+5,y-11],[x+6,y-16],[x+w-5,y-6]],'#bac0a0',3);};
++  const sack=(x,y)=>{oval(x,y+7,13,6,'#172a234b');rect(x-10,y-15,20,24,'#b49a64');rect(x-8,y-17,16,5,'#decc8f');rect(x-8,y-8,5,13,'#d1bb81');line([[x-9,y-13],[x+9,y-13]],'#77603d');};
++  const bottle=(x,y)=>{rect(x-3,y-9,6,4,'#b49961');rect(x-5,y-5,10,13,'#698e80');rect(x-3,y-3,6,9,'#bbd397');rect(x-3,y-3,2,5,'#e9f3c8');};
++  const box=(x,y,open=false)=>{oval(x,y+10,25,8,'#16251b44');rect(x-22,y-14,44,27,'#775733');rect(x-20,y-12,40,22,'#a77c45');for(const xx of [-13,9])rect(x+xx,y-13,4,25,'#d2b074');line([[x-20,y],[x+20,y]],'#735636');if(open){rect(x-20,y-12,40,11,'#342f25');poly([[x-22,y-14],[x-16,y-37],[x+27,y-31],[x+22,y-13]],'#a48656');}else{rect(x-22,y-21,44,8,'#c5a269');rect(x-4,y-16,8,11,'#d6c47d');}};
++  function human(x,y,coat='#8d794b',pose='stand',guard=false){
++   const seated=pose==='sit',b=seated?Math.sin(phase*1.7)*.7:0;
++   g.save();g.translate(x,y);oval(0,5,17,6,'#192a205c');
++   if(seated){rect(-16,-3,33,8,'#414b3c');rect(10,1,22,5,'#645439');rect(22,0,7,6,'#dfd3ac');rect(31,3,6,5,'#48382d');}
++   else{rect(-9,-3,7,9,'#5b4b36');rect(4,-3,7,9,'#5b4b36');rect(-10,4,9,4,'#322e27');rect(4,4,9,4,'#322e27');}
++   const lift=seated?12:0;
++   rect(-13,-26+lift+b,26,26-lift,guard?'#718781':coat);rect(-9,-25+lift+b,18,20-lift,guard?'#b1beb0':coat);
++   rect(-8,-24+lift+b,5,15-lift,guard?'#d6decb':'#c1af7880');rect(-11,-8,23,4,'#625135');rect(-2,-8,5,4,'#d5bd77');
++   line([[-13,-22+lift+b],[-17,-11+b],[-9,-5]],guard?'#82958c':coat,5);rect(-11,-8,6,5,'#e9bd86');
++   line([[13,-22+lift+b],[16,-10+b],[10,-5]],coat,5);rect(8,-8,6,5,'#e9bd86');
++   rect(-7,-40+lift+b,15,16,'#735137');rect(-6,-37+lift+b,13,12,'#e8b784');rect(-4,-37+lift+b,6,6,'#f3d0a0');rect(-4,-31+lift+b,2,2,'#343d30');rect(3,-31+lift+b,2,2,'#343d30');rect(-1,-27+lift+b,4,1,'#a57251');
++   if(guard){rect(-9,-42+lift+b,19,7,'#94a69e');rect(-6,-46+lift+b,13,6,'#bbc9b9');rect(-1,-46+lift+b,4,7,'#ba6952');}
++   else{rect(-9,-41+lift+b,18,4,coat);rect(-6,-46+lift+b,13,6,coat);}
++   g.restore();
++  }
++  function reed(x,y){line([[x,y],[x-3,y-22]],'#52683d');line([[x,y],[x+7,y-19]],'#8d9b52');rect(x-6,y-25,5,7,'#a29155');}
++  g.save();g.translate(site.x||0,site.y||0);g.lineJoin='round';g.lineCap='round';
++  if(site.scene==='wounded_guard'){
++   oval(0,6,62,20,'#354a2838');stone(19,-3,30);
++   // A leaning river willow and low hanging fronds frame the patrol's shelter.
++   poly([[30,-10],[36,-15],[43,-68],[38,-91],[33,-89],[36,-64]],'#6b6140');line([[38,-62],[21,-83],[4,-87]],'#8c7950',6);
++   for(const [x,y]of [[6,-83],[24,-87],[44,-91],[58,-80]]){oval(x,y,21,11,'#4c713d');line([[x-7,y],[x-9,y+28],[x-13,y+37]],'#88a35a',4);line([[x+7,y],[x+5,y+20]],'#698a46',4);}
++   if(done)human(-9,6,'#816c47','stand',true);else human(-8,8,'#816c47','sit',true);
++   poly([[-48,4],[-48,-20],[-27,-21],[-25,2],[-36,12]],'#637a79');poly([[-44,-17],[-30,-17],[-30,0],[-36,7],[-43,0]],'#b3c2b2');rect(-38,-14,4,17,'#9b593f');
++   line([[-62,19],[-22,25]],'#aa8d5a',3);poly([[-61,15],[-73,17],[-61,23]],'#bac8bd');line([[-6,27],[15,30]],'#aa8d5a',3);reed(63,17);
++  }else if(site.scene==='broken_cart'){
++   oval(-4,11,67,18,'#494c2d38');line([[-59,5],[54,7]],'#816039',5);line([[-58,12],[51,15]],'#b69861',2);
++   g.save();g.translate(-5,0);if(!done)g.rotate(-.11);
++   rect(-39,-31,76,32,'#6a4c2e');for(let i=0;i<4;i++)rect(-37,-29+i*7,71,5,i%2?'#b59155':'#caa568');
++   for(const xx of[-32,27]){rect(xx,-34,5,41,'#6f5637');oval(xx,7,14,14,'#594932');oval(xx,7,10,10,'#c29e60');for(let i=0;i<6;i++){const a=i*TAU/6;line([[xx,7],[xx+10*Math.cos(a),7+10*Math.sin(a)]],'#674e31',2);}oval(xx,7,3,3,'#e0bd77');}
++   sack(-18,-32);sack(8,-34);g.restore();
++   if(!done){line([[6,18],[45,5]],'#665138',9);line([[8,15],[45,2]],'#c09c64',3);}
++   else line([[-62,23],[-37,29]],'#8b6b43',6);
++   human(64,8,'#a38b50',done?'stand':'sit');sack(49,31);
++  }else if(site.scene==='road_dispute'){
++   oval(0,7,64,18,'#54533825');human(28,12,'#668b8f');rect(36,-7,13,14,'#94704b');line([[38,-10],[43,-15],[48,-10]],'#5b4933');
++   const age=Number.isFinite(state.completed_age)?state.completed_age:60;
++   if(!done||age<4){g.save();if(done){g.translate(-Math.min(age,4)*15,-Math.min(age,4)*3);g.globalAlpha=Math.max(0,1-age/4);}human(-31,0,'#76563e');rect(-13,-22,13,10,'#ddc991');rect(-6,-18,3,3,'#a95343');g.restore();}
++   line([[-66,10],[-66,-43]],'#7f633e',5);rect(-76,-43,31,14,'#b49b65');line([[-71,-38],[-51,-38]],'#6b5534');
++  }else if(site.scene==='lost_pouch'){
++   stone(-27,9,22);stone(24,13,19);reed(-45,22);reed(39,6);line([[-15,8],[4,5],[18,19]],'#806343',4);
++   for(const [x,y]of[[-8,24],[-1,32],[-10,42]])oval(x,y,3,5,'#716f444f');
++   if(!done){rect(-9,-3,20,17,'#704c2e');rect(-7,-2,16,12,'#a67940');rect(-6,-9,13,8,'#b38d50');rect(-1,-6,5,7,'#d9bb70');
++    if(state.hint){const a=.45+Math.sin(phase*2)*.2;g.save();g.globalAlpha=a;line([[-4,-4],[6,-4]],'#fff1c6',1);line([[1,-9],[1,2]],'#fff1c6',1);g.restore();}}
++  }else if(site.scene==='stolen_supplies'){
++   poly([[-65,-5],[-26,-61],[29,-9]],'#81764f');poly([[-26,-61],[-16,-8],[29,-9]],'#5a6541');line([[-27,-61],[-70,7]],'#cbb17b',2);line([[-27,-61],[35,5]],'#cbb17b',2);
++   line([[-65,25],[29,31]],'#655138',12);line([[-62,22],[27,28]],'#a28554',4);oval(-65,25,6,6,'#c2a16a');line([[-55,26],[-18,30]],'#443f2a',2);
++   box(17,13,done);box(-25,7,done);if(!done){rect(11,-10,14,7,'#cfdbb5');line([[16,-9],[16,-4]],'#8d6c44',2);}
++   oval(60,15,15,6,'#293e2b55');rect(48,-10,25,20,'#6c6241');oval(59,-17+Math.sin(phase)*.4,12,10,'#8ea652');poly([[49,-21],[40,-24],[47,-14]],'#8ea652');poly([[67,-21],[78,-24],[70,-13]],'#8ea652');line([[51,-18],[55,-18]],'#3c502e',2);line([[62,-18],[66,-18]],'#3c502e',2);oval(61,28,9,4,'#b09a66');
++   if(!done)line([[34,8],[60,26]],'#baab7855',1);
++  }else if(site.scene==='sealed_relic'){
++   oval(0,8,68,25,'#4d5c4238');for(const [x,y]of[[-54,7],[49,-17]]){rect(x-10,y-32,22,38,'#858d78');rect(x-14,y-35,30,6,'#c6c4a1');rect(x-15,y+2,33,9,'#a6ad8f');rect(x-6,y-26,4,23,'#bec4a3');}
++   rect(-34,-26,71,43,'#657266');rect(-30,-23,63,34,'#9da789');rect(-26,-20,55,27,done?'#36483c':'#7a8b75');
++   if(done){poly([[-37,-27],[-28,-61],[45,-48],[36,-27]],'#c1c4a1');line([[-26,-55],[36,-45]],'#e1d7b0',2);}
++   else{rect(-37,-34,76,10,'#c6c9a6');for(const x of[-18,0,18]){line([[x-4,-12],[x,-21],[x+5,-12],[x,-7],[x-4,-12]],'#cfcea4',2);}if(state.hint)rect(-20,-33,5,2,'#f2dc9c');}
++   for(const [x,y]of[[-41,23],[-29,25],[40,20]]){rect(x,y,10,4,'#6a8344');rect(x+4,y-4,7,4,'#8ba358');}
++  }else if(site.scene==='herbalist'){
++   oval(-10,9,64,19,'#45533828');human(36,5,'#6e8c50','sit');oval(10,17,15,8,'#806240');line([[-3,10],[0,1],[18,1],[23,10]],'#b89a60',3);
++   for(const [i,x,y]of[[0,-51,7],[1,-29,19],[2,-6,-4],[3,-37,-13]]){line([[x,y],[x,y-18]],'#496b39',2);oval(x-5,y-10,7,3,'#7f9a4c');oval(x+5,y-15,7,3,'#a2b85b');if(!done||i>1){rect(x-2,y-22,5,6,i%2?'#c3b677':'#d4ddb0');}}
++   bottle(22,21);if(done){bottle(6,22);bottle(-5,20);}else rect(11,10,8,3,'#94b55b');stone(-66,-7,12);
++  }else if(site.scene==='frightened_pony'){
++   human(58,6,'#9e7f49');const hop=done?0:Math.max(0,Math.sin(phase*3)) * 2;
++   g.save();g.translate(-22,-hop);oval(0,16,34,9,'#26382144');for(const x of[-23,16]){rect(x,0,7,20,'#ad8051');rect(x-1,16,9,5,'#51412e');}oval(0,-4,31,17,'#b28a57');oval(-8,-8,19,11,'#d2ae76');
++   const nod=done?6:Math.sin(phase*2)*3;g.save();g.translate(25,-12+nod);poly([[-9,7],[-3,-26],[14,-27],[18,-1]],'#c49c67');oval(11,-24,13,11,'#d4b583');oval(20,-19,11,7,'#e1c495');poly([[1,-30],[0,-46],[7,-34]],'#c9a370');poly([[12,-31],[16,-44],[18,-29]],'#c9a370');rect(11,-28,3,3,'#3c342b');line([[-3,-31],[-9,-21],[-8,-1]],'#6b5035',6);line([[14,-24],[21,-14]],'#806641',2);g.restore();
++   line([[-28,-10],[-39,-6],[-41,10+Math.sin(phase*2)*2]],'#6b5035',5);rect(-12,-15,26,19,'#776f48');rect(-10,-14,22,15,'#a39962');rect(-3,-15,4,20,'#635838');g.restore();
++   line([[28,-25],[42,-9]],'#a08a5b',2);sack(65,28);sack(42,31);
++  }
++  g.restore();
++ }
++ function createEvents(h){
++  const node=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!==undefined)e.textContent=text;return e;};
++  const panel=node('section','world-event-panel');panel.id='worldEventPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','worldEventTitle');
++  const header=node('header','world-event-header'),title=node('h2','', '');title.id='worldEventTitle';
++  const closeButton=node('button','world-event-close','×');closeButton.type='button';closeButton.setAttribute('aria-label','Zamknij wydarzenie');closeButton.onclick=close;
++  header.append(title,closeButton);const body=node('div','world-event-body');panel.append(header,body);document.getElementById('gameUI').append(panel);
++  let id='',owner='',signature='',focus=null,pending=false,pendingUntil=0,receipt='',hintSession='',hints=new Set();
++  function close(){if(panel.hidden)return;panel.hidden=true;pending=false;signature='';h.closed?.();if(focus?.isConnected&&focus.getClientRects().length)focus.focus({preventScroll:true});}
++  function entry(){return h.state?.().skill_challenges?.nearby?.find(e=>e.id===id);}
++  function open(site){if(!site?.id)return;focus=document.activeElement;h.prepare?.();owner=String(h.state?.().player?.id);id=site.id;signature='';pending=false;panel.hidden=false;render();closeButton.focus({preventScroll:true});}
++  function render(){
++   const state=h.state?.(),p=state?.player,session=String(h.session?.()??'')+':'+String(p?.id??'');
++   if(session!==hintSession){hintSession=session;hints.clear();}
++   const hint=(state?.skill_challenges?.nearby||[]).find(e=>e.hint&&!hints.has(e.id));
++   if(hint){hints.add(hint.id);h.notice?.('Dostrzegasz: '+hint.hint);}
++   if(panel.hidden)return;
++   if(!p||!p.alive||String(p.id)!==owner){close();return;}
++   const e=entry();if(!e){close();return;}
++   const token=JSON.stringify([e.completed,e.cooldown_remaining>0,p.last_roll?.id]);
++   if(pending&&(token!==receipt||performance.now()>pendingUntil))pending=false;
++   const key=JSON.stringify([e.name,e.completed,e.description,e.dialogue,e.aftermath,e.failure,e.options,e.hint,p.last_roll?.target_name===e.name?p.last_roll.id:null,pending]);
++   if(key===signature)return;signature=key;const scroll=body.scrollTop,focused=body.contains(document.activeElement)?document.activeElement.dataset.eventAction:null;body.replaceChildren();title.textContent=e.name;
++   const canvas=node('canvas','world-event-preview');canvas.width=720;canvas.height=230;canvas.setAttribute('aria-hidden','true');const g=canvas.getContext('2d');g.scale(2,2);g.fillStyle='#203c30';g.fillRect(0,0,360,115);g.save();g.translate(180,80);g.scale(.75,.75);drawEvent(g,{...e,x:0,y:0},e,0);g.restore();body.append(canvas);
++   if(!e.completed)body.append(node('p','world-event-description',e.description));body.append(node('p','world-event-dialogue',e.completed?e.aftermath:e.dialogue));
++   if(e.hint&&!e.completed)body.append(node('p','world-event-hint',e.hint));
++   const roll=p.last_roll;if(roll?.target_name===e.name){const receiptBox=node('div','world-event-roll');receiptBox.setAttribute('aria-live','polite');if(roll.check==='ability'){for(const line of root.BractwoRuntime?.checkRollLines(roll)||[])receiptBox.append(node('div','',line));receiptBox.append(node('b','',roll.saved?'Udało się':'Nie tym razem'));}else if(roll.check==='healing')receiptBox.append(node('div','',root.BractwoRuntime?.combatSummary(roll)||'Leczenie udane'));body.append(receiptBox);}
++   if(e.completed){body.append(node('p','world-event-result',e.result),node('small','world-event-reward','Nagroda odebrana · '+e.reward_hint));}
++   else{
++    if(e.failure)body.append(node('p','world-event-failure',e.failure));
++    const actions=node('div','world-event-actions');
++    for(const option of e.options||[]){const b=node('button','world-event-action');b.type='button';b.dataset.eventAction=option.id;b.append(node('strong','',option.label));
++     const cost=option.skill_name||option.cost_hint||'';if(cost)b.append(node('small','',cost));
++     b.disabled=pending||!option.available;b.title=option.reason||'';
++     if(option.reason)b.append(node('span','world-event-lock',option.reason));
++     b.onclick=()=>{const latest=entry(),o=latest?.options?.find(o=>o.id===option.id);if(pending||!o?.available)return;receipt=JSON.stringify([latest.completed,latest.cooldown_remaining>0,h.state().player?.last_roll?.id]);pending=true;pendingUntil=performance.now()+2500;h.send({type:'skill_challenge',challenge_id:id,action_id:o.id});signature='';render();};actions.append(b);
++    }body.append(actions);if(pending)body.append(node('p','world-event-working','Działasz…'));
++    body.append(node('small','world-event-reward',e.reward_hint));
++   }
++   const leave=node('button','world-event-leave',e.completed?'Ruszaj dalej':'Odejdź');leave.type='button';leave.onclick=close;body.append(leave);body.scrollTop=scroll;
++   if(focused)body.querySelector('[data-event-action="'+focused+'"]')?.focus({preventScroll:true});
++  }
++  panel.addEventListener('keydown',e=>{if(e.code==='Escape'||e.code==='KeyE'){e.preventDefault();e.stopPropagation();close();}else if(['Enter','Space'].includes(e.code))e.stopPropagation();});
++  for(const event of ['pointerdown','touchstart','wheel'])panel.addEventListener(event,e=>e.stopPropagation());
++  return {open,close,render,get visible(){return !panel.hidden;},get element(){return panel;}};
++ }
++ ui.drawEvent=drawEvent;ui.createEvents=createEvents;
++})(globalThis);

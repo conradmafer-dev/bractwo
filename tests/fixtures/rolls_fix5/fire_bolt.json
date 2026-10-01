@@ -1,0 +1,84 @@
+{
+  "id": "1",
+  "last_roll": {
+    "id": "fx2",
+    "kind": "combat_roll",
+    "source_id": "1",
+    "target_id": "target0",
+    "floor": 0,
+    "x": 1100,
+    "y": 1180,
+    "target_x": 1250,
+    "target_y": 1180,
+    "time": 0.0,
+    "duration": 1.4,
+    "radius": 0,
+    "check": "attack",
+    "rolls": [
+      15
+    ],
+    "roll": 15,
+    "bonus": 6,
+    "total": 21,
+    "defense": 11,
+    "hit": true,
+    "critical": false,
+    "disadvantage": false,
+    "advantage": false,
+    "damage": 8,
+    "damage_dice": "2k10",
+    "damage_rolls": [
+      4,
+      4
+    ],
+    "damage_modifier": 0,
+    "damage_sides": 10,
+    "damage_maximized": false,
+    "damage_type": "fire",
+    "action": "Ognisty pocisk",
+    "target_name": "Ogr maczugowy",
+    "expires_at": 1008.0
+  },
+  "combat_log": [
+    {
+      "id": "fx2",
+      "kind": "combat_roll",
+      "source_id": "1",
+      "target_id": "target0",
+      "floor": 0,
+      "x": 1100,
+      "y": 1180,
+      "target_x": 1250,
+      "target_y": 1180,
+      "time": 0.0,
+      "duration": 1.4,
+      "radius": 0,
+      "check": "attack",
+      "rolls": [
+        15
+      ],
+      "roll": 15,
+      "bonus": 6,
+      "total": 21,
+      "defense": 11,
+      "hit": true,
+      "critical": false,
+      "disadvantage": false,
+      "advantage": false,
+      "damage": 8,
+      "damage_dice": "2k10",
+      "damage_rolls": [
+        4,
+        4
+      ],
+      "damage_modifier": 0,
+      "damage_sides": 10,
+      "damage_maximized": false,
+      "damage_type": "fire",
+      "action": "Ognisty pocisk",
+      "target_name": "Ogr maczugowy",
+      "expires_at": 1008.0
+    }
+  ],
+  "simulation_time": 0.0
+}

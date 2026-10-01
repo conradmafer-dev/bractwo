@@ -1,0 +1,88 @@
+{
+  "id": "1",
+  "last_roll": {
+    "id": "fx1",
+    "kind": "combat_roll",
+    "source_id": "1",
+    "target_id": "1",
+    "floor": 0,
+    "x": 1100,
+    "y": 1180,
+    "target_x": 1100,
+    "target_y": 1180,
+    "time": 0.0,
+    "duration": 1.4,
+    "radius": 0,
+    "check": "ability",
+    "roll": 15,
+    "rolls": [
+      15
+    ],
+    "bonus": 6,
+    "total": 21,
+    "defense": 10,
+    "saved": true,
+    "hit": false,
+    "damage": 0,
+    "damage_dice": "",
+    "ability": "strength",
+    "skill": "athletics",
+    "check_extra_rolls": [
+      {
+        "name": "Wskazówki",
+        "sides": 4,
+        "rolls": [
+          4
+        ],
+        "sign": 1
+      }
+    ],
+    "action": "athletics",
+    "target_name": "Test1",
+    "expires_at": 1008.0
+  },
+  "combat_log": [
+    {
+      "id": "fx1",
+      "kind": "combat_roll",
+      "source_id": "1",
+      "target_id": "1",
+      "floor": 0,
+      "x": 1100,
+      "y": 1180,
+      "target_x": 1100,
+      "target_y": 1180,
+      "time": 0.0,
+      "duration": 1.4,
+      "radius": 0,
+      "check": "ability",
+      "roll": 15,
+      "rolls": [
+        15
+      ],
+      "bonus": 6,
+      "total": 21,
+      "defense": 10,
+      "saved": true,
+      "hit": false,
+      "damage": 0,
+      "damage_dice": "",
+      "ability": "strength",
+      "skill": "athletics",
+      "check_extra_rolls": [
+        {
+          "name": "Wskazówki",
+          "sides": 4,
+          "rolls": [
+            4
+          ],
+          "sign": 1
+        }
+      ],
+      "action": "athletics",
+      "target_name": "Test1",
+      "expires_at": 1008.0
+    }
+  ],
+  "simulation_time": 0.0
+}

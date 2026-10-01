@@ -1,0 +1,271 @@
+{
+  "release": "UI_32",
+  "base": "UI_31 z galerią/komentarzami oraz naniesionym FIX5",
+  "files": [
+    {
+      "path": "CZYTAJ_UI32.txt",
+      "bytes": 1781,
+      "sha256": "beee36f207697de491f20ee100e8e6ae3d28bf8351f62d61f758071ad717c2bf"
+    },
+    {
+      "path": "docs/UI_32_RAPORT_TESTOW.json",
+      "bytes": 4515,
+      "sha256": "a6d69d36d78f9b1a8b2e6430036d4d74a85724853b144bb73cfd40567d234914"
+    },
+    {
+      "path": "docs/UI_32_WYDARZENIA.md",
+      "bytes": 7009,
+      "sha256": "673d7c8b5f6368ae3bffc888cf2716009096efaf0ca825fb7c4dce614d381ebd"
+    },
+    {
+      "path": "docs/UI_32_ZMIANY.patch",
+      "bytes": 128885,
+      "sha256": "a898a3d757a309ee775fc6ce663c4827fbdfb8383a30e015e908c3fd0390f487"
+    },
+    {
+      "path": "docs/qa_ui32/browser-release-final.log",
+      "bytes": 10843,
+      "sha256": "8c4780662e720c3da8d00a304015ac53c6e12162a5545dd0e33b0e82b47c39a7"
+    },
+    {
+      "path": "docs/qa_ui32/browser_results.json",
+      "bytes": 3399,
+      "sha256": "5af5bf2f260130868aa7186615ab570ed958b9b55b0174470d5eac19a3435ece"
+    },
+    {
+      "path": "docs/qa_ui32/node-events-final.log",
+      "bytes": 3794,
+      "sha256": "f62dec4abc80660f23860a1de413e9fd38100970b591cc9c09e00b1497fdf683"
+    },
+    {
+      "path": "docs/qa_ui32/node-release.log",
+      "bytes": 78386,
+      "sha256": "ca812ffbdceb28bc975cdc7562f21d0f2e037f27875553671d64e92ccb49af09"
+    },
+    {
+      "path": "docs/qa_ui32/po_pomocy_straznikowi.png",
+      "bytes": 314692,
+      "sha256": "749d8671247f374ec573744bfdb708146fa46d30532dd2379d97dbbc6bf34b39"
+    },
+    {
+      "path": "docs/qa_ui32/preservation.log",
+      "bytes": 349,
+      "sha256": "928738408c32815c3c3fb2c7ac137b24eabb53c4aca9d01c9be56497773d35d3"
+    },
+    {
+      "path": "docs/qa_ui32/python-events-release.log",
+      "bytes": 4199,
+      "sha256": "3b044b5fb3ef965f32aa4c1c631d6384544069a247060985ce0ade0bca49bf16"
+    },
+    {
+      "path": "docs/qa_ui32/python-final.log",
+      "bytes": 23807,
+      "sha256": "7304a908efc02f27410487523a9d5539517ef869032db72dd927d1e7246522a8"
+    },
+    {
+      "path": "docs/qa_ui32/ranny_straznik_komputer.png",
+      "bytes": 317309,
+      "sha256": "7eddccbf795a4415b01391be044edbd74b4fd509f4ba3175e2d975dcc73ef510"
+    },
+    {
+      "path": "docs/qa_ui32/ranny_straznik_telefon.png",
+      "bytes": 125015,
+      "sha256": "178192ccfc6c5ce7cc09d36931c62dd8ba9be4d1eb5222d7e176c5f797151d86"
+    },
+    {
+      "path": "server/combat_rules.py",
+      "bytes": 29471,
+      "sha256": "58098622b7af3c9e77c0435e44e8c3fc9fce3bfa9e1e83343d8abf3bd4b2624c"
+    },
+    {
+      "path": "server/dnd_game.py",
+      "bytes": 52849,
+      "sha256": "84dd5a210a0bdd2228b6e40626890e412cf0bba6a2531f5f1b8e329665db7efe"
+    },
+    {
+      "path": "server/druid_circle_game.py",
+      "bytes": 37934,
+      "sha256": "775493b48e9be33096f90ae9f2ce46729680538ab8fbf2a877b6d763b914ef56"
+    },
+    {
+      "path": "server/environment_rules.py",
+      "bytes": 35723,
+      "sha256": "1a3434bd86483ad676fc6f3215f397142f4b12b7450d608e80d6b708530e5a34"
+    },
+    {
+      "path": "server/equipment_rules.py",
+      "bytes": 26838,
+      "sha256": "a09ebd8122bab2ee9b5dd51f659ef3998014494bfbf52f523dd3bd0143ea2405"
+    },
+    {
+      "path": "server/feat_rules.py",
+      "bytes": 9399,
+      "sha256": "3d0adb7867932c4de36d4f56a8e4051ae6e72e40df2072554471f60995504511"
+    },
+    {
+      "path": "server/martial_combat.py",
+      "bytes": 14459,
+      "sha256": "313bf83ada4e10e095744bbd8e6f2c6a164fe08c6ed3574ad176caa09da0e791"
+    },
+    {
+      "path": "server/martial_rules.py",
+      "bytes": 8640,
+      "sha256": "636326bb0ee6647b70d219d4c0957508917eeb2f898ebd27927b059387cc5df0"
+    },
+    {
+      "path": "server/rest_rules.py",
+      "bytes": 5225,
+      "sha256": "97159137408d1b050f7802ee9f623647836fd7db4e7de4a49ae6f9e67e0cb7ff"
+    },
+    {
+      "path": "server/server.py",
+      "bytes": 119131,
+      "sha256": "ab4aa6bb6700d8ad5e65733c8b7631c00c9f650333052953993c27dab049f574"
+    },
+    {
+      "path": "server/skill_content.py",
+      "bytes": 9728,
+      "sha256": "96b30ee06726b58a09d7f48afac80db225926c7c3865e221ee8062aecf99e578"
+    },
+    {
+      "path": "server/skill_game.py",
+      "bytes": 12982,
+      "sha256": "b861dd6f8fad2b4d137cfddb4c1fe3f07c2754c00be8b5686f84f1d2a91acba6"
+    },
+    {
+      "path": "server/wizard_offense.py",
+      "bytes": 10335,
+      "sha256": "9229140f37e069f5b867dd2141edcd211fff315492920c990f1de553efb52f13"
+    },
+    {
+      "path": "tests/fixtures/rolls_fix5/fire_bolt.json",
+      "bytes": 1658,
+      "sha256": "8cd5e3339a91f80e3bfb768775d61340e8f96af8c7018502469807547ec7aeca"
+    },
+    {
+      "path": "tests/fixtures/rolls_fix5/fireball.json",
+      "bytes": 3030,
+      "sha256": "8f75c0383dd1d6fe8f81b6e37115e2c2f8310cd1adae170f2cf6940bf07f42c9"
+    },
+    {
+      "path": "tests/fixtures/rolls_fix5/guidance.json",
+      "bytes": 1628,
+      "sha256": "01b230912d07d70e60d8b59fe5e4489ae72dbf4b1959c8fb6d04f532a12c9dd5"
+    },
+    {
+      "path": "tests/fixtures/rolls_fix5/healing.json",
+      "bytes": 1244,
+      "sha256": "40ca18c11bbe58e9e0e13e1c81c0e7d41b190cdb8013e0a4ed57281105f6ea57"
+    },
+    {
+      "path": "tests/fixtures/rolls_fix5/magic_missile.json",
+      "bytes": 3951,
+      "sha256": "952a561dc0c8753d918302c35d4e475007cd6e3b606b32d858730c8de3c883b5"
+    },
+    {
+      "path": "tests/fixtures/rolls_fix5/mark.json",
+      "bytes": 2926,
+      "sha256": "0ea5afa775dc3381ec28f20d9e408405131ad3c35592f96165899402d8d6992e"
+    },
+    {
+      "path": "tests/fixtures/rolls_fix5/potion.json",
+      "bytes": 1883,
+      "sha256": "321f19099f4aa0f86e8e595f681547b77568614a899b26fae4020bf686761743"
+    },
+    {
+      "path": "tests/fixtures/rolls_fix5/rest.json",
+      "bytes": 1297,
+      "sha256": "35d0d602349f6ee94d5a93745eea8a8164b642080369b83eec26e3a24b34113f"
+    },
+    {
+      "path": "tests/fixtures/rolls_fix5/savage.json",
+      "bytes": 2130,
+      "sha256": "beab85f6c3aa008e605abdb762dbb61b726a8cdd24e537b54c2b05af851593a5"
+    },
+    {
+      "path": "tests/fixtures/savage_horde_fix4.json",
+      "bytes": 1933,
+      "sha256": "1399529c83b84f8d6d4af980315146eb9a309d434927c85a8d4744e72ca5f740"
+    },
+    {
+      "path": "tests/test_client_runtime.cjs",
+      "bytes": 9231,
+      "sha256": "6dd39b85685a9e16201a633777c90a6a95330c09caf34116402b8a12eab2d01f"
+    },
+    {
+      "path": "tests/test_horde_breaker_ui31_fix3.py",
+      "bytes": 10708,
+      "sha256": "f0b3c8f994048b6d754e76927a6efd7219e6c4959e0633a5fdeb67688ed273ef"
+    },
+    {
+      "path": "tests/test_martial_combat_ui26.py",
+      "bytes": 18334,
+      "sha256": "5436c490f069a1992d23e93857eeb6d76513398e9fda5b2c1cd1a4c03ebf932e"
+    },
+    {
+      "path": "tests/test_roll_format_ui31_fix5.cjs",
+      "bytes": 8315,
+      "sha256": "81b622877e4d4668a93a687ae0db23ec6c727bbe436d37ceb9579b58fcb6ab78"
+    },
+    {
+      "path": "tests/test_roll_receipts_ui31_fix5.py",
+      "bytes": 8104,
+      "sha256": "569c25cf03b6be1619e443f49b473a544ad4d24a4828098cd0194cf24b169d2e"
+    },
+    {
+      "path": "tests/test_savage_feedback_ui31_fix4.cjs",
+      "bytes": 3661,
+      "sha256": "2e8acbe1af11bfea397cc59c4ece3cc40e6d899eff96cde5d88fd4ba9f753f69"
+    },
+    {
+      "path": "tests/test_savage_feedback_ui31_fix4.py",
+      "bytes": 4954,
+      "sha256": "93d222e58f7f2427ff87eec7f6437d54a07f3df85ac5d2045040a6150c6dd3b5"
+    },
+    {
+      "path": "tests/test_skill_challenges_ui28.py",
+      "bytes": 401,
+      "sha256": "107d6687b8ad7a4a993281edc0f181213f3fedc9983908ab571f65a6e7e0a625"
+    },
+    {
+      "path": "tests/test_world_events_ui32.cjs",
+      "bytes": 2510,
+      "sha256": "6fd24a018faff76333c4a4798cdcf31dd9059a8dd2d93e85ebf378b20dc9cc7d"
+    },
+    {
+      "path": "tests/test_world_events_ui32.py",
+      "bytes": 14179,
+      "sha256": "51f1778b23098e11d6d7432df1eefdd84f343f269900179e5ccaf042fc03637f"
+    },
+    {
+      "path": "tools/browser_world_events_ui32.py",
+      "bytes": 16213,
+      "sha256": "3d2729a4c59bb512f3523d4817ddd27d26b9573fddfe871c438e6cd6185e59fc"
+    },
+    {
+      "path": "web/character_sheet.js",
+      "bytes": 22888,
+      "sha256": "2834fc3cdf3b4a23565a382ab75cd9ca6539240ec3d71f827de9ac596805d291"
+    },
+    {
+      "path": "web/game.js",
+      "bytes": 167114,
+      "sha256": "8ae48475e7a54d5b1b12153a4a0eb633696d4df10387d5d64fefe3567e6615e9"
+    },
+    {
+      "path": "web/hud_layout.css",
+      "bytes": 15758,
+      "sha256": "a8d9fe3cce373663f22fbd0764603458dfb12e72e609e970ab26693e13c3bb90"
+    },
+    {
+      "path": "web/runtime.js",
+      "bytes": 35796,
+      "sha256": "51b1bf03c42db5df09286264336541494ca94951591a4157d37caa30285476bd"
+    },
+    {
+      "path": "web/skills_ui.js",
+      "bytes": 33849,
+      "sha256": "8989c0a4fbbd1b851227084a492098504edc8fe5ddd7dea7b0a03e979aeeddfa"
+    }
+  ]
+}

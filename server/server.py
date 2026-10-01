@@ -1192,6 +1192,9 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
             return
         p.rest_state = {}
         summary=rest_rules.finish(p,rest["kind"],self.combat_rng,rest.get("recover",True))
+        if summary.get("rolls"):
+            self.report_roll(p,p,dict(check='healing',hit=True,healing=summary['hp'],
+                damage=0,rest_rolls=summary['rolls']), 'Krótki odpoczynek',p)
         attunement_message = magic_items.finish_rest(p, rest)
         self.on_circle_rest(p,rest["kind"])
         self.wizard_school_rest(p,rest["kind"])
@@ -2029,7 +2032,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_31","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_32","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):

@@ -14,6 +14,9 @@ except ImportError:
     from progression import same_floor
 
 FIVE_FEET = 32  # The published world scale: 6.4 units per foot.
+# Horde Breaker alone uses one terrain tile for neighbouring creatures.
+# Keep Giant Killer and the rest of the world scale unchanged.
+HORDE_BREAKER_RADIUS = 64
 NAMES = {'precision':'Precyzyjny atak', 'riposte':'Riposta', 'parry':'Parowanie',
          'trip':'Atak powalający', 'menacing':'Atak zastraszający',
          'colossus_slayer':'Pogromca kolosów', 'horde_breaker':'Rozbijacz hord',
@@ -60,6 +63,8 @@ class MartialCombat:
         if not self._martial_spend(p, 'precision'): return False
         value = self.combat_rng.randint(1, martial.die_sides(p))
         result.update(martial_maneuver='precision', superiority_rolls=[value])
+        result['check_extra_rolls'] = [*result.get('check_extra_rolls', []),
+            dict(name='Precyzyjny atak', sides=martial.die_sides(p), rolls=[value], sign=1)]
         result['total'] += value; result['bonus'] += value
         result['hit'] = result['total'] >= result['defense']
         if result['hit']:
@@ -80,6 +85,7 @@ class MartialCombat:
         else: component['damage'] += extra['damage']
         result['damage'] += extra['damage']; result['damage_dice'] += f' + 1k{sides} ({NAMES[label]})'
         result[metadata] = extra['damage_rolls']
+        rules.record_damage_roll(result, extra, NAMES[label])
 
     def martial_damage_riders(self, p, target, result, spell=False):
         if not self.martial_weapon_source(p, spell) or not result.get('hit'): return
@@ -137,7 +143,8 @@ class MartialCombat:
         die = self.combat_rng.randint(1, martial.die_sides(target))
         reduction = max(0, die + rules.ability_modifier(target, 'dexterity'))
         reduction = min(reduction, result['damage'])
-        result.update(parry_reduction=reduction, parry_roll=die)
+        result.update(parry_reduction=reduction, parry_roll=die,
+                      parry_sides=martial.die_sides(target),parry_modifier=rules.ability_modifier(target,'dexterity'))
         result['damage'] -= reduction
         remaining = reduction
         for component in result.get('damage_components', []):
@@ -192,12 +199,12 @@ class MartialCombat:
         if (martial.hunter_choice(p) != 'horde_breaker' or getattr(self, '_martial_extra_depth', 0)
                 or not self.martial_weapon_source(p) or martial.state(p).get('horde_until', 0) > self.now()): return None
         now = self.now()
-        candidates = [e for e in self.nearby_enemies(primary, FIVE_FEET+1)]
+        candidates = [e for e in self.nearby_enemies(primary, HORDE_BREAKER_RADIUS+1)]
         # An automatic extra shot never starts a new fight with an uninvolved player.
         candidates += [q for q in self.players.values() if q is not p and
                        (p.aggressors.get(q.id, 0) > now or q.aggressors.get(p.id, 0) > now)]
         candidates = [q for q in candidates if q is not primary
-                      and math.hypot(q.x-primary.x, q.y-primary.y) <= FIVE_FEET
+                      and math.hypot(q.x-primary.x, q.y-primary.y) <= HORDE_BREAKER_RADIUS
                       and self._martial_target_legal(p, q)]
         if not candidates: return None
         target = min(candidates, key=lambda q: (math.hypot(q.x-primary.x, q.y-primary.y), str(q.id)))
