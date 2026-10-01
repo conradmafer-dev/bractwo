@@ -8,28 +8,26 @@
   <meta name="apple-mobile-web-app-title" content="Bractwo Krain">
   <link rel="manifest" href="/manifest.webmanifest">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
-  <title>Bractwo Krain – polska gra RPG online w przeglądarce</title>
-  <meta name="description" content="Polska gra RPG online w przeglądarce. Wybierz jedną z czterech klas, odkrywaj krainy i podziemia, zdobywaj łupy i graj z innymi.">
-  <meta name="robots" content="index, follow, max-image-preview:large">
   <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
   <!-- SEO_HEAD -->
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="character_sheet.css">
-  <link rel="stylesheet" href="level_up.css">
-  <link rel="stylesheet" href="loot_ui.css">
+  <link rel="stylesheet" href="character_sheet.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="level_up.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="loot_ui.css" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="hud_layout.css">
-  <link rel="stylesheet" href="windows.css">
-  <link rel="stylesheet" href="fighter.css">
-  <link rel="stylesheet" href="caster.css">
-  <link rel="stylesheet" href="martial.css">
+  <link rel="stylesheet" href="windows.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="fighter.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="caster.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="martial.css" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="mobile.css">
-  <link rel="stylesheet" href="rest_ui.css">
+  <link rel="stylesheet" href="rest_ui.css" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="app_shell.css">
-  <link rel="stylesheet" href="hotbar_ui.css">
-  <link rel="stylesheet" href="adventure_ui.css">
+  <link rel="stylesheet" href="hotbar_ui.css" media="print" onload="this.media='all'">
+  <link rel="stylesheet" href="adventure_ui.css" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="google_auth.css">
-  <link rel="stylesheet" href="service_ui.css">
+  <link rel="stylesheet" href="service_ui.css" media="print" onload="this.media='all'">
   <link rel="stylesheet" href="/landing.css">
+  <link rel="stylesheet" href="/comments.css">
 </head>
 <body>
   <canvas id="world" aria-label="Otwarty świat Bractwa Krain"></canvas>
@@ -39,14 +37,14 @@
       <header class="landing-header">
         <a class="landing-brand" href="#poczatek" aria-label="Bractwo Krain — początek strony"><svg viewBox="0 0 36 44" width="30" height="38" aria-hidden="true"><path d="M18 2 33 9v13c0 9-8 16-15 20C11 38 3 31 3 22V9Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M18 8v25m-7-9h14m-11 9h8m-8-18 4-7 4 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><span>BRACTWO<small>KRAIN</small></span></a>
         <nav class="landing-nav" aria-label="O grze">
-          <a href="#swiat">Świat</a><a href="#klasy">Klasy</a><a href="#pytania">Pytania</a><a class="landing-nav-play" href="#wejscie">Zagraj <span aria-hidden="true">↗</span></a>
+          <a href="#swiat">Świat</a><a href="#klasy">Klasy</a><a href="#poradniki">Poradniki</a><a class="landing-nav-play" href="#wejscie">Zagraj <span aria-hidden="true">↗</span></a>
         </nav>
       </header>
       <div id="poczatek" class="landing-hero">
         <section class="landing-intro" aria-labelledby="landing-title">
           <p class="landing-kicker"><span aria-hidden="true"></span> OTWARTY ŚWIAT · WSPÓLNA PRZYGODA</p>
-          <h1 id="landing-title">Bractwo <em>Krain</em></h1>
-          <p class="landing-subtitle">Polska gra RPG online w przeglądarce</p>
+          <h1 id="landing-title">Bractwo <em>Krain</em><span class="landing-title-detail">Polskie MMORPG z mechaniką D&amp;D</span></h1>
+          <p class="landing-subtitle">Gra w przeglądarce z magią Dungeons &amp; Dragons</p>
           <p class="landing-lead">Za murami osady zaczyna się twoja historia. Wyrusz przez lasy i archipelagi, zejdź do zapomnianych krypt i rozwijaj bohatera w świecie dzielonym z innymi graczami.</p>
           <a class="landing-cta" href="#wejscie">Rozpocznij przygodę <span aria-hidden="true">↗</span></a>
           <p class="landing-platforms">Na komputerze i telefonie <span aria-hidden="true">·</span> Bez pobierania gry</p>
@@ -66,6 +64,7 @@
           <p id="googleAccountHint" class="google-help"></p>
           <div id="googleCharacterActions" class="google-character-actions">
             <button id="googleNewCharacter" class="google-secondary" type="button">Stwórz nową postać</button>
+            <a class="landing-text-link" href="#komentarze">Przejdź do komentarzy graczy ↗</a>
           </div>
           <form id="googleProfile" hidden>
             <h3 id="googleProfileTitle">Nowa postać</h3>
@@ -97,10 +96,10 @@
             <figcaption><span class="landing-caption-dot" aria-hidden="true"></span> KADR Z GRY <span>Bractwo Krain</span></figcaption>
           </figure>
           <div class="landing-world-copy">
-            <h2 id="landing-world-title">Wybierz drogę.<br>Odkryj, dokąd prowadzi.</h2>
+            <h2 id="landing-world-title">Otwarty świat fantasy.<br>Wspólne wyprawy i podziemia.</h2>
             <p>Kontynent i otaczające go wyspy tworzą autorski świat fantasy. Przemierzaj lasy, pustynie i przełęcze. Korzystaj z przepraw łodziami i szukaj wejść do podziemi.</p>
             <p>W jaskiniach i rozległych kryptach czekają potwory, bossowie oraz rzadkie łupy. Zdobyte wyposażenie, atuty i nowe zdolności zmieniają sposób, w jaki walczy twoja postać.</p>
-            <a class="landing-text-link" href="#klasy">Znajdź swoją klasę <span aria-hidden="true">↓</span></a>
+            <a class="landing-text-link" href="/poradniki/swiat-i-wyprawy">Poznaj świat i zasady wypraw <span aria-hidden="true">↗</span></a>
           </div>
         </div>
         <div class="landing-features">
@@ -111,21 +110,107 @@
       </section>
       <section id="klasy" class="landing-section landing-classes" aria-labelledby="landing-classes-title">
         <div class="landing-section-label"><span>02 / BOHATEROWIE</span><span class="landing-section-rule" aria-hidden="true"></span><span>CZTERY DROGI ROZWOJU</span></div>
-        <div class="landing-section-heading"><h2 id="landing-classes-title">Kim staniesz się w krainach?</h2><p>Oręż, celny strzał, magia czy siła natury.<br>Wybierz klasę i rozwijaj jej możliwości.</p></div>
+        <div class="landing-section-heading"><h2 id="landing-classes-title">Cztery klasy postaci</h2><p>Oręż, celny strzał, magia czy siła natury.<br>Wybierz klasę i rozwijaj jej możliwości.</p></div>
         <div class="landing-class-grid">
           <article class="landing-class"><img src="/assets/feats/martial_weapons.svg" width="58" height="58" loading="lazy" alt=""><p class="landing-class-role">ORĘŻ I WYTRZYMAŁOŚĆ</p><h3>Rycerz</h3><p>Wojownik pierwszej linii. Korzysta ze stylów walki i dodatkowych ataków. Po promocji może zostać Mistrzem Bitewnym lub Czempionem.</p></article>
           <article class="landing-class"><img src="/assets/equipment/bow.svg" width="58" height="58" loading="lazy" alt=""><p class="landing-class-role">ŁUK I TROPIENIE</p><h3>Łowca</h3><p>Łączy walkę na dystans z czarami. Z czasem przywołuje wilczego towarzysza, a po promocji wybiera technikę łowiecką.</p></article>
           <article class="landing-class"><img src="/assets/feats/wizard_evocation.svg" width="58" height="58" loading="lazy" alt=""><p class="landing-class-role">WIEDZA I ŻYWIOŁY</p><h3>Czarodziej</h3><p>Włada sztuczkami i czarami kolejnych kręgów. Po promocji wybiera szkołę magii, która nadaje kierunek jego rozwojowi.</p></article>
           <article class="landing-class"><img src="/assets/equipment/nature_staff.svg" width="58" height="58" loading="lazy" alt=""><p class="landing-class-role">NATURA I PRZEMIANY</p><h3>Druid</h3><p>Czerpie moc z natury, wspiera towarzyszy i przybiera zwierzęce postacie. Po promocji wybiera własny krąg.</p></article>
         </div>
+        <a class="landing-text-link" href="/poradniki/klasy-postaci">Porównaj klasy i ich rozwój <span aria-hidden="true">↗</span></a>
+      </section>
+      <section id="mechanika-dnd" class="landing-section landing-dnd" aria-labelledby="landing-dnd-title">
+        <p class="landing-kicker">KOŚCI, ATUTY I MAGIA</p>
+        <div class="landing-section-heading"><h2 id="landing-dnd-title">Dungeons &amp; Dragons (D&amp;D) w Bractwie Krain</h2><p>Znane zasady przy stole.<br>Nowe przygody we wspólnym świecie online.</p></div>
+        <p class="landing-dnd-lead">Bractwo Krain to polskie MMORPG z autorską adaptacją wybranych zasad Dungeons &amp; Dragons. Ta gra w przeglądarce łączy rozwój bohatera i wspólne wyprawy z walką opartą na rzutach kośćmi.</p>
+        <div class="landing-guide-grid">
+          <article><h3>Rzuty k20 i zasady walki</h3><p>Ataki rozstrzygają rzuty k20 oraz klasa pancerza przeciwnika. Rzuty obronne pomagają oprzeć się zaklęciom, a trafienia krytyczne zwiększają obrażenia.</p></article>
+          <article><h3>Atuty i rozwój postaci</h3><p>Dobieraj atuty, rozwijaj zdolności swojej klasy i dopasowuj ekwipunek do stylu gry. Kolejne wybory pozwalają specjalizować bohatera.</p></article>
+          <article><h3>Kręgi czarów D&amp;D</h3><p>Odkrywaj sztuczki i zaklęcia kolejnych kręgów. Magia opiera się na zasadach D&amp;D: korzysta z rzutów na trafienie, rzutów obronnych oraz koncentracji, zależnie od czaru.</p></article>
+        </div>
+        <p class="landing-dnd-note">Adaptacja korzysta z zasad SRD 5.2.1. Mana, tempo walki i wybrane efekty czarów zostały dostosowane do rozgrywki online.</p>
       </section>
       <section class="landing-start landing-section" aria-labelledby="landing-start-title">
         <div><p class="landing-kicker">PIERWSZY KROK</p><h2 id="landing-start-title">Od konta do przygody.</h2><a class="landing-text-link" href="#wejscie">Przejdź do logowania <span aria-hidden="true">↗</span></a></div>
         <ol class="landing-steps"><li><span>01</span><div><h3>Zaloguj się przez Google</h3><p>Jedno konto pozwala utworzyć maksymalnie 4 postacie.</p></div></li><li><span>02</span><div><h3>Wybierz imię i klasę</h3><p>Każda postać ma własny rozwój i wyposażenie. Wybór klasy jest stały.</p></div></li><li><span>03</span><div><h3>Wyrusz z osady</h3><p>Poznaj mieszkańców, przyjmij pierwsze zadanie i odkrywaj świat w swoim tempie.</p></div></li></ol>
       </section>
+      <section id="poradniki" class="landing-section landing-guides" aria-labelledby="landing-guides-title">
+        <div class="landing-section-label"><span>03 / PORADNIKI</span><span class="landing-section-rule" aria-hidden="true"></span><span>PRZYGOTUJ SIĘ DO WYPRAWY</span></div>
+        <div class="landing-section-heading"><h2 id="landing-guides-title">Poznaj Bractwo Krain</h2><p>Praktyczne wskazówki przed pierwszym logowaniem<br>i przed kolejną wyprawą.</p></div>
+        <div class="landing-guide-grid">
+          <article><h3><a href="/poradniki/jak-zaczac">Jak zacząć grać?</a></h3><p>Załóż postać, poznaj sterowanie na komputerze i telefonie oraz przygotuj się do pierwszych zadań.</p><a class="landing-text-link" href="/poradniki/jak-zaczac">Przewodnik dla początkujących <span aria-hidden="true">↗</span></a></article>
+          <article><h3><a href="/poradniki/klasy-postaci">Jaką klasę wybrać?</a></h3><p>Sprawdź, jak walczą rycerz, łowca, czarodziej i druid oraz jakie możliwości otwiera promocja profesji.</p><a class="landing-text-link" href="/poradniki/klasy-postaci">Porównanie klas postaci <span aria-hidden="true">↗</span></a></article>
+          <article><h3><a href="/poradniki/swiat-i-wyprawy">Jak odkrywać świat?</a></h3><p>Dowiedz się, jak korzystać z Atlasu, podróżować łodzią, tworzyć drużynę i przygotować się do walki.</p><a class="landing-text-link" href="/poradniki/swiat-i-wyprawy">Świat, drużyny i wyprawy <span aria-hidden="true">↗</span></a></article>
+        </div>
+      </section>
+      <section id="galeria" class="landing-gallery landing-section" aria-labelledby="landing-gallery-title">
+        <div class="landing-section-label"><span>04 / GALERIA</span><span class="landing-section-rule" aria-hidden="true"></span><span>KADRY Z ROZGRYWKI</span></div>
+        <div class="landing-section-heading"><h2 id="landing-gallery-title">Zobacz świat Bractwa Krain</h2><p>Walka, podróże i chwile odpoczynku.<br>Wybierz kadr, aby obejrzeć go w pełnym rozmiarze.</p></div>
+        <div class="landing-gallery-grid">
+          <figure class="landing-gallery-card">
+            <a href="/assets/screenshots/bractwo-krain-zlote-wybrzeze.png" aria-label="Powiększ: błyskawica na Złotym Wybrzeżu">
+              <img src="/assets/screenshots/bractwo-krain-zlote-wybrzeze-960.webp" srcset="/assets/screenshots/bractwo-krain-zlote-wybrzeze-640.webp 640w, /assets/screenshots/bractwo-krain-zlote-wybrzeze-960.webp 960w" sizes="(max-width: 760px) calc(100vw - 48px), (max-width: 1000px) calc((100vw - 84px) / 2), (max-width: 1240px) calc((100vw - 112px) / 2), 564px" width="960" height="540" loading="lazy" decoding="async" alt="Czarodziej razi błyskawicą minotaura i skorpiona na pustyni Złotego Wybrzeża w polskim MMORPG Bractwo Krain.">
+            </a>
+            <figcaption><strong>Błyskawica na Złotym Wybrzeżu</strong><span>Walka z potworami pośród pustynnych skał.</span></figcaption>
+          </figure>
+          <figure class="landing-gallery-card">
+            <a href="/assets/screenshots/bractwo-krain-marchie-przystani.png" aria-label="Powiększ: most w Marchiach Przystani">
+              <img src="/assets/screenshots/bractwo-krain-marchie-przystani-960.webp" srcset="/assets/screenshots/bractwo-krain-marchie-przystani-640.webp 640w, /assets/screenshots/bractwo-krain-marchie-przystani-960.webp 960w" sizes="(max-width: 760px) calc(100vw - 48px), (max-width: 1000px) calc((100vw - 84px) / 2), (max-width: 1240px) calc((100vw - 112px) / 2), 564px" width="960" height="540" loading="lazy" decoding="async" alt="Czarodziej na drewnianym moście nad rzeką, obok przystani z łodzią — Bractwo Krain, gra w przeglądarce.">
+            </a>
+            <figcaption><strong>Most w Marchiach Przystani</strong><span>Rzeczna przeprawa, przystań i szlaki prowadzące dalej.</span></figcaption>
+          </figure>
+          <figure class="landing-gallery-card">
+            <a href="/assets/screenshots/bractwo-krain-rozdarcie-demonow.png" aria-label="Powiększ: odpoczynek w Przystani Cieni">
+              <img src="/assets/screenshots/bractwo-krain-rozdarcie-demonow-960.webp" srcset="/assets/screenshots/bractwo-krain-rozdarcie-demonow-640.webp 640w, /assets/screenshots/bractwo-krain-rozdarcie-demonow-960.webp 960w" sizes="(max-width: 760px) calc(100vw - 48px), (max-width: 1000px) calc((100vw - 84px) / 2), (max-width: 1240px) calc((100vw - 112px) / 2), 564px" width="960" height="540" loading="lazy" decoding="async" alt="Druid odpoczywa w niebieskim kręgu przy kamieniu przypisania i kupcu w Przystani Cieni w Bractwie Krain.">
+            </a>
+            <figcaption><strong>Odpoczynek w Przystani Cieni</strong><span>Bezpieczna osada w krainie Rozdarcia Demonów.</span></figcaption>
+          </figure>
+          <figure class="landing-gallery-card">
+            <a href="/assets/screenshots/bractwo-krain-magiczny-pocisk.png" aria-label="Powiększ: magiczny pocisk przy ruinach">
+              <img src="/assets/screenshots/bractwo-krain-magiczny-pocisk-960.webp" srcset="/assets/screenshots/bractwo-krain-magiczny-pocisk-640.webp 640w, /assets/screenshots/bractwo-krain-magiczny-pocisk-960.webp 960w" sizes="(max-width: 760px) calc(100vw - 48px), (max-width: 1000px) calc((100vw - 84px) / 2), (max-width: 1240px) calc((100vw - 112px) / 2), 564px" width="960" height="540" loading="lazy" decoding="async" alt="Fioletowe magiczne pociski czarodzieja przelatują obok kamiennych ruin i nieumarłych w Marchiach Przystani.">
+            </a>
+            <figcaption><strong>Magiczny pocisk przy ruinach</strong><span>Czarodziej w starciu z mieszkańcami zapomnianej twierdzy.</span></figcaption>
+          </figure>
+          <figure class="landing-gallery-card">
+            <a href="/assets/screenshots/bractwo-krain-mmorpg-otwarty-swiat.png" aria-label="Powiększ: zielone szlaki Złotego Wybrzeża">
+              <img src="/assets/screenshots/bractwo-krain-mmorpg-otwarty-swiat-960.webp" srcset="/assets/screenshots/bractwo-krain-mmorpg-otwarty-swiat-640.webp 640w, /assets/screenshots/bractwo-krain-mmorpg-otwarty-swiat-960.webp 960w" sizes="(max-width: 760px) calc(100vw - 48px), (max-width: 1000px) calc((100vw - 84px) / 2), (max-width: 1240px) calc((100vw - 112px) / 2), 564px" width="960" height="540" loading="lazy" decoding="async" alt="Czarodziej na kwiecistej łące przy szlaku i zabudowaniach Złotego Wybrzeża — otwarty świat polskiego MMORPG.">
+            </a>
+            <figcaption><strong>Zielone szlaki Złotego Wybrzeża</strong><span>Spokojna podróż między osadami otwartego świata.</span></figcaption>
+          </figure>
+          <figure class="landing-gallery-card">
+            <a href="/assets/screenshots/bractwo-krain-druid-rozdarcie-demonow.png" aria-label="Powiększ: druid w Rozdarciu Demonów">
+              <img src="/assets/screenshots/bractwo-krain-druid-rozdarcie-demonow-960.webp" srcset="/assets/screenshots/bractwo-krain-druid-rozdarcie-demonow-640.webp 640w, /assets/screenshots/bractwo-krain-druid-rozdarcie-demonow-960.webp 960w" sizes="(max-width: 760px) calc(100vw - 48px), (max-width: 1000px) calc((100vw - 84px) / 2), (max-width: 1240px) calc((100vw - 112px) / 2), 564px" width="960" height="540" loading="lazy" decoding="async" alt="Druid z laską i tarczą przemierza popieliste Rozdarcie Demonów obok fioletowych formacji skalnych w Bractwie Krain.">
+            </a>
+            <figcaption><strong>Druid w Rozdarciu Demonów</strong><span>Wyprawa wśród skał i popielistych bezdroży.</span></figcaption>
+          </figure>
+        </div>
+      </section>
+      <section id="komentarze" class="landing-comments" aria-labelledby="comments-title">
+        <div class="comments-intro">
+          <p class="landing-kicker">GŁOSY Z KRAIN</p>
+          <h2 id="comments-title">Komentarze graczy</h2>
+          <p>Podziel się wrażeniami z wyprawy, napisz, co lubisz, lub zaproponuj zmianę. Komentarze są publiczne i podpisane imieniem twojej postaci.</p>
+        </div>
+        <p id="commentsLoginPrompt"><a class="comments-link" href="#wejscie">Zaloguj się, aby dodać komentarz.</a> Czytać możesz bez logowania.</p>
+        <p id="commentsNoCharacter" hidden>Utwórz postać w <a class="comments-link" href="#wejscie">panelu logowania</a>, aby podpisać swój komentarz.</p>
+        <form id="commentForm" class="comment-form" hidden>
+          <label for="commentCharacter">Podpisz jako</label>
+          <select id="commentCharacter" name="character_id" required></select>
+          <label for="commentBody">Twój komentarz</label>
+          <textarea id="commentBody" name="body" rows="5" minlength="3" maxlength="1000" required aria-describedby="commentRules commentCount" placeholder="Jak podoba ci się Bractwo Krain?"></textarea>
+          <output id="commentCount" class="comment-count" for="commentBody">0 / 1000</output>
+          <p id="commentRules" class="comments-hint">Od 3 do 1000 znaków. Pisz bez wulgaryzmów i z szacunkiem do innych. Wpisy z rozpoznanymi wulgaryzmami nie zostaną opublikowane.</p>
+          <button id="commentSubmit" type="submit">Dodaj komentarz</button>
+        </form>
+        <div class="comments-tools"><button id="commentsRefresh" type="button">Odśwież komentarze</button><button id="commentsLogout" type="button" hidden>Wyloguj</button></div>
+        <p id="commentsStatus" role="status" aria-live="polite"></p>
+        <ol id="commentsList" class="comments-list" aria-label="Komentarze, od najnowszych"><!-- COMMENTS_LIST --></ol>
+        <button id="commentsMore" type="button" hidden>Pokaż starsze komentarze</button>
+        <noscript><p>Do dodawania komentarzy i wczytywania starszych wpisów włącz JavaScript.</p></noscript>
+      </section>
       <div class="landing-bottom-grid landing-section">
         <section id="pytania" class="landing-faq" aria-labelledby="landing-faq-title">
-          <p class="landing-kicker">ZANIM WYRUSZYSZ</p><h2 id="landing-faq-title">Dobrze wiedzieć.</h2>
+          <p class="landing-kicker">ZANIM WYRUSZYSZ</p><h2 id="landing-faq-title">Pytania o grę</h2>
           <details><summary>Czy muszę pobierać grę?</summary><p>Nie. Bractwo Krain działa w przeglądarce internetowej na komputerze i telefonie. Do rozgrywki potrzebujesz połączenia z internetem oraz włączonego JavaScript.</p></details>
           <details><summary>Jak rozpocząć grę i ile mogę mieć postaci?</summary><p>Zaloguj się przez Google w panelu na tej stronie. Następnie wybierz istniejącą postać albo utwórz nową, nadając jej imię i wybierając klasę. Na koncie możesz mieć maksymalnie 4 postacie.</p></details>
           <details><summary>Czy mogę grać ze znajomymi?</summary><p>Tak. Gracze dzielą wspólny świat i mogą tworzyć drużyny do 4 osób. Wspólne wyprawy pozwalają walczyć z potworami i zdobywać łupy. Dostępna jest również walka PvP z ochroną osad i postaci na niskich poziomach.</p></details>
@@ -133,7 +218,7 @@
         </section>
         <section class="ranking-card landing-ranking" aria-labelledby="landing-ranking-title"><div class="landing-ranking-top"><p class="landing-kicker">Z KRONIK ŚWIATA</p><h2 id="landing-ranking-title">Bohaterowie krain</h2><div class="ranking-heading">RANKING GRACZY <small>TOP 20 · poziom / PD</small></div></div><div id="rankingList" class="ranking-list">Ranking graczy pojawi się po połączeniu z serwerem.</div></section>
       </div>
-      <footer class="landing-footer"><span>Bractwo Krain <span aria-hidden="true">·</span> Autorski świat fantasy</span><a href="#poczatek">Wróć na początek <span aria-hidden="true">↑</span></a></footer>
+      <footer class="landing-footer"><span>Bractwo Krain <span aria-hidden="true">·</span> Autorski świat fantasy</span><a href="#galeria">Galeria</a><a href="#komentarze">Komentarze</a><a href="#poczatek">Wróć na początek <span aria-hidden="true">↑</span></a></footer>
     </div>
   </main>
 
@@ -199,35 +284,36 @@
     <div id="deathPanel" class="death-panel" hidden><div>✦</div><h2>Podróż jeszcze się nie kończy.</h2><p id="deathText">Powrót do osady…</p><p>Część złota i postępu poziomu została utracona.</p></div>
     <div id="disconnectPanel" class="disconnect-panel" hidden><h2>Utracono połączenie</h2><p>Postęp jest zapisywany. Jeśli trwa walka PvP, postać pozostaje w świecie do wygaśnięcia blokady walki.</p><button id="reconnectButton" class="primary">Wróć do logowania</button></div>
     <div id="legacyClassPanel" class="modal-panel" hidden><div class="eyebrow">POSTAĆ Z WCZEŚNIEJSZEJ WERSJI</div><h2>Wybierz swoją drogę.</h2><p>Poziom i złoto zostają. Klasę możesz wybrać raz, w bezpiecznej osadzie.</p><div id="legacyChoices" class="class-picker"></div><button id="closeLegacy" class="text-button">Wybiorę później</button></div>
-    <div id="helpPanel" class="help-panel" hidden><button id="closeHelp" class="close-button" aria-label="Zamknij pomoc">×</button><div class="eyebrow">PRZEWODNIK POGRANICZA</div><h2>Kości, kręgi i towarzysze.</h2><p>Ruch jest ciągły. Jedna runda trwa 3 sekundy. Kliknij potwora, aby go zaznaczyć. Spacja lub przycisk Atakuj uruchamia atak. Esc usuwa cel i zatrzymuje autoatak. Poza aktywnym oknem autoatak jest wstrzymany.</p><dl><dt>Ruch</dt><dd>WASD / strzałki / joystick</dd><dt>Atak bez celu</dt><dd>Spacja / Atakuj — najbliższy potwór w zasięgu</dd><dt>Czary i przypisanie</dt><dd>1–0, −, = i F1–F12 — bieżąca strona paska · Page Up / Page Down — strony · K — zakładka Czary</dd><dt>Najczęściej używany czar</dt><dd>F — wybór z ostatnich 100 udanych użyć</dd><dt>Karta postaci</dt><dd>C / przycisk w prawym górnym rogu · I — ekwipunek · U — umiejętności</dd><dt>Mikstura zdrowia</dt><dd>Q — mikstura przypisana w plecaku</dd><dt>Odpoczynek</dt><dd>R — krótki odpoczynek · Shift+R — długi · ponowne użycie przerywa</dd><dt>Rozmowa / ekwipunek</dt><dd>E / I</dd><dt>Dziennik / gracze / minimapa / Atlas</dt><dd>J / P / M / N; Atlas otwiera się także po kliknięciu minimapy.</dd><dt>Czat / pomoc / usuń cel</dt><dd>Enter / H / Esc</dd></dl><p>Atak: k20 + premia przeciw KP. Naturalna 1 zawsze pudłuje; 20 daje krytyk — podwaja kości, nie stały modyfikator. Obrażenia są naprawdę losowane, np. 1k8+3. Rzuty obronne i ich skutki zależą od czaru. Czar wpisany podczas odnowienia głównej akcji jest kolejny w kolejce przed autoatakiem. Akcje dodatkowe i reakcja Tarcza mają osobne odnowienia.</p><p>Czarodziej i druid: I krąg od poziomu 1, II od 10, III od 20 i kolejne co 10, aż do IX na 80. Łowca: kręgi I–V na 1/20/40/60/80. Sztuczki kosztują 0 many. Łowca wzywa wilka od 10.; druid zmienia się w wilka i kota od 5., czarnego niedźwiedzia od 15. i brunatnego od 35. Krąg Księżyca może w przemianie rzucać swoje dodatkowe czary; pozostałe czary są wtedy niedostępne. Ponowne użycie przemiany przywraca ludzką postać. Koncentracja pozwala utrzymać jeden taki efekt; otrzymanie obrażeń wymaga obrony KON.</p><p>Długonogi: 600 rund, bez koncentracji; atak go nie przerywa. 600 rund D&amp;D to godzina; w tempie Bractwa 3 s/rundę oznacza to 30 min czasu rzeczywistego. Efekty i ich liczniki widzisz u góry ekranu; dotknij efektu, by odczytać opis.</p><p>Mana odpowiada ważonej puli komórek: na starcie 40 many, I krąg kosztuje 20, więc wystarcza na dwa czary. Mana nie odnawia się samoczynnie. Długi odpoczynek przywraca ją w całości; wybrane zdolności odzyskiwania działają po krótkim odpoczynku. Wszystkie odblokowane czary automatycznie trafiają na kolejne strony paska.</p><p>To adaptacja SRD 5.2.1: mana, 3-sekundowe rundy, progi poziomów i skrócone czasy są zasadami Bractwa Krain. Ofensywne czary i wilk walczą z potworami oraz graczami po odblokowaniu PvP, z zachowaniem ochrony osad i niskich poziomów. Leczenie innych graczy wymaga wspólnej drużyny; wsparcie walczącego w PvP sojusznika wymaga odblokowania PvP i włącza leczącego do walki. Wyciszenie wskazówki sterowania krzyżykiem zapamiętuje się na tym urządzeniu.</p><div class="section-label">PvP Z KONSEKWENCJAMI</div><p id="pvpHelp">Osada i postacie poniżej 8. poziomu są chronione. Aby zaatakować gracza, wyłącz blokadę PvP i wybierz go kliknięciem w świecie lub na liście graczy. Biała czaszka oznacza agresora. Trzy nieuzasadnione zabójstwa w 24 godziny dają czerwoną czaszkę na 24 godziny. Walka blokuje wejście do osady i bezpieczne wylogowanie przez 20 sekund.</p><p id="deathHelp">Śmierć: −5% złota i −10% postępu bieżącego poziomu. Z czerwoną czaszką: −20% złota, −20% postępu i utrata jednego niezałożonego przedmiotu. Bez utraty poziomu. Za zabicie gracza nie ma doświadczenia.</p><p><b>Śledzenie zadań:</b> w Dzienniku (J) naciśnij Śledź zadanie przy wybranym zleceniu. Kierunek zmienia się wraz z postępem, a po wykonaniu prowadzi po nagrodę. Przycisk Śledzone · wyłącz kończy śledzenie. Kliknięcie panelu zadania otwiera jego wpis w dzienniku.</p><p><b>Odpoczynek:</b> wybierz przycisk przy pasku czarów, a na telefonie nad przyciskiem Rozmawiaj. Przycisk otwiera krótki wybór. R rozpoczyna krótki odpoczynek (10 s): leczenie z kości zdrowia, część użyć zdolności i dostępne odzyskanie many. Shift+R rozpoczyna długi odpoczynek (30 s), także poza miastem: całe HP, mana i zasoby. Po ukończeniu krótki odnawia się przez 15 s, a długi przez 60 s. Czasy odnowienia pozostają po ponownym zalogowaniu. Możesz zacząć 3 s po ostatnim starciu z potworem; blokada PvP trwa nadal 20 s. Postęp jest nad postacią, która medytuje w niebieskim kręgu z kroplami many. Ruch, walka lub ponowne naciśnięcie Odpoczynek przerywają regenerację. Punkty odzyskujesz po ukończeniu. Przerwanie nie uruchamia cooldownu. Sposób odnawiania poszczególnych zdolności znajdziesz w ich opisach i zakładce Atuty. Mikstury many zostały usunięte; jedyny slot mikstury zdrowia ma skrót Q.</p><p><b>Czary kręgów:</b> wariant, postać i umiejętność wybierzesz w zakładce Czary. Kliknięcie wolnego miejsca w świecie ustawia niebieski cel obszaru; kliknięcie drzewa wskazuje cel Wędrówki drzew. Esc usuwa wskazanie. Krąg druida wybierzesz od poziomu 10 w zakładce Atuty.</p><p><b>Pełny ekran i aplikacja:</b> przycisk ⛶ przełącza pełny ekran. Na telefonie jest obok mapy, a na komputerze w górnym menu. „Zainstaluj grę” pozwala otwierać Bractwo Krain z własnej ikony. Rozgrywka wymaga internetu.</p><p><b>Odrodzenie:</b> użyj kamienia przypisania w wybranym mieście i potwierdź przypisanie. Wejście do miasta ani rejs nie zmienia tego wyboru. Przystanie przy łodziach są strefami bezpiecznymi; blokada walki PvP nadal zabrania wejścia do strefy ochrony.</p><div class="help-footer">Blokada PvP zapobiega twoim atakom. Poza strefą ochrony nie zapewnia nietykalności.</div></div>
+    <div id="helpPanel" class="help-panel" hidden><button id="closeHelp" class="close-button" aria-label="Zamknij pomoc">×</button><div class="eyebrow">PRZEWODNIK POGRANICZA</div><h2>Kości, kręgi i towarzysze.</h2><p>Ruch jest ciągły. Jedna runda trwa 3 sekundy. Kliknij potwora, aby go zaznaczyć. Spacja lub przycisk Atakuj uruchamia atak. Esc usuwa cel i zatrzymuje autoatak. Poza aktywnym oknem autoatak jest wstrzymany.</p><dl><dt>Ruch</dt><dd>WASD / strzałki / joystick</dd><dt>Atak bez celu</dt><dd>Spacja / Atakuj — najbliższy potwór w zasięgu</dd><dt>Czary i przypisanie</dt><dd>1–0, −, = i F1–F12 — bieżąca strona paska · Page Up / Page Down — strony · K — zakładka Czary</dd><dt>Najczęściej używany czar</dt><dd>F — wybór z ostatnich 100 udanych użyć</dd><dt>Karta postaci</dt><dd>C / przycisk w prawym górnym rogu · I — ekwipunek · U — umiejętności</dd><dt>Mikstura zdrowia</dt><dd>Q — mikstura przypisana w plecaku</dd><dt>Odpoczynek</dt><dd>R — krótki odpoczynek · Shift+R — długi · ponowne użycie przerywa</dd><dt>Rozmowa / ekwipunek</dt><dd>E / I</dd><dt>Dziennik / gracze / minimapa / Atlas</dt><dd>J / P / M / N; Atlas otwiera się także po kliknięciu minimapy.</dd><dt>Czat / pomoc / usuń cel</dt><dd>Enter / H / Esc</dd></dl><p>Atak: k20 + premia przeciw KP. Naturalna 1 zawsze pudłuje; 20 daje krytyk — podwaja kości, nie stały modyfikator. Obrażenia są naprawdę losowane, np. 1k8+3. Rzuty obronne i ich skutki zależą od czaru. Czar wpisany podczas odnowienia głównej akcji jest kolejny w kolejce przed autoatakiem. Akcje dodatkowe i reakcja Tarcza mają osobne odnowienia.</p><p>Czarodziej i druid: I krąg od poziomu 1, II od 10, III od 20 i kolejne co 10, aż do IX na 80. Łowca: kręgi I–V na 1/20/40/60/80. Sztuczki kosztują 0 many. Łowca wzywa wilka od 10.; druid zmienia się w wilka i kota od 5., czarnego niedźwiedzia od 15. i brunatnego od 35. Krąg Księżyca może w przemianie rzucać swoje dodatkowe czary; pozostałe czary są wtedy niedostępne. Ponowne użycie przemiany przywraca ludzką postać. Koncentracja pozwala utrzymać jeden taki efekt; otrzymanie obrażeń wymaga obrony KON.</p><p>Długonogi: 600 rund, bez koncentracji; atak go nie przerywa. 600 rund D&amp;D to godzina; w tempie Bractwa 3 s/rundę oznacza to 30 min czasu rzeczywistego. Efekty i ich liczniki widzisz u góry ekranu; dotknij efektu, by odczytać opis.</p><p>Mana odpowiada ważonej puli komórek: na starcie 40 many, I krąg kosztuje 20, więc wystarcza na dwa czary. Mana nie odnawia się samoczynnie. Długi odpoczynek przywraca ją w całości; wybrane zdolności odzyskiwania działają po krótkim odpoczynku. Wszystkie odblokowane czary automatycznie trafiają na kolejne strony paska.</p><p>To adaptacja SRD 5.2.1: mana, 3-sekundowe rundy, progi poziomów i skrócone czasy są zasadami Bractwa Krain. Ofensywne czary i wilk walczą z potworami oraz graczami po odblokowaniu PvP, z zachowaniem ochrony osad i niskich poziomów. Leczenie innych graczy wymaga wspólnej drużyny; wsparcie walczącego w PvP sojusznika wymaga odblokowania PvP i włącza leczącego do walki. Wyciszenie wskazówki sterowania krzyżykiem zapamiętuje się na tym urządzeniu.</p><div class="section-label">PvP Z KONSEKWENCJAMI</div><p id="pvpHelp">Osada i postacie poniżej 8. poziomu są chronione. Aby zaatakować gracza, wyłącz blokadę PvP i wybierz go kliknięciem w świecie lub na liście graczy. Biała czaszka oznacza agresora. Trzy nieuzasadnione zabójstwa w 24 godziny dają czerwoną czaszkę na 24 godziny. Walka blokuje wejście do osady i bezpieczne wylogowanie przez 20 sekund.</p><p id="deathHelp">Śmierć: −5% złota i −10% postępu bieżącego poziomu. Z czerwoną czaszką: −20% złota, −20% postępu i utrata jednego niezałożonego przedmiotu. Bez utraty poziomu. Za zabicie gracza nie ma doświadczenia.</p><p><b>Śledzenie zadań:</b> w Dzienniku (J) naciśnij Śledź zadanie przy wybranym zleceniu. Kierunek zmienia się wraz z postępem, a po wykonaniu prowadzi po nagrodę. Przycisk Śledzone · wyłącz kończy śledzenie. Kliknięcie panelu zadania otwiera jego wpis w dzienniku.</p><p><b>Odpoczynek:</b> wybierz przycisk przy pasku czarów, a na telefonie nad przyciskiem Rozmawiaj. Przycisk otwiera krótki wybór. R rozpoczyna krótki odpoczynek (10 s): leczenie z kości zdrowia, część użyć zdolności i dostępne odzyskanie many. Shift+R rozpoczyna długi odpoczynek (30 s), także poza miastem: całe HP, mana i zasoby. Po ukończeniu krótki odnawia się przez 15 s, a długi przez 60 s. Czasy odnowienia pozostają po ponownym zalogowaniu. Możesz zacząć 3 s po ostatnim starciu z potworem; blokada PvP trwa nadal 20 s. Postęp jest nad postacią, która medytuje w niebieskim kręgu z kroplami many. Ruch, walka lub ponowne naciśnięcie Odpoczynek przerywają regenerację. Punkty odzyskujesz po ukończeniu. Przerwanie nie uruchamia cooldownu. Sposób odnawiania poszczególnych zdolności znajdziesz w ich opisach i zakładce Atuty. Mikstury many zostały usunięte; jedyny slot mikstury zdrowia ma skrót Q.</p><p><b>Czary kręgów:</b> wariant, postać i umiejętność wybierzesz w zakładce Czary. Kliknięcie wolnego miejsca w świecie ustawia niebieski cel obszaru; kliknięcie drzewa wskazuje cel Wędrówki drzew. Esc usuwa wskazanie. Krąg druida wybierzesz od poziomu 10 w zakładce Atuty.</p><p><b>Pełny ekran i aplikacja:</b> przycisk ⛶ przełącza pełny ekran. Na telefonie jest obok mapy, a na komputerze w górnym menu. „Zainstaluj grę” pozwala otwierać Bractwo Krain z własnej ikony. Rozgrywka wymaga internetu.</p><p><b>Odrodzenie:</b> użyj kamienia przypisania w wybranym mieście i potwierdź przypisanie. Wejście do miasta ani rejs nie zmienia tego wyboru. Przystanie przy łodziach są strefami bezpiecznymi; blokada walki PvP nadal zabrania wejścia do strefy ochrony.</p><p><a href="/#komentarze" target="_blank" rel="noopener">Komentarze graczy — otwórz stronę gry w nowej karcie ↗</a></p><div class="help-footer">Blokada PvP zapobiega twoim atakom. Poza strefą ochrony nie zapewnia nietykalności.</div></div>
   </section>
-  <script src="runtime.js"></script>
-  <script src="world_geometry.js"></script>
-  <script src="atlas_map.js"></script>
-  <script src="spell_vfx.js"></script>
-  <script src="inventory_ui.js"></script>
-  <script src="fighter_ui.js"></script>
-  <script src="fighter_vfx.js"></script>
-  <script src="caster_ui.js"></script>
-  <script src="caster_vfx.js"></script>
-  <script src="circle_spell_ui.js"></script>
-  <script src="circle_vfx.js"></script>
-  <script src="martial_ui.js"></script>
-  <script src="skills_ui.js"></script>
-  <script src="character_sheet.js"></script>
-  <script src="level_up.js"></script>
-  <script src="loot_ui.js"></script>
-  <script src="mobile.js"></script>
-  <script src="windows.js"></script>
-  <script src="rest_ui.js"></script>
-  <script src="app_shell.js"></script>
-  <script src="hotbar_ui.js"></script>
-  <script src="adventure_ui.js"></script>
-  <script src="google_auth.js"></script>
-  <script src="wizard_vfx.js"></script>
-<script src="service_ui.js"></script>
-  <script src="hud_icons.js"></script>
-  <script src="terrain_art.js"></script>
-  <script src="game.js"></script>
+  <script defer src="runtime.js"></script>
+  <script defer src="world_geometry.js"></script>
+  <script defer src="atlas_map.js"></script>
+  <script defer src="spell_vfx.js"></script>
+  <script defer src="inventory_ui.js"></script>
+  <script defer src="fighter_ui.js"></script>
+  <script defer src="fighter_vfx.js"></script>
+  <script defer src="caster_ui.js"></script>
+  <script defer src="caster_vfx.js"></script>
+  <script defer src="circle_spell_ui.js"></script>
+  <script defer src="circle_vfx.js"></script>
+  <script defer src="martial_ui.js"></script>
+  <script defer src="skills_ui.js"></script>
+  <script defer src="character_sheet.js"></script>
+  <script defer src="level_up.js"></script>
+  <script defer src="loot_ui.js"></script>
+  <script defer src="mobile.js"></script>
+  <script defer src="windows.js"></script>
+  <script defer src="rest_ui.js"></script>
+  <script defer src="app_shell.js"></script>
+  <script defer src="hotbar_ui.js"></script>
+  <script defer src="adventure_ui.js"></script>
+  <script defer src="google_auth.js"></script>
+  <script defer src="/comments.js"></script>
+  <script defer src="wizard_vfx.js"></script>
+<script defer src="service_ui.js"></script>
+  <script defer src="hud_icons.js"></script>
+  <script defer src="terrain_art.js"></script>
+  <script defer src="game.js"></script>
 </body>
 </html>

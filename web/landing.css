@@ -43,6 +43,10 @@
 #authScreen .landing-kicker > span { width: 6px; height: 6px; display: inline-block; border: 1px solid #d5b776; transform: rotate(45deg); flex: 0 0 auto; }
 #authScreen .landing-intro h1 { font: normal clamp(60px, 6.8vw, 91px)/1.05 Georgia, "Times New Roman", serif; letter-spacing: -3.8px; margin: 24px 0 22px; }
 #authScreen .landing-intro h1 em { display: block; color: var(--landing-gold); font-weight: normal; }
+#authScreen .landing-title-detail { display: block; margin-top: 20px; font: normal clamp(20px, 2.3vw, 27px)/1.4 Georgia, serif; letter-spacing: -.3px; color: var(--landing-ink); }
+#authScreen .landing-dnd .landing-section-heading { margin-top: 16px; }
+#authScreen .landing-dnd-lead { max-width: 800px; margin-bottom: 28px; color: var(--landing-muted); }
+#authScreen .landing-dnd-note { margin-top: 20px; max-width: 800px; color: var(--landing-muted); font-size: 12px; }
 #authScreen .landing-subtitle { font: normal 21px/1.5 Georgia, serif; color: #e4e5d7; }
 #authScreen .landing-lead { max-width: 485px; color: var(--landing-muted); font-size: 15px; line-height: 1.85; margin-top: 16px; }
 #authScreen .landing-cta { display: inline-flex; gap: 30px; align-items: center; justify-content: space-between; background: linear-gradient(130deg, #edcf99, #caa66a); color: #17291e; border: 1px solid #f3d9a2; border-radius: 3px; padding: 12px 21px; margin-top: 29px; font-size: 13px; font-weight: 650; box-shadow: 0 7px 26px #0002; }
@@ -105,6 +109,21 @@
 #authScreen .landing-steps li > span { font: 20px/1.3 Georgia, serif; color: #bca371; }
 #authScreen .landing-steps h3 { font: 600 13px/1.6 system-ui, sans-serif; }
 #authScreen .landing-steps p { font-size: 12px; line-height: 1.7; margin-top: 5px; color: var(--landing-muted); }
+#authScreen .landing-guide-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+#authScreen .landing-guide-grid article { padding: 24px; border: 1px solid var(--landing-line); border-radius: 3px; background: #15261e88; }
+#authScreen .landing-guide-grid h3 a:hover { color: var(--landing-gold); }
+#authScreen .landing-guide-grid p { margin-top: 14px; font-size: 13px; line-height: 1.8; color: var(--landing-muted); }
+#authScreen .landing-guide-grid .landing-text-link { font-size: 12px; }
+#authScreen .landing-classes > .landing-text-link { margin-top: 28px; }
+#authScreen .landing-gallery-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px 24px; }
+#authScreen .landing-gallery-card { min-width: 0; border: 1px solid var(--landing-line); border-radius: 3px; background: #15261e88; }
+#authScreen .landing-gallery-card > a { display: block; margin: 5px; background: #09150f; }
+#authScreen .landing-gallery-card > a:hover { outline: 1px solid var(--landing-gold); }
+#authScreen .landing-gallery-card > a:focus-visible { outline-offset: 3px; }
+#authScreen .landing-gallery-card img { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+#authScreen .landing-gallery-card figcaption { padding: 13px 17px 18px; }
+#authScreen .landing-gallery-card figcaption strong { display: block; color: var(--landing-ink); font: normal 21px/1.35 Georgia, serif; }
+#authScreen .landing-gallery-card figcaption span { display: block; margin-top: 6px; color: var(--landing-muted); font-size: 12px; line-height: 1.7; }
 #authScreen .landing-bottom-grid { display: grid; grid-template-columns: 1.22fr 1fr; gap: 70px; align-items: start; }
 #authScreen .landing-faq h2 { margin: 12px 0 26px; }
 #authScreen .landing-faq details { border-bottom: 1px solid var(--landing-line); padding: 17px 0; }
@@ -168,6 +187,8 @@
   #authScreen .landing-class:nth-child(even) { padding-right: 0; }
   #authScreen .landing-class > img { margin-bottom: 16px; }
   #authScreen .landing-start { grid-template-columns: 1fr; gap: 30px; }
+  #authScreen .landing-guide-grid { grid-template-columns: 1fr; gap: 18px; }
+  #authScreen .landing-gallery-grid { grid-template-columns: 1fr; gap: 22px; }
   #authScreen .landing-bottom-grid { grid-template-columns: 1fr; gap: 35px; }
   #authScreen .landing-faq h2 { margin-bottom: 17px; }
   #authScreen .landing-ranking { padding: 24px; }

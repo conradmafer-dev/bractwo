@@ -28,7 +28,11 @@
     function actionButton(a){const b=button(a.label||'Wybierz',()=>h.open(['abilities','feats','skills','stats'].includes(a.tab)?a.tab:'stats',a.section||(a.kind==='skill_expertise'?'training':a.kind==='mastery'?'mastery':undefined)),'level-up-action');b.dataset.kind=a.kind;b.dataset.original=a.label||'Wybierz';return b;}
     function actions(){for(const card of cards.values())for(const b of card.querySelectorAll('[data-kind]')){const assigned=(b.dataset.kind==='mastery'&&!(player?.mastery_points>0))||(b.dataset.kind==='training_feat'&&!(player?.character_sheet?.training?.points>0))||(b.dataset.kind==='skill_expertise'&&!(player?.character_sheet?.skills?.choices?.find(pool=>pool.source==='expertise')?.remaining>0));b.disabled=assigned;b.textContent=assigned?'Przydzielono':b.dataset.original;}}
     function layout(toNewest=false){
-      panel.hidden=cards.size===0;if(panel.hidden)return;
+      const hidden=cards.size===0;
+      // The HUD observes visibility attributes; writing an unchanged value
+      // would schedule another layout indefinitely, even on the landing page.
+      if(panel.hidden!==hidden)panel.hidden=hidden;
+      if(hidden)return;
       const narrow=innerWidth<560,height=viewport.clientHeight,width=viewport.clientWidth;
       const gap=narrow?36:42,shift=narrow?7:10,cardWidth=width-3*shift-6;
       if(toNewest||!cards.has(active))active=[...cards.keys()].at(-1);

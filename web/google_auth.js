@@ -33,8 +33,9 @@
     if (Object.values(ui).some(value => !value)) return null;
     let config = null, ticket = '', challenge = '', classId = 'knight', account = null;
     let generation = 0, timer = null, pending = false, externalBusy = false, scriptPromise = null, preparing = false;
+    let commentsSigningOut = false, retryCommentsLogout = false, verificationRequest = null;
     const eligible = () => sameOriginServer(options.server, loc);
-    const allowed = () => eligible() && (!options.canStart || options.canStart());
+    const allowed = () => eligible() && !commentsSigningOut && (!options.canStart || options.canStart());
     const current = serial => generation === serial && allowed();
     const googleApi = () => root.google?.accounts?.id;
     const atLimit = () => (account?.characters?.length || 0) >= 4;
@@ -46,13 +47,13 @@
     }
     function setBusy(value) {
       externalBusy = value;
-      const disabled = pending || value;
+      const disabled = pending || value || commentsSigningOut;
       ui.googleButton.inert = disabled;
       ui.googleButton.setAttribute('aria-disabled', String(disabled));
       for (const input of ui.googleAccount.querySelectorAll('input,button')) input.disabled = disabled;
       ui.googleNewCharacter.disabled = disabled || atLimit();
       ui.googleRetry.disabled = disabled;
-      ui.googleCancel.disabled = value;
+      ui.googleCancel.disabled = value || commentsSigningOut;
     }
     function createProfile() {
       if (atLimit()) return;
@@ -73,7 +74,10 @@
       clearSecrets(); ui.googleAccount.hidden = true; ui.googleProfile.hidden = true;
       ui.googleButton.hidden = false; ui.googleIntro.hidden = false; ui.googleButton.replaceChildren();
       ui.googleCharacters.replaceChildren(); ui.googleRetry.hidden = true; ui.authError.textContent = ''; status('');
-      if (logout) googleApi()?.disableAutoSelect();
+      if (logout) {
+        googleApi()?.disableAutoSelect();
+        if (root.BractwoComments) { void root.BractwoComments.logout(); return; }
+      }
       if (refresh && allowed()) void prepare();
       else ui.googleRetry.hidden = !config?.enabled;
     }
@@ -144,19 +148,25 @@
       // Only this page's own server verifies the ID token. It is never decoded or persisted here.
       const payload = {challenge, credential}; credential = '';
       try { response.credential = ''; } catch (_) { /* SDK may freeze its response. */ }
+      const verification = verificationRequest = request('/auth/google/verify', payload);
       try {
-        const result = await request('/auth/google/verify', payload);
+        const result = await verification;
         if (!current(serial)) return;
         if (typeof result.ticket !== 'string' || !result.ticket) throw new Error('Serwer nie potwierdził logowania Google.');
         ticket = result.ticket; challenge = ''; clearTimeout(timer); pending = false; setBusy(externalBusy);
         showAccount(result.account);
+        root.dispatchEvent(new CustomEvent('bractwo:account-verified'));
         timer = setTimeout(() => {
           if (generation !== serial || externalBusy) return;
           reset({refresh:false}); status('Potwierdzenie Google wygasło. Wybierz konto ponownie.', true);
         }, Math.max(1, Number(result.expires_in) || 300) * 1000);
       } catch (error) {
         if (current(serial)) { reset({refresh:false}); ui.googleRetry.hidden = false; status(error.message, true); }
-      } finally { payload.credential = ''; if (generation === serial) { pending = false; setBusy(externalBusy); } }
+      } finally {
+        if (verificationRequest === verification) verificationRequest = null;
+        payload.credential = '';
+        if (generation === serial) { pending = false; setBusy(externalBusy); }
+      }
     }
     async function prepare() {
       if (!allowed() || preparing) return;
@@ -199,8 +209,28 @@
     });
     ui.googleNewCharacter.addEventListener('click', () => createProfile());
     ui.googleProfileBack.addEventListener('click', () => { ui.googleProfile.hidden = true; });
-    ui.googleRetry.addEventListener('click', () => { config = null; void prepare(); });
+    ui.googleRetry.addEventListener('click', () => {
+      if (retryCommentsLogout && root.BractwoComments) { void root.BractwoComments.logout(); return; }
+      config = null; void prepare();
+    });
     ui.googleCancel.addEventListener('click', () => reset({logout:true}));
+    root.addEventListener('bractwo:comments-signing-out', event => {
+      commentsSigningOut = true; retryCommentsLogout = false;
+      if (verificationRequest) event.detail?.waitUntil(verificationRequest);
+      googleApi()?.disableAutoSelect();
+      reset({refresh:false}); setBusy(externalBusy);
+    });
+    root.addEventListener('bractwo:comments-signed-out', () => {
+      commentsSigningOut = false; retryCommentsLogout = false;
+      googleApi()?.disableAutoSelect();
+      reset();
+    });
+    root.addEventListener('bractwo:comments-signout-failed', () => {
+      commentsSigningOut = false; retryCommentsLogout = true;
+      reset({refresh:false});
+      status('Nie udało się wylogować poprzedniego konta. Spróbuj ponownie.', true);
+      ui.googleRetry.hidden = false;
+    });
     ui.googleProfile.addEventListener('submit', event => {
       event.preventDefault(); if (!allowed() || pending || externalBusy || atLimit()) return;
       try {

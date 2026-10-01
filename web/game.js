@@ -17,6 +17,7 @@
   let connectionSerial = 0, loginTimer = null, lastSnapshotAt = 0, ground = null;
   let viewport = { w: innerWidth, h: innerHeight, dpr: 1 }, camera = { x: 660, y: 1080, scale: 1 };
   let visuals = new Map(), particles = [], lastFrame = performance.now(), nextAttackAt = 0;
+  let animationFrame = null;
   const heldKeys = new Set();
   const joystick = { x: 0, y: 0, pointer: null };
   let attackPointer = null, attackHeld = false, blurPaused = false;
@@ -133,7 +134,7 @@
     activeSocket.addEventListener("close", () => {
       if (serial !== connectionSerial) return;
       clearTimeout(loginTimer); busy(false); resetControls(); restUI?.close();
-      if (playing) { playing = false; ui.disconnectPanel.hidden = false; ui.connectionStatus.textContent = "ROZŁĄCZONO"; }
+      if (playing) { playing = false; stopRendering(); ui.disconnectPanel.hidden = false; ui.connectionStatus.textContent = "ROZŁĄCZONO"; }
       else if (!authFailed) {
         if (!ui.authError.textContent || ui.authError.textContent.includes("…")) ui.authError.textContent = "Połączenie zostało zamknięte. Spróbuj ponownie.";
         googleAuth?.connectionError(ui.authError.textContent, 'google_retry');
@@ -153,6 +154,7 @@
   function backToLogin() {
     resetControls(); restUI?.close(); ++connectionSerial; clearTimeout(loginTimer);
     if (socket) socket.close(); socket = null; playing = false; busy(false); me = null;
+    stopRendering();
     ui.authScreen.hidden = false; ui.gameUI.hidden = true; ui.authError.textContent = "";
     googleAuth?.logout();
   }
@@ -207,6 +209,7 @@
     for (const [id, time] of seenEffects) if (Number(packet.time || 0) - time > 4) seenEffects.delete(id);
     // Exact, persistent advancement receipts replace generic milestone toasts.
     updateHUD();
+    startRendering();
   }
 
   function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
@@ -860,7 +863,7 @@
     if(warmScheduled||!warmQueue.length||document.hidden)return;
     warmScheduled=true;
     const work=()=>{
-      warmScheduled=false;if(document.hidden)return;
+      warmScheduled=false;if(!playing||!me||document.hidden)return;
       const point=warmQueue.shift();if(!point)return;
       const [x,y,f]=point,key=`${f}:${x}:${y}`;
       if(!groundChunks.has(key))groundChunks.set(key,makeGroundChunk(x,y,f));
@@ -1050,7 +1053,9 @@
   globalThis.visualViewport?.addEventListener('resize',resize);
   document.addEventListener('fullscreenchange',resize);
   document.addEventListener('webkitfullscreenchange',resize);
-  resize();buildGround();
+  // Terrain is prepared only after the server welcomes a player. The public
+  // landing page covers the canvas and needs no generated ground texture.
+  resize();
   function inView(x,y,margin=100){return Math.abs(x-camera.x)<viewport.w/camera.scale/2+margin&&Math.abs(y-camera.y)<viewport.h/camera.scale/2+margin;}
   function glow(x,y,radius,color,strength=.2){ctx.save();ctx.globalAlpha=strength;const gradient=ctx.createRadialGradient(x,y,0,x,y,radius);gradient.addColorStop(0,color);gradient.addColorStop(1,"transparent");ctx.fillStyle=gradient;ctx.fillRect(x-radius,y-radius,radius*2,radius*2);ctx.restore();}
   function label(text,x,y,color="#f7efc8",size=11){ctx.font=`600 ${size}px system-ui,sans-serif`;ctx.textAlign="center";ctx.textBaseline="middle";ctx.lineWidth=3;ctx.strokeStyle="#253323e8";ctx.lineJoin="round";ctx.strokeText(text,x,y);ctx.fillStyle=color;ctx.fillText(text,x,y);}
@@ -1547,13 +1552,25 @@
     const trees=world.environment_trees||(world.obstacles||[]).filter(o=>o.type==='grove').map(o=>({x:o.x+o.w/2,y:o.y+o.h,floor:o.floor||0}));
     ctx.save();ctx.strokeStyle='#bcecbcb0';ctx.lineWidth=1.3;for(const tree of trees){if(!sameFloor(me,tree)||!inView(tree.x,tree.y))continue;ctx.beginPath();ctx.arc(tree.x,tree.y,8+Math.sin(t*2)*1.5,0,TAU);ctx.stroke();}ctx.restore();
   }
+  function stopRendering(){
+    if(animationFrame!==null)cancelAnimationFrame(animationFrame);
+    animationFrame=null;
+    fpsMeter.reset();
+  }
+  function startRendering(){
+    if(animationFrame!==null||!playing||!me||document.hidden)return;
+    lastFrame=performance.now();
+    fpsMeter.reset();
+    animationFrame=requestAnimationFrame(frame);
+  }
   function frame(now){
+    animationFrame=null;
+    if(!playing||!me||document.hidden)return;
     const dt=Math.min(.05,(now-lastFrame)/1000),t=now/1000;lastFrame=now;const smoothing=1-Math.exp(-dt*13);
     const renderTime=Number(snapshot.time||0)+Math.max(0,(now-lastSnapshotAt)/1000)-.1;
     for(const v of visuals.values()){const oldX=v.x,oldY=v.y,point=v.track.sample(renderTime);v.x=point.x;v.y=point.y;v.move+=Math.hypot(v.x-oldX,v.y-oldY)*.023;}
     const fps=fpsMeter.sample(now);if(fps&&playing){ui.fpsCounter.textContent=`${fps.fps} FPS`;ui.fpsCounter.title=`Średnia klatka: ${fps.ms.toFixed(1)} ms`;}
     if(me){const own=visuals.get(`p:${myId}`);if(own){camera.x+=(own.x-camera.x)*(1-Math.exp(-dt*8));camera.y+=(own.y-camera.y)*(1-Math.exp(-dt*8));}}
-    else if(!playing){camera.x=690+Math.sin(t*.035)*65;camera.y=1040+Math.sin(t*.05)*65;}
     const halfW=viewport.w/camera.scale/2,halfH=viewport.h/camera.scale/2;
     camera.x=Math.max(Math.min(halfW,world.width/2),Math.min(world.width-Math.min(halfW,world.width/2),camera.x));camera.y=Math.max(Math.min(halfH,world.height/2),Math.min(world.height-Math.min(halfH,world.height/2),camera.y));
     ctx.setTransform(viewport.dpr,0,0,viewport.dpr,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle="#668b48";ctx.fillRect(0,0,viewport.w,viewport.h);
@@ -1580,9 +1597,12 @@
     drawGoal();drawTreeTargets(t);drawWorldPoint(t);drawEffects(now);drawParticles(dt);for(const v of visuals.values())if(v.kind==="p"&&sameFloor(me,v.entity))drawSpeech(v,now);
     ctx.restore();drawMinimap();
     if(playing&&lastSnapshotAt&&now-lastSnapshotAt>5000)ui.connectionStatus.textContent="BRAK ODPOWIEDZI";else if(playing&&ui.connectionStatus.textContent!==" ONLINE")ui.connectionStatus.innerHTML="<i></i> ONLINE";
-    requestAnimationFrame(frame);
+    animationFrame=requestAnimationFrame(frame);
   }
-  document.addEventListener("visibilitychange",()=>fpsMeter.reset());
+  document.addEventListener("visibilitychange",()=>{
+    stopRendering();
+    if(!document.hidden)startRendering();
+  });
 
   const spellIcons={longstrider:'»',mage_armor:'◇',burning_hands:'♨',healing_word:'♥',starry_wisp:'✧',shocking_grasp:'ϟ',fire_bolt:'✹',ray_of_frost:'❄',acid_splash:'◉',magic_missile:'✦',shield:'⬡',scorching_ray:'☄',fireball:'☀',misty_step:'»',shillelagh:'♧',thorn_whip:'⌁',produce_flame:'♨',cure_wounds:'♥',entangle:'♜',moonbeam:'☾',wild_shape_wolf:'♞',wild_shape_bear:'♟',animal_companion:'♞',hunters_mark:'⌖',ensnaring_strike:'⌁',second_wind:'♥',guidance:'✣',guiding_bolt:'✦'};
   Runtime.bindTouchScroll(ui.hotbarSlots.closest('.hotbar-viewport'),()=>ui.gameUI.classList.contains('mobile-hud'));
@@ -1785,5 +1805,4 @@
   }
   setTimeout(refreshRanking,150);setInterval(refreshRanking,30000);
 
-  requestAnimationFrame(frame);
 })();
