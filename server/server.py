@@ -25,7 +25,8 @@ try:
     from . import seo
     from . import comments
     from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
-    from . import continent_world, adventure_content, expedition_content, terrain_detail, encounter_layout
+    from . import continent_world, adventure_content, expedition_content, terrain_detail, encounter_layout, starter_adventures
+    from .starter_adventures import StarterAdventureGame
     from .adventure_combat import AdventureGame
     from .google_accounts import GoogleAccountGame
     from .google_auth import GoogleAuthService, register_routes as register_google_routes
@@ -56,7 +57,8 @@ except ImportError:
     import seo
     import comments
     import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
-    import continent_world, adventure_content, expedition_content, terrain_detail, encounter_layout
+    import continent_world, adventure_content, expedition_content, terrain_detail, encounter_layout, starter_adventures
+    from starter_adventures import StarterAdventureGame
     from adventure_combat import AdventureGame
     from google_accounts import GoogleAccountGame
     from google_auth import GoogleAuthService, register_routes as register_google_routes
@@ -292,14 +294,15 @@ environment_rules.configure_world()
 continent_world.finalize(content, OBSTACLES)
 terrain_detail.configure(content, OBSTACLES, LANDMARKS)
 encounter_layout.configure(content, OBSTACLES, LANDMARKS)
-content.WORLD_REVISION = 30
+starter_adventures.configure(content, OBSTACLES, LANDMARKS, ZONES, ENEMY_TYPES)
+content.WORLD_REVISION = 33
 MERCHANT['stock'] = list(content.STARTER_MERCHANT_STOCK)
 content.STARTER_MERCHANT = MERCHANT
 # Powerful rings are deliberate rewards; repeatable monster drops remain rare.
 for monster_spec in ENEMY_TYPES.values():
     for entry in monster_spec.get('loot',{}).get('entries',[]):
         spec = ITEMS.get(entry.get('template'),{})
-        if spec.get('slot') == 'ring' and spec.get('magic_id'):
+        if spec.get('slot') == 'ring' and spec.get('magic_id') and entry.get('template') != 'ring_headless_signet':
             entry['chance'] = min(entry['chance'], .02 if monster_spec.get('boss') else .003)
 dnd_content.DEFAULT_HOTBARS["knight"] = ["second_wind", "action_surge"]
 dnd_content.STATUS_SPECS.update({
@@ -415,6 +418,7 @@ class Player:
     boss_kills: int = 0
     relics: list = field(default_factory=list)
     chests: list = field(default_factory=list)
+    starter_bosses: list = field(default_factory=list)
     inventory: list = field(default_factory=list)
     equipment: dict = field(default_factory=lambda: {"weapon": "", "armor": "", "ring": "", "shield": ""})
     inventory_rules_version: int = 0
@@ -581,6 +585,7 @@ class Player:
             result.update(level_up.pending(self))
             if self._hotbar_level != dnd_content.hotbar_signature(self):dnd_content.sync_hotbar(self)
             result.update(private_state(self, now))
+            result['starter_adventures']=starter_adventures.player_state(self)
             rest_reason, rest_wait = rest_block_status(self, now, simulation_time)
             result.update({"rest": {"kind": self.rest_state["kind"], "total": self.rest_state["total"],
                                      "remaining": round(max(0, self.rest_state["until"]-now), 3)} if self.rest_state else {},
@@ -650,7 +655,7 @@ class Player:
             "site_cooldowns", "wind_until", "ward_until", "premium_demo_until", "floor", "skill_tries", "promoted", "soul", "runes", "bank_gold", "depot", "home_city", "blessed", "mastery", "spell_cooldowns", "spell_ready", "rune_ready", "haste_until", "transition_ready",
             "x", "y", "hp", "mana", "level", "xp", "gold", "class_id", "class_chosen", "weapon", "kills", "boss_kills",
             "inventory_rules_version", "potion_slots", "loot_discoveries",
-            "relics", "chests", "inventory", "equipment", "potions", "quest_progress", "discoveries", "attack_cooldown_until", "ability_cooldown_until",
+            "relics", "chests", "starter_bosses", "inventory", "equipment", "potions", "quest_progress", "discoveries", "attack_cooldown_until", "ability_cooldown_until",
             "potion_cooldown_until", "bulwark_until", "combat_until", "pvp_combat_until", "white_until", "red_until",
             "unjust_kills", "aggressors", "respawn_until", "last_pvp_attacker", "last_pvp_unjust", "last_pvp_hit_until")}
 
@@ -712,7 +717,7 @@ class Enemy:
                 "attack_until": self.attack_until, "facing": self.facing, "armor_class": spec["armor_class"], "attack_bonus": spec["attack_bonus"], "damage_dice": combat_rules.dice_text(spec["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
 
 
-class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,EnvironmentGame,WizardSchoolGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
+class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,EnvironmentGame,WizardSchoolGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
     def __init__(self, db_path, clock=None):
         self.clock = clock or time.time
         self.rng = random.Random()
@@ -779,6 +784,7 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
                 "world_revision": getattr(content,"WORLD_REVISION",20), "landmasses": getattr(content,"LANDMASSES",[]),
                 "ports": getattr(content,"PORTS",[]), "sea_routes": getattr(content,"SEA_ROUTES",[]),
                 "magic_items": magic_items.metadata(),
+                "starter_adventures": content.STARTER_ADVENTURES,
                 "skill_challenge_catalog": self.skill_challenge_metadata(),
                 "terrain": content.TERRAIN, "terrain_detail": getattr(content,"TERRAIN_DETAIL",{}),
                 "encounter_layout": {"version": content.ENCOUNTER_LAYOUT["version"], "counts": content.ENCOUNTER_LAYOUT["counts"]},
@@ -852,6 +858,7 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
         if "class_id" not in saved:
             p.class_chosen = False
             p.class_id = "knight"
+        starter_adventures.normalize(p)
         self.migrate_dnd(p,saved)
         if "inventory" not in saved:
             self.starter(p)
@@ -881,6 +888,12 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
         if p.hp <= 0 and not p.respawn_until:
             p.respawn_until = self.now() + 4
         # Old relic progression may have saved a character in an invalid tile.
+        if p.floor == 0 and saved.get('world_revision',20) < 33:
+            for o in OBSTACLES:
+                if o.get('starter_adventure') and o.get('floor',0)==0 and intersects(p.x,p.y,o):
+                    entry=content.STARTER_ADVENTURES['tower_entry' if o['type']=='old_starter_tower' else 'crypt_entry']
+                    p.x,p.y=entry['x'],entry['y'];p.dx=p.dy=0;p.input_time=-10
+                    break
         stranded = p.floor == 0 and getattr(content.WATER_MAP,"ocean_blocked",lambda *_:False)(p.x,p.y,18)
         p._shore_recovery_pending = stranded
         p._terrain_recovery_pending = (not stranded and p.floor == 0 and saved.get('world_revision',20) < 29
@@ -1292,6 +1305,7 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
                     self.advance_kill_quests(p, enemy.kind)
                     if enemy.kind == "boss" or spec.get("boss"):
                         p.boss_kills += 1
+                    starter_adventures.record_victory(p, enemy.kind)
                     detail = f"{spec['name']}: +{xp} PD · +{gold} złota"
                     detail += self.grant_loot(p, loot_tables.roll(p.class_id, spec, self.rng), source_kind=enemy.kind)
                     self.save_player(p)
@@ -1339,6 +1353,8 @@ class Game(CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,Mart
         sites = [site for site in content.POIS if near(p, site) and self.line_clear(p, SimpleNamespace(**site))]
         if sites:
             site = min(sites, key=lambda s: point_distance(p, s))
+            if site.get('action') == 'starter_treasure':
+                return await self.open_starter_treasure(p, site)
             now = self.now()
             if p.combat_until > now:
                 return await self.notice(p, "Najpierw zakończ walkę, aby skorzystać z tego miejsca.")
@@ -2032,7 +2048,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_32","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_33","world_revision":getattr(content,"WORLD_REVISION",20)})
 
     app.router.add_get("/health",health)
     async def ranking(request):
@@ -2070,7 +2086,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
                 raise web.HTTPNotFound()
             return web.FileResponse(path,headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
         app.router.add_get("/"+filename,public_css)
-    for route,filename in [("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/skills_ui.js","skills_ui.js"),("/feat_ui.js","feat_ui.js"),("/feat_ui.css","feat_ui.css"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/terrain_art.js","terrain_art.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
+    for route,filename in [("/starter_adventures.js","starter_adventures.js"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/skills_ui.js","skills_ui.js"),("/feat_ui.js","feat_ui.js"),("/feat_ui.css","feat_ui.css"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/terrain_art.js","terrain_art.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

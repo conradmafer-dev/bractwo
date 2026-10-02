@@ -1,0 +1,72 @@
+RAPORT TESTÓW UI33 — wykonane lokalnie na zaktualizowanym projekcie
+
+1. NOWE TESTY PYTHON: 29/29 PASS
+   Testy przejść i ciągłych tras między pomieszczeniami; wszystkie miejsca
+   odrodzenia i obie strony schodów mają prześwit; stare szczury i kopalnia
+   pozostają. Schody i cztery nagrody działają dla postaci poziomu 1.
+   Zaliczenie bossa, osobiste skrzynie, brak podwójnej nagrody przy spamowaniu,
+   pełny plecak, stosy mikstur, cofnięcie transakcji po błędzie zapisu,
+   ponowne otwarcie pliku SQLite, utrzymanie blokady PvP i krótka przerwa PvE.
+   Rapier: Zręczność, biegłość wyłącznie w tej broni, brak zmiany cech/atutów.
+   Pierścień: tylko ST; sygnet: tylko obrony na Kondycję; pancerz i tarcza:
+   bez podwójnego doliczania +1, dotychczasowe wymagania wyszkolenia zachowane.
+   Specjalne ataki: stały cel, unik, osłona filarem, przerwanie po śmierci bossa.
+   HTTP: nowy moduł, ikona, odnośniki JS w stronie i /health z UI_33 dostępne.
+
+2. NOWY TEST JAVASCRIPT: PASS
+   Osobiste stany skrzyń, odrodzony strażnik, wszystkie nowe typy obiektów,
+   postacie i fazy zapowiedzi. Rysowanie przywraca stan kontekstu canvas.
+   Dodatkowo przechodzą stare testy: savage_feedback_ui31_fix4,
+   roll_format_ui31_fix5, world_events_ui32, rest_ui_0818, multitouch_ui03.
+
+3. RENDEROWANIE W PRZEGLĄDARCE
+   Chromium headless, prawdziwe moduły gry i migawki serwera. Siedem widoków:
+   wieża na powierzchni, komnaty krypt, oba bossy, skarb, telefon w poziomie
+   915×412 i w pionie 390×844; pulpit 1366×768. Brak błędów JavaScript.
+   Użyto lokalnego renderera offline z testową migawką, nie logowania Google.
+   Diagnostyczny renderer, fikcyjne połączenie i eksporty debugowania NIE są
+   częścią dostarczonego projektu. To nie test na fizycznym telefonie.
+
+4. KONTROLOWANE SYMULACJE WALK
+   Rzeczywisty kod ataku, czarów, obrażeń, kolizji i AI serwera. Każda klasa
+   na poziomie 10, początkowy ekwipunek, pełne zasoby przed bossem, bez nowych
+   nagród i bez wybranego pierwszego atutu. Skrypt korzysta z podstawowych
+   zdolności klasy, schodzi z zapowiedzi, używa najwyżej jednej mikstury;
+   druid może się leczyć. Czterdzieści ustalonych losowych przebiegów na parę.
+
+   Boss                    Klasa      Wygrane    Śr. czas walki
+   Szkielet bez głowy       Wojownik     40/40       18,0 s
+   Szkielet bez głowy       Łowca        36/40       22,5 s
+   Szkielet bez głowy       Czarodziej   40/40        9,2 s
+   Szkielet bez głowy       Druid        40/40       20,1 s
+   Łucznik starej wieży     Wojownik     40/40       17,7 s
+   Łucznik starej wieży     Łowca        40/40       10,6 s
+   Łucznik starej wieży     Czarodziej   40/40        8,6 s
+   Łucznik starej wieży     Druid        40/40       17,3 s
+
+   Wyniki odnoszą się wyłącznie do tej strategii i próby, nie stanowią
+   gwarancji wygranej ani prognozy dla graczy. Symulacja nie zastępuje
+   ręcznych testów balansu. Łowca, który zostaje w zwarciu ze szkieletem,
+   ma trudniej; początkowy łuk podlega dotychczasowym regułom walki z bliska.
+
+5. SZERSZE TESTY REGRESJI I OGRANICZENIA
+   W wykonanym zestawie 169 testów Pythona: 162 PASS, 7 FAIL.
+   Te same siedem niepowodzeń odtworzono na niezmienionym przesłanym ZIP-ie:
+   test_mithral_removes_strength_and_stealth_penalties
+   test_passives_require_a_point_and_cannot_be_repeated
+   test_repeatable_asi_is_serializable_and_caps_each_allocation
+   test_catalog_rewards_and_authored_loot_only_expose_health
+   test_01_local_boat_payment_destination_home_and_remote_rejection
+   test_02_nearest_merchant_stock_is_authoritative
+   test_05_ocean_migration_only_moves_legacy_revision
+   Nie poprawiano tych niezwiązanych historycznych testów/reguł w UI33.
+   Dwa stare pliki testów JS mana_growth_0816 i wand_casting_0817 nie startują
+   z powodu istniejącego błędu kodowania/składni; pozostają niezmienione.
+   Nie stwierdzono nowych niepowodzeń w porównanym zestawie Pythona.
+   Nie oznacza to, że cały historyczny zestaw testów projektu jest zielony.
+
+6. NIE WYKONANO
+   Nie wdrażano na Railway, nie zmieniano repozytorium GitHub, nie odczytywano
+   prawdziwej produkcyjnej bazy, nie logowano się przez produkcyjne Google,
+   nie budowano APK ani nie przeprowadzano rzeczywistego testu sieciowego
+   wielu graczy. Testy osobistych nagród obejmują odrębne postacie na serwerze.

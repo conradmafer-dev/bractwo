@@ -1,0 +1,74 @@
+[
+  {
+    "boss": "dawn_headless_skeleton",
+    "class": "knight",
+    "trials": 40,
+    "wins": 40,
+    "mean_seconds": 18.0,
+    "mean_remaining_hp": 22.6,
+    "potion_used": 3
+  },
+  {
+    "boss": "dawn_headless_skeleton",
+    "class": "ranger",
+    "trials": 40,
+    "wins": 36,
+    "mean_seconds": 22.5,
+    "mean_remaining_hp": 13.9,
+    "potion_used": 28
+  },
+  {
+    "boss": "dawn_headless_skeleton",
+    "class": "mage",
+    "trials": 40,
+    "wins": 40,
+    "mean_seconds": 9.2,
+    "mean_remaining_hp": 13.8,
+    "potion_used": 8
+  },
+  {
+    "boss": "dawn_headless_skeleton",
+    "class": "druid",
+    "trials": 40,
+    "wins": 40,
+    "mean_seconds": 20.1,
+    "mean_remaining_hp": 17.3,
+    "potion_used": 23
+  },
+  {
+    "boss": "old_tower_archer",
+    "class": "knight",
+    "trials": 40,
+    "wins": 40,
+    "mean_seconds": 17.7,
+    "mean_remaining_hp": 24.3,
+    "potion_used": 1
+  },
+  {
+    "boss": "old_tower_archer",
+    "class": "ranger",
+    "trials": 40,
+    "wins": 40,
+    "mean_seconds": 10.6,
+    "mean_remaining_hp": 25.2,
+    "potion_used": 1
+  },
+  {
+    "boss": "old_tower_archer",
+    "class": "mage",
+    "trials": 40,
+    "wins": 40,
+    "mean_seconds": 8.6,
+    "mean_remaining_hp": 18.0,
+    "potion_used": 0
+  },
+  {
+    "boss": "old_tower_archer",
+    "class": "druid",
+    "trials": 40,
+    "wins": 40,
+    "mean_seconds": 17.3,
+    "mean_remaining_hp": 16.8,
+    "potion_used": 17
+  }
+]

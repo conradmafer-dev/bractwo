@@ -52,6 +52,9 @@ class AdventureGame:
         # attacks retain the weapon's actual type (arrows pass theirs explicitly).
         if not pvp and damage_kind is None and spec.get('content_version')=='UI_20':
             damage_kind=spec.get('melee_damage_type','bludgeoning')
+        if not pvp and spec.get('starter_adventure') and melee and not area and dice is None:
+            dice=tuple(spec['melee_dice'])
+            damage_kind=damage_kind or ('slashing' if spec.get('creature_type')=='undead' else 'piercing')
         attacks=spec.get('adventure_attacks')
         if pvp or area or spell or dice is not None or not attacks or environment.polymorph(source):
             return super().hit_player(source,target,power,pvp=pvp,unjust=unjust,area=area,dice=dice,

@@ -1,0 +1,46 @@
+test_failed_save_rolls_back_every_part_of_the_treasure (test_starter_adventures_ui33.PersistenceAndHTTP.test_failed_save_rolls_back_every_part_of_the_treasure) ... ok
+test_http_serves_new_module_icons_and_current_revision (test_starter_adventures_ui33.PersistenceAndHTTP.test_http_serves_new_module_icons_and_current_revision) ... /mnt/data/work/bractwo-main/server/server.py:2041: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["game"]=Game(db_path, clock=clock)
+/mnt/data/work/bractwo-main/server/server.py:2042: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["google_auth"]=google_auth_service if google_auth_service is not None else GoogleAuthService.from_env()
+/mnt/data/work/bractwo-main/server/server.py:2044: NotAppKeyWarning: It is recommended to use web.AppKey instances for keys.
+https://docs.aiohttp.org/en/stable/web_advanced.html#application-s-config
+  app["comments"]=comments.CommentService(app["game"].db,app["google_auth"].allowed_origin)
+Executing <Task pending name='Task-7' coro=<PersistenceAndHTTP.test_http_serves_new_module_icons_and_current_revision() running at /mnt/data/work/bractwo-main/tests/test_starter_adventures_ui33.py:300> cb=[_run_until_complete_cb() at /usr/lib/python3.13/asyncio/base_events.py:181] created at /usr/lib/python3.13/asyncio/runners.py:100> took 0.191 seconds
+ok
+test_real_database_reopen_keeps_receipt_and_equipment (test_starter_adventures_ui33.PersistenceAndHTTP.test_real_database_reopen_keeps_receipt_and_equipment) ... ok
+test_all_four_tower_rewards_are_guaranteed_at_level_one (test_starter_adventures_ui33.StarterAdventures.test_all_four_tower_rewards_are_guaranteed_at_level_one) ... <string>:17: ResourceWarning: unclosed database in <sqlite3.Connection object at 0x7feadbcad8a0>
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+ok
+test_all_rooms_have_a_walkable_route_to_their_objectives (test_starter_adventures_ui33.StarterAdventures.test_all_rooms_have_a_walkable_route_to_their_objectives) ... ok
+test_cannot_open_from_another_floor_or_far_away (test_starter_adventures_ui33.StarterAdventures.test_cannot_open_from_another_floor_or_far_away) ... ok
+test_chest_needs_real_boss_credit (test_starter_adventures_ui33.StarterAdventures.test_chest_needs_real_boss_credit) ... ok
+test_chest_state_and_boss_credit_persist_across_reload (test_starter_adventures_ui33.StarterAdventures.test_chest_state_and_boss_credit_persist_across_reload) ... ok
+test_crypt_potions_stack_without_needing_three_cells (test_starter_adventures_ui33.StarterAdventures.test_crypt_potions_stack_without_needing_three_cells) ... ok
+test_full_bag_keeps_entire_treasure_unclaimed (test_starter_adventures_ui33.StarterAdventures.test_full_bag_keeps_entire_treasure_unclaimed) ... ok
+test_magic_medium_armor_and_shield_do_not_double_count_plus_one (test_starter_adventures_ui33.StarterAdventures.test_magic_medium_armor_and_shield_do_not_double_count_plus_one) ... ok
+test_new_spawn_and_stair_clearance (test_starter_adventures_ui33.StarterAdventures.test_new_spawn_and_stair_clearance) ... ok
+test_old_save_inside_new_tower_moves_to_its_door_without_reset (test_starter_adventures_ui33.StarterAdventures.test_old_save_inside_new_tower_moves_to_its_door_without_reset) ... ok
+test_original_magic_catalog_migration_does_not_replace_new_rings (test_starter_adventures_ui33.StarterAdventures.test_original_magic_catalog_migration_does_not_replace_new_rings) ... ok
+test_original_surface_rats_and_mine_are_preserved (test_starter_adventures_ui33.StarterAdventures.test_original_surface_rats_and_mine_are_preserved) ... ok
+test_potion_stack_overflow_requires_space_and_is_atomic (test_starter_adventures_ui33.StarterAdventures.test_potion_stack_overflow_requires_space_and_is_atomic) ... ok
+test_public_personal_chest_state_and_custom_assets_exist (test_starter_adventures_ui33.StarterAdventures.test_public_personal_chest_state_and_custom_assets_exist) ... ok
+test_pvp_block_is_not_bypassed_by_the_three_second_pve_pause (test_starter_adventures_ui33.StarterAdventures.test_pvp_block_is_not_bypassed_by_the_three_second_pve_pause) ... ok
+test_rapier_uses_dexterity_and_only_grants_item_specific_training (test_starter_adventures_ui33.StarterAdventures.test_rapier_uses_dexterity_and_only_grants_item_specific_training) ... ok
+test_respawned_guardian_blocks_a_previously_unlocked_chest (test_starter_adventures_ui33.StarterAdventures.test_respawned_guardian_blocks_a_previously_unlocked_chest) ... ok
+test_rewards_are_personal_not_global (test_starter_adventures_ui33.StarterAdventures.test_rewards_are_personal_not_global) ... ok
+test_ring_dc_bonus_does_not_change_spell_attack_or_damage (test_starter_adventures_ui33.StarterAdventures.test_ring_dc_bonus_does_not_change_spell_attack_or_damage) ... ok
+test_round_trip_through_all_stairs_at_level_one (test_starter_adventures_ui33.StarterAdventures.test_round_trip_through_all_stairs_at_level_one) ... ok
+test_signet_only_buffs_constitution_saves_and_not_the_ability (test_starter_adventures_ui33.StarterAdventures.test_signet_only_buffs_constitution_saves_and_not_the_ability) ... ok
+test_spamming_open_cannot_duplicate_the_reward (test_starter_adventures_ui33.StarterAdventures.test_spamming_open_cannot_duplicate_the_reward) ... ok
+test_special_arrow_hits_when_not_dodged (test_starter_adventures_ui33.StarterAdventures.test_special_arrow_hits_when_not_dodged) ... ok
+test_special_line_is_fixed_and_can_be_sidestepped (test_starter_adventures_ui33.StarterAdventures.test_special_line_is_fixed_and_can_be_sidestepped) ... ok
+test_sweep_is_local_and_cancelled_if_boss_dies (test_starter_adventures_ui33.StarterAdventures.test_sweep_is_local_and_cancelled_if_boss_dies) ... ok
+test_tower_pillar_really_blocks_the_special_arrow (test_starter_adventures_ui33.StarterAdventures.test_tower_pillar_really_blocks_the_special_arrow) ... ok
+
+----------------------------------------------------------------------
+Ran 29 tests in 4.148s
+
+OK

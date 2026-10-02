@@ -68,6 +68,35 @@ for _key, _name, _rarity, _description, _effect in [
     if 'armor_bonus' in _effect: CATALOG[_key].update(ac_bonus=1, armor=1)
 
 
+# UI33 starter treasures. The named armor/shield use ordinary SRD +1 effects;
+# the two rings and the weapon's self-training are original Bractwo properties.
+_item('old_tower_breastplate_1', 'Napierśnik Starej Wieży +1', 'armor', 'rare',
+      'Średni pancerz. KP 15 + Zręczność (maks. +2). Magiczne +1 jest już wliczone. Obowiązuje szkolenie w średnich pancerzach.',
+      base_cost=400, armor_kind='medium', base_ac=14, strength_required=0,
+      stealth_disadvantage=False, armor_summary='Średni · KP 15 + Zręczność (maks. +2)',
+      magic_effects={'armor_bonus': 1}, starter_reward=True)
+CATALOG['old_tower_breastplate_1'].update(ac_bonus=1, armor=1)
+_item('old_tower_shield_1', 'Tarcza Wieżowego Strażnika +1', 'shield', 'uncommon',
+      'Łącznie +3 do KP: +2 za tarczę i magiczne +1. Wymaga szkolenia w tarczach oraz wolnej ręki.',
+      base_cost=10, shield_ac=3, armor_summary='Tarcza · +3 KP',
+      magic_effects={'shield_bonus': 1}, starter_reward=True)
+_item('ring_focused_will', 'Pierścień Skupionej Woli', 'ring', 'uncommon',
+      '+1 do ST czarów podczas noszenia. Nie zwiększa trafienia ani obrażeń czarów. Nie wymaga zestrojenia.',
+      magic_effects={'spell_save_dc': 1}, starter_reward=True)
+_item('ring_headless_signet', 'Sygnet Bezgłowego', 'ring', 'uncommon',
+      '+1 do rzutów obronnych na Kondycję, także w celu utrzymania koncentracji. Nie wymaga zestrojenia.',
+      magic_effects={'constitution_save': 1}, starter_reward=True)
+_item('echo_rapier', 'Rapier Echa', 'weapon', 'uncommon',
+      '1k8 obrażeń kłutych. Finezja: lepsza z Siły i Zręczności do trafienia i obrażeń. Magia zapewnia biegłość tylko w tym rapierze podczas dzierżenia; bez atutu i bez zwiększania cech. Bez premii +1.',
+      base_cost=25, weapon_type='rapier', weapon_name='Rapier', weapon_category='martial',
+      weapon='sword', weapon_dice=[1,8], damage_dice='1k8', damage_type='piercing',
+      two_handed=False, ranged=False, finesse=True, heavy=False, spell_bonus=0,
+      magic_effects={'self_training': True}, starter_reward=True)
+for _key in ('ring_focused_will','ring_headless_signet','echo_rapier'):
+    CATALOG[_key]['magic_source']='Bractwo Krain · autorska właściwość (UI33)'
+    CATALOG[_key].pop('srd_value_gp',None)
+
+
 def configure(items):
     """Run last: the old rarity converter must not overwrite SRD properties."""
     for key, old in list(items.items()):

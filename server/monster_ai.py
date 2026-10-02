@@ -302,14 +302,14 @@ class MonsterAI:
                 self.enemy_move_towards(e, aim_x, aim_y, dt)
                 continue
             if spec.get('boss') and self.time >= e.aoe_ready and d < spec['special_range']:
-                e.aoe_ready = self.time + (6 if e.hp < e.max_hp*.4 else 8)
+                e.aoe_ready = self.time + spec.get('special_interval', 6 if e.hp < e.max_hp*.4 else 8)
                 self.queue_enemy_attack(e, target, special=True)
                 e.ready = max(e.ready, self.time + 1.4)
                 continue
             approach = spec['melee_range'] if hybrid else spec['range']
             if d > approach*.8:
                 self.enemy_move_towards(e, target.x, target.y, dt)
-            elif spec.get('combat_role') == 'ranged' and d < 115:
+            elif spec.get('combat_role') == 'ranged' and d < spec.get('retreat_distance',115):
                 # Tactical spacing is relative to the foe, never to the spawn.
                 self.enemy_move_towards(e, e.x-e.facing[0]*60, e.y-e.facing[1]*60, dt, .6)
             if d <= spec['melee_range'] and self.time >= e.ready:

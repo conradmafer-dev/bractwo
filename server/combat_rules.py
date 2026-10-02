@@ -68,7 +68,7 @@ def ability_modifier(p, ability): return (attributes(p)[ability]-10)//2
 
 def spell_ability(p): return 'intelligence' if p.class_id=='mage' else 'wisdom'
 def spell_bonus(p): return proficiency(p)+ability_modifier(p,spell_ability(p))+gear.spell_equipment_bonus(p)+caster.spell_path_bonus(p)
-def spell_dc(p): return 8+spell_bonus(p)
+def spell_dc(p): return 8+spell_bonus(p)+magic_items.effect(p,'spell_save_dc')
 
 def active_buff(p,key): return environment.active(p,key)
 
@@ -113,7 +113,7 @@ def save_bonus(p,ability='dexterity'):
     if environment.polymorph(p):return caster.form_spec(p).get('saves',{}).get(ability,ability_modifier(p,ability))
     base=ability_modifier(p,ability)+(proficiency(p) if ability in gear.feat_rules.save_proficiencies(p) else 0)
     if p.form:base=max(base,caster.form_spec(p).get('saves',{}).get(ability,base))
-    return base+circles.save_bonus(p,ability)+magic_items.effect(p,'protection')+(2 if ability=='dexterity' and (active_buff(p,'nature_sanctuary') or active_buff(p,'wizard_shelter')) else 0)-getattr(p,'exhaustion',0)*2
+    return base+circles.save_bonus(p,ability)+magic_items.effect(p,'protection')+(magic_items.effect(p,'constitution_save') if ability=='constitution' else 0)+(2 if ability=='dexterity' and (active_buff(p,'nature_sanctuary') or active_buff(p,'wizard_shelter')) else 0)-getattr(p,'exhaustion',0)*2
 
 def legacy_max_hp(p):
     """Pre-UI_12 totals, retained for save migration and historical receipts."""

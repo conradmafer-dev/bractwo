@@ -6,7 +6,7 @@
   const mini = $("minimap"), mctx = mini.getContext("2d");
   const ui = Object.fromEntries(Array.from(document.querySelectorAll("[id]"), element => [element.id, element]));
   const revisionLabel=document.querySelector('.auth-foot');
-  if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_32';
+  if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_33';
   const classInfo = {
     knight: {name:"Rycerz",icon:"⚔",color:"#f8d377",cape:"#cc4845",ability:"Drugi oddech",weapon:"sword"},
     ranger: {name:"Łowca",icon:"➶",color:"#f1d99c",cape:"#9e682e",ability:"Znak łowcy",weapon:"bow"},
@@ -281,7 +281,7 @@
     const skillSite=nearestSkillChallenge(), nearbyNpc=nearestNpc();
     nearby=nearestStair() || (skillSite&&(!nearbyNpc||distance(me,skillSite)<distance(me,nearbyNpc))?skillSite:nearbyNpc) || nearestSite() || (merchantNear()?nearestMerchant():null); ui.interactPrompt.hidden=!nearby || !ui.sidePanel.hidden;
     ui.interactButton.classList.toggle("available",!!nearby);
-    ui.interactButton.querySelector("small").textContent=nearby?.skill_challenge&&["lost_pouch","sealed_relic","stolen_supplies"].includes(nearby.scene)?"Zbadaj":"Rozmawiaj";
+    ui.interactButton.querySelector("small").textContent=nearby?.action==='starter_treasure'?'Otwórz':nearby?.to_floor!==undefined?'Przejdź':nearby?.skill_challenge&&["lost_pouch","sealed_relic","stolen_supplies"].includes(nearby.scene)?"Zbadaj":"Rozmawiaj";
     ui.interactName.textContent=nearby?.name||"Mieszkańcy Przystani";
     ui.interactPrompt.querySelector("small").textContent=nearby?.skill_challenge?"WYDARZENIE · E":nearby?.to_floor!==undefined?"SCHODY · E":nearby?.action?"UŻYJ · E":nearby?.service==='binding_stone'?"PRZYPISANIE ODRADZANIA · E":nearby?.service?"USŁUGI · E":nearby?.id?"ROZMOWA I ZLECENIA":"HANDEL I ODPOCZYNEK";
     ui.deathPanel.hidden=me.hp>0;
@@ -925,7 +925,7 @@
     }
     trimChunks();prepareGroundAhead(x0,y0,x1,y1,floor);
     if(!world.landmasses?.length&&!floor&&ground&&camera.x-viewport.w/camera.scale/2<3200&&camera.y-viewport.h/camera.scale/2<2304)ctx.drawImage(ground,0,0);
-    if(floor>0)for(const entry of nearbyDrawables())if(entry.kind==='elevation')drawCliff(entry.data,true);
+    if(floor>0)for(const entry of nearbyDrawables())if(entry.kind==='elevation'&&!entry.data.starter_adventure)drawCliff(entry.data,true);
     if(floor<0){for(const d of world.dungeons||[])if(d.floor===floor&&inView(d.x+d.w/2,d.y+d.h/2,d.w)){for(const r of d.rooms){ctx.strokeStyle='#d0b88a55';ctx.lineWidth=2;ctx.strokeRect(r.x,r.y,r.w,r.h);}}}
   }
   function drawStair(s){
@@ -1089,6 +1089,7 @@
     if(edgeOnly){line(ctx,[[x,y+h],[x,y],[x+w,y],[x+w,y+h]],'#dbcfaa',4);}
   }
   function drawSite(l,t){
+    if(globalThis.BractwoStarterAdventures?.chest(ctx,l,me,snapshot,t))return;
     const{x,y}=l,remaining=me?.site_cooldowns?.[l.id]||0,color=remaining?'#969e8b':l.action==='ward'?'#cab1ef':l.action==='wind'?'#b9e5d5':'#e6cc84';
     ellipse(ctx,x,y+4,33,15,'#34453866');
     if(l.action==='cache'){
@@ -1170,6 +1171,7 @@
   }
   function drawObstacle(o,index){
     const{x,y,w,h}=o;if(!inView(x+w/2,y+h/2,Math.max(w,h)+90))return;
+    if(globalThis.BractwoStarterAdventures?.obstacle(ctx,o,performance.now()/1000))return;
     if(o.relief_theme&&globalThis.BractwoTerrainArt?.drawRelief(ctx,o,index))return;
     if(o.type==='ruin'&&o.expedition){
       ellipse(ctx,x+w/2,y+h*.85,w*.61,h*.56,'#25231b77');block(ctx,x,y+8,w,h-8,'#776247');block(ctx,x-3,y+2,w+6,h-15,'#bdac80');block(ctx,x+3,y+5,w-6,h-21,'#d4bf8e');
@@ -1383,6 +1385,7 @@
     if(String(e.id)===selectedEnemy){const z=Number(e.size)||spec.size||1;ctx.strokeStyle='#f05942';ctx.lineWidth=2;ctx.strokeRect(x-30*z,y-62*z,60*z,70*z);}
     const custom=globalThis.BractwoWizardVFX?.actor(ctx,v,t)||globalThis.BractwoCircleVFX?.form(ctx,x,y,e,t)||globalThis.BractwoCasterVFX.actor(ctx,v,t);
     if(custom){if(!e.is_companion&&!e.is_familiar){label(e.name||e.kind,x,y-72,'#e5dbc1',9);block(ctx,x-20,y-65,40,4,'#3a453d');block(ctx,x-19,y-64,38*Math.max(0,e.hp/e.max_hp),2,'#e87955');}return;}
+    if(globalThis.BractwoStarterAdventures?.actor(ctx,v,spec,t))return;
     if(spec.sprite&&globalThis.BractwoLootUI.drawMonster(ctx,v,spec,snapshot.time)){
       const z=spec.size||1,yy=y-78*z,w=spec.boss?64:42;
       if(!e.is_companion){label(e.name||kind,x,yy,spec.boss?'#f7d692':'#e5dbc1',spec.boss?11:9);
@@ -1470,6 +1473,7 @@
       if(e.persistent&&renderedFields.has(e.id))continue;
       const x=e.x,y=e.y-17,tx=e.target_x??e.x,ty=(e.target_y??e.y)-17,angle=Math.atan2(ty-y,tx-x);
       ctx.save();
+      if(globalThis.BractwoStarterAdventures?.effect(ctx,e,q)){ctx.restore();continue;}
       if(globalThis.BractwoFighterVFX.draw(ctx,e,q)){ctx.restore();continue;}
       if(globalThis.BractwoWizardVFX?.draw(ctx,e,q,now/1000)){ctx.restore();continue;}
       if(globalThis.BractwoSpellVFX.draw(ctx,e,q,now/1000)){ctx.restore();continue;}
@@ -1576,7 +1580,7 @@
     camera.x=Math.max(Math.min(halfW,world.width/2),Math.min(world.width-Math.min(halfW,world.width/2),camera.x));camera.y=Math.max(Math.min(halfH,world.height/2),Math.min(world.height-Math.min(halfH,world.height/2),camera.y));
     ctx.setTransform(viewport.dpr,0,0,viewport.dpr,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle="#668b48";ctx.fillRect(0,0,viewport.w,viewport.h);
     ctx.save();ctx.translate(Math.round(viewport.w/2),Math.round(viewport.h/2));ctx.scale(camera.scale,camera.scale);ctx.translate(-Math.round(camera.x),-Math.round(camera.y));
-    drawGround();globalThis.BractwoWizardVFX?.fields(ctx,snapshot.players||[],me,t);globalThis.BractwoCasterVFX.world(ctx,world,me,snapshot,t);if(!(me?.floor)){drawWaterways(t);drawRiver(t);drawSafeZone();drawVillage(t);}
+    drawGround();globalThis.BractwoStarterAdventures?.ground(ctx,world,me?.floor||0,{left:camera.x-halfW,right:camera.x+halfW,top:camera.y-halfH,bottom:camera.y+halfH});globalThis.BractwoWizardVFX?.fields(ctx,snapshot.players||[],me,t);globalThis.BractwoCasterVFX.world(ctx,world,me,snapshot,t);if(!(me?.floor)){drawWaterways(t);drawRiver(t);drawSafeZone();drawVillage(t);}
     globalThis.BractwoCircleVFX?.fields(ctx,(snapshot.circle_fields||[]).filter(f=>sameFloor(me,f)&&inView(f.x,f.y,Math.max(150,f.radius||0,f.length||0))),t);
     const objects=[];
     for(const entry of nearbyDrawables()){

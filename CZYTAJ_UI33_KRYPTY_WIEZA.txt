@@ -1,0 +1,87 @@
+BRACTWO KRAIN 0.8.18 — UI33: KRYPTY ŚWITU I STARA WIEŻA
+Aktualizacja wersji przeglądarkowej oraz wspólnego serwera.
+Baza: przesłany bractwo-main.zip, commit 4142ea7dfa7d637d414cfb9f128e1d5e7685e533.
+
+INSTALACJA NA OBECNYM PROJEKCIE
+1. Zachowaj kopię repozytorium i aktualnej bazy na swoim wolumenie.
+2. Wypakuj paczkę AKTUALIZACJA. Skopiuj jej zawartość do głównego katalogu
+   obecnego repozytorium, scalając katalogi server/, web/, client/ i tests/.
+   Podmień istniejące pliki, a nowe dodaj. Nie usuwaj pozostałych plików.
+   Nie przesyłaj samego ZIP-a jako jednego pliku do repozytorium.
+3. Wyślij zmienione i nowe pliki na GitHub. Pozwól Railway zbudować i uruchomić
+   nową wersję. Jeżeli automatyczne wdrażanie jest wyłączone, uruchom wdrożenie.
+4. Odśwież grę. Ekran logowania i /health wskazują UI_33. Nowy JS jest wczytywany
+   jako starter_adventures.js?v=ui33 oraz game.js?v=ui33.
+
+To nie jest sama poprawka CSS: potrzebne są razem zmiany server/ i web/.
+Nie podmieniaj bazy world.sqlite3; nie odłączaj Volume; nie zmieniaj sekretów,
+ustawień logowania Google, run.py, Dockerfile ani konfiguracji hostingu.
+Paczka nie zawiera bazy, kont testowych ani mechanizmu omijającego logowanie.
+Nie została automatycznie wysłana na GitHub ani wdrożona na Railway.
+
+Alternatywa: paczka PELNY_PROJEKT zawiera cały zaktualizowany projekt. Nie trzeba
+stosować do niej dodatkowo małej paczki AKTUALIZACJA. Ona również nie zawiera
+bazy ani sekretów wdrożenia. Nie zastępuje kopii danych z wolumenu.
+
+KRYPTY ŚWITU
+Wejście: na Dziedzińcu Świtu, kamienny grobowiec i schody (2570,445), poziom 0.
+E / przycisk interakcji przenosi na poziom -1. Trzy komnaty z korytarzami,
+sarkofagami, paleniskami i trzema kruchymi szkieletami.
+Boss: Szkielet bez głowy — 36 PŻ, KP 12, +3 do ataku, zwykły cios 1k4+1.
+Ślepy zamach: zapowiadany okrąg, 1,45 s na odejście; 1k6+2 ciętych,
+rzut obronny na Zręczność ST 11 zmniejsza obrażenia o połowę.
+Łup bossa: 15% na Sygnet Bezgłowego (+1 do rzutów obronnych na Kondycję,
+w tym koncentracji), trofeum nieumarłego i 25% na małą miksturę zdrowia.
+Skrzynia Bezgłowego: gwarantowane 120 złota i 3 małe mikstury zdrowia.
+
+STARA WIEŻA
+Wejście: bezpośrednio na południe za początkowymi szczurami (740,1750),
+otwór w północnej ścianie wieży. Zachowana została stara kopalnia obok.
+Parter na poziomie +1, izba wartowników +2, szczyt +3. Schody działają w obie
+strony. Po jednym słabszym wartowniku na dwóch niższych kondygnacjach.
+Boss na szczycie: Łucznik starej wieży — 32 PŻ, KP 12, +3 do ataku,
+zwykły strzał 1k6+1, w zwarciu słabszy atak 1k4+1.
+Strzał mierzony: stała linia celu, 1,65 s na zejście, 1k8+1 obrażeń przy trafieniu.
+Dwa kamienne filary naprawdę blokują strzały. Boss nie ucieka bez końca przed
+postacią walczącą wręcz. Łup: 12% na łuk bandyty, trofeum i 25% na miksturę.
+
+SKARB STAREJ WIEŻY — WSZYSTKIE CZTERY PRZEDMIOTY, NIE LOSOWANIE JEDNEGO
+• Napierśnik Starej Wieży +1: średni pancerz, KP 15 + Zręczność, standardowo
+  maksymalnie +2 ze Zręczności. Istniejący Mistrz średniego pancerza nadal działa.
+• Pierścień Skupionej Woli: +1 do ST czarów. Nie zwiększa trafienia ani obrażeń.
+• Tarcza Wieżowego Strażnika +1: łącznie +3 do KP, zamiast zwykłego +2.
+• Rapier Echa: 1k8 kłutych, finezja — korzysta z lepszej Siły/Zręczności zarówno
+  do trafienia, jak i obrażeń. Nie dodaje magicznego +1 do ataku/obrażeń.
+  Podczas używania zapewnia biegłość tylko w sobie: bez wydawania atutu,
+  bez trwałego szkolenia we wszystkich broniach i bez darmowego punktu cechy.
+Dodatkowo: 60 złota. Wymagania klasy dotyczące średniego pancerza i tarczy
+pozostają; wyjątek od wymaganej biegłości dotyczy wyłącznie Rapiera Echa.
+Nowe przedmioty są dostępne od poziomu 1 i nie wymagają zestrojenia.
+Pierścień ST, sygnet i samouczący rapier mają autorskie właściwości Bractwa.
+
+ZASADY SKRZYŃ I BOSSÓW
+Poziom 10 jest zaleceniem do walki, nie blokadą wejścia, schodów ani skrzyni.
+Trzeba uzyskać zaliczenie pokonania strażnika: samemu lub w uprawnionej drużynie.
+Skrzynie nie wymagają klucza ani testu umiejętności. Nagroda jest osobista,
+jednorazowa dla danej postaci i zapisana w bazie. Inny gracz jej nie zabierze.
+Przed otwarciem: podejdź do skrzyni, zakończ walkę i odczekaj 3 s po PvE.
+Dotychczasowa blokada PvP nie została skrócona. Pełny plecak nie kasuje nagrody;
+paczka z czterema przedmiotami wymaga czterech wolnych miejsc.
+Bossowie odradzają się po 4 minutach. Jeżeli strażnik odrodził się przed odbiorem,
+trzeba go znów pokonać. Ich losowy łup można zdobywać ponownie.
+
+ZGODNOŚĆ Z ZAPISAMI I INTERFEJSEM
+Nie resetowano postaci, ekwipunku, starych potworów, zadań ani świata.
+Nowe obszary i przeciwnicy są dopisane po generatorach dotychczasowego świata.
+Postać ze starszego zapisu, która znalazłaby się wewnątrz nowej bryły budynku
+na powierzchni, zostaje przeniesiona przed odpowiednie wejście, bez resetu.
+web/hud_layout.css pozostał identyczny bajt w bajt z przesłaną paczką.
+Nie dodano dużego okna walki: zapowiedzi ataków są rysowane na ziemi.
+Native Android/Godot: nie budowano nowego APK. Nowe rysowanie lokacji i bossów
+w tej aktualizacji dotyczy klienta przeglądarkowego. Ikony wyposażenia są też
+zachowane w client/assets/equipment jako zasoby źródłowe.
+
+TESTY
+python -m unittest discover -s tests -p 'test_starter_adventures_ui33.py' -v
+node tests/test_starter_adventures_ui33.cjs
+Szczegółowy wynik i ograniczenia: RAPORT_TESTOW_UI33.txt.

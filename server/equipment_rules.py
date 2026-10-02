@@ -200,6 +200,8 @@ def proficient(p,item=None):
     item=weapon(p) if item is None else item
     if not item: return True  # unarmed
     if is_focus(item):return p.class_id in item.get('class_ids',[])
+    # This item's magic provides training only for this weapon, never a feat.
+    if item.get('magic_effects',{}).get('self_training'):return True
     return has(p,'simple_weapons' if item.get('weapon_category')=='simple' else 'martial_weapons')
 
 
@@ -418,6 +420,9 @@ def preview(p,item):
         result['equip_error']='Wymaga wolnej ręki.'
     if slot in ('armor','shield','ring'):
         result['ac']=r.armor_class(q)
+        if slot=='ring':
+            result['spell_save_dc_bonus']=int(canonical.get('magic_effects',{}).get('spell_save_dc',0))
+            result['constitution_save_bonus']=int(canonical.get('magic_effects',{}).get('constitution_save',0))
         result['armor_penalty']=armor_penalty(q)
         result['speed_penalty']=armor_speed_penalty(q)>0
         if slot=='shield':result['untrained_shield']=not shield_trained(q)
