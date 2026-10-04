@@ -23,7 +23,9 @@ class Document(HTMLParser):
         super().__init__()
         self.tags = []
         self.schemas = []
+        self.headlines = []
         self._schema = None
+        self._headline = None
         self.feed(source)
 
     def handle_starttag(self, tag, attributes):
@@ -31,15 +33,22 @@ class Document(HTMLParser):
         self.tags.append((tag, attributes))
         if tag == "script" and attributes.get("type") == "application/ld+json":
             self._schema = ""
+        if tag == "h1":
+            self._headline = ""
 
     def handle_data(self, data):
         if self._schema is not None:
             self._schema += data
+        if self._headline is not None:
+            self._headline += data
 
     def handle_endtag(self, tag):
         if tag == "script" and self._schema is not None:
             self.schemas.append(json.loads(self._schema))
             self._schema = None
+        if tag == "h1" and self._headline is not None:
+            self.headlines.append(self._headline.strip())
+            self._headline = None
 
     def find(self, tag, **attributes):
         return [attrs for name, attrs in self.tags
@@ -128,12 +137,68 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(webpage["isPartOf"]["@id"], self.origin + "/#website")
                 if page.path != "/":
                     breadcrumbs = next(item for item in graph if item["@type"] == "BreadcrumbList")
+                    expected_paths = ["/"]
+                    if page.published_date:
+                        expected_paths.append("/blog")
+                    expected_paths.append(page.path)
                     self.assertEqual([item["item"] for item in breadcrumbs["itemListElement"]],
-                                     [self.origin + "/", self.origin + page.path])
+                                     [self.origin + path for path in expected_paths])
                 titles.add(page.title)
                 descriptions.add(page.description)
         self.assertEqual(len(titles), len(seo.PUBLIC_PAGES))
         self.assertEqual(len(descriptions), len(seo.PUBLIC_PAGES))
+
+    async def test_blog_index_collection_links_to_every_published_article(self):
+        response = await self.client.get("/blog")
+        self.assertEqual(response.status, 200)
+        document = Document(await response.text())
+        graph = document.schemas[0]["@graph"]
+        webpage = next(item for item in graph if item["@type"] == "WebPage")
+        collection = next(item for item in graph if item["@type"] == "CollectionPage")
+        articles = next(item for item in graph if item["@type"] == "ItemList")
+        self.assertEqual(webpage["mainEntity"]["@id"], collection["@id"])
+        self.assertEqual(collection["url"], self.origin + "/blog")
+        self.assertEqual(collection["mainEntity"]["@id"], articles["@id"])
+        self.assertEqual(document.find("meta", property="og:type")[0]["content"], "website")
+        self.assertEqual([item["url"] for item in articles["itemListElement"]],
+                         [self.origin + page.path for page in seo.BLOG_ARTICLES])
+        self.assertEqual([item["position"] for item in articles["itemListElement"]],
+                         list(range(1, len(seo.BLOG_ARTICLES) + 1)))
+        visible_links = {link.get("href") for link in document.find("a")}
+        self.assertTrue({page.path for page in seo.BLOG_ARTICLES}.issubset(visible_links))
+        self.assertFalse(any(item["@type"] == "BlogPosting" for item in graph))
+
+    async def test_article_schema_matches_visible_headline_author_date_and_breadcrumbs(self):
+        for page in seo.BLOG_ARTICLES:
+            with self.subTest(path=page.path):
+                response = await self.client.get(page.path)
+                self.assertEqual(response.status, 200)
+                source = await response.text()
+                document = Document(source)
+                graph = document.schemas[0]["@graph"]
+                webpage = next(item for item in graph if item["@type"] == "WebPage")
+                article = next(item for item in graph if item["@type"] == "BlogPosting")
+                breadcrumbs = next(item for item in graph if item["@type"] == "BreadcrumbList")
+                self.assertEqual(article["headline"], page.name)
+                self.assertEqual(document.headlines, [article["headline"]])
+                self.assertEqual(article["url"], self.origin + page.path)
+                self.assertEqual(article["mainEntityOfPage"]["@id"], webpage["@id"])
+                self.assertEqual(webpage["mainEntity"]["@id"], article["@id"])
+                self.assertEqual(article["datePublished"], "2026-10-04")
+                self.assertNotIn("dateModified", article)
+                self.assertTrue(document.find("time", datetime=article["datePublished"]))
+                self.assertEqual(article["author"], {"@type": "Organization",
+                                 "name": "Zespół Bractwa Krain", "url": self.origin + "/"})
+                self.assertEqual(article["publisher"], article["author"])
+                self.assertIn(article["author"]["name"], source)
+                self.assertEqual(article["image"], self.origin + seo.IMAGE_PATH)
+                self.assertEqual(article["articleSection"], page.category)
+                self.assertEqual(document.find("meta", property="og:type")[0]["content"], "article")
+                self.assertEqual(document.find("meta", property="article:published_time")[0]["content"],
+                                 article["datePublished"])
+                self.assertEqual([item["position"] for item in breadcrumbs["itemListElement"]], [1, 2, 3])
+                self.assertEqual([item["item"] for item in breadcrumbs["itemListElement"]],
+                                 [self.origin + "/", self.origin + "/blog", self.origin + page.path])
 
     async def test_sitemap_lists_only_successful_canonical_documents(self):
         response = await self.client.get("/sitemap.xml")
@@ -171,7 +236,8 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
     async def test_technical_endpoints_and_errors_are_noindex(self):
         for path, status in (("/health", 200), ("/ranking", 200), ("/auth/google/config", 200),
                              ("/offline.html", 200), ("/missing-page", 404),
-                             ("/poradniki/missing-guide", 404), ("/assets/missing.png", 404)):
+                             ("/poradniki/missing-guide", 404), ("/blog/missing-article", 404),
+                             ("/assets/missing.png", 404)):
             with self.subTest(path=path):
                 response = await self.client.get(path)
                 self.assertEqual(response.status, status)
@@ -211,6 +277,7 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
 
     async def test_public_styles_and_preview_image_are_available(self):
         for path, content_type in (("/landing.css", "text/css"), ("/guide.css", "text/css"),
+                                   ("/blog.css", "text/css"),
                                    (seo.IMAGE_PATH, "image/png")):
             response = await self.client.get(path)
             self.assertEqual(response.status, 200)

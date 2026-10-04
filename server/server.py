@@ -2079,7 +2079,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
                 raise web.HTTPMovedPermanently(location=request.rel_url.with_path(page.path,keep_query=True))
             app.router.add_get(page.path+"/",page_redirect)
             app.router.add_get(page.path+".html",page_redirect)
-    for filename in ("landing.css","guide.css","comments.css","comments.js"):
+    for filename in ("landing.css","guide.css","blog.css","comments.css","comments.js"):
         async def public_css(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

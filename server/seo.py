@@ -33,9 +33,52 @@ class PublicPage:
     title: str
     description: str
     name: str
+    published_date: str | None = None
+    category: str | None = None
 
 
 HOME_PAGE = PublicPage("/", "index.html", TITLE, DESCRIPTION, "Bractwo Krain")
+BLOG_PAGE = PublicPage(
+    "/blog", "blog/index.html",
+    "Blog D&D — poradniki i zasady | Bractwo Krain",
+    "Poznaj D&D online po polsku: zasady k20, Klasa Pancerza, magia i atuty. "
+    "Praktyczne poradniki oraz przykłady z polskiego MMORPG Bractwo Krain.",
+    "Blog D&D i Bractwa Krain",
+)
+BLOG_ARTICLES = (
+    PublicPage(
+        "/blog/dnd-online", "blog/dnd-online.html",
+        "D&D online po polsku — sesja RPG czy gra w przeglądarce? | Bractwo Krain",
+        "Jak grać w D&D online po polsku? Porównaj sesję z Mistrzem Gry, wirtualny "
+        "stół i MMORPG w przeglądarce. Poznaj zasady D&D zaadaptowane w Bractwie Krain.",
+        "D&D online po polsku — sesja RPG czy gra w przeglądarce?",
+        published_date="2026-10-04", category="D&D online",
+    ),
+    PublicPage(
+        "/blog/walka-k20", "blog/walka-k20.html",
+        "K20, Klasa Pancerza i trafienia krytyczne w D&D | Bractwo Krain",
+        "Jak działa walka w D&D? Zrozum rzut k20, premię do ataku, Klasę Pancerza "
+        "i trafienia krytyczne dzięki obliczeniom i przykładom z Bractwa Krain.",
+        "K20, Klasa Pancerza i trafienia krytyczne — jak działa walka?",
+        published_date="2026-10-04", category="Zasady D&D",
+    ),
+    PublicPage(
+        "/blog/magia-kregi-czarow", "blog/magia-kregi-czarow.html",
+        "Czarodziej czy druid? Magia D&D w Bractwie Krain",
+        "Kręgi czarów, rzuty obronne i koncentracja w D&D. Porównaj czarodzieja "
+        "z druidem i poznaj adaptację magii do rozgrywki w Bractwie Krain.",
+        "Czarodziej czy druid? Magia D&D w Bractwie Krain",
+        published_date="2026-10-04", category="Magia D&D",
+    ),
+    PublicPage(
+        "/blog/atuty-rozwoj-postaci", "blog/atuty-rozwoj-postaci.html",
+        "Atuty w D&D i Bractwie — jak rozwijać bohatera? | Bractwo Krain",
+        "Poznaj atuty, cechy i biegłości w D&D oraz ich rolę w rozwoju postaci. "
+        "Zobacz, jak wybierać ulepszenia bohatera w Bractwie Krain.",
+        "Atuty w D&D i Bractwie — jak rozwijać bohatera?",
+        published_date="2026-10-04", category="Rozwój postaci",
+    ),
+)
 PUBLIC_PAGES = (
     HOME_PAGE,
     PublicPage(
@@ -59,6 +102,8 @@ PUBLIC_PAGES = (
         "Dowiedz się, jak przygotować bohatera i współpracować z innymi graczami.",
         "Świat i wyprawy",
     ),
+    BLOG_PAGE,
+    *BLOG_ARTICLES,
 )
 
 
@@ -119,7 +164,7 @@ def metadata_head(config, page=HOME_PAGE):
     homepage = config.canonical
     image = config.origin + IMAGE_PATH
     attributes = [
-        ("property", "og:type", "website"),
+        ("property", "og:type", "article" if page.published_date else "website"),
         ("property", "og:locale", "pl_PL"),
         ("property", "og:site_name", "Bractwo Krain"),
         ("property", "og:title", page.title),
@@ -136,6 +181,10 @@ def metadata_head(config, page=HOME_PAGE):
         ("name", "twitter:image", image),
         ("name", "twitter:image:alt", IMAGE_ALT),
     ]
+    if page.published_date:
+        attributes.append(("property", "article:published_time", page.published_date))
+        if page.category:
+            attributes.append(("property", "article:section", page.category))
     if config.google_verification:
         attributes.append(("name", "google-site-verification", config.google_verification))
     lines = [
@@ -157,6 +206,10 @@ def metadata_head(config, page=HOME_PAGE):
         webpage["mainEntity"] = {"@id": homepage + "#game"}
     else:
         webpage["breadcrumb"] = {"@id": canonical + "#breadcrumb"}
+        if page.published_date:
+            webpage["mainEntity"] = {"@id": canonical + "#article"}
+        elif page.path == BLOG_PAGE.path:
+            webpage["mainEntity"] = {"@id": canonical + "#collection"}
     structured = {"@context": "https://schema.org", "@graph": [webpage]}
     if page.path == "/":
         structured["@graph"].extend([
@@ -174,13 +227,43 @@ def metadata_head(config, page=HOME_PAGE):
              "isPartOf": {"@id": homepage + "#website"}},
         ])
     else:
+        breadcrumbs = [
+            {"@type": "ListItem", "position": 1, "name": "Bractwo Krain", "item": homepage},
+        ]
+        if page.published_date:
+            breadcrumbs.append({"@type": "ListItem", "position": 2,
+                                "name": BLOG_PAGE.name, "item": config.origin + BLOG_PAGE.path})
+        breadcrumbs.append({"@type": "ListItem", "position": len(breadcrumbs) + 1,
+                            "name": page.name, "item": canonical})
         structured["@graph"].append({
             "@type": "BreadcrumbList", "@id": canonical + "#breadcrumb",
-            "itemListElement": [
-                {"@type": "ListItem", "position": 1, "name": "Bractwo Krain", "item": homepage},
-                {"@type": "ListItem", "position": 2, "name": page.name, "item": canonical},
-            ],
+            "itemListElement": breadcrumbs,
         })
+    if page.path == BLOG_PAGE.path:
+        structured["@graph"].extend([
+            {"@type": "CollectionPage", "@id": canonical + "#collection", "url": canonical,
+             "name": page.name, "description": page.description, "inLanguage": "pl-PL",
+             "isPartOf": {"@id": homepage + "#website"},
+             "mainEntity": {"@id": canonical + "#articles"}},
+            {"@type": "ItemList", "@id": canonical + "#articles",
+             "itemListElement": [
+                 {"@type": "ListItem", "position": position, "name": article.name,
+                  "url": config.origin + article.path}
+                 for position, article in enumerate(BLOG_ARTICLES, start=1)
+             ]},
+        ])
+    elif page.published_date:
+        author = {"@type": "Organization", "name": "Zespół Bractwa Krain", "url": homepage}
+        article = {
+            "@type": "BlogPosting", "@id": canonical + "#article", "url": canonical,
+            "headline": page.name, "description": page.description, "inLanguage": "pl-PL",
+            "datePublished": page.published_date, "author": author, "publisher": author,
+            "image": image, "mainEntityOfPage": {"@id": canonical + "#webpage"},
+            "isPartOf": {"@id": config.origin + BLOG_PAGE.path + "#collection"},
+        }
+        if page.category:
+            article["articleSection"] = page.category
+        structured["@graph"].append(article)
     # A JSON script remains safe even if future editable text contains </script>.
     payload = json.dumps(structured, ensure_ascii=False, separators=(",", ":"))
     payload = payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
