@@ -128,7 +128,8 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                                  [{"rel": "canonical", "href": self.origin + page.path}])
                 self.assertEqual(document.find("meta", property="og:url")[0]["content"], self.origin + page.path)
                 self.assertEqual(document.find("meta", property="og:title")[0]["content"], page.title)
-                self.assertEqual(document.find("meta", name="twitter:card")[0]["content"], "summary_large_image")
+                self.assertEqual(document.find("meta", name="twitter:card")[0]["content"],
+                                 "summary" if page.article_kind == "NewsArticle" else "summary_large_image")
                 self.assertEqual(len(document.find("meta", name="robots")), 1)
                 self.assertEqual(len(document.schemas), 1)
                 graph = document.schemas[0]["@graph"]
@@ -158,18 +159,19 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
         articles = next(item for item in graph if item["@type"] == "ItemList")
         self.assertEqual(webpage["mainEntity"]["@id"], collection["@id"])
         self.assertEqual(collection["url"], self.origin + "/blog")
+        self.assertEqual(document.headlines, [seo.BLOG_PAGE.name])
         self.assertEqual(collection["mainEntity"]["@id"], articles["@id"])
         self.assertEqual(document.find("meta", property="og:type")[0]["content"], "website")
         self.assertEqual([item["url"] for item in articles["itemListElement"]],
-                         [self.origin + page.path for page in seo.BLOG_ARTICLES])
+                         [self.origin + page.path for page in seo.ALL_BLOG_ARTICLES])
         self.assertEqual([item["position"] for item in articles["itemListElement"]],
-                         list(range(1, len(seo.BLOG_ARTICLES) + 1)))
+                         list(range(1, len(seo.ALL_BLOG_ARTICLES) + 1)))
         visible_links = {link.get("href") for link in document.find("a")}
-        self.assertTrue({page.path for page in seo.BLOG_ARTICLES}.issubset(visible_links))
-        self.assertFalse(any(item["@type"] == "BlogPosting" for item in graph))
+        self.assertTrue({page.path for page in seo.ALL_BLOG_ARTICLES}.issubset(visible_links))
+        self.assertFalse(any(item["@type"] in ("BlogPosting", "NewsArticle") for item in graph))
 
     async def test_article_schema_matches_visible_headline_author_date_and_breadcrumbs(self):
-        for page in seo.BLOG_ARTICLES:
+        for page in seo.ALL_BLOG_ARTICLES:
             with self.subTest(path=page.path):
                 response = await self.client.get(page.path)
                 self.assertEqual(response.status, 200)
@@ -177,7 +179,7 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 document = Document(source)
                 graph = document.schemas[0]["@graph"]
                 webpage = next(item for item in graph if item["@type"] == "WebPage")
-                article = next(item for item in graph if item["@type"] == "BlogPosting")
+                article = next(item for item in graph if item["@type"] == page.article_kind)
                 breadcrumbs = next(item for item in graph if item["@type"] == "BreadcrumbList")
                 self.assertEqual(article["headline"], page.name)
                 self.assertEqual(document.headlines, [article["headline"]])
@@ -191,7 +193,15 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                                  "name": "Zespół Bractwa Krain", "url": self.origin + "/"})
                 self.assertEqual(article["publisher"], article["author"])
                 self.assertIn(article["author"]["name"], source)
-                self.assertEqual(article["image"], self.origin + seo.IMAGE_PATH)
+                if page.article_kind == "NewsArticle":
+                    self.assertNotIn("image", article)
+                    self.assertNotIn("primaryImageOfPage", webpage)
+                    self.assertNotIn("about", webpage)
+                    self.assertFalse(document.find("meta", property="og:image"))
+                    self.assertFalse(document.find("meta", name="twitter:image"))
+                else:
+                    self.assertEqual(article["image"], self.origin + seo.IMAGE_PATH)
+                    self.assertEqual(webpage["about"]["@id"], self.origin + "/#game")
                 self.assertEqual(article["articleSection"], page.category)
                 self.assertEqual(document.find("meta", property="og:type")[0]["content"], "article")
                 self.assertEqual(document.find("meta", property="article:published_time")[0]["content"],

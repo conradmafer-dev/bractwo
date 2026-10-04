@@ -35,15 +35,16 @@ class PublicPage:
     name: str
     published_date: str | None = None
     category: str | None = None
+    article_kind: str = "BlogPosting"
 
 
 HOME_PAGE = PublicPage("/", "index.html", TITLE, DESCRIPTION, "Bractwo Krain")
 BLOG_PAGE = PublicPage(
     "/blog", "blog/index.html",
-    "Blog D&D — poradniki i zasady | Bractwo Krain",
+    "Blog D&D i newsy MMORPG | Bractwo Krain",
     "Poznaj D&D online po polsku: zasady k20, Klasa Pancerza, magia i atuty. "
-    "Praktyczne poradniki oraz przykłady z polskiego MMORPG Bractwo Krain.",
-    "Blog D&D i Bractwa Krain",
+    "Czytaj poradniki Bractwa Krain i sprawdzone aktualności ze świata MMORPG.",
+    "Blog D&D i aktualności MMORPG",
 )
 BLOG_ARTICLES = (
     PublicPage(
@@ -79,6 +80,41 @@ BLOG_ARTICLES = (
         published_date="2026-10-04", category="Rozwój postaci",
     ),
 )
+NEWS_ARTICLES = (
+    PublicPage(
+        "/blog/runescape-4-zapowiedz", "blog/runescape-4-zapowiedz.html",
+        "RuneScape 4 zapowiedziane — nowe MMORPG i Ashenfall | Bractwo Krain",
+        "Jagex zapowiedział RuneScape 4 z początkiem przygody w Ashenfall. "
+        "Co ogłoszono o nowym MMORPG, czego jeszcze nie wiemy i co oznacza to dla graczy?",
+        "RuneScape 4 zapowiedziane. Nowe MMORPG zacznie się w Ashenfall",
+        published_date="2026-10-04", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+    ),
+    PublicPage(
+        "/blog/runescape-pluginy-beta", "blog/runescape-pluginy-beta.html",
+        "RuneScape: beta pluginów 6 października i Quest Helper | Bractwo Krain",
+        "Beta pluginów RuneScape rusza 6 października 2026. Quest Helper obejmie "
+        "62 zadania. Poznaj potwierdzone informacje i ograniczenia testów.",
+        "RuneScape: beta pluginów 6 października. Quest Helper z 62 zadaniami",
+        published_date="2026-10-04", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+    ),
+    PublicPage(
+        "/blog/ddo-court-of-strahd", "blog/ddo-court-of-strahd.html",
+        "DDO: The Court of Strahd 14 października i Hardcore | Bractwo Krain",
+        "14 października 2026 w Dungeons & Dragons Online startuje The Court of Strahd. "
+        "Poznaj latarnie, zasady Hardcore i potwierdzone szczegóły wydarzenia.",
+        "DDO: The Court of Strahd rusza 14 października. Latarnie i tryb Hardcore",
+        published_date="2026-10-04", category="Newsy MMORPG · Dungeons & Dragons", article_kind="NewsArticle",
+    ),
+    PublicPage(
+        "/blog/pantheon-crafting-2027", "blog/pantheon-crafting-2027.html",
+        "Pantheon: crafting planowany na 2027 — Q&A 2 października | Bractwo Krain",
+        "Q&A Pantheon z 2 października 2026: crafting planowany na 2027 rok. "
+        "Sprawdzamy zapowiedzi twórców i rozróżniamy plany od gotowych funkcji.",
+        "Pantheon: crafting planowany na 2027. Co ujawniono w Q&A z 2 października?",
+        published_date="2026-10-04", category="Newsy MMORPG · Pantheon", article_kind="NewsArticle",
+    ),
+)
+ALL_BLOG_ARTICLES = (*NEWS_ARTICLES, *BLOG_ARTICLES)
 PUBLIC_PAGES = (
     HOME_PAGE,
     PublicPage(
@@ -103,7 +139,7 @@ PUBLIC_PAGES = (
         "Świat i wyprawy",
     ),
     BLOG_PAGE,
-    *BLOG_ARTICLES,
+    *ALL_BLOG_ARTICLES,
 )
 
 
@@ -163,6 +199,7 @@ def metadata_head(config, page=HOME_PAGE):
     canonical = config.origin + page.path
     homepage = config.canonical
     image = config.origin + IMAGE_PATH
+    is_news = page.article_kind == "NewsArticle"
     attributes = [
         ("property", "og:type", "article" if page.published_date else "website"),
         ("property", "og:locale", "pl_PL"),
@@ -170,17 +207,20 @@ def metadata_head(config, page=HOME_PAGE):
         ("property", "og:title", page.title),
         ("property", "og:description", page.description),
         ("property", "og:url", canonical),
-        ("property", "og:image", image),
-        ("property", "og:image:type", "image/png"),
-        ("property", "og:image:width", "1920"),
-        ("property", "og:image:height", "1080"),
-        ("property", "og:image:alt", IMAGE_ALT),
-        ("name", "twitter:card", "summary_large_image"),
+        ("name", "twitter:card", "summary" if is_news else "summary_large_image"),
         ("name", "twitter:title", page.title),
         ("name", "twitter:description", page.description),
-        ("name", "twitter:image", image),
-        ("name", "twitter:image:alt", IMAGE_ALT),
     ]
+    if not is_news:
+        attributes.extend([
+            ("property", "og:image", image),
+            ("property", "og:image:type", "image/png"),
+            ("property", "og:image:width", "1920"),
+            ("property", "og:image:height", "1080"),
+            ("property", "og:image:alt", IMAGE_ALT),
+            ("name", "twitter:image", image),
+            ("name", "twitter:image:alt", IMAGE_ALT),
+        ])
     if page.published_date:
         attributes.append(("property", "article:published_time", page.published_date))
         if page.category:
@@ -199,9 +239,10 @@ def metadata_head(config, page=HOME_PAGE):
         "@type": "WebPage", "@id": canonical + "#webpage", "url": canonical,
         "name": page.title, "description": page.description, "inLanguage": "pl-PL",
         "isPartOf": {"@id": homepage + "#website"},
-        "about": {"@id": homepage + "#game"},
-        "primaryImageOfPage": {"@id": homepage + "#image"},
     }
+    if not is_news:
+        webpage["about"] = {"@id": homepage + "#game"}
+        webpage["primaryImageOfPage"] = {"@id": homepage + "#image"}
     if page.path == "/":
         webpage["mainEntity"] = {"@id": homepage + "#game"}
     else:
@@ -249,18 +290,20 @@ def metadata_head(config, page=HOME_PAGE):
              "itemListElement": [
                  {"@type": "ListItem", "position": position, "name": article.name,
                   "url": config.origin + article.path}
-                 for position, article in enumerate(BLOG_ARTICLES, start=1)
+                 for position, article in enumerate(ALL_BLOG_ARTICLES, start=1)
              ]},
         ])
     elif page.published_date:
         author = {"@type": "Organization", "name": "Zespół Bractwa Krain", "url": homepage}
         article = {
-            "@type": "BlogPosting", "@id": canonical + "#article", "url": canonical,
+            "@type": page.article_kind, "@id": canonical + "#article", "url": canonical,
             "headline": page.name, "description": page.description, "inLanguage": "pl-PL",
             "datePublished": page.published_date, "author": author, "publisher": author,
-            "image": image, "mainEntityOfPage": {"@id": canonical + "#webpage"},
+            "mainEntityOfPage": {"@id": canonical + "#webpage"},
             "isPartOf": {"@id": config.origin + BLOG_PAGE.path + "#collection"},
         }
+        if not is_news:
+            article["image"] = image
         if page.category:
             article["articleSection"] = page.category
         structured["@graph"].append(article)
