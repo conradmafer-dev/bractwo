@@ -1,0 +1,40 @@
+{
+  "base_commit": "cf1e946c7885b478b2d324ddb096557033756216",
+  "current_python": {
+    "total": 67,
+    "passed": 60,
+    "failed": 7
+  },
+  "boss_tests": {
+    "total": 34,
+    "passed": 34
+  },
+  "historical_modules": {
+    "total": 33,
+    "passed": 26,
+    "failed": 7,
+    "unchanged_failures": [
+      "test_01_local_boat_payment_destination_home_and_remote_rejection",
+      "test_02_nearest_merchant_stock_is_authoritative",
+      "test_05_ocean_migration_only_moves_legacy_revision",
+      "test_catalog_rewards_and_authored_loot_only_expose_health",
+      "test_mithral_removes_strength_and_stealth_penalties",
+      "test_passives_require_a_point_and_cannot_be_repeated",
+      "test_repeatable_asi_is_serializable_and_caps_each_allocation"
+    ]
+  },
+  "javascript": {
+    "command": "node --test tests/test_starter_adventures_ui33.cjs",
+    "passed": 1,
+    "failed": 0
+  },
+  "original_commit_with_new_tests": {
+    "tests": 5,
+    "failed_subtests": 6,
+    "failed_test_methods": 3
+  },
+  "checks": [
+    "git diff --check",
+    "py_compile: starter_adventures, balance_starter_bosses, test_starter_boss_balance"
+  ]
+}

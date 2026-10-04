@@ -144,22 +144,26 @@ def configure(c, obstacles, landmarks, zones, enemies):
     enemies['dawn_crypt_skeleton'].update(creature_type='undead',condition_immunities=['poisoned'])
     creature('old_tower_lookout','Wartownik starej wieży',9,11,2,[1,4,1],
              appearance='goblin',starter_visual='tower_lookout',color='#bd9877')
-    s=creature(CRYPT_BOSS,'Szkielet bez głowy',36,12,3,[1,4,1],
+    # More HP prevents a short spell burst from skipping the encounter; lower
+    # AC helps attack-roll builds, especially a bow caught at close range.
+    s=creature(CRYPT_BOSS,'Szkielet bez głowy',64,8,3,[1,4,1],
         appearance='skeleton',starter_visual='headless',color='#ded5b5')
-    s.update(boss=True,level=10,xp=150,gold=28,respawn=240,size=1.2,hp_dice=[8,8,0],
+    s.update(boss=True,level=10,xp=150,gold=28,respawn=240,size=1.2,hp_dice=[8,8,28],
         creature_type='undead',condition_immunities=['poisoned'],aggro=260,
         special_range=160,special_pattern='blind_sweep',special_interval=9.0,
-        special_dice=[1,6,2],special_windup=1.45,special_radius=110)
+        special_dice=[1,6,2],special_windup=1.65,special_radius=80,
+        special_recovery=1.8,attack_interval=4.2,speed=68)
     s['loot']['entries']=[dict(kind='item',template='ring_headless_signet',chance=.15),
         dict(kind='item',template='trophy_undead',chance=1),
         dict(kind='potion',template='health_potion',chance=.25)]
-    s=creature(TOWER_BOSS,'Łucznik starej wieży',32,12,3,[1,6,1],
+    s=creature(TOWER_BOSS,'Łucznik starej wieży',60,8,3,[1,6,1],
         appearance='goblin',starter_visual='tower_archer',color='#beaa7a')
-    s.update(boss=True,level=10,xp=150,gold=28,respawn=240,hp_dice=[5,8,10],
+    s.update(boss=True,level=10,xp=150,gold=28,respawn=240,hp_dice=[8,8,24],
         projectile='arrow',combat_role='ranged',range=360,melee_range=58,
         melee_dice=[1,4,1],special_dice=[1,8,1],aggro=350,speed=72,
         retreat_distance=0,special_range=430,special_pattern='aimed_shot',
-        special_interval=9.5,special_windup=1.65,special_width=22)
+        special_interval=9.5,special_windup=1.65,special_width=22,
+        special_recovery=1.5)
     s['loot']['entries']=[dict(kind='item',template='bandit_longbow',chance=.12),
         dict(kind='item',template='trophy_raider',chance=1),
         dict(kind='potion',template='health_potion',chance=.25)]
@@ -262,9 +266,12 @@ class StarterAdventureGame:
         target_point=SimpleNamespace(id='',x=h['target_x'],y=h['target_y'],floor=e.floor)
         effect=self.combat_effect(e,'starter_warning',target_point,radius=h['radius'],duration=delay)
         effect.update(shape=shape,width=h['width'],label=h['action'])
-        e.mobile_cast=False;e.cast_until=self.time+delay
-        e.attack_until=self.time+delay;e.ready=max(e.ready,self.time+delay+.8)
-        e.ranged_ready=max(e.ranged_ready,self.time+delay+.8)
+        # Recovery holds position too, giving melee a gap to close and a bow
+        # user a chance to regain distance. Damage still resolves at windup end.
+        recovery=s.get('special_recovery',.8)
+        e.mobile_cast=False;e.cast_until=self.time+delay+recovery
+        e.attack_until=self.time+delay;e.ready=max(e.ready,e.cast_until)
+        e.ranged_ready=max(e.ranged_ready,e.cast_until)
 
     def resolve_hazards(self):
         try:from . import environment_rules as env
