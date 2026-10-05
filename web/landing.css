@@ -138,6 +138,11 @@
 #authScreen .ranking-heading small { font-size: 9px; }
 #authScreen .ranking-list { margin-top: 15px; max-height: 262px; font: 12px/1.6 system-ui, sans-serif; }
 #authScreen .ranking-row { padding: 9px 0; }
+#authScreen .landing-game-recommendation { display: flex; flex-wrap: wrap; align-items: center; gap: 24px 32px; margin-bottom: 32px; padding: 28px; border: 1px solid var(--landing-line); border-radius: 3px; background: #15261e88; }
+#authScreen .landing-game-recommendation > div { flex: 1 1 400px; min-width: 0; }
+#authScreen .landing-game-recommendation h2 { margin: 10px 0 12px; font-size: 30px; }
+#authScreen .landing-game-recommendation > div > p:last-child { margin: 0; color: var(--landing-muted); font-size: 14px; line-height: 1.8; }
+#authScreen .landing-game-recommendation .landing-cta { margin-top: 0; max-width: 100%; }
 #authScreen .landing-footer { border-top: 1px solid var(--landing-line); padding: 26px 0 35px; display: flex; align-items: center; justify-content: space-between; gap: 20px; font-size: 10px; color: #95a58f; }
 #authScreen .landing-footer > span > span { margin: 0 8px; }
 #authScreen .landing-footer a { padding: 8px 0; }
