@@ -38,8 +38,10 @@
 #authScreen .landing-nav a:hover, #authScreen .landing-text-link:hover, #authScreen .landing-footer a:hover { color: #f6deb1; }
 #authScreen .landing-nav .landing-nav-play { padding: 9px 18px; border: 1px solid #bda77877; border-radius: 3px; color: #f0d6a5; }
 #authScreen .landing-nav-play span { margin-left: 15px; }
-#authScreen .landing-hero { display: grid; grid-template-columns: minmax(0, 1.34fr) minmax(340px, .9fr); gap: clamp(30px, 7vw, 104px); align-items: center; padding: 72px 0 76px; }
+#authScreen .landing-hero { display: grid; grid-template-columns: minmax(0, 1.34fr) minmax(340px, .9fr); grid-template-areas: "intro login" "description login"; gap: 0 clamp(30px, 7vw, 104px); align-items: center; padding: 72px 0 76px; }
 #authScreen .landing-intro { min-width: 0; }
+#authScreen .landing-hero > section.landing-intro { grid-area: intro; align-self: end; }
+#authScreen .landing-after-login { grid-area: description; align-self: start; }
 #authScreen .landing-kicker { font: 600 10px/1.6 system-ui, sans-serif; color: var(--landing-gold); letter-spacing: 1.8px; }
 #authScreen .landing-intro > .landing-kicker { display: flex; align-items: center; gap: 10px; }
 #authScreen .landing-kicker > span { width: 6px; height: 6px; display: inline-block; border: 1px solid #d5b776; transform: rotate(45deg); flex: 0 0 auto; }
@@ -56,7 +58,7 @@
 #authScreen .landing-cta:hover { filter: brightness(1.09); }
 #authScreen .landing-platforms { color: #9eaf9f; font-size: 11px; margin-top: 16px; }
 #authScreen .landing-platforms span { padding: 0 7px; color: #728674; }
-#authScreen .landing-login { width: 100%; max-width: none; padding: 36px 30px 23px; margin: 0; align-self: center; background: linear-gradient(145deg, #26372aed, #15241ded); border: 1px solid #b29d685c; border-radius: 4px; box-shadow: 0 25px 60px #0003, inset 0 0 0 5px #10251c44; scroll-margin-top: 28px; }
+#authScreen .landing-login { grid-area: login; width: 100%; max-width: none; padding: 36px 30px 23px; margin: 0; align-self: center; background: linear-gradient(145deg, #26372aed, #15241ded); border: 1px solid #b29d685c; border-radius: 4px; box-shadow: 0 25px 60px #0003, inset 0 0 0 5px #10251c44; scroll-margin-top: 28px; }
 #authScreen .landing-login-ornament { position: absolute; top: -18px; left: calc(50% - 18px); width: 36px; height: 36px; background: #1e3326; display: grid; place-items: center; color: #dbbd7f; font: 24px Georgia, serif; }
 #authScreen .landing-login > .eyebrow { font-size: 8px; letter-spacing: 1.35px; color: #d9bf8b; text-align: center; }
 #authScreen .landing-login h2 { font-size: 31px; text-align: center; margin: 14px 0 12px; }
@@ -167,7 +169,7 @@
   #authScreen .landing-header { min-height: 80px; flex-wrap: wrap; gap: 10px 20px; padding: 16px 0; }
   #authScreen .landing-nav { flex-wrap: wrap; gap: 8px 20px; font-size: 14px; }
   #authScreen .landing-nav a { min-height: 44px; display: inline-flex; align-items: center; }
-  #authScreen .landing-hero { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 30px 0 40px; }
+  #authScreen .landing-hero { grid-template-columns: minmax(0, 1fr); grid-template-areas: "intro" "login" "description"; gap: 28px; padding: 30px 0 40px; }
   #authScreen .landing-intro { max-width: 640px; }
   #authScreen .landing-intro h1 { font-size: clamp(38px, 7vw, 64px); line-height: 1.08; margin: 14px 0; letter-spacing: -1.8px; }
   #authScreen .landing-intro h1 em { display: inline; }
