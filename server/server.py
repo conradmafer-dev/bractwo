@@ -2114,6 +2114,11 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
                 headers["Content-Type"] = "application/javascript"
             return web.FileResponse(path,headers=headers)
         app.router.add_get(route,asset)
+    async def favicon(request):
+        return web.FileResponse(web_dir/"favicon.ico",headers={
+            "Content-Type":"image/vnd.microsoft.icon", "Cache-Control":"public, max-age=86400",
+            "X-Content-Type-Options":"nosniff"})
+    app.router.add_get("/favicon.ico",favicon)
     app.router.add_static("/assets/",web_dir/"assets",show_index=False)
     app.router.add_static("/icons/",web_dir/"icons",show_index=False)
     app.cleanup_ctx.append(lifecycle)

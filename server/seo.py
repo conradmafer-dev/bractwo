@@ -287,6 +287,7 @@ def metadata_head(config, page=HOME_PAGE):
         f'<meta name="description" content="{escape(page.description, quote=True)}">',
         '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">',
         f'<link rel="canonical" href="{escape(canonical, quote=True)}">',
+        '<link rel="icon" href="/favicon.ico" type="image/vnd.microsoft.icon" sizes="16x16 32x32 48x48 64x64 128x128 256x256">',
     ]
     lines.extend(f'<meta {kind}="{name}" content="{escape(value, quote=True)}">'
                  for kind, name, value in attributes)
