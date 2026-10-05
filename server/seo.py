@@ -117,6 +117,16 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/aion-2-start-polska", "blog/aion-2-start-polska.html",
+        "AION 2: start 5 października — godzina w Polsce | Bractwo Krain",
+        "Globalny start AION 2 zaplanowano na 5 października 2026. Sprawdź godzinę w Polsce, "
+        "harmonogram przerwy technicznej i zmiany w aktualizacji premierowej.",
+        "AION 2: globalny start 5 października. O której ruszą serwery w Polsce?",
+        published_date="2026-10-05", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/aion-2-start-skrzydla-ilustracja-1200.webp",
+                        "Skrzydlata postać nad chmurami przed podniebną cytadelą — ilustracja redakcyjna do artykułu o starcie AION 2.", 1200, 675),
+    ),
+    PublicPage(
         "/blog/runescape-4-zapowiedz", "blog/runescape-4-zapowiedz.html",
         "RuneScape 4 zapowiedziane — nowe MMORPG i Ashenfall | Bractwo Krain",
         "Jagex zapowiedział RuneScape 4 z początkiem przygody w Ashenfall. "

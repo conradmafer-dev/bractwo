@@ -215,7 +215,7 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(article["url"], self.origin + page.path)
                 self.assertEqual(article["mainEntityOfPage"]["@id"], webpage["@id"])
                 self.assertEqual(webpage["mainEntity"]["@id"], article["@id"])
-                self.assertEqual(article["datePublished"], "2026-10-04")
+                self.assertEqual(article["datePublished"], page.published_date)
                 self.assertNotIn("dateModified", article)
                 self.assertTrue(document.find("time", datetime=article["datePublished"]))
                 self.assertEqual(article["author"], {"@type": "Organization",

@@ -38,3 +38,11 @@ Editorial concept illustration for a Polish MMORPG news article about planned cr
 `server/seo.py` owns the canonical article image, dimensions and alt text. Keep those values synchronized with the visible figure. The same image is used by Article/NewsArticle, ImageObject, Open Graph, Twitter and the image sitemap. The server sets the WebP Content-Type explicitly for minimal deployment environments. Keep descriptive filenames stable and use responsive variants of the same image rather than duplicates with different names.
 
 Reference: https://developers.google.com/search/docs/appearance/google-images
+
+## AION 2 launch illustration — 2026-10-05
+
+Built-in ImageGen output, published as `web/assets/blog/aion-2-start-skrzydla-ilustracja-1200.webp` (1200×675) and `web/assets/blog/aion-2-start-skrzydla-ilustracja-640.webp` (640×360), WebP quality 85. The article explicitly labels it an AI-generated editorial illustration, not a game screenshot. No official artwork was used as an input.
+
+Prompt:
+
+Use case: stylized-concept. Create an original editorial hero illustration for a Polish MMO blog article about the global launch of AION 2. Wide 16:9 composition, high-quality atmospheric fantasy digital painting with finely detailed painterly textures. A winged humanoid adventurer viewed from behind glides above a sea of clouds toward a grand airy citadel on a floating rocky island, warm dawn sunlight, immense sense of altitude, detailed pale stone spires, luminous sky and soft mist. A refined restrained palette of desaturated blue, warm gold and forest green, matching a dark-green gaming editorial website. Wing anatomy coherent, two wings attached to the character's upper back, clear elegant silhouette. No text, logos, interface, fake screenshot, or recognizable official game characters or locations. This is a conceptual editorial illustration and will be visibly labeled AI-generated, not actual gameplay. No elements from any supplied official promotional artwork.
