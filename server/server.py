@@ -22,7 +22,7 @@ import time
 from aiohttp import web, WSMsgType
 try:
     from . import world_content as content
-    from . import seo
+    from . import seo, level_rules, world_levels
     from . import comments
     from . import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     from . import continent_world, adventure_content, expedition_content, terrain_detail, encounter_layout, starter_adventures
@@ -54,7 +54,7 @@ try:
     from . import progression_guide
 except ImportError:
     import world_content as content
-    import seo
+    import seo, level_rules, world_levels
     import comments
     import living_world, vertical_world, loot_tables, combat_rules, loot_content, hunt_content, discovery_rules
     import continent_world, adventure_content, expedition_content, terrain_detail, encounter_layout, starter_adventures
@@ -298,6 +298,7 @@ starter_adventures.configure(content, OBSTACLES, LANDMARKS, ZONES, ENEMY_TYPES)
 content.WORLD_REVISION = 33
 MERCHANT['stock'] = list(content.STARTER_MERCHANT_STOCK)
 content.STARTER_MERCHANT = MERCHANT
+world_levels.configure(content, ZONES, QUESTS, ITEMS, ENEMY_TYPES, LANDMARKS, NPCS, POTIONS, PVP_RULES)
 # Powerful rings are deliberate rewards; repeatable monster drops remain rare.
 for monster_spec in ENEMY_TYPES.values():
     for entry in monster_spec.get('loot',{}).get('entries',[]):
@@ -323,14 +324,14 @@ def intersects(x, y, rect, radius=RADIUS):
             and y + radius > rect["y"] and y - radius < rect["y"] + rect["h"])
 
 
-def player_speed(level):
+def player_speed(level, legacy_growth_level=0):
     """Gentle, unbounded-level movement growth; clients never supply speed."""
+    level = max(level_rules.to_legacy(level), legacy_growth_level)
     return 100 + 90 * (level - 1) / (level + 79)
 
 
 def xp_next(level):
-    # Integer arithmetic: intentionally no gameplay level cap.
-    return 55 + (level - 1) * 35
+    return level_rules.xp_next(level)
 
 
 def make_item(template):
@@ -456,6 +457,10 @@ class Player:
     input_time: float = -10
     chat_at: float = -10
     rules_version: int = 8
+    level_rules_version: int = level_rules.VERSION
+    legacy_growth_level: int = 0
+    level_migration_notice: dict = field(default_factory=dict)
+    legacy_level_up_batches: list = field(default_factory=list)
     mana_rules_version: int = dnd_content.MANA_RULES_VERSION
     hp_rules_version: int = combat_rules.HP_RULES_VERSION
     mana_recovery_until: float = 0
@@ -490,7 +495,7 @@ class Player:
 
     @property
     def base_speed(self):
-        return player_speed(self.level)
+        return player_speed(self.level, self.legacy_growth_level)
 
     @property
     def speed(self):
@@ -567,7 +572,7 @@ class Player:
         aura=self.buffs.get('wrath_of_sea',{})
         sanctuary=druid_circles.runtime(self).get('sanctuary')
         result['circle_visual']={'starry_form':druid_circles.starry_form(self),
-            'sea_radius':(64 if aura.get('level',0)>=25 else 32) if aura.get('until',0)>now else 0,
+            'sea_radius':(64 if aura.get('level',0)>=6 else 32) if aura.get('until',0)>now else 0,
             'sanctuary':sanctuary if sanctuary and sanctuary.get('until',0)>now else None,
             'flight':environment_rules.flying(self),'submerged':self.submerged}
         result['wizard_visual']=wizard_schools.public_visual(self,now)
@@ -614,6 +619,9 @@ class Player:
                            "queued_spell": self.pending_spell.get('spell',''),
                            "combat_log": self.combat_log[-8:]})
             result.update({"xp": self.xp, "xp_next": xp_next(self.level), "gold": self.gold,
+                           "xp_total": level_rules.xp_floor(self.level) + self.xp,
+                           "xp_level_start": level_rules.xp_floor(self.level),
+                           "xp_next_total": level_rules.xp_floor(self.level + 1),
                            "pvp_safety": self.pvp_safety, "unjust_kills": len([t for t in self.unjust_kills if t > now-86400]),
                            "inventory": [inventory_rules.public_item(self, i, ENEMY_TYPES) for i in self.inventory], "equipment": dict(self.equipment),
                            "potions": dict(self.potions), "potion_slots": dict(self.potion_slots), "known_loot": inventory_rules.known_loot(self, ENEMY_TYPES), "potion_cooldown": max(0, self.bonus_cooldown_until-now),
@@ -651,7 +659,7 @@ class Player:
             "wizard_school", "wizard_school_state", "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "_piercer_used", "_slasher_used", "_crusher_used", "exhaustion",
             "martial_archetype", "martial_state",
             "fighting_style", "weapon_grip", "fighter_rules_version",
-            "level_up_batches", "rules_version", "mana_rules_version", "hp_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
+            "level_up_batches", "rules_version", "level_rules_version", "legacy_growth_level", "level_migration_notice", "legacy_level_up_batches", "mana_rules_version", "hp_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
             "site_cooldowns", "wind_until", "ward_until", "premium_demo_until", "floor", "skill_tries", "promoted", "soul", "runes", "bank_gold", "depot", "home_city", "blessed", "mastery", "spell_cooldowns", "spell_ready", "rune_ready", "haste_until", "transition_ready",
             "x", "y", "hp", "mana", "level", "xp", "gold", "class_id", "class_chosen", "weapon", "kills", "boss_kills",
             "inventory_rules_version", "potion_slots", "loot_discoveries",
@@ -780,7 +788,7 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
         return float(self.clock())
 
     def metadata(self):
-        return {"version": content.VERSION, "combat_rules": combat_rules.RULES, "regions": content.REGIONS, "cities": content.CITIES, "stairs": content.STAIRS,
+        return {"version": content.VERSION, "level_rules": level_rules.metadata(), "combat_rules": combat_rules.RULES, "regions": content.REGIONS, "cities": content.CITIES, "stairs": content.STAIRS,
                 "world_revision": getattr(content,"WORLD_REVISION",20), "landmasses": getattr(content,"LANDMASSES",[]),
                 "ports": getattr(content,"PORTS",[]), "sea_routes": getattr(content,"SEA_ROUTES",[]),
                 "magic_items": magic_items.metadata(),
@@ -850,6 +858,7 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
 
     def load_player(self, pid, name, ws, saved):
+        saved = level_rules.migrate_saved(saved)
         p = Player(pid, name, ws)
         for attr in p.save_data():
             if attr in saved:
@@ -1004,6 +1013,12 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
         self.persist()
         await self.send(ws, {"type": "welcome", "id": pid, "world": self.metadata(), "owner_deltas": pid in self.compact_clients})
         await self.send(ws, self.wire_snapshot(p))
+        if p.level_migration_notice:
+            change = p.level_migration_notice
+            await self.notice(p, f'Nowa skala poziomów: {change["old_level"]} → {p.level}. Zachowano postęp doświadczenia, zdolności i zdobyte przyrosty statystyk.')
+            p.level_migration_notice = {}
+            with self.db:
+                self.save_player(p)
         await self.notice(p, "Witaj w Przystani! Strażniczka Mira przy placu ma pierwsze zadanie: szczury na łące. Podejdź i otwórz dziennik (J / E).")
 
     def in_safe(self, p):
@@ -1065,14 +1080,12 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
     def award(self, p, xp, gold):
         p.xp += int(xp)
         p.gold += int(gold)
-        # Solve total XP cost algebraically with integer sqrt. No loop or level cap.
-        # Cost of k levels: k * current_cost + 35*k*(k-1)/2.
-        b = 2*xp_next(p.level)-35
-        levels = max(0, (math.isqrt(b*b+280*p.xp)-b)//70)
-        if levels:
-            p.xp -= levels*xp_next(p.level)+35*levels*(levels-1)//2
-            level_up.record(p, p.level+1, p.level+levels)
-            p.level += levels
+        total = level_rules.xp_floor(p.level) + p.xp
+        new_level = level_rules.level_for_xp(total)
+        if new_level > p.level:
+            p.xp = total - level_rules.xp_floor(new_level)
+            level_up.record(p, p.level+1, new_level)
+            p.level = new_level
             p.hp = p.max_hp
             p.mana = p.max_mana
 
@@ -2048,7 +2061,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_33","world_revision":getattr(content,"WORLD_REVISION",20)})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_34","world_revision":getattr(content,"WORLD_REVISION",20),"level_rules_version":level_rules.VERSION})
 
     app.router.add_get("/health",health)
     async def ranking(request):

@@ -103,7 +103,7 @@ func refresh() -> void:
 	if host.get_viewport().gui_get_focus_owner() is OptionButton:
 		return
 	var p: Dictionary = host.player
-	var next: String = JSON.stringify([tab, bag_page, selected_item, p.get("inventory"), p.get("equipment"), p.get("character_sheet"), selected_style, not host.progression.near_service("master").is_empty(), p.get("attributes"), p.get("skills"), p.get("mastery"), p.get("mastery_points"), float(p.get("combat_remaining", 0)) > 0, float(p.get("bonus_remaining", 0)) > 0, p.get("alive"), p.get("hotbar"), p.get("level"), p.get("gold"), p.get("xp"), p.get("bank_gold"), p.get("soul"), p.get("kills"), p.get("boss_kills"), p.get("armor_class"), p.get("damage_dice"), p.get("attack_bonus"), p.get("potions"), p.get("potion_slots"), p.get("shield_armed"), p.get("ensnaring_armed"), p.get("concentration"), p.get("form"), int(p.get("mana", 0)), int(p.get("hp", 0)), p.get("queued_spell"), ceili(float(p.get("action_remaining", 0)) * 10) if not str(p.get("queued_spell", "")).is_empty() else 0, p.get("spell_cooldowns"), p.get("spell_profiles"), p.get("status_effects")])
+	var next: String = JSON.stringify([tab, bag_page, selected_item, p.get("inventory"), p.get("equipment"), p.get("character_sheet"), selected_style, not host.progression.near_service("master").is_empty(), p.get("attributes"), p.get("skills"), p.get("mastery"), p.get("mastery_points"), float(p.get("combat_remaining", 0)) > 0, float(p.get("bonus_remaining", 0)) > 0, p.get("alive"), p.get("hotbar"), p.get("level"), p.get("gold"), p.get("xp"), p.get("xp_total"), p.get("xp_next_total"), p.get("bank_gold"), p.get("soul"), p.get("kills"), p.get("boss_kills"), p.get("armor_class"), p.get("damage_dice"), p.get("attack_bonus"), p.get("potions"), p.get("potion_slots"), p.get("shield_armed"), p.get("ensnaring_armed"), p.get("concentration"), p.get("form"), int(p.get("mana", 0)), int(p.get("hp", 0)), p.get("queued_spell"), ceili(float(p.get("action_remaining", 0)) * 10) if not str(p.get("queued_spell", "")).is_empty() else 0, p.get("spell_cooldowns"), p.get("spell_profiles"), p.get("status_effects")])
 	if signature == next:
 		return
 	signature = next
@@ -262,7 +262,7 @@ func statistics(p: Dictionary) -> void:
 	for r: Dictionary in s.get("resistances", []):
 		text(str(r.get("name", "")) + (" · połowa obrażeń" if float(r.get("multiplier", 1)) == 0.5 else " · niewrażliwość" if float(r.get("multiplier", 1)) == 0 else " · zwykłe obrażenia"))
 	text("Ruch: %s stóp na rundę · Zasięg broni: %d stóp · Kość zdrowia: %s" % [s.get("movement_per_round", 0), roundi(float(p.get("attack_range", 0)) / 6.4), s.get("hit_die", "")])
-	text("PD: %d/%d · Złoto: %d · Bank: %d · Dusza: %d/%d" % [int(p.get("xp", 0)), int(p.get("xp_next", 0)), int(p.get("gold", 0)), int(p.get("bank_gold", 0)), int(p.get("soul", 0)), int(p.get("max_soul", 100))])
+	text("PD: %d/%d · Złoto: %d · Bank: %d · Dusza: %d/%d" % [int(p.get("xp_total", p.get("xp", 0))), int(p.get("xp_next_total", p.get("xp_next", 300))), int(p.get("gold", 0)), int(p.get("bank_gold", 0)), int(p.get("soul", 0)), int(p.get("max_soul", 100))])
 	text("Potwory: %d · Bossowie: %d" % [int(p.get("kills", 0)), int(p.get("boss_kills", 0))])
 	var skills: Dictionary = {"melee":"Walka wręcz", "distance":"Walka dystansowa", "magic":"Magia", "shielding":"Obrona"}
 	for key: String in p.get("skills", {}):

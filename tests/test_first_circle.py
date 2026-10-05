@@ -1,4 +1,4 @@
-"""Circle-I regression, updated for 0.8.4 mana, ten-level gates and paginated saved bars."""
+"""Circle-I regression, updated for 0.8.4 mana, D&D level gates and paginated saved bars."""
 import json
 from pathlib import Path
 import sys
@@ -26,36 +26,36 @@ class FirstCircleCatalogue(unittest.TestCase):
     def test_circle_display_matches_actual_spell_access(self):
         for cls in ('mage', 'druid', 'ranger', 'knight'):
             p = Player('1', 'Test', class_id=cls)
-            for level in range(1, 106):
+            for level in range(1, 26):
                 p.level = level
                 for key, spec in dnd.SPELLS.items():
                     if cls in spec['class_ids'] and spec['circle'] > 0:
                         with self.subTest(cls=cls, level=level, spell=key):
                             self.assertEqual(dnd.spell_allowed(p, key), spec['circle'] <= dnd.circle_for(cls, level) and level >= spec.get('class_min_levels',{}).get(cls,1))
 
-    def test_second_and_later_circles_at_ten_level_milestones(self):
+    def test_second_and_later_circles_at_dnd_milestones(self):
         for cls in ('mage', 'druid'):
             p = Player('1', 'Test', class_id=cls)
             for key, spec in dnd.SPELLS.items():
                 if cls in spec['class_ids'] and spec['circle'] >= 2:
-                    gate = (spec['circle'] - 1) * 10
+                    gate = 2 * spec['circle'] - 1
                     self.assertEqual(dnd.spell_level(spec, cls), gate)
                     p.level = gate - 1
                     self.assertFalse(dnd.spell_allowed(p, key), key)
                     p.level = gate
                     self.assertTrue(dnd.spell_allowed(p, key), key)
-            for level in (1, 5, 9):
+            for level in (1, 2):
                 self.assertEqual(dnd.circle_for(cls, level), 1)
 
     def test_ranger_initial_spells_and_longstrider_gates(self):
-        for key,gate in [('cure_wounds',1),('hunters_mark',1),('ensnaring_strike',1),('longstrider',5)]:
+        for key,gate in [('cure_wounds',1),('hunters_mark',1),('ensnaring_strike',1),('longstrider',2)]:
             self.assertEqual(dnd.spell_level(dnd.SPELLS[key], 'ranger'),gate)
-            for level in (1,4,5,9,10,19,20):
+            for level in (1,2,3,4,5,19,20):
                 self.assertEqual(dnd.spell_allowed(Player('1','Test',class_id='ranger',level=level),key),level>=gate)
 
     def test_class_features_keep_their_gates(self):
-        for key, cls, gate in (('second_wind', 'knight', 1), ('animal_companion', 'ranger', 10),
-                               ('wild_shape_wolf', 'druid', 5), ('wild_shape_bear', 'druid', 35)):
+        for key, cls, gate in (('second_wind', 'knight', 1), ('animal_companion', 'ranger', 3),
+                               ('wild_shape_wolf', 'druid', 2), ('wild_shape_bear', 'druid', 8)):
             self.assertEqual(dnd.spell_level(dnd.SPELLS[key], cls), gate)
 
     def test_default_hotbar_first_circle_slots_are_unlocked(self):
@@ -73,7 +73,7 @@ class FirstCircleCatalogue(unittest.TestCase):
                     self.assertEqual(spec['mana'], 0)
                 elif spec['circle'] == 1:
                     self.assertEqual(spec['mana'], 0 if spec.get('free_cast') else 20)
-        for level, count in ((1, 1), (19, 1), (20, 2), (49, 2), (50, 3), (80, 4)):
+        for level, count in ((1, 1), (4, 1), (5, 2), (10, 2), (11, 3), (17, 4)):
             self.assertEqual(rules.cantrip_count(Player('1', 'Test', class_id='mage', level=level)), count)
 
 
@@ -176,9 +176,9 @@ class FirstCircleGameplay(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(p.hp,1);self.assertEqual(p.mana,mana)
         self.assertFalse(p.buffs);self.assertFalse(p.concentration)
 
-    async def test_second_circle_denied_before_level_ten(self):
+    async def test_second_circle_denied_before_level_three(self):
         for cls, spell in (('mage', 'scorching_ray'), ('druid', 'moonbeam')):
-            for level in (1, 5, 9):
+            for level in (1, 2):
                 p = self.player(cls, level); mana = p.mana; hp = self.e.hp
                 await self.g.cast_spell(p, spell, self.e.id)
                 self.assertEqual(p.mana, mana); self.assertEqual(self.e.hp, hp)
@@ -186,7 +186,7 @@ class FirstCircleGameplay(unittest.IsolatedAsyncioTestCase):
 
     async def test_existing_save_gains_circle_without_losing_custom_hotbar(self):
         for cls, spell in (('mage', 'magic_missile'), ('druid', 'entangle')):
-            for level in (1, 5, 9):
+            for level in (1, 2):
                 p = self.player(cls, level); saved = p.save_data()
                 saved['rules_version'] = 8
                 saved['hotbar'] = [spell, '', '', '', '', '', '', '']
@@ -199,7 +199,7 @@ class FirstCircleGameplay(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(loaded.public(self.clock(), private=True)['spell_circle'], 1)
 
     async def test_level_one_pvp_protection_remains_despite_unlocked_spells(self):
-        p = self.player('mage'); q = self.player('knight', 20, '2')
+        p = self.player('mage'); q = self.player('knight', 5, '2')
         p.pvp_safety = False; mana = p.mana; hp = q.hp
         await self.g.cast_spell(p, 'magic_missile', target_id=q.id)
         self.assertEqual(q.hp, hp); self.assertEqual(p.mana, mana)
@@ -233,13 +233,13 @@ class FirstCircleNetwork(unittest.IsolatedAsyncioTestCase):
 
     async def test_help_and_milestones_use_new_gate(self):
         html = await (await self.client.get('/')).text()
-        self.assertIn('I krąg od poziomu 1, II od 10', html)
+        self.assertIn('I krąg od poziomu 1, II od 3', html)
         self.assertNotIn('I krąg od poziomu 10', html)
         from server import world_content as content
         first = next(m for m in content.MILESTONES if m[0] == 1)
-        tenth = next(m for m in content.MILESTONES if m[0] == 10)
+        third = next(m for m in content.MILESTONES if m[0] == 3)
         self.assertIn('I krąg', first[1]); self.assertIn('od początku', first[2])
-        self.assertIn('towarzysz', tenth[1])
+        self.assertIn('towarzysz', third[1])
 
 
 if __name__ == '__main__':

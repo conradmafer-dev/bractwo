@@ -1,4 +1,4 @@
-"""Authoritative SRD 5.2.1 spell growth, delayed to Bractwo's level gates.
+"""Authoritative SRD 5.2.1 spell growth on standard character levels.
 
 Cantrips grow with character level. Levelled spells grow ONLY where their SRD
 entry permits upcasting and pay the chosen circle's mana cost. Auto chooses the
@@ -37,11 +37,11 @@ UPCAST = {
 }
 
 # No spell gains a fictitious caster-level bonus. This conversion also supports
-# future rules saying +N per two/three caster levels: +N per 10/15 game levels.
+# future rules saying +N per two/three caster levels without another conversion.
 def caster_steps(level, every=1, start=1):
     if type(every) is not int or every < 1 or type(start) is not int or start < 1:
         raise ValueError('Positive integer caster-level intervals are required')
-    effective = min(20, max(1, 1 + int(level)//5))
+    effective = min(20, max(1, int(level)))
     return max(0, (effective-start)//every)
 
 
@@ -93,7 +93,7 @@ def resolve(p, key, *, automatic=False, active=True):
     try:from . import druid_circles as dc
     except ImportError:import druid_circles as dc
     free_base=(key=='guiding_bolt' and dc.circle(p)=='stars' and dc.feature_remaining(p,'guiding_bolt') and dc.state(p).get('map_equipped',True)
-        or dc.circle(p)=='land' and p.level>=25 and dc.state(p).get('natural_free_armed') and not dc.spent(p,'natural_free') and key in dc.bonus_spells(p) and s.get('circle',0)>0)
+        or dc.circle(p)=='land' and p.level>=6 and dc.state(p).get('natural_free_armed') and not dc.spent(p,'natural_free') and key in dc.bonus_spells(p) and s.get('circle',0)>0)
     if not automatic and free_base and not selected:rank=s['circle']
     s.update(cast_circle=rank, power_choice=0 if automatic or selected not in options else selected,
              power_options=options, resolved=True)
@@ -218,8 +218,7 @@ def level_gains(before, after, key):
 
 
 def next_upgrade(p, key):
-    candidates=(range(2,96) if key=='arcane_recovery' and getattr(p,'mana_rules_version',dnd.MANA_RULES_VERSION)>=dnd.MANA_RULES_VERSION
-                else sorted(set(range(5,100,5)) | set(dnd.RANGER_CIRCLE_LEVELS)))
+    candidates=range(2,21)
     now = resolve(p,key,automatic=True,active=False)
     for level in candidates:
         if level <= p.level:
@@ -247,7 +246,7 @@ def client_profiles(p):
     """Small private overrides, cached; the shared base catalogue stays immutable."""
     locked=getattr(p,'concentration_profile',{})
     active=bool(p.concentration_until>getattr(p,'current_wall_time',0))
-    signature=(p.class_id,p.level,getattr(p,'mana_rules_version',dnd.MANA_RULES_VERSION),p.primal_order,p.weapon_grip,tuple(sorted(p.training_feats.items())),rules.gear.weapon(p).get('weapon_type',''),tuple(sorted(getattr(p,'spell_circle_choices',{}).items())),
+    signature=(p.class_id,p.level,getattr(p,'legacy_growth_level',0),getattr(p,'mana_rules_version',dnd.MANA_RULES_VERSION),p.primal_order,p.weapon_grip,tuple(sorted(p.training_feats.items())),rules.gear.weapon(p).get('weapon_type',''),tuple(sorted(getattr(p,'spell_circle_choices',{}).items())),
         rules.ability_modifier(p,rules.spell_ability(p)),p.gear_bonus('attack'),p.mastery.get('power',0),
         p.concentration if active else '',locked.get('cast_circle',0) if active else 0)
     try:
@@ -280,12 +279,12 @@ def client_profiles(p):
         if spec.get('kind')=='shape' and dc.circle(p)=='moon':
             from fractions import Fraction
             form=rules.caster.FORMS[spec['form']]
-            gate=min(gate,max(10,5*(3*int(Fraction(str(form.get('cr','0'))))-1)))
-            if form.get('fly'):gate=max(35,gate)
+            gate=min(gate,max(3,3*int(Fraction(str(form.get('cr','0'))))))
+            if form.get('fly'):gate=max(8,gate)
         result[key]['required_level']=gate
         if spec.get('cast_circle',spec.get('circle'))==spec.get('circle'):
             if key=='guiding_bolt' and dc.circle(p)=='stars' and dc.feature_remaining(p,'guiding_bolt') and dc.state(p).get('map_equipped',True):result[key]['mana']=0
-            if dc.circle(p)=='land' and p.level>=25 and dc.state(p).get('natural_free_armed') and not dc.spent(p,'natural_free') and key in dc.bonus_spells(p) and spec.get('circle',0)>0:result[key]['mana']=0
+            if dc.circle(p)=='land' and p.level>=6 and dc.state(p).get('natural_free_armed') and not dc.spent(p,'natural_free') and key in dc.bonus_spells(p) and spec.get('circle',0)>0:result[key]['mana']=0
         result[key]['cast_in_form']=dc.circle(p)=='moon' and key in dc.bonus_spells(p)
         if spec.get('kind')=='martial_feature':
             maneuver=spec['martial_maneuver']
@@ -313,7 +312,7 @@ def client_profiles(p):
             current = dc.starry_form(p)
             is_form = key in ('circle_star_archer', 'circle_star_chalice', 'circle_star_dragon')
             free = key in ('circle_star_arrow', 'circle_move_sanctuary', 'circle_wrath_strike')
-            free = free or (is_form and bool(current) and p.level >= 45)
+            free = free or (is_form and bool(current) and p.level >= 10)
             free = free or (key == 'circle_wrath_of_sea' and dc.active(p, 'wrath_of_sea'))
             if key == 'circle_moonlight_step':
                 result[key].update(uses_remaining=dc.feature_remaining(p,'moonlight_step'),
@@ -324,7 +323,7 @@ def client_profiles(p):
                 if not free:
                     result[key].update(uses_remaining=dc.shape_remaining(p),uses_maximum=dc.shape_max(p))
             if is_form: result[key]['already_active'] = key == 'circle_star_'+current
-            amount = (2 if p.level >= 45 else 1)
+            amount = (2 if p.level >= 10 else 1)
             wisdom = dc.wisdom(p)
             dice = str(amount)+'k8'+('+' if wisdom>=0 else '')+str(wisdom)
             if key in ('circle_star_archer','circle_star_arrow'):
@@ -332,7 +331,7 @@ def client_profiles(p):
             elif key == 'circle_star_chalice':
                 result[key]['power_summary'] = '+'+dice+' leczenia po czarze leczącym opłaconym maną. Bez pasywnej regeneracji.'
             elif key == 'circle_star_dragon':
-                result[key]['power_summary'] = 'Minimum 10 na k20: koncentracja, testy INT i MĄD.'+(' Lot 20 stóp.' if p.level>=45 else '')
+                result[key]['power_summary'] = 'Minimum 10 na k20: koncentracja, testy INT i MĄD.'+(' Lot 20 stóp.' if p.level>=10 else '')
         if key.startswith('wild_shape_') or key=='wild_companion':
             result[key]['resource_cost']=0 if key.startswith('wild_shape_') and p.form else 1
             result[key]['resource_name']='Dziki kształt'

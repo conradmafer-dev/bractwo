@@ -33,7 +33,7 @@ def _runtime(p):
     return p.wizard_school_runtime
 
 
-def _school(p, key, level=10):
+def _school(p, key, level=3):
     return (getattr(p, 'class_id', '') == 'mage' and getattr(p, 'promoted', False)
             and getattr(p, 'level', 0) >= level and getattr(p, 'wizard_school', '') == key)
 
@@ -98,10 +98,10 @@ class WizardDefense:
         self._wizard_defense_save(p)
 
     def wizard_spell_resistance(self, p):
-        return _school(p, 'abjuration', 65)
+        return _school(p, 'abjuration', 14)
 
     def wizard_spell_save_advantage(self, p):
-        return _school(p, 'abjuration', 65)
+        return _school(p, 'abjuration', 14)
 
     def wizard_absorb_damage(self, p, damage, source=None, **kwargs):
         """Reduce already resisted damage before concentration and temporary HP."""
@@ -112,7 +112,7 @@ class WizardDefense:
         # Stable order when several allies have armed protection. A second ward
         # is only spent if the previous ward did not absorb the complete hit.
         candidates.extend(q for q in sorted(self.players.values(), key=lambda q: q.id)
-                          if q is not p and _school(q, 'abjuration', 25)
+                          if q is not p and _school(q, 'abjuration', 6)
                           and _runtime(q).get('projected_ward_target') == p.id)
         for owner in candidates:
             data = _state(owner); available = _count(data, 'ward_hp')
@@ -142,7 +142,7 @@ class WizardDefense:
         return True
 
     def wizard_attack_reaction(self, target, result):
-        if not result.get('hit') or not _school(target, 'illusion', 45): return False
+        if not result.get('hit') or not _school(target, 'illusion', 10): return False
         data = _state(target)
         if (not data.get('self_armed') or _count(data, 'self_spent') >= 1
                 or target.reaction_ready > self.now() or not self._wizard_defense_available(target, action=False)
@@ -164,7 +164,7 @@ class WizardDefense:
             p.buffs.pop('wizard_decoy', None)
         else:
             data['self_spent'] = 0
-            if _school(p, 'abjuration', 45) and data.get('ward_created'):
+            if _school(p, 'abjuration', 10) and data.get('ward_created'):
                 data['ward_hp'] = self.wizard_ward_max(p)
 
     async def wizard_defense_command(self, p, action, data):
@@ -176,10 +176,10 @@ class WizardDefense:
     async def wizard_defense_action(self, p, key, enemy_id=None, target_id=None, **kwargs):
         if not isinstance(key, str): return False
         key = key.removeprefix('wizard_')
-        features = {'ward_recharge': ('abjuration', 10, True), 'projected_ward': ('abjuration', 25, None),
-                    'decoy': ('illusion', 10, True), 'phantasm': ('illusion', 25, False),
-                    'illusory_self': ('illusion', 45, None), 'self_restore': ('illusion', 45, True),
-                    'shelter': ('illusion', 65, False)}
+        features = {'ward_recharge': ('abjuration', 3, True), 'projected_ward': ('abjuration', 6, None),
+                    'decoy': ('illusion', 3, True), 'phantasm': ('illusion', 6, False),
+                    'illusory_self': ('illusion', 10, None), 'self_restore': ('illusion', 10, True),
+                    'shelter': ('illusion', 14, False)}
         if key not in features: return False
         school, level, bonus = features[key]
         if not _school(p, school, level) or not self._wizard_defense_available(p): return True
@@ -258,7 +258,7 @@ class WizardDefense:
             if rt.get('decoy_until', 0) <= now: p.buffs.pop('wizard_decoy', None)
             shelter = rt.get('shelter')
             if not shelter: continue
-            if not _school(p, 'illusion', 65) or shelter['until'] <= now or p.floor != shelter['floor']:
+            if not _school(p, 'illusion', 14) or shelter['until'] <= now or p.floor != shelter['floor']:
                 rt.pop('shelter', None); continue
             center = SimpleNamespace(x=shelter['x'], y=shelter['y'], floor=shelter['floor'])
             for q in self.players.values():

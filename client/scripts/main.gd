@@ -7,9 +7,9 @@ const CLASS_IDS: Array[String] = ["knight", "ranger", "mage", "druid"]
 const CLASS_NAMES: Dictionary = {"knight":"Rycerz", "ranger":"Łowca", "mage":"Czarodziej", "druid":"Druid"}
 const CLASS_DESCRIPTIONS: Dictionary = {
 	"knight":"Wybór stylu, mistrzostwo broni, kolczuga i tarcza. Drugi oddech bez many.",
-	"ranger":"Łuk, I krąg i bezpłatny Znak łowcy od początku; wilk od poziomu 10.",
-	"mage":"Różdżka: 1k4. Darmowe sztuczki; I krąg od poziomu 1, II od 10, dalsze co 10.",
-	"druid":"Wybór Strażnika lub Mistyka natury; I krąg od 1., wilk i kot od 5. poziomu."
+	"ranger":"Łuk, I krąg i bezpłatny Znak łowcy od początku; wilk od poziomu 3.",
+	"mage":"Różdżka: 1k4. Darmowe sztuczki; I krąg od poziomu 1, II od 3, dalsze co 2.",
+	"druid":"Wybór Strażnika lub Mistyka natury; I krąg od 1., wilk i kot od 2. poziomu."
 }
 const SLOT_NAMES: Dictionary = {"weapon":"Broń", "armor":"Pancerz", "shield":"Tarcza", "ring":"Pierścień", "trophy":"Trofeum"}
 const PAPER: Color = Color("eee6ce")
@@ -842,9 +842,9 @@ func _update_hud() -> void:
 	hp_bar.value = float(player.get("hp", 100))
 	mana_bar.max_value = maxf(1, float(player.get("max_mana", 1)))
 	mana_bar.value = float(player.get("mana", 0))
-	xp_bar.max_value = maxf(1, float(player.get("xp_next", 100)))
+	xp_bar.max_value = maxf(1, float(player.get("xp_next", 300)))
 	xp_bar.value = float(player.get("xp", 0))
-	vital_label.text = "HP %d/%d  Mana %d/%d  XP %d/%d  Ruch %.1f" % [int(hp_bar.value), int(hp_bar.max_value), int(mana_bar.value), int(mana_bar.max_value), int(xp_bar.value), int(xp_bar.max_value), float(player.get("speed", 100))]
+	vital_label.text = "HP %d/%d  Mana %d/%d  XP %d/%d  Ruch %.1f" % [int(hp_bar.value), int(hp_bar.max_value), int(mana_bar.value), int(mana_bar.max_value), int(player.get("xp_total", player.get("xp", 0))), int(player.get("xp_next_total", player.get("xp_next", 300))), float(player.get("speed", 100))]
 	vital_label.text += " · Piętro %s%d" % ["+" if int(player.get("floor", 0)) > 0 else "", int(player.get("floor", 0))]
 	if float(player.get("wind_remaining", 0)) > 0:
 		vital_label.text += " · Wiatr +15%"
@@ -868,7 +868,7 @@ func _update_hud() -> void:
 	status_label.text = skull_text + combat_text
 	status_label.add_theme_color_override("font_color", RED if skull != "none" or combat > 0 else PAPER)
 	var rules: Dictionary = world_data.get("pvp_rules", {})
-	if int(player.get("level", 1)) < int(rules.get("min_level", 8)):
+	if int(player.get("level", 1)) < int(rules.get("min_level", 2)):
 		status_label.text += " · Ochrona poziomu"
 	status_label.tooltip_text = "Nieuzasadnione zabójstwa: %d / %d w ostatnich 24 h" % [int(player.get("unjust_kills", 0)), int(rules.get("red_kills", 3))]
 	var safe: bool = bool(player.get("pvp_safety", true))
@@ -1143,7 +1143,7 @@ func _refresh_party() -> void:
 		return
 	last_players_key = key
 	var rules: Dictionary = world_data.get("pvp_rules", {})
-	pvp_rules_label.text = "PvP od poziomu %d, poza osadą. Biała czaszka po agresji: %ds. %d nieuzasadnione zabójstwa / 24 h: czerwona czaszka na 24 h.\nŚmierć: −%d%% złota i −%d%% bieżącego XP. Czerwona czaszka: −%d%% złota i −%d%% XP oraz 1 niezałożony przedmiot. Bez utraty poziomu.\nPodczas walki PvP nie wejdziesz do osady. Rozłączenie w walce nie chroni postaci." % [int(rules.get("min_level", 8)), int(rules.get("white_seconds", 120)), int(rules.get("red_kills", 3)), int(float(rules.get("normal_gold_loss", 0.05))*100), int(float(rules.get("normal_xp_loss", 0.10))*100), int(float(rules.get("red_gold_loss", 0.20))*100), int(float(rules.get("red_xp_loss", 0.20))*100)]
+	pvp_rules_label.text = "PvP od poziomu %d, poza osadą. Biała czaszka po agresji: %ds. %d nieuzasadnione zabójstwa / 24 h: czerwona czaszka na 24 h.\nŚmierć: −%d%% złota i −%d%% bieżącego XP. Czerwona czaszka: −%d%% złota i −%d%% XP oraz 1 niezałożony przedmiot. Bez utraty poziomu.\nPodczas walki PvP nie wejdziesz do osady. Rozłączenie w walce nie chroni postaci." % [int(rules.get("min_level", 2)), int(rules.get("white_seconds", 120)), int(rules.get("red_kills", 3)), int(float(rules.get("normal_gold_loss", 0.05))*100), int(float(rules.get("normal_xp_loss", 0.10))*100), int(float(rules.get("red_gold_loss", 0.20))*100), int(float(rules.get("red_xp_loss", 0.20))*100)]
 	var party_id: String = str(player.get("party_id", ""))
 	var members: Array = player.get("party_members", [])
 	var party_rules: Dictionary = world_data.get("party_rules", {})
@@ -1182,7 +1182,7 @@ func _toggle_safety() -> void:
 	attack_held = false
 	if bool(player.get("pvp_safety", true)):
 		var rules: Dictionary = world_data.get("pvp_rules", {})
-		safety_confirm.dialog_text = "PvP: broń, czary, obszary i wilk. Uważaj na osoby w obszarze.\nNieuzasadniona agresja: biała czaszka.\n%d nieuzasadnione zabójstwa / 24 h: czerwona czaszka i surowsza kara śmierci.\nPvP od poziomu %d, poza chronioną osadą." % [int(rules.get("red_kills", 3)), int(rules.get("min_level", 8))]
+		safety_confirm.dialog_text = "PvP: broń, czary, obszary i wilk. Uważaj na osoby w obszarze.\nNieuzasadniona agresja: biała czaszka.\n%d nieuzasadnione zabójstwa / 24 h: czerwona czaszka i surowsza kara śmierci.\nPvP od poziomu %d, poza chronioną osadą." % [int(rules.get("red_kills", 3)), int(rules.get("min_level", 2))]
 		safety_confirm.popup_centered(Vector2i(620, 240))
 	else:
 		_send({"type":"pvp_safety", "enabled":true})
@@ -1733,7 +1733,7 @@ func _potion_count(prefix: String) -> int:
 
 func _spell_gate(spec: Dictionary) -> int:
 	var cls: String = str(player.get("class_id", ""))
-	return int(spec.get("class_levels", {}).get(cls, spec.get("min_level", 1)))
+	return int(spec.get("required_level", spec.get("class_levels", {}).get(cls, spec.get("min_level", 1))))
 
 func _cast_slot(slot: int) -> void:
 	var bar: Array = player.get("hotbar", [])

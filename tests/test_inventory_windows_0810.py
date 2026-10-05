@@ -12,7 +12,7 @@ from test_dnd import Clock,WS,Dice
 class Supplies(unittest.IsolatedAsyncioTestCase):
  def setUp(self):
   self.clock=Clock();self.g=Game(':memory:',clock=self.clock)
-  self.p=Player('one','Tester',WS(),class_id='mage',level=50,x=680,y=1180)
+  self.p=Player('one','Tester',WS(),class_id='mage',level=11,x=680,y=1180)
   self.g.players[self.p.id]=self.p;self.g.starter(self.p);self.p.hp=self.p.max_hp;self.p.mana=self.p.max_mana;self.p.gold=1000
   self.g.combat_rng=Dice(d20=10)
  def tearDown(self):self.g.db.close()
@@ -135,7 +135,7 @@ class DelayedHome(unittest.TestCase):
  def test_return_does_not_reset_hp_or_cooldown(self):
   self.e.ready=1000;self.steps(25);self.assertEqual(self.e.ready,1000);self.assertLess(self.e.hp,self.e.max_hp)
  def test_attack_interrupts_return(self):
-  self.steps(25);p=Player('hit','Hit',WS(),level=100,x=self.e.x+100,y=self.e.y);self.g.players[p.id]=p
+  self.steps(25);p=Player('hit','Hit',WS(),level=21,x=self.e.x+100,y=self.e.y);self.g.players[p.id]=p
   self.g.provoke_enemy(self.e,p);self.assertFalse(self.e.returning);self.assertEqual(self.e.return_at,0)
   self.assertNotIn(self.e.id,self.g.recovering_enemies);self.assertIn(self.e.id,self.g.chasing_enemies)
  def test_zero_hp_cannot_walk_home(self):

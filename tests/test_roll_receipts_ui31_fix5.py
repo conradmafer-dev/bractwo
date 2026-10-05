@@ -66,7 +66,7 @@ class TelemetryIntegration(unittest.IsolatedAsyncioTestCase):
         state=p.public(self.clock(),self.g.time,private=True)
         (path/(name+'.json')).write_text(json.dumps(dict(id=state['id'],last_roll=state['last_roll'],combat_log=state['combat_log'],simulation_time=self.g.time),ensure_ascii=False,indent=2))
     async def test_user_bow_example_exposes_two_d8_results_and_only_one_modifier(self):
-        p=self.player('ranger',10);p.origin_feat='savage_attacker';wear(p,'bandit_longbow')
+        p=self.player('ranger',3);p.origin_feat='savage_attacker';wear(p,'bandit_longbow')
         target=self.enemy('target',p.x+150,p.y,'ogre');self.g.combat_rng=TraceDice(15,2,6)
         await self.g.dnd_attack(p,enemy_id=target.id)
         r=p.last_roll
@@ -78,7 +78,7 @@ class TelemetryIntegration(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.g.combat_rng.calls),3)
         self.save_fixture('savage',p)
     async def test_mark_records_its_own_die_without_replacing_the_weapon(self):
-        p=self.player('ranger',10);p.origin_feat='savage_attacker';wear(p,'bandit_longbow')
+        p=self.player('ranger',3);p.origin_feat='savage_attacker';wear(p,'bandit_longbow')
         target=self.enemy('target',p.x+150,p.y,'ogre')
         await self.g.cast_spell(p,'hunters_mark',target.id)
         self.g.combat_rng=TraceDice(15,2,6,4)
@@ -91,7 +91,7 @@ class TelemetryIntegration(unittest.IsolatedAsyncioTestCase):
         self.save_fixture('mark',p)
     async def test_attack_save_automatic_spells_include_actual_dice(self):
         for i,(spell,expected) in enumerate((('fire_bolt',10),('fireball',6),('magic_missile',4))):
-            p=self.player('mage',20,str(i+1));target=self.enemy('target'+str(i),p.x+150,p.y,'ogre')
+            p=self.player('mage',5,str(i+1));target=self.enemy('target'+str(i),p.x+150,p.y,'ogre')
             await self.g.cast_spell(p,spell,target.id)
             r=p.last_roll
             self.assertEqual(r['damage_sides'],expected,(spell,r))
@@ -120,7 +120,7 @@ class TelemetryIntegration(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(self.g.combat_rng.calls),2)
         self.save_fixture('guidance',p)
     async def test_short_rest_reports_healer_reroll_and_long_rest_invents_no_dice(self):
-        p=self.player('ranger',10);p.origin_feat='healer';p.hp=p.max_hp-5
+        p=self.player('ranger',3);p.origin_feat='healer';p.hp=p.max_hp-5
         self.g.combat_rng=TraceDice(1,6)
         await self.g.start_rest(p,'short');self.assertTrue(p.rest_state)
         self.clock.advance(10);self.g.time+=10;self.g.tick_rest(p)
@@ -135,7 +135,7 @@ class TelemetryIntegration(unittest.IsolatedAsyncioTestCase):
         await self.g.start_rest(p,'long');self.clock.advance(30);self.g.time+=30;self.g.tick_rest(p)
         self.assertEqual(p.hp,p.max_hp);self.assertEqual(p.combat_log,before)
     async def test_roll_metadata_is_private_and_serializable(self):
-        p=self.player('ranger',10);p.origin_feat='savage_attacker'
+        p=self.player('ranger',3);p.origin_feat='savage_attacker'
         target=self.enemy('target',p.x+150,p.y)
         await self.g.dnd_attack(p,enemy_id=target.id)
         state=p.public(self.clock(),self.g.time,private=True)

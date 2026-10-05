@@ -23,7 +23,7 @@ def catalog():
         def profile(level):
             return SimpleNamespace(class_id=class_id, spec=spec, level=level,
                                    form='', mastery={})
-        for level in range(1, 101):
+        for level in range(1, 22):
             before,after = profile(max(1,level-1)),profile(level)
             details=[]; titles=[]
             circle=dnd.circle_for(class_id,level)
@@ -62,24 +62,25 @@ def catalog():
             if level in rules.gear.feat_levels(after):
                 titles.append('Rozwój cech lub atut')
                 details.append('Jeden wybór: +2 do cechy albo +1 do dwóch cech (limit 20), lub atut. C → Cechy / Atuty.')
-            if level==5 and class_id in ('mage','ranger'):
+            if level==2 and class_id in ('mage','ranger'):
                 details.append('C → Umiejętności: wybierz jedną ekspertyzę w posiadanej biegłości.'+(' Uczony obejmuje umiejętności wiedzy.' if class_id=='mage' else ''))
-            if level==40 and class_id=='ranger':
+            if level==9 and class_id=='ranger':
                 details.append('C → Umiejętności: wybierz dwie kolejne ekspertyzy.')
             if class_id=='knight' and level==1:
                 details.append('Wybierz jeden styl walki w C → Atuty. Mistrzostwa: miecz długi, miecz dwuręczny, młot dwuręczny. Kolczuga i tarcza na start.')
-            if level==8:details.append('Rejsy i możliwość odblokowania PvP poza osadami.')
+            if level==2:details.append('Rejsy i możliwość odblokowania PvP poza osadami.')
             if level==PROMOTION_LEVEL:
                 details.append(f'Możliwość promocji u mistrza: {PROMOTION_COST} złota.')
                 if class_id=='druid':details.append('Po promocji możesz wybrać krąg druida w C → Atuty.')
                 if class_id=='mage':details.append('Po promocji wybierz szkołę czarodzieja w C → Atuty: Ewokacja, Odpychanie, Wróżbiarstwo lub Iluzja.')
                 if class_id=='knight':details.append('Po promocji wybierz w C → Atuty: Mistrz Bitewny (trzy manewry i 4 kości przewagi k8) albo Czempion (krytyk bronią 19–20).')
                 if class_id=='ranger':details.append('Po promocji wybierz Huntera i jedną technikę w C → Atuty: Pogromca kolosów, Rozbijacz hord albo Zabójca olbrzymów.')
-            if class_id=='knight' and level in (30,45,70,85):
-                details.append({30:'Mistrz Bitewny: piąta kość przewagi.',45:'Mistrz Bitewny: kości przewagi k10.',70:'Mistrz Bitewny: szósta kość przewagi. Czempion: krytyk bronią 18–20.',85:'Mistrz Bitewny: kości przewagi k12.'}[level])
-            if class_id=='mage' and level in (25,45,65):details.append('Nowa zdolność wybranej szkoły czarodzieja; szczegóły w C → Atuty.')
-            if level==40:details.append('Możliwość zakupu błogosławieństwa u mistrza: 500 złota.')
-            if level==50:details.append('Po promocji: pierwszy punkt mistrzostwa; kolejne co 5 poziomów. Przydzielasz poza walką.')
+            if class_id=='knight' and level in (7,10,15,18):
+                details.append({7:'Mistrz Bitewny: piąta kość przewagi.',10:'Mistrz Bitewny: kości przewagi k10.',15:'Mistrz Bitewny: szósta kość przewagi. Czempion: krytyk bronią 18–20.',18:'Mistrz Bitewny: kości przewagi k12.'}[level])
+            if class_id=='mage' and level in (6,10,14):details.append('Nowa zdolność wybranej szkoły czarodzieja; szczegóły w C → Atuty.')
+            if level==9:details.append('Możliwość zakupu błogosławieństwa u mistrza: 500 złota.')
+            if level==11:details.append('Po promocji: pierwszy punkt mistrzostwa; kolejne co poziom. Przydzielasz poza walką.')
+            if level==21:details.append('Dalszy rozwój Bractwa: kolejne poziomy i mistrzostwa. Biegłość, HP i zdolności D&D osiągają limit na poziomie 20.')
             if details:
                 entries.append(dict(level=level,name=' / '.join(titles) or 'Wzrost postaci',
                                     description=' '.join(details),spells=[key for key,_ in unlocked]))

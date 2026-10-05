@@ -23,15 +23,15 @@ class WizardOffense:
             state['overchannel_armed'] = False
             state['portent_armed'] = {}
             if schools.school(p) == 'divination':
-                state['portents'] = [self.combat_rng.randint(1, 20) for _ in range(3 if p.level >= 65 else 2)]
+                state['portents'] = [self.combat_rng.randint(1, 20) for _ in range(3 if p.level >= 14 else 2)]
         schools.runtime(p).pop('third_eye_until', None)
         getattr(p, 'buffs', {}).pop('wizard_third_eye', None)
 
     async def wizard_offense_command(self, p, action, data):
         school = schools.school(p)
         if action == 'overchannel':
-            if school != 'evocation' or p.level < 65:
-                await self.notice(p, 'Przeciążenie wymaga szkoły Ewokacji i poziomu 65.'); return True
+            if school != 'evocation' or p.level < 14:
+                await self.notice(p, 'Przeciążenie wymaga szkoły Ewokacji i poziomu 14.'); return True
             state = schools.state(p)
             if 'value' in data and type(data['value']) is not bool: return True
             state['overchannel_armed'] = data.get('value', not state.get('overchannel_armed', False))
@@ -54,8 +54,8 @@ class WizardOffense:
             await self.notice(p, f'Przygotowano przepowiednię {values[index]}. Zastąpi następny pasujący rzut k20.')
             return True
         if action == 'third_eye':
-            if school != 'divination' or p.level < 45:
-                await self.notice(p, 'Trzecie oko wymaga szkoły Wróżbiarstwa i poziomu 45.'); return True
+            if school != 'divination' or p.level < 10:
+                await self.notice(p, 'Trzecie oko wymaga szkoły Wróżbiarstwa i poziomu 10.'); return True
             state = schools.state(p)
             if state.get('third_eye_used', 0):
                 await self.notice(p, 'Trzecie oko odnawia krótki odpoczynek.'); return True
@@ -80,7 +80,7 @@ class WizardOffense:
             state['portent_armed'] = {}; return None
         result = values[index]; values[index] = None; state['portent_armed'] = {}
         state['portent_turn_until'] = self.now() + rules.ROUND_SECONDS
-        if p.level >= 25: p.mana = min(p.max_mana, p.mana + 20)
+        if p.level >= 6: p.mana = min(p.max_mana, p.mana + 20)
         self._wizard_offense_save(p)
         return result
 
@@ -91,21 +91,21 @@ class WizardOffense:
         return result
 
     def wizard_third_eye(self, p):
-        return schools.school(p) == 'divination' and p.level >= 45 and schools.runtime(p).get('third_eye_until', 0) > self.now()
+        return schools.school(p) == 'divination' and p.level >= 10 and schools.runtime(p).get('third_eye_until', 0) > self.now()
 
     def wizard_prepare_spell(self, p, s, targets, target_id=None, mana=0):
         """Called after validation, before the committed cast: failures spend nothing."""
         if schools.school(p) != 'evocation': return
         s['_wizard_cast'] = dict(started=self.now(), empowered_used=False)
         state = schools.state(p)
-        if (p.level >= 65 and state.get('overchannel_armed') and mana > 0
+        if (p.level >= 14 and state.get('overchannel_armed') and mana > 0
                 and 1 <= s.get('cast_circle', s.get('circle', 0)) <= 5
                 and s.get('kind') in ('attack', 'save', 'missiles', 'field', 'circle_field') and s.get('dice', [0])[0]):
             state['overchannel_armed'] = False
             used = max(0, int(state.get('overchannel_used', 0)))
             state['overchannel_used'] = used + 1
             s['_wizard_cast'].update(overchannel=True, backlash_dice=(used+1)*s.get('cast_circle', s.get('circle', 0)) if used else 0)
-        if p.level >= 25 and s.get('id') in EVOCATION_IDS and s.get('area') and s.get('save'):
+        if p.level >= 6 and s.get('id') in EVOCATION_IDS and s.get('area') and s.get('save'):
             protect = [t.id for t in targets if self.is_player_target(t) and t.id != target_id][:1+s.get('cast_circle', s.get('circle', 0))]
             s['_wizard_protected'] = protect
             # Preserve the original area anchor even if every creature is protected.
@@ -121,7 +121,7 @@ class WizardOffense:
     def wizard_maximize_spell(self, p, s):
         s = s or {}
         context = s.get('_wizard_cast', {})
-        return bool(schools.school(p) == 'evocation' and p.level >= 65 and context.get('overchannel')
+        return bool(schools.school(p) == 'evocation' and p.level >= 14 and context.get('overchannel')
                     and self.now() < context.get('started', 0)+rules.ROUND_SECONDS)
 
     def wizard_potent_cantrip(self, p, s):
@@ -129,7 +129,7 @@ class WizardOffense:
 
     def wizard_empower_roll(self, p, s, result):
         context = s.get('_wizard_cast', {})
-        if (schools.school(p) != 'evocation' or p.level < 45 or s.get('id') not in EVOCATION_IDS
+        if (schools.school(p) != 'evocation' or p.level < 10 or s.get('id') not in EVOCATION_IDS
                 or context.get('empowered_used') or not result.get('damage_rolls')): return
         # A field retains this same cast context, so later ticks cannot reapply INT.
         if not context: return

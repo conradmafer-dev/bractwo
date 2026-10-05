@@ -9,7 +9,7 @@ from server import dnd_content as dnd, druid_circles as circles, spell_scaling
 
 
 class GroupedHotbar(unittest.TestCase):
-    def player(self, level=15, circle='stars', cls='druid'):
+    def player(self, level=4, circle='stars', cls='druid'):
         p = Player('1', 'GroupedQA', class_id=cls, level=level)
         p.druid_circle = circle if cls == 'druid' else ''
         p.current_wall_time = 1000
@@ -17,7 +17,7 @@ class GroupedHotbar(unittest.TestCase):
         dnd.sync_hotbar(p)
         return p
 
-    def test_level15_stars_six_variants_become_two_slots(self):
+    def test_level4_stars_six_variants_become_two_slots(self):
         p = self.player()
         bar = dnd.grouped_hotbar(p)
         self.assertEqual(sum(bool(x) for x in p.hotbar), 21)
@@ -74,7 +74,7 @@ class GroupedHotbar(unittest.TestCase):
         for key in ('circle_star_archer','circle_star_chalice','circle_star_dragon'):
             self.assertEqual(profiles[key]['uses_remaining'],0)
             self.assertEqual(profiles[key]['resource_cost'],1)
-        p.level=45;p.buffs['starry_form']=dict(until=2000);circles.runtime(p)['starry_form']='archer'
+        p.level=10;p.buffs['starry_form']=dict(until=2000);circles.runtime(p)['starry_form']='archer'
         circles.state(p)['shape_spent']=circles.shape_max(p)
         profiles=spell_scaling.client_profiles(p)
         self.assertTrue(profiles['circle_star_archer']['already_active'])
@@ -90,7 +90,7 @@ class GroupedHotbar(unittest.TestCase):
 
     def test_non_druid_bars_are_unchanged(self):
         for cls in ('mage','ranger','knight'):
-            p=self.player(80,cls=cls)
+            p=self.player(17,cls=cls)
             self.assertEqual(dnd.grouped_hotbar(p),p.hotbar)
 
 
@@ -98,7 +98,7 @@ class StarActivation(unittest.IsolatedAsyncioTestCase):
     player=base.GameRules.player
     def setUp(self):
         self.clock=base.Clock();self.g=Game(':memory:',clock=self.clock)
-        self.p=self.player('druid',15)
+        self.p=self.player('druid',4)
         self.p.druid_circle='stars';self.g.migrate_druid_circle(self.p)
     def tearDown(self):self.g.db.close()
     def advance(self):

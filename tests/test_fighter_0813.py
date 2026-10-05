@@ -17,21 +17,21 @@ class FighterData(unittest.TestCase):
         self.assertEqual(set(fighter.STYLES),{'dueling','defense','great_weapon'})
         self.assertEqual({m['effect'] for m in fighter.MASTERIES.values()},{'sap','graze','topple'})
     def test_second_wind_free_and_sixty_seconds(self):
-        for lv in (1,5,20,95,100):
+        for lv in (1,2,5,20,21):
             p=Player('1','T',level=lv);s=spell_scaling.resolve(p,'second_wind')
             self.assertEqual((s['mana'],s['cooldown'],s['action']),(0,60,'bonus'))
-            self.assertEqual(s['dice'],[1,10,min(20,1+lv//5)])
+            self.assertEqual(s['dice'],[1,10,min(20,lv)])
     def test_surge_only_knight_at_five(self):
         for cls in CLASSES:
-            for lv in (1,4,5,20,100):
+            for lv in (1,2,5,20,21):
                 p=Player('1','T',class_id=cls,level=lv)
-                self.assertEqual(dnd.spell_allowed(p,'action_surge'),cls=='knight' and lv>=5)
+                self.assertEqual(dnd.spell_allowed(p,'action_surge'),cls=='knight' and lv>=2)
     def test_surge_is_free_not_a_spell_circle(self):
-        s=spell_scaling.resolve(Player('1','T',level=5),'action_surge')
+        s=spell_scaling.resolve(Player('1','T',level=2),'action_surge')
         self.assertEqual((s['mana'],s['cooldown'],s['action'],s['circle']),(0,90,'extra',0))
         self.assertTrue(s['feature'])
-    def test_receipt_level_five_surge_and_second_wind_increment(self):
-        p=Player('1','T',level=5);level_up.record(p,5,5)
+    def test_receipt_level_two_surge_and_second_wind_increment(self):
+        p=Player('1','T',level=2);level_up.record(p,2,2)
         rows=level_up.pending(p)['pending_level_ups'][0]['rows']
         self.assertTrue(any('Zryw akcji' in str(x) for x in rows),rows)
         self.assertTrue(any(x.get('label')=='Drugi oddech' and x.get('gain')=='+1' for x in rows),rows)
@@ -66,8 +66,8 @@ class FighterGame(unittest.IsolatedAsyncioTestCase):
         n=next(x for x in NPCS if x.get('service')=='master');self.p.x=n['x'];self.p.y=n['y'];self.p.floor=n.get('floor',0)
         return n
     def pvp(self):
-        self.e.alive=False;self.p.level=20;self.p.hp=self.p.max_hp;self.p.pvp_safety=False
-        q=self.player('knight',20,'2');q.x=self.p.x+70;q.hp=q.max_hp;q.pvp_safety=False
+        self.e.alive=False;self.p.level=5;self.p.hp=self.p.max_hp;self.p.pvp_safety=False
+        q=self.player('knight',5,'2');q.x=self.p.x+70;q.hp=q.max_hp;q.pvp_safety=False
         return q
     def test_starter_chain_shield_real_ac18(self):
         self.assertEqual(self.p.armor_class,18)
@@ -181,7 +181,7 @@ class FighterGame(unittest.IsolatedAsyncioTestCase):
     async def test_pvp_graze_resistance_and_protection(self):
         q=self.pvp();self.wear('training_greatsword');self.p.equipment['shield']='';self.g.combat_rng=base.Dice(1)
         q.buffs['stoneskin']={'until':self.clock()+30};before=q.hp
-        await self.g.attack(self.p,target_id=q.id);self.assertEqual(before-q.hp,4)  # two attacks; level-20 STR +4, halved to 2 each
+        await self.g.attack(self.p,target_id=q.id);self.assertEqual(before-q.hp,4)  # two attacks; level-5 STR +4, halved to 2 each
         self.advance();self.p.pvp_safety=True;before=q.hp
         await self.g.attack(self.p,target_id=q.id);self.assertEqual(q.hp,before)
     def test_pvp_prone_stops_movement_until_standing(self):
@@ -203,19 +203,19 @@ class FighterGame(unittest.IsolatedAsyncioTestCase):
         q=self.g.load_player(self.p.id,self.p.name,base.WS(),json.loads(json.dumps(self.p.save_data())))
         self.assertEqual(q.spell_cooldowns['second_wind'],self.clock()+60)
     async def test_surge_additional_attack_does_not_reset_other_actions(self):
-        self.p.level=5;self.p.mana=0;self.p.bonus_cooldown_until=self.clock()+2
+        self.p.level=2;self.p.mana=0;self.p.bonus_cooldown_until=self.clock()+2
         await self.g.attack(self.p,enemy_id=self.e.id);main=self.p.attack_cooldown_until;before=self.e.hp
         await self.g.cast_spell(self.p,'action_surge',enemy_id=self.e.id)
         self.assertLess(self.e.hp,before);self.assertEqual(self.p.attack_cooldown_until,main);self.assertEqual(self.p.bonus_cooldown_until,self.clock()+2);self.assertEqual(self.p.mana,0)
         self.assertEqual(self.p.spell_cooldowns['action_surge'],self.clock()+90)
         self.assertEqual(self.p.spell_history[-1],'action_surge')
     async def test_surge_extra_attacks_all_levels(self):
-        for lv,n in ((5,1),(20,2),(50,3),(95,4)):
+        for lv,n in ((2,1),(5,2),(11,3),(20,4)):
             self.p.level=lv;self.p.spell_cooldowns={};self.g.combat_rng=base.Dice(20);self.e.hp=9999
             await self.g.cast_spell(self.p,'action_surge',enemy_id=self.e.id)
             self.assertEqual(self.g.combat_rng.checks,n)
     async def test_surge_spam_and_invalid_target_never_reset_cooldown(self):
-        self.p.level=5;self.e.x=self.p.x+999
+        self.p.level=2;self.e.x=self.p.x+999
         await self.g.cast_spell(self.p,'action_surge',enemy_id=self.e.id);self.assertNotIn('action_surge',self.p.spell_cooldowns)
         self.e.x=self.p.x+70;await self.g.cast_spell(self.p,'action_surge',enemy_id=self.e.id);hp=self.e.hp
         for _ in range(8):await self.g.cast_spell(self.p,'action_surge',enemy_id=self.e.id)
@@ -228,7 +228,7 @@ class FighterGame(unittest.IsolatedAsyncioTestCase):
         with patch.object(self.g,'line_clear',return_value=False):await self.g.cast_spell(self.p,'action_surge',target_id=q.id)
         self.assertEqual(q.hp,before);self.assertNotIn('action_surge',self.p.spell_cooldowns)
     async def test_surge_cooldown_persistent_and_main_attack_still_available(self):
-        self.p.level=5;await self.g.cast_spell(self.p,'action_surge',enemy_id=self.e.id);self.assertEqual(self.p.attack_cooldown_until,0)
+        self.p.level=2;await self.g.cast_spell(self.p,'action_surge',enemy_id=self.e.id);self.assertEqual(self.p.attack_cooldown_until,0)
         q=self.g.load_player(self.p.id,self.p.name,base.WS(),json.loads(json.dumps(self.p.save_data())))
         self.assertEqual(q.spell_cooldowns['action_surge'],self.clock()+90)
     async def test_shop_buy_actual_weapon_and_persistent_inventory(self):

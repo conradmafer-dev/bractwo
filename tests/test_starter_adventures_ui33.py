@@ -29,7 +29,7 @@ class StarterAdventures(unittest.IsolatedAsyncioTestCase):
         self.clock=Clock();self.g=Game(':memory:',clock=self.clock);self.g.combat_rng=Dice()
         self.p=self.player()
     def tearDown(self):self.g.db.close()
-    def player(self,cls='ranger',level=10,pid='1'):
+    def player(self,cls='ranger',level=3,pid='1'):
         p=Player(pid,'Tester'+pid,WS(),class_id=cls,level=level,x=1100,y=1180)
         self.g.starter(p);p.hp=p.max_hp;p.mana=p.max_mana;p.current_wall_time=self.clock()
         self.g.players[p.id]=p
@@ -257,7 +257,7 @@ class StarterAdventures(unittest.IsolatedAsyncioTestCase):
         for key in (*sa.TOWER_REWARDS,'ring_headless_signet'):
             self.assertTrue((root/'web'/ITEMS[key]['icon']).is_file())
         meta=self.g.metadata();self.assertEqual(meta['world_revision'],33)
-        self.assertEqual(meta['starter_adventures']['recommended_level'],10)
+        self.assertEqual(meta['starter_adventures']['recommended_level'],3)
 
 
 class PersistenceAndHTTP(StarterAdventures):
@@ -298,7 +298,7 @@ class PersistenceAndHTTP(StarterAdventures):
         try:
             async with TestClient(TestServer(app)) as client:
                 response=await client.get('/health');data=await response.json()
-                self.assertEqual(data['ui_revision'],'UI_33');self.assertEqual(data['world_revision'],33)
+                self.assertEqual(data['ui_revision'],'UI_34');self.assertEqual(data['world_revision'],33)
                 for route in ['/starter_adventures.js','/game.js','/assets/equipment/echo_rapier.svg']:
                     response=await client.get(route)
                     self.assertEqual(response.status,200,route);self.assertGreater(len(await response.read()),200)

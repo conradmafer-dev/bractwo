@@ -131,7 +131,7 @@ function worker() {
     location: { origin: 'https://bractwo.example' }, clients: { claim: async () => { claimed++; } }, skipWaiting: async () => { skipped++; },
   });
   const context = {
-    self: root, URL, caches: { open: async () => cache, keys: async () => ['unrelated-project', 'bractwo-app-shell-0.8.17', 'bractwo-app-shell-0.8.18'], delete: async name => deleted.push(name) },
+    self: root, URL, caches: { open: async () => cache, keys: async () => ['unrelated-project', 'bractwo-app-shell-0.8.17', 'bractwo-app-shell-0.8.18-ui31', 'bractwo-app-shell-0.8.18-ui34'], delete: async name => deleted.push(name) },
     fetch: async request => { fetches.push(request); if (failure) throw new Error('offline'); return { body: 'fresh network' }; },
   };
   vm.runInNewContext(swSource, context, { filename: 'sw.js' });
@@ -147,7 +147,7 @@ function worker() {
 test('worker precaches only disconnected page and icons, and preserves unrelated caches', async () => {
   const w = worker(); await w.lifecycle('install'); await w.lifecycle('activate');
   assert.deepEqual(w.cached, ['/offline.html', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png']);
-  assert.deepEqual(w.deleted, ['bractwo-app-shell-0.8.17']);
+  assert.deepEqual(w.deleted, ['bractwo-app-shell-0.8.17', 'bractwo-app-shell-0.8.18-ui31']);
   assert.deepEqual(w.counts(), { claimed: 1, skipped: 1 });
 });
 

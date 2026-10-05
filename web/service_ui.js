@@ -49,7 +49,7 @@
     for(const item of items){const row=el('article',undefined,'service-item'),img=el('img');img.src=item.icon||w.items?.[item.template]?.icon||'assets/equipment/empty.svg';img.alt='';row.append(img,el('strong',item.name+(item.quantity>1?' ×'+item.quantity:'')));
      const type=depositing?'depot_store':'depot_take',b=btn(depositing?'Odłóż':'Zabierz',()=>command(type,{uid:item.uid}),blocked||full);b.dataset.serviceAction=type;row.append(b);body.append(row);root.BractwoInventoryUI?.bind(row,item,w);}
    }else if(tab==='promotion'){
-    const level=p.promotion?.required_level??10,cost=p.promotion?.cost??2000;
+    const level=p.promotion?.required_level??3,cost=p.promotion?.cost??2000;
     body.append(el('h3',p.promoted?'Promocja uzyskana':'Wyższa ranga profesji'));
     text(p.promoted?'Masz już promocję.':`Od poziomu ${level} · jednorazowo ${cost} złota. Przy sobie: ${p.gold} złota.`);
     if(['mage','druid'].includes(p.class_id))text(p.class_id==='mage'?'Promocja odblokowuje wybór szkoły czarodzieja w C → Atuty.':'Promocja odblokowuje wybór kręgu druida w C → Atuty.');
@@ -57,11 +57,11 @@
     if(p.promoted&&['mage','druid'].includes(p.class_id))body.append(btn('Otwórz Atuty',()=>h.character?.('feats')));
    }else if(tab==='blessing'){
     body.append(el('h3',p.blessed?'Błogosławieństwo aktywne':'Ochrona na kolejną wyprawę'));
-    text('Poziom 40 · 500 złota. Chroni połowę zwykłej kary złota i PD przy następnej śmierci. Czerwona czaszka wyłącza ochronę.');
-    action(p.blessed?'✓ Aktywne':'Kup błogosławieństwo','bless',blocked||p.blessed||p.level<40||p.gold<500);
+    text('Poziom 9 · 500 złota. Chroni połowę zwykłej kary złota i PD przy następnej śmierci. Czerwona czaszka wyłącza ochronę.');
+    action(p.blessed?'✓ Aktywne':'Kup błogosławieństwo','bless',blocked||p.blessed||p.level<9||p.gold<500);
    }else if(tab==='mastery'){
-    text(`Punkty mistrzostwa: ${p.mastery_points||0}. Pierwszy od poziomu 50 po promocji, następne co 5 poziomów.`);
-    for(const[id,label]of[['power','Potęga'],['focus','Skupienie']]){body.append(el('h3',`${label}: ${p.mastery?.[id]||0}/20`));text(id==='focus'?'+4 maksymalnej many za punkt.':p.class_id==='mage'?'Nie wzmacnia Iskry ani czarów.':'Ataki bronią: +1 obrażeń co 10 punktów, maksymalnie +2.');action('Dodaj punkt','mastery',blocked||!p.promoted||p.level<50||!p.mastery_points||(p.mastery?.[id]||0)>=20,{branch:id});}
+    text(`Punkty mistrzostwa: ${p.mastery_points||0}. Pierwszy od poziomu 11 po promocji, następne co poziom.`);
+    for(const[id,label]of[['power','Potęga'],['focus','Skupienie']]){body.append(el('h3',`${label}: ${p.mastery?.[id]||0}/20`));text(id==='focus'?'+4 maksymalnej many za punkt.':p.class_id==='mage'?'Nie wzmacnia Iskry ani czarów.':'Ataki bronią: +1 obrażeń co 10 punktów, maksymalnie +2.');action('Dodaj punkt','mastery',blocked||!p.promoted||p.level<11||!p.mastery_points||(p.mastery?.[id]||0)>=20,{branch:id});}
     action('Wyzeruj przydział · 200 złota','mastery_reset',blocked||p.gold<200||!Object.values(p.mastery||{}).some(n=>n>0));
    }else if(tab==='boat'){
     text('Bezpieczna przystań · wybierz miejsce docelowe.','service-safe');

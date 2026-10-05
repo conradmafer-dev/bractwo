@@ -142,6 +142,14 @@
     return {packet,label,disabled:player.alive===false||player.hp<=0||player.action_remaining>0||unable||tooFar,
       hint:tooFar?'Podejdź do sojusznika.':''};
   }
+  function experienceProgress(player) {
+    const progress=Math.max(0,Number(player?.xp)||0);
+    const needed=Math.max(1,Number(player?.xp_next)||1);
+    const start=Math.max(0,Number(player?.xp_level_start)||0);
+    const total=Math.max(0,Number(player?.xp_total??(start+progress))||0);
+    const nextTotal=Math.max(0,Number(player?.xp_next_total??(start+needed))||0);
+    return {total,nextTotal,progress,needed,ratio:Math.max(0,Math.min(1,progress/needed))};
+  }
   function manaBudgetText(budget) {
     if(budget?.progression==='per_level') {
       const bonus=budget.bonus?` + ${budget.bonus} premii`:'';
@@ -160,7 +168,7 @@
     const required=Number(player?.spell_profiles?.[spec?.id]?.required_level??spec?.required_level);if(Number.isFinite(required))return required;
     const cls=player?.class_id;
     if(spec?.class_levels?.[cls]!==undefined)return Number(spec.class_levels[cls]);
-    if(cls==='ranger'&&spec?.circle>0)return spec.circle===1?1:(spec.circle-1)*20;
+    if(cls==='ranger'&&spec?.circle>0)return spec.circle===1?1:(spec.circle-1)*4+1;
     return Number(spec?.min_level)||1;
   }
   function concentrationWarning(spec,player,spells={}) {
@@ -532,7 +540,7 @@
     }
     return right+100>=view.left&&left-100<=view.right&&bottom+100>=view.top&&top-360<=view.bottom;
   }
-  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, effectVisible, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, displayHotbar, hotbarGroupForSpell, spellCostText, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, martialHotbarLabel, combatSummary, diceResult, numericFormula, checkRollLines, damageRollDetails, damageRollLines, savageAttackDetails, savageAttackSummary, combatNoticeEntries, renderCombatNotice, bindTouchTap, bindTouchScroll };
+  const api = { SurfaceMap, SpatialIndex, FrameRateMeter, MotionTrack, mergeOwner, hitActor, effectVisible, HOTBAR_ROW_SIZE, HOTBAR_PAGE_SIZE, displayHotbar, hotbarGroupForSpell, spellCostText, hotbarSlotForCode, hotbarLabel, hotbarPageCount, hotbarKey, formatEffectTime, statusAction, experienceProgress, manaBudgetText, spellProfile, spellGate, concentrationWarning, spellMana, spellUsable, queuedSpellLabel, martialHotbarLabel, combatSummary, diceResult, numericFormula, checkRollLines, damageRollDetails, damageRollLines, savageAttackDetails, savageAttackSummary, combatNoticeEntries, renderCombatNotice, bindTouchTap, bindTouchScroll };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.BractwoRuntime = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);

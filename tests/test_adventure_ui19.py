@@ -91,7 +91,7 @@ class AdventureCombat(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.g.players.clear();self.g._adventure_grapples={};self.g.effects=[]
         self.g.combat_rng=base.Dice(20,3)
-        self.p=Player('199','Próba',base.WS(),class_id='knight',level=95,x=8400,y=5600,floor=-10)
+        self.p=Player('199','Próba',base.WS(),class_id='knight',level=20,x=8400,y=5600,floor=-10)
         self.g.starter(self.p);self.p.hp=self.p.max_hp;self.p.temp_hp=1000;self.p.current_wall_time=self.clock()
         self.g.players[self.p.id]=self.p
     def enemy(self,kind):

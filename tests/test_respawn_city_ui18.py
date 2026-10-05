@@ -17,7 +17,7 @@ class RespawnCityTests(unittest.IsolatedAsyncioTestCase):
             enemy.alive = False
             enemy.respawn_at = 0
         self.game.legacy_enemies = []
-        self.player = Player('1', 'CityTest', WS(), level=8, gold=100000,
+        self.player = Player('1', 'CityTest', WS(), level=2, gold=100000,
                              x=1100, y=1180)
         self.game.starter(self.player)
         self.player.hp = self.player.max_hp

@@ -1,0 +1,10 @@
+{
+  "baseline": "../qa_starter_balance/after_level10.json",
+  "current": "after_level3.json",
+  "old_level": 10,
+  "new_level": 3,
+  "trials_per_class_per_boss": 40,
+  "compared_runs": 320,
+  "wins": 320,
+  "different_runs_excluding_level": []
+}

@@ -1,24 +1,29 @@
-"""5E/SRD-based combat content; Bractwo's mana, timing and level gates are homebrew.
+"""5E/SRD-based combat content; Bractwo's mana and timing are homebrew.
 See docs/RULES_0.8.md and LICENSE-SRD.txt. Descriptions are original Polish summaries.
 """
+try:
+    from . import level_rules
+except ImportError:
+    import level_rules
+
 CLASS_SPECS = {
     'knight': dict(name='Rycerz', description='Wojownik: miecz, wytrzymałość i dodatkowe ataki.', weapon='sword', hp=12, hp_growth=1.6, mana=30, mana_growth=1,
                    damage=7.5, armor=0, hit_die=10, ability_name='Drugi oddech', ability_cost=5, ability_cooldown=30,
                    attributes=dict(strength=16, dexterity=12, constitution=14, intelligence=10, wisdom=10, charisma=10), primary='strength', saves=['strength','constitution'], default_ability='second_wind'),
-    'ranger': dict(name='Łowca', description='Łuk i I krąg od początku. Darmowy Znak łowcy; wilczy towarzysz od poziomu 10.', weapon='bow', hp=12, hp_growth=1.6, mana=40, mana_growth=0,
+    'ranger': dict(name='Łowca', description='Łuk i I krąg od początku. Darmowy Znak łowcy; wilczy towarzysz od poziomu 3.', weapon='bow', hp=12, hp_growth=1.6, mana=40, mana_growth=0,
                    damage=7.5, armor=0, hit_die=10, ability_name='Znak łowcy', ability_cost=0, ability_cooldown=30,
                    attributes=dict(strength=12, dexterity=16, constitution=14, intelligence=10, wisdom=14, charisma=10), primary='dexterity', saves=['strength','dexterity'], default_ability='hunters_mark'),
     'mage': dict(name='Czarodziej', description='Różdżka: iskra 1k4. Darmowe sztuczki i I krąg od 1. poziomu.', weapon='staff', hp=8, hp_growth=1.2, mana=40, mana_growth=0,
                    damage=2.5, armor=0, hit_die=6, ability_name='Promień mrozu', ability_cost=0, ability_cooldown=0,
                    attributes=dict(strength=8, dexterity=14, constitution=14, intelligence=16, wisdom=12, charisma=10), primary='intelligence', saves=['intelligence','wisdom'], default_ability='ray_of_frost'),
-    'druid': dict(name='Druid', description='Laska wręcz, I krąg magii natury od 1. poziomu; przemiana od 5.', weapon='staff', hp=10, hp_growth=1.4, mana=40, mana_growth=0,
+    'druid': dict(name='Druid', description='Laska wręcz, I krąg magii natury od 1. poziomu; przemiana od 2.', weapon='staff', hp=10, hp_growth=1.4, mana=40, mana_growth=0,
                    damage=5.5, armor=0, hit_die=8, ability_name='Shillelagh', ability_cost=0, ability_cooldown=0,
                    attributes=dict(strength=14, dexterity=12, constitution=14, intelligence=10, wisdom=16, charisma=10), primary='wisdom', saves=['intelligence','wisdom'], default_ability='shillelagh'),
 }
 
-# Circle I at creation, then a new circle at each ten-level milestone.
-FULL_CASTER_CIRCLE_LEVELS = (1, 10, 20, 30, 40, 50, 60, 70, 80)
-RANGER_CIRCLE_LEVELS = (1, 20, 40, 60, 80)
+# Circle I at creation; later circles use standard class-level gates.
+FULL_CASTER_CIRCLE_LEVELS = (1, 3, 5, 7, 9, 11, 13, 15, 17)
+RANGER_CIRCLE_LEVELS = (1, 5, 9, 13, 17)
 
 # Mana is a shared weighted budget, not separate tabletop slot counters.
 # Each row is the full-caster slot distribution from SRD 5.2.1.
@@ -30,10 +35,11 @@ FULL_CASTER_SLOTS = (
     (4,3,3,3,2,1,1,1,1), (4,3,3,3,3,1,1,1,1),
     (4,3,3,3,3,2,1,1,1), (4,3,3,3,3,2,2,1,1),
 )
-# Preserve old milestone totals, but distribute the gains between them.
-# 95 remains the full-caster cap (tabletop level 20); a knight stays at 30.
+# Keep the old interpolation in its original units to preserve resource totals
+# and intermediate gains already earned by migrated characters.
 MANA_RULES_VERSION = 3
-MANA_GROWTH_LEVELS = (1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95)
+LEGACY_MANA_GROWTH_LEVELS = (1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95)
+MANA_GROWTH_LEVELS = tuple(level_rules.from_legacy(level) for level in LEGACY_MANA_GROWTH_LEVELS)
 MANA_RECOVERY_DELAY = 12.0
 MANA_RECOVERY_FIELD_SECONDS = 240.0
 MANA_RECOVERY_SAFE_SECONDS = 20.0
@@ -49,22 +55,21 @@ LONGSTRIDER_SPEED_BONUS = 10 * UNITS_PER_FOOT / GAME_ROUND_SECONDS
 
 def mana_slot_budget(class_id, level):
     if class_id in ('mage', 'druid'):
-        return FULL_CASTER_SLOTS[min(20, max(1, 1 + int(level)//5))-1]
+        return FULL_CASTER_SLOTS[min(20, max(1, int(level)))-1]
     if class_id == 'ranger':
-        # 2024 half-caster slots: tabletop 1/5/9/13/17 => game 1/20/40/60/80.
-        effective = min(20, max(1, 1 + int(level)//5))
+        effective = min(20, max(1, int(level)))
         return FULL_CASTER_SLOTS[(effective-1)//2]
     return ()
 
 
 def legacy_base_mana(class_id, level):
-    """Pre-0.8.16 budget, retained for migration and old advancement receipts."""
-    slots = mana_slot_budget(class_id, level)
+    """Pre-0.8.16 budget at a LEGACY level, for migration/old receipts only."""
+    slots = mana_slot_budget(class_id, level_rules.from_legacy(level))
     return sum(n*MANA_COSTS[i+1] for i,n in enumerate(slots)) if slots else int(CLASS_SPECS[class_id]['mana'])
 
 
 MANA_CHECKPOINTS = {cls: tuple((level, legacy_base_mana(cls, level))
-                    for level in MANA_GROWTH_LEVELS) for cls in CLASS_SPECS}
+                    for level in LEGACY_MANA_GROWTH_LEVELS) for cls in CLASS_SPECS}
 
 
 def interpolate_growth(level, checkpoints):
@@ -83,26 +88,31 @@ def interpolate_growth(level, checkpoints):
     return checkpoints[-1][1]
 
 
-def base_mana(class_id, level, version=MANA_RULES_VERSION):
+def _base_mana_at_growth_level(class_id, legacy_level, version=MANA_RULES_VERSION):
     if version < MANA_RULES_VERSION:
-        return legacy_base_mana(class_id, level)
-    return interpolate_growth(level, MANA_CHECKPOINTS[class_id])
+        return legacy_base_mana(class_id, legacy_level)
+    return interpolate_growth(legacy_level, MANA_CHECKPOINTS[class_id])
+
+
+def base_mana(class_id, level, version=MANA_RULES_VERSION):
+    """Resource budget at a current (D&D-numbered) character level."""
+    return _base_mana_at_growth_level(class_id, level_rules.to_legacy(level), version)
 
 
 def max_mana(p):
-    base = base_mana(p.class_id, p.level, getattr(p, 'mana_rules_version', MANA_RULES_VERSION))
+    base = _base_mana_at_growth_level(p.class_id, level_rules.growth_level(p), getattr(p, 'mana_rules_version', MANA_RULES_VERSION))
     return base + max(0, min(20, int(p.mastery.get('focus', 0))))*4
 
 
 def mana_budget_info(p):
     version = getattr(p, 'mana_rules_version', MANA_RULES_VERSION)
-    base = base_mana(p.class_id, p.level, version)
+    base = _base_mana_at_growth_level(p.class_id, level_rules.growth_level(p), version)
     # Slots still describe the old tabletop reference, NOT limits on each circle
     # and NOT the current interpolated pool. Clients display base/bonus instead.
     return dict(slots=list(mana_slot_budget(p.class_id, p.level)),
                 base=base, bonus=max_mana(p)-base, costs=list(MANA_COSTS), shared=True,
                 progression='per_level' if version >= MANA_RULES_VERSION else 'weighted_slots',
-                next_level_gain=base_mana(p.class_id, p.level+1, version)-base,
+                next_level_gain=max(0, base_mana(p.class_id, p.level+1, version)-base),
                 slots_are_reference=version >= MANA_RULES_VERSION)
 
 # An explicit implementation catalogue, not the entire tabletop spell list.
@@ -115,7 +125,7 @@ def add(key, name, english, circle, classes, kind, description, **extra):
         cooldown=0, action='action', kind=kind, description=description, range=310,
         radius=0, effect='magic_bolt', source='SRD 5.2.1', **extra)
 
-add('fire_bolt','Ognisty pocisk','Fire Bolt',0,'mage','attack','Rzut ataku czarem; 1k10 ognia. Więcej kości na poziomach 20/50/80.',dice=[1,10,0], damage_type='fire',scales=True)
+add('fire_bolt','Ognisty pocisk','Fire Bolt',0,'mage','attack','Rzut ataku czarem; 1k10 ognia. Więcej kości na poziomach 5/11/17.',dice=[1,10,0], damage_type='fire',scales=True)
 add('ray_of_frost','Promień mrozu','Ray of Frost',0,'mage','attack','1k8 zimna; trafiony cel porusza się wolniej przez jedną rundę.',dice=[1,8,0],damage_type='cold',scales=True,slow=3)
 add('shocking_grasp','Porażający uścisk','Shocking Grasp',0,'mage','attack','Czar w zwarciu: 1k8 błyskawic. Trafiony cel nie wykona reakcji przez rundę.',dice=[1,8,0],damage_type='lightning',scales=True,melee=True,no_reactions=3)
 add('acid_splash','Rozprysk kwasu','Acid Splash',0,'mage','save','1k6 kwasu w małym obszarze. Obrona ZRĘ: brak obrażeń.',dice=[1,6,0],damage_type='acid',scales=True,save='dexterity',save_half=False,area=True)
@@ -173,18 +183,18 @@ add('ensnaring_strike','Uderzenie oplątujące','Ensnaring Strike',1,'ranger','w
     dice=[1,6,0], damage_type='piercing', save='strength', concentration=True, duration=30, duration_rounds=10, buff='restrained')
 SPELLS['ensnaring_strike'].update(action='bonus', source='Mechanika 2024; opis i implementacja własna Bractwa')
 SPELLS['hunters_mark'].update(mana=0, cooldown=30, free_cast=True)
-SPELLS['longstrider']['class_min_levels']={'ranger':5}
+SPELLS['longstrider']['class_min_levels']={'ranger':2}
 
 # Class features deliberately marked as adaptations, not misrepresented as spells.
 add('second_wind','Drugi oddech','Second Wind',0,'knight','heal','Zdolność wojownika: odzyskaj 1k10 + poziom bojowy HP; odnowienie 30 s.',dice=[1,10,0],feature=True)
-add('animal_companion','Zew towarzysza','Animal Companion',0,'ranger','companion','Od poziomu 10: wezwij wilka. Walczy z wybranym przeciwnikiem, także graczem po odblokowaniu PvP; może zginąć; ponowne wezwanie po 45 s.',feature=True)
-add('wild_shape_wolf','Dziki kształt · wilk','Wild Shape',0,'druid','shape','Od poziomu 20: wilk, ugryzienie 2k4+2 i tymczasowe HP. Brak czarów w formie; użyj ponownie, by powrócić.',feature=True,form='wolf')
-add('wild_shape_bear','Dziki kształt · niedźwiedź','Wild Shape',0,'druid','shape','Od poziomu 40: niedźwiedź, dwa ataki 2k6+4 na rundę i tymczasowe HP. Brak czarów w formie.',feature=True,form='bear')
+add('animal_companion','Zew towarzysza','Animal Companion',0,'ranger','companion','Od poziomu 3: wezwij wilka. Walczy z wybranym przeciwnikiem, także graczem po odblokowaniu PvP; może zginąć; ponowne wezwanie po 45 s.',feature=True)
+add('wild_shape_wolf','Dziki kształt · wilk','Wild Shape',0,'druid','shape','Od poziomu 5: wilk, ugryzienie 2k4+2 i tymczasowe HP. Brak czarów w formie; użyj ponownie, by powrócić.',feature=True,form='wolf')
+add('wild_shape_bear','Dziki kształt · niedźwiedź','Wild Shape',0,'druid','shape','Od poziomu 9: niedźwiedź, dwa ataki 2k6+4 na rundę i tymczasowe HP. Brak czarów w formie.',feature=True,form='bear')
 
 for key in ('shillelagh','healing_word','hunters_mark','misty_step','barkskin','second_wind','wild_shape_wolf','wild_shape_bear'):
     SPELLS[key]['action']='bonus'
 for key in ('shield',): SPELLS[key]['action']='reaction'
-for key, gate, mana, cooldown in [('second_wind',1,5,30),('animal_companion',10,8,45),('wild_shape_wolf',20,10,60),('wild_shape_bear',40,16,60)]:
+for key, gate, mana, cooldown in [('second_wind',1,5,30),('animal_companion',3,8,45),('wild_shape_wolf',5,10,60),('wild_shape_bear',9,16,60)]:
     SPELLS[key].update(min_level=gate,mana=mana,cooldown=cooldown,source='Zdolność klasy · adaptacja Bractwa')
 SPELLS['wild_shape_wolf']['duration']=90
 SPELLS['wild_shape_bear']['duration']=90
@@ -249,14 +259,14 @@ for key,spec in SPELLS.items():
 
 # Current dice/counts/durations are delivered by the server per character.
 SPELLS['hunters_mark']['duration'] = 600 * GAME_ROUND_SECONDS
-SPELLS['fire_bolt']['description'] = 'Ognisty pocisk trafia po udanym rzucie ataku czarem. Sztuczka rośnie na poziomach 20, 50 i 80.'
+SPELLS['fire_bolt']['description'] = 'Ognisty pocisk trafia po udanym rzucie ataku czarem. Sztuczka rośnie na poziomach 5, 11 i 17.'
 SPELLS['ray_of_frost']['description'] = 'Zimny promień. Trafiony cel porusza się wolniej przez jedną rundę.'
 SPELLS['shocking_grasp']['description'] = 'Porażenie w zwarciu. Trafiony cel nie może wykonać reakcji przez rundę.'
 SPELLS['acid_splash']['description'] = 'Kwas rozpryskuje się w małym obszarze. Udana obrona ZRĘ chroni przed obrażeniami.'
 SPELLS['produce_flame']['description'] = 'Miotany płomień. Darmowa sztuczka z rzutem ataku czarem.'
 SPELLS['thorn_whip']['description'] = 'Ciernisty bicz zadaje obrażenia kłute i przyciąga mniejszego przeciwnika do 10 stóp. Rzut ataku czarem wręcz.'
 SPELLS['starry_wisp']['description'] = 'Promienisty ognik. Trafiony przeciwnik zostaje oznaczony światłem przez rundę.'
-SPELLS['shillelagh']['description'] = 'Magiczna laska atakuje Mądrością zamiast Siłą. Jej kość obrażeń rośnie na poziomach 20, 50 i 80.'
+SPELLS['shillelagh']['description'] = 'Magiczna laska atakuje Mądrością zamiast Siłą. Jej kość obrażeń rośnie na poziomach 5, 11 i 17.'
 SPELLS['magic_missile']['description'] = 'Pociski mocy trafiają automatycznie. Każdy zadaje 1k4+1 obrażeń. Tarcza zatrzymuje całą salwę.'
 SPELLS['burning_hands']['description'] = 'Płomienie w stożku przed postacią. Udana obrona ZRĘ zmniejsza obrażenia o połowę.'
 SPELLS['cure_wounds']['description'] = 'Dotyk przywraca zdrowie. Domyślnie leczysz siebie; zaznacz członka drużyny, aby uleczyć jego.'
@@ -274,7 +284,7 @@ SPELLS['chain_lightning']['description'] = 'Błyskawica przeskakuje z pierwszego
 SPELLS['heal']['description'] = 'Przywraca zdrowie tobie lub wskazanemu sojusznikowi, bez rzutu kośćmi.'
 SPELLS['hunters_mark']['description'] = 'Oznacz przeciwnika: każde twoje trafienie rzutem ataku zadaje mu dodatkowe 1k6 mocy. Bez many; odnowienie 30 s, również przy zmianie celu. Wymaga koncentracji. Atak i leczenie jej nie przerywają. Wyższe kręgi wydłużają czas, nie zwiększają obrażeń.'
 SPELLS['longstrider']['description'] = 'Dotyk: szybkość +10 stóp. Atak, obrażenia i inne czary nie przerywają efektu. Bez koncentracji. Wyższy krąg obejmuje więcej członków drużyny w zasięgu dotyku, nie wydłuża czasu.'
-SPELLS['second_wind']['description'] = 'Akcja dodatkowa: odzyskaj 1k10 + poziom bojowy HP. Premia rośnie co 5 poziomów postaci. Odnowienie: 30 s.'
+SPELLS['second_wind']['description'] = 'Akcja dodatkowa: odzyskaj 1k10 + poziom postaci HP (maks. +20). Odnowienie: 30 s.'
 
 # Preference order only. sync_hotbar removes locked spells, fills gaps and appends
 # every unlocked spell. Two rows of twelve buttons make one bank.
@@ -424,17 +434,17 @@ def configure(content, classes, potions):
     content.RUNES = {}  # Old Tibian runes no longer bypass class/circle requirements.
     content.PROMOTIONS = {'knight':'Mistrz miecza','ranger':'Mistrz łowów','mage':'Arcymag','druid':'Arcydruid'}
     content.MILESTONES = [(1,'I krąg / sztuczki i broń','Czarodziej, druid i łowca: I krąg od początku. Kości obrażeń, KP i cechy. Sztuczki nie kosztują many.'),
-        (8,'Rejsy i PvP','Dostęp do statków i świadomie włączanego PvP poza osadami.'),
-        (10,'II krąg / wilczy towarzysz','Czarodziej i druid: II krąg. Łowca: wilczy towarzysz.'),
-        (20,'III krąg / dodatkowy atak','Czarodziej i druid: III krąg (Kula ognia / Wezwanie błyskawicy). Łowca: II krąg. Rycerz i łowca: 2 ataki.'),
-        (30,'IV krąg','Uschnięcie, Lodowa burza i Kamienna skóra.'),
-        (40,'V krąg','Czarodziej i druid: V krąg. Łowca: III krąg.'),
-        (50,'VI krąg / 3 ataki','Rycerz: 3 ataki. Czarodziej i druid: VI krąg.'),
-        (60,'VII krąg','Palec śmierci i Burza ognia; łowca: IV krąg.'),
-        (70,'VIII krąg','Rozbłysk słońca i Zapalająca chmura.'),
-        (80,'IX krąg','Rój meteorów i Przewidywanie; łowca: V krąg. Ostatni wzrost kości sztuczek.'),
-        (95,'4 ataki rycerza','Rycerz wykonuje 4 niezależne rzuty ataku w jednej akcji.'),
-        (100,'Dalsza wędrówka','Poziomy postaci nadal nie mają limitu.')]
+        (2,'Rejsy i PvP','Dostęp do statków i świadomie włączanego PvP poza osadami.'),
+        (3,'II krąg / wilczy towarzysz','Czarodziej i druid: II krąg. Łowca: wilczy towarzysz.'),
+        (5,'III krąg / dodatkowy atak','Czarodziej i druid: III krąg (Kula ognia / Wezwanie błyskawicy). Łowca: II krąg. Rycerz i łowca: 2 ataki.'),
+        (7,'IV krąg','Uschnięcie, Lodowa burza i Kamienna skóra.'),
+        (9,'V krąg','Czarodziej i druid: V krąg. Łowca: III krąg.'),
+        (11,'VI krąg / 3 ataki','Rycerz: 3 ataki. Czarodziej i druid: VI krąg.'),
+        (13,'VII krąg','Palec śmierci i Burza ognia; łowca: IV krąg.'),
+        (15,'VIII krąg','Rozbłysk słońca i Zapalająca chmura.'),
+        (17,'IX krąg','Rój meteorów i Przewidywanie; łowca: V krąg. Ostatni wzrost kości sztuczek.'),
+        (20,'4 ataki rycerza','Rycerz wykonuje 4 niezależne rzuty ataku w jednej akcji.'),
+        (21,'Dalsza wędrówka','Poziomy postaci nadal nie mają limitu.')]
     for i, dice in enumerate(([2,4,2],[4,4,4],[8,4,8],[10,4,20]),1):
         key='health_potion'+('' if i==1 else '_'+str(i))
         potions[key].update(dice=dice,restore=int(dice[0]*(dice[1]+1)/2+dice[2]))

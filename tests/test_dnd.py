@@ -39,17 +39,17 @@ class PureRules(unittest.TestCase):
         self.assertEqual(rules.proficiency(Player('1','A')),2)
         self.assertEqual(rules.proficiency(Player('1','A',level=10000)),6)
     def test_cantrips_scale_without_multiple_casts(self):
-        for level,n in ((1,1),(19,1),(20,2),(49,2),(50,3),(80,4),(999,4)):
+        for level,n in ((1,1),(4,1),(5,2),(10,2),(11,3),(17,4),(999,4)):
             p=Player('1','A',class_id='mage',level=level);i=make_item('mage_weapon_1');p.inventory=[i];p.equipment['weapon']=i['uid']
             self.assertEqual(rules.cantrip_count(p),n);self.assertEqual(rules.weapon_dice(p),(1,4,0));self.assertEqual(rules.attacks_per_round(p),1)
     def test_weapon_extra_attacks(self):
-        for cls,levels in (('knight',[(1,1),(20,2),(50,3),(95,4)]),('ranger',[(1,1),(20,2),(100,2)]),('druid',[(100,1)])):
+        for cls,levels in (('knight',[(1,1),(5,2),(11,3),(20,4)]),('ranger',[(1,1),(5,2),(20,2)]),('druid',[(20,1)])):
             for lv,count in levels:self.assertEqual(rules.attacks_per_round(Player('1','A',class_id=cls,level=lv)),count)
     def test_circles_full(self):
-        for level in range(1,105):
-            self.assertEqual(dnd.circle_for('mage',level),min(9,1+level//10));self.assertEqual(dnd.circle_for('druid',level),min(9,1+level//10))
+        for level in range(1,25):
+            self.assertEqual(dnd.circle_for('mage',level),min(9,1+(level-1)//2));self.assertEqual(dnd.circle_for('druid',level),min(9,1+(level-1)//2))
     def test_circles_ranger(self):
-        for level in range(1,105):self.assertEqual(dnd.circle_for('ranger',level),min(5,1+level//20))
+        for level in range(1,25):self.assertEqual(dnd.circle_for('ranger',level),min(5,1+(level-1)//4))
     def test_knight_no_spells(self):self.assertEqual(dnd.circle_for('knight',100),0)
     def test_critical_doubles_dice_not_modifier(self):
         result=rules.roll_attack(Dice(20,4),5,99,(1,8,3))
@@ -89,17 +89,17 @@ class GameRules(unittest.IsolatedAsyncioTestCase):
         self.g.db.execute('INSERT INTO accounts VALUES(?,?,?,?,?,?)',(int(p.id),p.name,p.name.lower(),b'salt',b'hash',json.dumps(p.save_data())))
         self.g.save_player(p);self.g.db.commit()
     async def test_malformed_cast_target_rejected_without_cost(self):
-        p=self.player('druid',30);mana=p.mana
+        p=self.player('druid',7);mana=p.mana
         for target in ([],{},42):await self.g.cast_spell(p,'healing_word',target_id=target)
         await self.g.cast_spell(p,'healing_word',enemy_id=self.e.id,target_id=p.id)
         self.assertEqual(p.mana,mana);self.assertFalse(p.pending_spell)
     async def test_repeated_concentration_spell_free_with_empty_mana(self):
-        p=self.player('druid',30);await self.g.cast_spell(p,'call_lightning',self.e.id)
+        p=self.player('druid',7);await self.g.cast_spell(p,'call_lightning',self.e.id)
         p.mana=0;before=self.e.hp;self.clock.advance(3.1)
         await self.g.cast_spell(p,'call_lightning',self.e.id)
         self.assertEqual(p.mana,0);self.assertLess(self.e.hp,before)
     async def test_freedom_of_movement_cancels_magical_movement_penalty(self):
-        p=self.player('druid',40);base=p.speed
+        p=self.player('druid',9);base=p.speed
         p.buffs['restrained']={'until':self.clock()+20};self.assertEqual(p.speed,0)
         await self.g.cast_spell(p,'freedom_of_movement');self.assertGreaterEqual(p.speed,base)
     async def test_real_weapon_damage(self):
@@ -109,7 +109,7 @@ class GameRules(unittest.IsolatedAsyncioTestCase):
         for _ in range(10):await self.g.attack(self.p,enemy_id=self.e.id)
         self.assertEqual(hp,self.e.hp)
     async def test_extra_attacks_all_rolled_separately(self):
-        self.p.level=95;await self.g.attack(self.p,enemy_id=self.e.id)
+        self.p.level=20;await self.g.attack(self.p,enemy_id=self.e.id)
         self.assertEqual(self.g.combat_rng.checks,4);self.assertEqual(len(self.p.combat_log),4)
     async def test_druid_basic_melee_range(self):
         p=self.player('druid');self.e.x=1300;await self.g.attack(p,enemy_id=self.e.id);self.assertEqual(self.e.hp,999)
@@ -128,103 +128,103 @@ class GameRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.e.hp,987);self.assertEqual(p.mana,mana-20)
     async def test_ranger_early_magic(self):
         p=self.player('ranger',1);await self.g.cast_spell(p,'hunters_mark',self.e.id);self.assertEqual(p.mark_target,self.e.id)
-        p.level=20;await self.g.cast_spell(p,'hunters_mark',self.e.id);self.assertEqual(p.mark_target,self.e.id)
+        p.level=5;await self.g.cast_spell(p,'hunters_mark',self.e.id);self.assertEqual(p.mark_target,self.e.id)
     async def test_magic_missile_base_circle_three_automatic_hits(self):
-        p=self.player('mage',10);p.spell_circle_choices['magic_missile']=1;self.g.combat_rng=Dice(1,2);await self.g.cast_spell(p,'magic_missile',self.e.id)
+        p=self.player('mage',3);p.spell_circle_choices['magic_missile']=1;self.g.combat_rng=Dice(1,2);await self.g.cast_spell(p,'magic_missile',self.e.id)
         self.assertEqual(self.e.hp,990);self.assertEqual(self.g.combat_rng.checks,0);self.assertEqual(len(p.combat_log),3)
     async def test_scorching_ray_three_attack_rolls(self):
-        p=self.player('mage',20);p.spell_circle_choices['scorching_ray']=2;self.e.x=1200;await self.g.cast_spell(p,'scorching_ray',self.e.id)
+        p=self.player('mage',5);p.spell_circle_choices['scorching_ray']=2;self.e.x=1200;await self.g.cast_spell(p,'scorching_ray',self.e.id)
         self.assertEqual(self.g.combat_rng.checks,3)
     async def test_fireball_save_and_damage(self):
-        p=self.player('mage',30);p.spell_circle_choices['fireball']=3;self.g.combat_rng=Dice(1,3);await self.g.cast_spell(p,'fireball',self.e.id)
+        p=self.player('mage',7);p.spell_circle_choices['fireball']=3;self.g.combat_rng=Dice(1,3);await self.g.cast_spell(p,'fireball',self.e.id)
         self.assertEqual(self.e.hp,999-24);self.assertEqual(p.last_roll['damage_dice'],'8k6')
     async def test_meteor_hits_selected_center_once(self):
-        p=self.player('mage',90);self.g.combat_rng=Dice(1,3);await self.g.cast_spell(p,'meteor_swarm',self.e.id)
+        p=self.player('mage',19);self.g.combat_rng=Dice(1,3);await self.g.cast_spell(p,'meteor_swarm',self.e.id)
         self.assertEqual(self.e.hp,879);self.assertEqual(len(p.combat_log),1)
     async def test_healing_uses_dice_and_ability(self):
-        p=self.player('druid',10);p.spell_circle_choices['cure_wounds']=1;p.hp=1;await self.g.cast_spell(p,'cure_wounds')
+        p=self.player('druid',3);p.spell_circle_choices['cure_wounds']=1;p.hp=1;await self.g.cast_spell(p,'cure_wounds')
         self.assertEqual(p.hp,10);self.assertEqual(p.last_roll['damage_dice'],'2k8+3')
     async def test_healing_full_hp_no_cost(self):
-        p=self.player('druid',10);mana=p.mana;await self.g.cast_spell(p,'cure_wounds');self.assertEqual(p.mana,mana)
+        p=self.player('druid',3);mana=p.mana;await self.g.cast_spell(p,'cure_wounds');self.assertEqual(p.mana,mana)
     async def test_heal_other_player_only_party(self):
-        p=self.player('druid',10);q=self.player(pid='2');q.hp=1
+        p=self.player('druid',3);q=self.player(pid='2');q.hp=1
         await self.g.cast_spell(p,'healing_word',target_id=q.id);self.assertEqual(q.hp,1)
         p.party_id=q.party_id='party';await self.g.cast_spell(p,'healing_word',target_id=q.id);self.assertGreater(q.hp,1)
     async def test_friendly_heal_rejects_pvp_combat_while_safety_locked(self):
-        p=self.player('druid',10);q=self.player(pid='2');q.hp=1;p.party_id=q.party_id='party';q.pvp_combat_until=2000
+        p=self.player('druid',3);q=self.player(pid='2');q.hp=1;p.party_id=q.party_id='party';q.pvp_combat_until=2000
         await self.g.cast_spell(p,'cure_wounds',target_id=q.id);self.assertEqual(q.hp,1)
     async def test_hunters_mark_each_attack(self):
-        p=self.player('ranger',20);self.e.x=1200;await self.g.cast_spell(p,'hunters_mark',self.e.id)
+        p=self.player('ranger',5);self.e.x=1200;await self.g.cast_spell(p,'hunters_mark',self.e.id)
         before=self.e.hp;await self.g.attack(p,enemy_id=self.e.id)
         self.assertEqual(before-self.e.hp,20);self.assertEqual(p.last_roll['mark_rolls'],[3])
     async def test_one_concentration_only(self):
-        p=self.player('druid',20);self.g.combat_rng=Dice(1);await self.g.cast_spell(p,'entangle',self.e.id)
+        p=self.player('druid',5);self.g.combat_rng=Dice(1);await self.g.cast_spell(p,'entangle',self.e.id)
         self.assertTrue(self.g.enemy_condition(self.e,'restrained'));self.clock.advance()
         await self.g.cast_spell(p,'moonbeam',self.e.id);self.assertEqual(p.concentration,'moonbeam');self.assertFalse(self.g.enemy_condition(self.e,'restrained'))
     async def test_damage_breaks_concentration(self):
-        p=self.player('druid',20);await self.g.cast_spell(p,'moonbeam',self.e.id);self.g.combat_rng=Dice(1)
+        p=self.player('druid',5);await self.g.cast_spell(p,'moonbeam',self.e.id);self.g.combat_rng=Dice(1)
         self.g.damage_player(p,2,rolled=True);self.assertFalse(p.concentration);self.assertFalse(self.g.spell_fields)
     async def test_concentration_expires(self):
-        p=self.player('ranger',20);await self.g.cast_spell(p,'hunters_mark',self.e.id);self.clock.advance(600*dnd.GAME_ROUND_SECONDS+1);self.g.tick_dnd(.05);self.assertFalse(p.mark_target)
+        p=self.player('ranger',5);await self.g.cast_spell(p,'hunters_mark',self.e.id);self.clock.advance(600*dnd.GAME_ROUND_SECONDS+1);self.g.tick_dnd(.05);self.assertFalse(p.mark_target)
     async def test_shield_can_turn_hit_into_miss(self):
-        p=self.player('mage',10);await self.g.cast_spell(p,'shield');self.g.combat_rng=Dice(8)
+        p=self.player('mage',3);await self.g.cast_spell(p,'shield');self.g.combat_rng=Dice(8)
         hp=p.hp;mana=p.mana;result=self.g.hit_player(self.e,p)
         self.assertTrue(result['shielded']);self.assertEqual(p.hp,hp);self.assertEqual(p.mana,mana-20)
     async def test_shield_does_not_cancel_critical(self):
-        p=self.player('mage',50);await self.g.cast_spell(p,'shield');self.g.combat_rng=Dice(20);hp=p.hp
+        p=self.player('mage',11);await self.g.cast_spell(p,'shield');self.g.combat_rng=Dice(20);hp=p.hp
         result=self.g.hit_player(self.e,p);self.assertTrue(result['critical']);self.assertLess(p.hp,hp)
     async def test_barkskin_minimum_ac(self):
-        p=self.player('druid',20);await self.g.cast_spell(p,'barkskin');self.assertGreaterEqual(p.armor_class,17)
+        p=self.player('druid',5);await self.g.cast_spell(p,'barkskin');self.assertGreaterEqual(p.armor_class,17)
     async def test_stoneskin_halves_physical_damage(self):
-        p=self.player('druid',40);await self.g.cast_spell(p,'stoneskin');self.g.combat_rng=Dice(20)
+        p=self.player('druid',9);await self.g.cast_spell(p,'stoneskin');self.g.combat_rng=Dice(20)
         hp=p.hp;self.g.damage_player(p,10,rolled=True,damage_type='slashing');self.assertEqual(p.hp,hp-5)
     async def test_no_damage_minimum_one_after_zero_save(self):
         hp=self.p.hp;self.g.damage_player(self.p,0,rolled=True);self.assertEqual(hp,self.p.hp)
     async def test_blind_or_entangle_retries_save(self):
-        p=self.player('druid',10);self.g.combat_rng=Dice(1);await self.g.cast_spell(p,'entangle',self.e.id)
+        p=self.player('druid',3);self.g.combat_rng=Dice(1);await self.g.cast_spell(p,'entangle',self.e.id)
         self.g.combat_rng=Dice(20);self.clock.advance();self.g.tick_dnd(.05);self.assertFalse(self.g.enemy_condition(self.e,'restrained'))
     async def test_moonbeam_periodic_not_each_frame(self):
-        p=self.player('druid',20);await self.g.cast_spell(p,'moonbeam',self.e.id);self.g.tick_dnd(.05);hp=self.e.hp
+        p=self.player('druid',5);await self.g.cast_spell(p,'moonbeam',self.e.id);self.g.tick_dnd(.05);hp=self.e.hp
         for _ in range(50):self.g.tick_dnd(.05)
         self.assertEqual(self.e.hp,hp);self.clock.advance();self.g.tick_dnd(.05);self.assertLess(self.e.hp,hp)
     async def test_spike_growth_damage_only_on_movement(self):
-        p=self.player('druid',20);await self.g.cast_spell(p,'spike_growth',self.e.id);self.g.tick_dnd(.05);self.assertEqual(self.e.hp,999)
+        p=self.player('druid',5);await self.g.cast_spell(p,'spike_growth',self.e.id);self.g.tick_dnd(.05);self.assertEqual(self.e.hp,999)
         self.e.x+=35;self.g.tick_dnd(.05);self.assertEqual(self.e.hp,993)
     async def test_concentration_recast_free(self):
-        p=self.player('druid',30);await self.g.cast_spell(p,'call_lightning',self.e.id);mana=p.mana;self.clock.advance()
+        p=self.player('druid',7);await self.g.cast_spell(p,'call_lightning',self.e.id);mana=p.mana;self.clock.advance()
         await self.g.cast_spell(p,'call_lightning',self.e.id);self.assertEqual(mana,p.mana)
     async def test_every_spell_executes(self):
         for key,s in dnd.SPELLS.items():
             with self.subTest(key=key):
-                p=self.player(s['class_ids'][0],100);p.hp=p.max_hp//2;p.mana=999
+                p=self.player(s['class_ids'][0],21);p.hp=p.max_hp//2;p.mana=999
                 self.g.companions={};self.g.spell_fields=[];self.e.hp=999;self.e.alive=True;self.e.x=1170;self.e.y=1180
                 await self.g.cast_spell(p,key,self.e.id if s['kind'] in ('attack','save','field','missiles','mark','control') else None)
                 self.g.tick_dnd(.05)
                 if s['kind'] in ('attack','save','missiles'):self.assertGreater(p.attack_cooldown_until,self.clock())
     async def test_shape_has_temporary_health(self):
-        p=self.player('druid',20);await self.g.cast_spell(p,'wild_shape_wolf');hp=p.hp;temp=p.temp_hp
+        p=self.player('druid',5);await self.g.cast_spell(p,'wild_shape_wolf');hp=p.hp;temp=p.temp_hp
         self.assertEqual(p.form,'wolf');self.assertEqual(rules.weapon_dice(p),(1,6,2));self.g.damage_player(p,temp+1,rolled=True)
         self.assertEqual(p.hp,hp-1);self.assertEqual(p.form,'wolf')
     async def test_bear_two_attacks(self):
-        p=self.player('druid',40);await self.g.cast_spell(p,'wild_shape_bear');self.assertEqual(rules.attacks_per_round(p),2)
+        p=self.player('druid',9);await self.g.cast_spell(p,'wild_shape_bear');self.assertEqual(rules.attacks_per_round(p),2)
     async def test_no_casting_in_shape_and_free_return(self):
-        p=self.player('druid',20);await self.g.cast_spell(p,'wild_shape_wolf');mana=p.mana
+        p=self.player('druid',5);await self.g.cast_spell(p,'wild_shape_wolf');mana=p.mana
         await self.g.cast_spell(p,'produce_flame',self.e.id);self.assertEqual(self.e.hp,999)
         self.clock.advance();await self.g.cast_spell(p,'wild_shape_wolf');self.assertFalse(p.form);self.assertEqual(mana,p.mana)
     async def test_pet_gate_and_real_actor(self):
-        p=self.player('ranger',9);await self.g.cast_spell(p,'animal_companion');self.assertFalse(self.g.companions)
-        p.level=10;await self.g.cast_spell(p,'animal_companion');self.assertEqual(len(self.g.snapshot(p)['companions']),1)
+        p=self.player('ranger',2);await self.g.cast_spell(p,'animal_companion');self.assertFalse(self.g.companions)
+        p.level=3;await self.g.cast_spell(p,'animal_companion');self.assertEqual(len(self.g.snapshot(p)['companions']),1)
     async def test_pet_only_attacks_selected_enemy(self):
-        p=self.player('ranger',10);await self.g.cast_spell(p,'animal_companion');pet=self.g.companions[p.id]
+        p=self.player('ranger',3);await self.g.cast_spell(p,'animal_companion');pet=self.g.companions[p.id]
         self.g.tick_dnd(.05);self.assertEqual(self.e.hp,999)
         await self.g.select_combat_target(p,{'enemy_id':self.e.id});self.g.tick_dnd(.05);self.assertLess(self.e.hp,999)
         self.assertGreater(pet.ready,self.clock())
     async def test_pet_death_cooldown(self):
-        p=self.player('ranger',10);await self.g.cast_spell(p,'animal_companion');pet=self.g.companions[p.id]
+        p=self.player('ranger',3);await self.g.cast_spell(p,'animal_companion');pet=self.g.companions[p.id]
         self.g.damage_player(pet,999,rolled=True);self.g.tick_dnd(.05);self.assertFalse(self.g.companions)
         self.assertGreaterEqual(p.spell_cooldowns['animal_companion'],self.clock()+45)
     async def test_pet_removed_on_floor_change(self):
-        p=self.player('ranger',10);await self.g.cast_spell(p,'animal_companion');p.floor=-1;self.g.tick_dnd(.05);self.assertFalse(self.g.companions)
+        p=self.player('ranger',3);await self.g.cast_spell(p,'animal_companion');p.floor=-1;self.g.tick_dnd(.05);self.assertFalse(self.g.companions)
     async def test_select_starts_auto_and_round_cooldown(self):
         await self.g.select_combat_target(self.p,{'enemy_id':self.e.id});await self.g.process_player_actions();hp=self.e.hp
         self.assertLess(hp,999);await self.g.process_player_actions();self.assertEqual(hp,self.e.hp)
@@ -238,17 +238,17 @@ class GameRules(unittest.IsolatedAsyncioTestCase):
     async def test_auto_floor_isolation(self):
         self.e.floor=-1;await self.g.select_combat_target(self.p,{'enemy_id':self.e.id});self.assertFalse(self.p.auto_enabled)
     async def test_auto_pvp_safety_never_implicitly_disabled(self):
-        q=self.player(pid='2',level=20);self.p.level=20;await self.g.select_combat_target(self.p,{'target_id':q.id});await self.g.process_player_actions()
+        q=self.player(pid='2',level=5);self.p.level=5;await self.g.select_combat_target(self.p,{'target_id':q.id});await self.g.process_player_actions()
         self.assertTrue(self.p.pvp_safety);self.assertFalse(self.p.auto_enabled)
     async def test_queued_spell_preempts_auto(self):
-        p=self.player('mage',10);self.e.x=1200;await self.g.select_combat_target(p,{'enemy_id':self.e.id});await self.g.process_player_actions();await self.g.attack(p,enemy_id=self.e.id)
+        p=self.player('mage',3);self.e.x=1200;await self.g.select_combat_target(p,{'enemy_id':self.e.id});await self.g.process_player_actions();await self.g.attack(p,enemy_id=self.e.id)
         await self.g.cast_spell(p,'magic_missile',self.e.id);self.assertEqual(p.pending_spell['spell'],'magic_missile')
         self.clock.advance();await self.g.process_player_actions();self.assertEqual(p.last_roll['action'],'Magiczny pocisk');self.assertFalse(p.pending_spell)
     async def test_auto_pause_clears_spell_queue(self):
-        p=self.player('mage',10);await self.g.select_combat_target(p,{'enemy_id':self.e.id});p.attack_cooldown_until=2000
+        p=self.player('mage',3);await self.g.select_combat_target(p,{'enemy_id':self.e.id});p.attack_cooldown_until=2000
         await self.g.cast_spell(p,'magic_missile',self.e.id);await self.g.on_packet(p.ws,{'type':'auto_pause','paused':True});self.assertFalse(p.pending_spell);self.assertFalse(p.auto_enabled)
     async def test_hotbar_persisted(self):
-        p=self.player('mage',20);self.account(p);await self.g.bind_spell(p,0,'fireball');saved=json.loads(self.g.db.execute('SELECT data FROM accounts').fetchone()[0]);self.assertEqual(saved['hotbar'][0],'fireball')
+        p=self.player('mage',5);self.account(p);await self.g.bind_spell(p,0,'fireball');saved=json.loads(self.g.db.execute('SELECT data FROM accounts').fetchone()[0]);self.assertEqual(saved['hotbar'][0],'fireball')
         loaded=self.g.load_player(p.id,p.name,p.ws,saved);self.assertEqual(loaded.hotbar[0],'fireball');self.assertFalse(loaded.auto_enabled)
     async def test_hotbar_rejects_foreign_and_bad_slot(self):
         before=self.p.hotbar[:]
@@ -256,13 +256,13 @@ class GameRules(unittest.IsolatedAsyncioTestCase):
             await self.g.bind_spell(self.p,slot,key)
         self.assertEqual(before,self.p.hotbar)
     async def test_ranking_public_and_no_private_data(self):
-        self.account(self.p);q=self.player('ranger',20,'2');self.account(q)
+        self.account(self.p);q=self.player('ranger',5,'2');self.account(q)
         await self.g.on_packet(WS(),{'type':'ranking'})
         board=self.g.ranking()['ranking'];self.assertEqual(board[0]['name'],q.name)
         self.assertFalse(any(key in json.dumps(board) for key in ('password','inventory','salt','_pid')))
     async def test_ranking_empty_accounts(self):self.assertEqual(self.g.ranking()['ranking'],[])
     async def test_migrate_paladin_gear_uid_and_hp(self):
-        p=self.player('ranger',20);self.account(p);saved=p.save_data();saved.pop('rules_version');saved['class_id']='paladin';saved['hp']=(115+19*13)/2
+        p=self.player('ranger',5);self.account(p);saved=p.save_data();saved.pop('rules_version');saved.pop('level_rules_version',None);saved['level']=20;saved['class_id']='paladin';saved['hp']=(115+19*13)/2
         saved['inventory'][0]['template']=saved['inventory'][0]['template'].replace('ranger','paladin');uid=saved['inventory'][0]['uid']
         migrated=self.g.load_player(p.id,p.name,p.ws,saved)
         self.assertEqual(migrated.class_id,'ranger');self.assertEqual(migrated.inventory[0]['uid'],uid);self.assertAlmostEqual(migrated.hp,migrated.max_hp/2)
@@ -273,7 +273,7 @@ class GameRules(unittest.IsolatedAsyncioTestCase):
         saved=self.p.save_data();saved.pop('rules_version');saved['runes']={'fire':2};loaded=self.g.load_player('1','Test',WS(),saved)
         self.assertEqual(loaded.gold,self.p.gold+50);again=self.g.load_player('1','Test',WS(),loaded.save_data());self.assertEqual(again.gold,loaded.gold)
     async def test_death_stops_auto_and_shape(self):
-        p=self.player('druid',20);await self.g.cast_spell(p,'wild_shape_wolf');await self.g.select_combat_target(p,{'enemy_id':self.e.id});self.g.damage_player(p,999,rolled=True)
+        p=self.player('druid',5);await self.g.cast_spell(p,'wild_shape_wolf');await self.g.select_combat_target(p,{'enemy_id':self.e.id});self.g.damage_player(p,999,rolled=True)
         self.assertFalse(p.auto_enabled);self.assertFalse(p.form);self.assertEqual(p.temp_hp,0)
     async def test_world_terrain_preserved(self):
         self.assertGreater(len(self.g.enemies),10000);self.assertGreater(len(self.g.metadata()['regions']),10);self.assertGreater(len(self.g.metadata()['stairs']),10)

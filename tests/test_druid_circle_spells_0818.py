@@ -10,7 +10,7 @@ class CircleSpells(unittest.IsolatedAsyncioTestCase):
     player=base.GameRules.player
     enemy=base.GameRules.enemy
 
-    def druid(self,circle='land',land='tropical',level=40):
+    def druid(self,circle='land',land='tropical',level=9):
         p=self.player('druid',level);p.druid_circle=circle;p.druid_circle_state={'land':land}
         p.mana=p.max_mana
         return p
@@ -24,7 +24,7 @@ class CircleSpells(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(dnd.SPELLS['hold_monster']['range'],90*6.4)
 
     async def test_invalid_payload_and_protected_target_do_not_spend_resources(self):
-        p=self.druid('sea');q=self.player('knight',40,'2');q.x=p.x+50
+        p=self.druid('sea');q=self.player('knight',9,'2');q.x=p.x+50
         before=p.mana
         for key,options in (([],{}),('conjure_elemental',{'variant':[]}),('control_water',{'variant':'invented'}),
                             ('fog_cloud',{'point':{'x':float('nan'),'y':0}})):

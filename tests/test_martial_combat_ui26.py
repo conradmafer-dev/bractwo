@@ -20,7 +20,7 @@ class MartialCombatTests(unittest.IsolatedAsyncioTestCase):
         self.g.legacy_enemies = []
         self.addCleanup(self.g.db.close)
 
-    def hero(self, path='battle_master', choice='', pid='1', level=10):
+    def hero(self, path='battle_master', choice='', pid='1', level=3):
         p = self.player('ranger' if path == 'hunter' else 'knight', level, pid)
         p.promoted = True; p.martial_archetype = path
         p.martial_state = dict(maneuvers=['precision', 'trip', 'menacing'], superiority_spent=0,
@@ -56,9 +56,9 @@ class MartialCombatTests(unittest.IsolatedAsyncioTestCase):
     def test_champion_nineteen_hits_even_impossible_ac_and_scales(self):
         p=self.hero('champion');e=self.enemy();self.g.combat_rng=base.Dice(19,4)
         with patch.dict(content.ENEMIES[e.kind],armor_class=99):self.assertTrue(self.attack(p,e)['hit'])
-        p.level=70;self.g.combat_rng=base.Dice(18,4)
+        p.level=15;self.g.combat_rng=base.Dice(18,4)
         self.assertTrue(self.attack(p,e)['critical'])
-        p.level=69;self.assertFalse(self.attack(p,e)['critical'])
+        p.level=14;self.assertFalse(self.attack(p,e)['critical'])
 
     def test_precision_converts_miss_rolls_damage_once_and_spends_one(self):
         p=self.hero();e=self.enemy();p.martial_state['offense']='precision';self.g.combat_rng=base.Dice(8,4)
@@ -84,7 +84,7 @@ class MartialCombatTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(martial.remaining(p),3)
 
     def test_precision_resolves_after_shield_with_correct_new_damage(self):
-        p=self.hero();q=self.player('mage',20,'2');q.x=p.x+70;p.pvp_safety=False;q.shield_armed=True
+        p=self.hero();q=self.player('mage',5,'2');q.x=p.x+70;p.pvp_safety=False;q.shield_armed=True
         p.martial_state['offense']='precision'
         initial=q.armor_class-rules.attack_bonus(p)+1
         self.assertGreater(initial,1);self.assertLess(initial,19)
@@ -95,7 +95,7 @@ class MartialCombatTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(martial.remaining(p),3)
 
     def test_precision_before_shield_cannot_spend_again(self):
-        p=self.hero();q=self.player('mage',20,'2');q.x=p.x+70;p.pvp_safety=False;q.shield_armed=True
+        p=self.hero();q=self.player('mage',5,'2');q.x=p.x+70;p.pvp_safety=False;q.shield_armed=True
         p.martial_state['offense']='precision';self.g.combat_rng=base.Dice(q.armor_class-rules.attack_bonus(p)-1,4)
         result=self.g.hit_player(p,q,pvp=True)
         self.assertTrue(result['shielded']);self.assertFalse(result['hit']);self.assertEqual(martial.remaining(p),3)
@@ -135,7 +135,7 @@ class MartialCombatTests(unittest.IsolatedAsyncioTestCase):
         self.assertNotIn('frightened',e.conditions)
 
     def test_fear_disadvantages_ability_checks_and_forced_movement_allowed(self):
-        p=self.hero();q=self.player('knight',10,'2');q.x=p.x+70;p.pvp_safety=False
+        p=self.hero();q=self.player('knight',3,'2');q.x=p.x+70;p.pvp_safety=False
         q.buffs['frightened']=dict(until=self.clock()+6,owner=p.id)
         result=self.g.environment_ability_check(q,'strength',10)
         self.assertEqual(len(result['rolls']),2)
@@ -235,7 +235,7 @@ class MartialCombatTests(unittest.IsolatedAsyncioTestCase):
         self.assertIsNone(self.g.martial_horde_breaker(p,e))
 
     def test_horde_does_not_attack_uninvolved_party_safe_or_different_floor_players(self):
-        p=self.hero('hunter','horde_breaker');e=self.enemy();q=self.player('knight',10,'2');q.x=e.x+10;p.pvp_safety=False
+        p=self.hero('hunter','horde_breaker');e=self.enemy();q=self.player('knight',3,'2');q.x=e.x+10;p.pvp_safety=False
         self.assertIsNone(self.g.martial_horde_breaker(p,e))
         p.aggressors[q.id]=self.clock()+20;q.floor=-99
         self.assertIsNone(self.g.martial_horde_breaker(p,e))
@@ -271,7 +271,7 @@ class MartialCombatTests(unittest.IsolatedAsyncioTestCase):
                 if lock=='blind':p.buffs['blind']=dict(until=self.clock()+3)
                 if lock=='dead':p.hp=0
                 if lock=='floor':e.floor=-99
-                if lock=='pvp_safety':source=self.player('druid',10,'2');source.x=p.x+25;source.form='bear'
+                if lock=='pvp_safety':source=self.player('druid',3,'2');source.x=p.x+25;source.form='bear'
                 before=source.hp
                 with patch.dict(content.ENEMIES[e.kind],size='medium' if lock=='small' else 'large'):
                     self.g.martial_after_incoming_attack(source,p,dict(check='save' if lock=='save' else 'attack',hit=True,is_melee=True))

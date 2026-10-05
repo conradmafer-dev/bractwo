@@ -88,7 +88,7 @@ class BossRecovery(unittest.IsolatedAsyncioTestCase):
 
 
 class SoloBalance(unittest.TestCase):
-    def test_level_ten_starter_builds_have_comparable_encounters(self):
+    def test_level_three_starter_builds_have_comparable_encounters(self):
         async def sample():
             return [await fight(boss, cls, seed)
                     for boss in sa.BOSSES for cls in CLASSES for seed in range(8)]

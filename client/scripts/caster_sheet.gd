@@ -83,7 +83,10 @@ func render(sheet, p: Dictionary) -> void:
 	var points: int = int(training.get("points", 0))
 	sheet.text("Atuty wyposażenia · wybory: %d" % points, true)
 	if points == 0:
-		sheet.text("Wybory na poziomach 15, 35, 55 i 75.")
+		var levels: PackedStringArray = []
+		for value in training.get("levels", [4, 8, 12, 16, 19]):
+			levels.append(str(value))
+		sheet.text("Poziomy wyborów: " + ", ".join(levels) + ".")
 	if training.get("options", []).is_empty():
 		sheet.text("Masz już dostępne wyszkolenia. Niewydane wybory pozostają zapisane.")
 	for feat: Dictionary in training.get("options", []):

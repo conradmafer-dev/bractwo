@@ -22,7 +22,7 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
                     until=self.clock()+30,profile=dict(water_variant=variant))
 
     def test_control_water_changes_live_movement_and_beast_swim_speed(self):
-        p=self.player('druid',85);p.x,p.y=5880,8150
+        p=self.player('druid',18);p.x,p.y=5880,8150
         self.g.environment_bind(p)
         self.assertEqual(env.movement_speed(p,100),50)
         field=self.water_field();self.g.circle_spell_fields=[field]
@@ -36,7 +36,7 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
         self.assertAlmostEqual(env.movement_speed(p,100),100*50/30)
 
     def test_grapple_tree_stride_and_headwind_spend_movement(self):
-        p=self.player('druid',45);circles.runtime(p)['grapple_slow']=True
+        p=self.player('druid',10);circles.runtime(p)['grapple_slow']=True
         self.assertEqual(env.movement_speed(p,100),50)
         p.druid_circle_runtime['grapple_slow']=False
         p.buffs['tree_movement_cost']=dict(until=self.clock()+3,feet=10)
@@ -47,7 +47,7 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(env.movement_speed(p,100),100)
 
     def test_omen_is_chosen_before_ability_d20(self):
-        p=self.player('druid',25);p.druid_circle='stars'
+        p=self.player('druid',6);p.druid_circle='stars'
         p.druid_circle_state=dict(omen='weal',omen_armed=True)
         class TraceDice(base.Dice):
             def __init__(self):super().__init__();self.order=[]
@@ -58,9 +58,9 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(circles.spent(p,'omen'),1)
 
     def test_whirlpool_only_pulls_water_targets_and_escape_allows_leaving(self):
-        p=self.player('druid',45);p.x,p.y=5880,8150
+        p=self.player('druid',10);p.x,p.y=5880,8150
         swimmer=self.enemy('swimmer',x=5980,y=8150)
-        flyer=self.player('druid',45,'2');flyer.x,flyer.y=5980,8150;flyer.form='eagle'
+        flyer=self.player('druid',10,'2');flyer.x,flyer.y=5980,8150;flyer.form='eagle'
         dry=self.enemy('dry',x=6180,y=8150)
         moved=[];self.g.environment_forced_move=lambda actor,dx,dy:moved.append(actor.id)
         field=self.water_field('whirlpool');self.g.circle_spell_fields=[field]
@@ -73,7 +73,7 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(self.g.blocked_for(swimmer,5990,8150))
 
     async def test_repeated_dive_does_not_refill_breath_and_crocodile_holds_it(self):
-        p=self.player('druid',85);p.x,p.y=5880,8150
+        p=self.player('druid',18);p.x,p.y=5880,8150
         await self.g.environment_action(p,'dive');deadline=p.breath_until
         self.clock.advance(5)
         await self.g.environment_action(p,'dive')
@@ -83,7 +83,7 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(p.breath_until-self.clock(),1800)
 
     async def test_dragon_floor_is_used_by_real_study_and_search_actions(self):
-        p=self.player('druid',45);p.druid_circle='stars'
+        p=self.player('druid',10);p.druid_circle='stars'
         p.buffs['starry_form']=dict(until=self.clock()+30);circles.runtime(p)['starry_form']='dragon'
         target=self.enemy(x=p.x+35,y=p.y)
         await self.g.environment_action(p,'study',enemy_id=target.id)
@@ -94,7 +94,7 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
         self.assertIn(target.id,p._environment_detected)
 
     def test_polymorph_cannot_use_wild_shape_moon_bonuses(self):
-        p=self.player('druid',65);p.druid_circle='moon';p.form='wolf'
+        p=self.player('druid',14);p.druid_circle='moon';p.form='wolf'
         p.buffs['polymorph']=dict(until=self.clock()+30)
         self.assertEqual(circles.armor_class_floor(p),0)
         self.assertEqual(circles.save_bonus(p,'constitution'),0)
@@ -105,13 +105,13 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(hit['damage'],5)
 
     def test_polymorph_suppresses_own_circle_passives_but_keeps_external_magic(self):
-        p=self.player('druid',65);p.druid_circle='land'
+        p=self.player('druid',14);p.druid_circle='land'
         p.buffs['polymorph']=dict(until=self.clock()+30)
         self.assertFalse(circles.poison_immune(p))
         self.assertFalse(circles.resists(p,'fire'))
         p.druid_circle='sea'
         self.assertFalse(circles.can_swim(p))
-        p.buffs['wrath_of_sea']=dict(until=self.clock()+30,level=65,owner=p.id)
+        p.buffs['wrath_of_sea']=dict(until=self.clock()+30,level=14,owner=p.id)
         self.assertEqual(circles.flight_speed(p),0)
         self.assertFalse(circles.resists(p,'cold'))
         p.buffs['wrath_of_sea']['owner']='other-druid'
@@ -146,7 +146,7 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
 
     def test_polymorphed_enemy_has_beast_defenses_movement_and_wakes_on_damage(self):
         from server import dnd_content as dnd
-        p=self.player('druid',40);e=self.enemy();e.current_wall_time=self.clock()
+        p=self.player('druid',9);e=self.enemy();e.current_wall_time=self.clock()
         self.g._polymorph(p,e,dnd.SPELLS['polymorph'],'polar_bear',False)
         self.assertTrue(env.swimming(e));self.assertEqual(env.enemy_spec(e)['armor_class'],12)
         hp=e.hp;temporary=e.temp_hp
@@ -158,7 +158,7 @@ class EnvironmentRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(e.form,'');self.assertEqual(e.hp,hp)
 
     def test_monster_area_attack_uses_condition_aware_saving_throw(self):
-        p=self.player('knight',15);e=self.enemy();p.buffs['paralyzed']=dict(until=self.clock()+30)
+        p=self.player('knight',4);e=self.enemy();p.buffs['paralyzed']=dict(until=self.clock()+30)
         self.g.combat_rng=base.Dice(20)
         hit=self.g.hit_player(e,p,area=True,dice=(1,4,0))
         self.assertTrue(hit['automatic_failure']);self.assertFalse(hit['saved'])

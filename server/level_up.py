@@ -18,7 +18,7 @@ ATTRIBUTES = {'strength':'Siła','dexterity':'Zręczność','constitution':'Kond
 
 
 def mastery_points(p):
-    return max(0, (p.level-50)//5+1-sum(p.mastery.values())) if p.promoted and p.level >= 50 else 0
+    return max(0, p.level-10-sum(p.mastery.values())) if p.promoted and p.level >= 11 else 0
 
 
 def record(p, first, last):
@@ -34,6 +34,7 @@ def record(p, first, last):
         martial_archetype=getattr(p,'martial_archetype',''),
         martial_state={k:v for k,v in getattr(p,'martial_state',{}).items() if k in ('maneuvers','hunter_choice')},
         mana_rules_version=p.mana_rules_version,hp_rules_version=p.hp_rules_version,
+        legacy_growth_level=getattr(p,'legacy_growth_level',0),
         mastery=p.mastery, fighting_style=p.fighting_style, weapon_grip=p.weapon_grip, equipment=p.equipment,
         inventory=[i for i in p.inventory if i.get('uid') in worn]))
     # Coalesce ordinary repeated awards only when their permanent profile agrees.
@@ -59,6 +60,7 @@ def number(value):
 
 def permanent(p, level, context):
     q = copy.copy(p)
+    q.legacy_growth_level=0
     q.fighting_style="";q.weapon_grip="one";q.primal_order='';q.training_feats={}
     q.origin_feat='';q.ability_build={};q.skill_training={}
     q._legacy_auto_attributes='feat_rules_version' not in context

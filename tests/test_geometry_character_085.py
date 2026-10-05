@@ -85,7 +85,7 @@ class AdaptiveHotbar(unittest.TestCase):
         self.assertEqual(len([k for k in p.hotbar if k]),12)
     def test_all_level_available_spells_in_24_slot_banks(self):
         for cls in dnd.CLASS_SPECS:
-            for level in (1,10,20,40,80,100):
+            for level in (1,3,5,9,17,21):
                 p=Player('1','Hero',class_id=cls,level=level);dnd.sync_hotbar(p)
                 self.assertEqual(len(p.hotbar)%24,0);self.assertGreaterEqual(len(p.hotbar),24)
                 self.assertEqual({k for k in p.hotbar if k},{k for k in dnd.SPELLS if dnd.spell_allowed(p,k)})
@@ -128,17 +128,17 @@ class LiveSpells(unittest.IsolatedAsyncioTestCase):
         fx=next(e for e in self.g.effects if e.get('spell_id')=='burning_hands')
         for e in (self.e,inside,outside,behind,beyond):self.assertEqual(geo.contains(fx['area'],e.x,e.y),e.hp<999)
     async def test_lightning_can_hit_beyond_primary_inside_line_only(self):
-        p=self.player('mage',20);inside=self.enemy('inside',p.x+300,p.y+15);outside=self.enemy('outside',p.x+300,p.y+17)
+        p=self.player('mage',5);inside=self.enemy('inside',p.x+300,p.y+15);outside=self.enemy('outside',p.x+300,p.y+17)
         await self.g.cast_spell(p,'lightning_bolt',self.e.id);self.assertLess(inside.hp,999);self.assertEqual(outside.hp,999)
     async def test_entangle_hits_square_corner_but_not_outside(self):
         p=self.player('druid');self.g.combat_rng=base.Dice(1,3)
         inside=self.enemy('inside',self.e.x+63,self.e.y+63);outside=self.enemy('outside',self.e.x+65,self.e.y+65)
         await self.g.cast_spell(p,'entangle',self.e.id);self.assertIn('restrained',inside.conditions);self.assertNotIn('restrained',outside.conditions)
     async def test_meteor_overlap_does_not_multiply_damage(self):
-        p=self.player('mage',80);before=self.e.hp;await self.g.cast_spell(p,'meteor_swarm',self.e.id)
+        p=self.player('mage',17);before=self.e.hp;await self.g.cast_spell(p,'meteor_swarm',self.e.id)
         self.assertEqual(before-self.e.hp,120);fx=next(e for e in self.g.effects if e.get('spell_id')=='meteor_swarm');self.assertEqual(len(fx['area']['circles']),4)
     async def test_field_visual_has_duration_and_ends_with_concentration(self):
-        p=self.player('druid',10);await self.g.cast_spell(p,'moonbeam',self.e.id)
+        p=self.player('druid',3);await self.g.cast_spell(p,'moonbeam',self.e.id)
         self.assertTrue(self.g.spell_fields);field=self.g.spell_fields[0]
         fx=next(e for e in self.g.effects if e['id']==field['effect_id']);self.assertTrue(fx['persistent']);self.assertEqual(fx['duration'],dnd.SPELLS['moonbeam']['duration'])
         self.g.break_concentration(p);self.assertTrue(fx['ended']);self.assertNotIn(field['effect_id'],self.g.snapshot(p)['active_field_effects'])
@@ -154,7 +154,7 @@ class LiveSpells(unittest.IsolatedAsyncioTestCase):
         p=self.player('mage');self.assertNotIn('character_sheet',p.public(self.clock(),private=False))
         info=p.public(self.clock(),private=True)['character_sheet'];self.assertEqual(info['spell_attack_bonus'],rules.spell_bonus(p));self.assertEqual(len(info['saving_throws']),6);self.assertEqual(len(info['resistances']),13)
     async def test_sheet_resistances_are_the_same_as_damage_rules(self):
-        p=self.player('mage',40);p.buffs['stoneskin']={'until':self.clock()+60};p.buffs['resist_fire']={'until':self.clock()+60}
+        p=self.player('mage',9);p.buffs['stoneskin']={'until':self.clock()+60};p.buffs['resist_fire']={'until':self.clock()+60}
         data=character_sheet.build(p)
         for r in data['resistances']:
             self.assertEqual(r['multiplier'],rules.resistance_multiplier(p,r['type']))

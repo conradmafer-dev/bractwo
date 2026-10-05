@@ -6,14 +6,14 @@
   const mini = $("minimap"), mctx = mini.getContext("2d");
   const ui = Object.fromEntries(Array.from(document.querySelectorAll("[id]"), element => [element.id, element]));
   const revisionLabel=document.querySelector('.auth-foot');
-  if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_33';
+  if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_34';
   const classInfo = {
     knight: {name:"Rycerz",icon:"⚔",color:"#f8d377",cape:"#cc4845",ability:"Drugi oddech",weapon:"sword"},
     ranger: {name:"Łowca",icon:"➶",color:"#f1d99c",cape:"#9e682e",ability:"Znak łowcy",weapon:"bow"},
     mage: {name:"Czarodziej",icon:"✧",color:"#b6c7ff",cape:"#4d65bd",ability:"Promień mrozu",weapon:"staff"},
     druid: {name:"Druid",icon:"❋",color:"#c0e895",cape:"#478e4d",ability:"Shillelagh",weapon:"staff"}
   };
-  let world = { width:3200,height:2304,spawn:{x:560,y:1180},obstacles:[],zones:[],river:{x:1500,y:0,w:180,h:2304,bridge_y:1080,bridge_h:150},merchant:{x:680,y:1180,name:"Kupiec"},safe_zone:{x:560,y:1180,radius:260},classes:{},pvp_rules:{min_level:8} };
+  let world = { width:3200,height:2304,spawn:{x:560,y:1180},obstacles:[],zones:[],river:{x:1500,y:0,w:180,h:2304,bridge_y:1080,bridge_h:150},merchant:{x:680,y:1180,name:"Kupiec"},safe_zone:{x:560,y:1180,radius:260},classes:{},pvp_rules:{min_level:2} };
   let snapshot = { players: [], enemies: [], world: {}, time: 0 };
   let myId = null, me = null, socket = null, playing = false, connecting = false;
   let connectionSerial = 0, loginTimer = null, lastSnapshotAt = 0, ground = null;
@@ -222,7 +222,7 @@
   function merchantNear() { return !!me && me.hp > 0 && sameFloor(me,nearestMerchant()) && distance(me,nearestMerchant()) <= (nearestMerchant().radius || 150); }
   function formatNumber(value) { return numberFormat.format(Number(value)||0); }
   function updateRules() {
-    const rules=world.pvp_rules||{}, min=rules.min_level||8;
+    const rules=world.pvp_rules||{}, min=rules.min_level||2;
     ui.pvpHelp.textContent=`Osada i postacie poniżej ${min}. poziomu są chronione. Aby zaatakować gracza, wyłącz blokadę PvP i wybierz go kliknięciem w świecie lub na liście graczy. Odblokowanie obejmuje również czary, obszary i wilka. Obszar może trafić innych niechronionych graczy, nawet gdy celujesz w potwora. Wsparcie drużyny w PvP wymaga odblokowania i włącza leczącego do walki. Biała czaszka oznacza agresora. Trzy nieuzasadnione zabójstwa w 24 godziny dają czerwoną czaszkę na 24 godziny. Walka blokuje wejście do osady i bezpieczne wylogowanie przez 20 sekund.`;
   }
   function updateHUD() {
@@ -235,9 +235,10 @@
     ui.manaText.textContent=`${Math.floor(me.mana||0)} / ${formatNumber(me.max_mana)}`;
     ui.manaText.parentElement.title=Runtime.manaBudgetText(me.mana_budget)+' Mana wraca podczas długiego odpoczynku oraz dzięki dostępnym zdolnościom odzyskiwania przy krótkim odpoczynku.';
     ui.manaFill.style.width=`${Math.max(0,Math.min(100,(me.mana||0)/(me.max_mana||1)*100))}%`;
-    ui.xpFill.style.width=`${Math.max(0,Math.min(100,(me.xp||0)/(me.xp_next||1)*100))}%`;
-    ui.xpText.textContent=`${formatNumber(me.xp)} / ${formatNumber(me.xp_next)} PD`;
-    ui.playerName.title=`Doświadczenie: ${formatNumber(me.xp)} / ${formatNumber(me.xp_next)}`;
+    const experience=globalThis.BractwoRuntime.experienceProgress(me);
+    ui.xpFill.style.width=`${experience.ratio*100}%`;
+    ui.xpText.textContent=`${formatNumber(experience.total)} / ${formatNumber(experience.nextTotal)} PD`;
+    ui.playerName.title=`Doświadczenie: ${formatNumber(experience.total)} / ${formatNumber(experience.nextTotal)}`;
     ui.goldText.textContent=formatNumber(me.gold); ui.goldText.title=`${formatNumber(me.gold)} złota`;
     ui.attackButton.querySelector("span").textContent=info.icon;
     ui.onlineCount.textContent=`${snapshot.players.filter(player=>!player.disconnected).length} online`;
@@ -259,8 +260,8 @@
     const zone=[...world.zones,...(world.regions||[])].find(item=>sameFloor(me,item)&&globalThis.BractwoWorldGeometry.inRegion(item,me.x,me.y));
     ui.movementStatus.textContent=`${world.surfaces?.[me.surface]?.name||'Trawa'} · ${Number(me.speed||100).toFixed(0)}${me.premium_demo?' · Premium test':''}${me.wind_remaining>0?' · Wiatr +15%':''}${me.ward_remaining>0?' · Osłona PvE':''}`;
     ui.regionName.textContent=(zone?.name||"Dzikie Pogranicze")+(me.floor?` · piętro ${me.floor>0?'+':''}${me.floor}`:"");
-    const safe=inSafeZone(me), protectedLevel=me.level<(world.pvp_rules?.min_level||8);
-    ui.zoneStatus.textContent=safe?((world.safe_zones||[]).some(z=>z.kind==='harbour'&&sameFloor(me,z)&&distance(me,z)<=z.radius)?'Bezpieczna przystań':'Bezpieczna osada'):protectedLevel?`Ochrona PvP do ${world.pvp_rules?.min_level||8}. poziomu`:"Teren otwarty · PvP z karami";
+    const safe=inSafeZone(me), protectedLevel=me.level<(world.pvp_rules?.min_level||2);
+    ui.zoneStatus.textContent=safe?((world.safe_zones||[]).some(z=>z.kind==='harbour'&&sameFloor(me,z)&&distance(me,z)<=z.radius)?'Bezpieczna przystań':'Bezpieczna osada'):protectedLevel?`Ochrona PvP do ${world.pvp_rules?.min_level||2}. poziomu`:"Teren otwarty · PvP z karami";
     const combat=Math.max(0,Number(me.combat_remaining)||0);
     ui.combatStatus.hidden=combat<=0;
     ui.combatStatus.textContent=me.pvp_combat_remaining>0?`PvP: ${Math.ceil(me.pvp_combat_remaining)} s · wejście do strefy ochrony zablokowane`:`Walka: ${Math.ceil(combat)} s · poczekaj z handlem i wylogowaniem`;
@@ -797,11 +798,11 @@
       root.append(element('div','section-label','KOLEJNE MOŻLIWOŚCI'));
       for(const m of world.class_progression?.[me.class_id]||[])guideRow(root,`${me.level>=m.level?'✓':'◇'} Poziom ${m.level} · ${m.name}`,m.description);
       const can=!!nearbyService('master')&&!me.combat_remaining&&me.hp>0;
-      const promotionLevel=me.promotion?.required_level??10,promotionCost=me.promotion?.cost??2000;
+      const promotionLevel=me.promotion?.required_level??3,promotionCost=me.promotion?.cost??2000;
       const circleBenefit=me.class_id==='druid'?' Odblokowuje wybór kręgu w C → Atuty.':me.class_id==='mage'?' Odblokowuje wybór szkoły czarodzieja w C → Atuty.':'';
-      guideRow(root,'Promocja profesji',me.promoted?'Masz wyższą rangę.'+circleBenefit+' Mistrzostwo od poziomu 50.':`Poziom ${promotionLevel} · ${promotionCost} złota · porozmawiaj z mistrzem w mieście.`+circleBenefit,[actionButton('Porozmawiaj z mistrzem',()=>servicePanel.open(nearbyService('master')),!can)]);
-      root.append(element('p','muted',`Punkty mistrzostwa: ${me.mastery_points||0}. Pierwszy na poziomie 50, kolejne co 5 poziomów. Wymagana promocja. Punkt przydzielisz poza walką w C → Statystyki.`));
-      for(const[key,name,detail]of[['power','Potęga',me.class_id==='mage'?'Nie wzmacnia Iskry ani czarów.':'Ataki bronią +1 obrażeń co 10 punktów, maksymalnie +2. Bez premii do przemian i czarów.'],['focus','Skupienie','+4 maksymalnej many za punkt']])guideRow(root,`${name} · ${me.mastery?.[key]||0}/20`,detail,[actionButton('Dodaj punkt',()=>send({type:'mastery',branch:key}),me.combat_remaining>0||!me.promoted||me.level<50||!me.mastery_points||(me.mastery?.[key]||0)>=20)]);
+      guideRow(root,'Promocja profesji',me.promoted?'Masz wyższą rangę.'+circleBenefit+' Mistrzostwo od poziomu 11.':`Poziom ${promotionLevel} · ${promotionCost} złota · porozmawiaj z mistrzem w mieście.`+circleBenefit,[actionButton('Porozmawiaj z mistrzem',()=>servicePanel.open(nearbyService('master')),!can)]);
+      root.append(element('p','muted',`Punkty mistrzostwa: ${me.mastery_points||0}. Pierwszy na poziomie 11, kolejne co poziom. Wymagana promocja. Punkt przydzielisz poza walką w C → Statystyki.`));
+      for(const[key,name,detail]of[['power','Potęga',me.class_id==='mage'?'Nie wzmacnia Iskry ani czarów.':'Ataki bronią +1 obrażeń co 10 punktów, maksymalnie +2. Bez premii do przemian i czarów.'],['focus','Skupienie','+4 maksymalnej many za punkt']])guideRow(root,`${name} · ${me.mastery?.[key]||0}/20`,detail,[actionButton('Dodaj punkt',()=>send({type:'mastery',branch:key}),me.combat_remaining>0||!me.promoted||me.level<11||!me.mastery_points||(me.mastery?.[key]||0)>=20)]);
       
     }else if(expansionTab==='atlas'){
       root.append(element('p','panel-tip',`${(world.regions||[]).length} krain · ${(world.cities||[]).length} miast. Poziomy krain to zalecenie. Mapa nie zamyka się po kliknięciu.`));
