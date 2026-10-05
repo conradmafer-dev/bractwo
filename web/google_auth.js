@@ -34,6 +34,7 @@
     let config = null, ticket = '', challenge = '', classId = 'knight', account = null;
     let generation = 0, timer = null, pending = false, externalBusy = false, scriptPromise = null, preparing = false;
     let commentsSigningOut = false, retryCommentsLogout = false, verificationRequest = null;
+    let buttonReady = false, buttonWidth = 0;
     const eligible = () => sameOriginServer(options.server, loc);
     const allowed = () => eligible() && !commentsSigningOut && (!options.canStart || options.canStart());
     const current = serial => generation === serial && allowed();
@@ -54,6 +55,18 @@
       ui.googleNewCharacter.disabled = disabled || atLimit();
       ui.googleRetry.disabled = disabled;
       ui.googleCancel.disabled = value || commentsSigningOut;
+      if (!disabled) renderGoogleButton();
+    }
+    function renderGoogleButton() {
+      if (!buttonReady || !allowed() || !challenge || pending || externalBusy || ui.googleButton.hidden) return;
+      const available = ui.googleSignIn.clientWidth;
+      if (!available) return;
+      const width = Math.max(200, Math.min(348, available));
+      if (width === buttonWidth) return;
+      ui.googleButton.replaceChildren();
+      googleApi().renderButton(ui.googleButton, {type:'standard',theme:'outline',size:'large',text:'signin_with',
+        shape:'rectangular',logo_alignment:'left',locale:'pl',width});
+      buttonWidth = width;
     }
     function createProfile() {
       if (atLimit()) return;
@@ -66,6 +79,7 @@
     }
     function clearSecrets() {
       ++generation; clearTimeout(timer); timer = null; ticket = ''; challenge = ''; pending = false; preparing = false;
+      buttonReady = false; buttonWidth = 0;
       account = null; ui.googleName.value = '';
       googleApi()?.cancel();
       setBusy(externalBusy);
@@ -187,9 +201,8 @@
         if (!current(serial)) return;
         googleApi().initialize({client_id:config.client_id, nonce:start.nonce, auto_select:false,
           ux_mode:'popup', callback:response => receiveCredential(response, serial)});
-        ui.googleButton.replaceChildren();
-        googleApi().renderButton(ui.googleButton, {type:'standard',theme:'outline',size:'large',text:'signin_with',
-          shape:'rectangular',logo_alignment:'left',locale:'pl',width:Math.max(200, Math.min(348, ui.googleSignIn.clientWidth || 300))});
+        buttonReady = true;
+        renderGoogleButton();
         status('Wybierz konto Google, aby wejść do gry.');
         timer = setTimeout(() => {
           if (generation !== serial || pending || externalBusy || ticket) return;
@@ -240,6 +253,8 @@
         options.connect(packet);
       } catch (error) { status(error.message, true); }
     });
+    if (root.ResizeObserver) new root.ResizeObserver(renderGoogleButton).observe(ui.googleSignIn);
+    else root.addEventListener('resize', renderGoogleButton);
     if (eligible()) void prepare();
     else { status('Otwórz grę pod adresem jej serwera, aby zalogować się przez Google.'); ui.googleIntro.hidden = true; }
     return {

@@ -14,6 +14,8 @@
   scroll-behavior: smooth;
   scroll-padding: 28px;
   touch-action: pan-y pinch-zoom;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   color: var(--landing-ink);
   background: radial-gradient(ellipse 80% 640px at 78% 15%, #2747366e, transparent), linear-gradient(125deg, #0a1813 5%, #142820 48%, #0b1915 100%);
   scrollbar-color: #7b8161 #101f19;
@@ -159,20 +161,20 @@
   #authScreen .landing-class { padding: 4px 17px 0; }
   #authScreen .landing-bottom-grid { gap: 35px; }
 }
-@media (max-width: 760px) {
+@media (max-width: 1000px) {
   #authScreen { scroll-padding: 18px; }
   #authScreen .landing-shell { padding: 0 24px; }
-  #authScreen .landing-header { min-height: 85px; }
-  #authScreen .landing-nav { gap: 20px; font-size: 12px; }
-  #authScreen .landing-nav a[href="#swiat"] { display: none; }
-  #authScreen .landing-hero { grid-template-columns: 1fr; gap: 42px; padding: 42px 0 48px; }
-  #authScreen .landing-intro { max-width: 520px; }
-  #authScreen .landing-intro h1 { font-size: clamp(56px, 11vw, 76px); margin: 20px 0 18px; letter-spacing: -2.8px; }
+  #authScreen .landing-header { min-height: 80px; flex-wrap: wrap; gap: 10px 20px; padding: 16px 0; }
+  #authScreen .landing-nav { flex-wrap: wrap; gap: 8px 20px; font-size: 14px; }
+  #authScreen .landing-nav a { min-height: 44px; display: inline-flex; align-items: center; }
+  #authScreen .landing-hero { grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 30px 0 40px; }
+  #authScreen .landing-intro { max-width: 640px; }
+  #authScreen .landing-intro h1 { font-size: clamp(38px, 7vw, 64px); line-height: 1.08; margin: 14px 0; letter-spacing: -1.8px; }
   #authScreen .landing-intro h1 em { display: inline; }
   #authScreen .landing-subtitle { font-size: 20px; }
-  #authScreen .landing-lead { font-size: 14px; }
+  #authScreen .landing-lead { font-size: 16px; line-height: 1.6; max-width: 600px; }
   #authScreen .landing-cta { margin-top: 22px; }
-  #authScreen .landing-login { max-width: 520px; padding: 30px 25px 23px; scroll-margin-top: 18px; }
+  #authScreen .landing-login { min-width: 0; max-width: 640px; padding: 26px 24px 22px; scroll-margin-top: 18px; }
   #authScreen .landing-login h2 { font-size: 30px; }
   #authScreen .landing-section { padding: 40px 0; }
   #authScreen .landing-section-label { margin-bottom: 25px; font-size: 9px; gap: 12px; }
@@ -210,12 +212,12 @@
   #authScreen .landing-nav a[href="#klasy"] { display: none; }
   #authScreen .landing-nav .landing-nav-play { padding: 8px 12px; }
   #authScreen .landing-nav-play span { margin-left: 8px; }
-  #authScreen .landing-hero { padding-top: 34px; gap: 36px; }
+  #authScreen .landing-hero { padding-top: 24px; gap: 26px; }
   #authScreen .landing-kicker { font-size: 8px; letter-spacing: 1.45px; }
-  #authScreen .landing-intro h1 { font-size: 59px; line-height: 1.04; letter-spacing: -2.8px; }
-  #authScreen .landing-intro h1 em { display: block; }
+  #authScreen .landing-intro h1 { font-size: clamp(36px, 9vw, 42px); line-height: 1.12; letter-spacing: -1.2px; }
+  #authScreen .landing-intro h1 em { display: inline; }
   #authScreen .landing-subtitle { font-size: 18px; max-width: 300px; }
-  #authScreen .landing-lead { font-size: 13px; line-height: 1.8; }
+  #authScreen .landing-lead { font-size: 16px; line-height: 1.6; }
   #authScreen .landing-platforms { font-size: 10px; }
   #authScreen .landing-platforms span { padding: 0 4px; }
   #authScreen .landing-login { padding: 28px 18px 21px; }
@@ -235,7 +237,7 @@
   #authScreen .landing-nav { gap: 10px; font-size: 11px; }
   #authScreen .landing-nav .landing-nav-play { padding: 7px 10px; }
   #authScreen .landing-login { padding-left: 14px; padding-right: 14px; }
-  #authScreen .landing-intro h1 { font-size: 56px; }
+  #authScreen .landing-intro h1 { font-size: 36px; }
   #authScreen .landing-cta { width: 100%; }
   #authScreen .class-option { padding-left: 7px; padding-right: 7px; grid-template-columns: 20px 1fr; column-gap: 4px; }
   #authScreen .class-option strong { font-size: 11px; }
@@ -246,3 +248,56 @@
   #authScreen .landing-ranking { padding: 19px; }
 }
 @media (prefers-reduced-motion: reduce) { #authScreen { scroll-behavior: auto; } }
+
+
+/* Mobile entry: readable controls, compact introduction, and no desktop-width card. */
+@media (max-width: 1000px) {
+  #authScreen .landing-intro h1 { font-size: clamp(2.375rem, 7vw, 4rem); }
+  #authScreen .landing-title-detail { font-size: clamp(1.25rem, 3.3vw, 1.5625rem); line-height: 1.35; margin-top: 12px; letter-spacing: 0; }
+  #authScreen .landing-lead { font-size: 1rem; }
+  #authScreen .landing-kicker { font-size: .75rem; line-height: 1.5; letter-spacing: 1px; }
+  #authScreen .landing-cta { min-height: 48px; padding: 12px 20px; font-size: 1rem; justify-content: center; }
+  #authScreen .landing-platforms { font-size: .875rem; line-height: 1.6; margin-top: 12px; }
+  #authScreen .landing-login > .eyebrow { font-size: .75rem; line-height: 1.5; letter-spacing: .8px; }
+  #authScreen .landing-login h2 { margin: 10px 0; }
+  #authScreen .landing-login .muted, #authScreen .google-help, #authScreen .google-status { font-size: .875rem; line-height: 1.6; }
+  #authScreen .google-sign-in { margin-top: 14px; }
+  #authScreen #googleIntro { margin-top: 14px; padding-top: 12px; }
+  #authScreen .google-secondary, #authScreen .app-text-button { min-height: 44px; font-size: .875rem; }
+  #authScreen .class-option strong { font-size: .875rem; }
+  #authScreen .class-option small, #authScreen .google-character span { font-size: .75rem; line-height: 1.5; }
+  #authScreen #googleProfile input { min-height: 48px; font-size: 1rem; }
+  #authScreen .class-picker legend, #authScreen #googleProfile label { font-size: .875rem; line-height: 1.5; }
+  #authScreen .primary { min-height: 48px; font-size: 1rem; }
+  #authScreen .landing-world-copy p, #authScreen .landing-features p, #authScreen .landing-class p, #authScreen .landing-guide-grid p, #authScreen .landing-steps p, #authScreen .landing-faq details p { font-size: 1rem; line-height: 1.65; }
+  #authScreen .landing-section-heading > p, #authScreen .landing-gallery-card figcaption span { font-size: .875rem; line-height: 1.65; }
+  #authScreen .landing-text-link, #authScreen .landing-faq summary, #authScreen .landing-steps h3 { font-size: .875rem; min-height: 44px; }
+  #authScreen .landing-class .landing-class-role { font-size: .75rem; line-height: 1.5; letter-spacing: .6px; }
+  #authScreen .landing-dnd-note, #authScreen .landing-section-label { font-size: .75rem; }
+  #authScreen .ranking-list { font-size: .875rem; }
+  #authScreen .ranking-row { grid-template-columns: 24px minmax(0, 1fr) 76px 28px; gap: 6px; padding: 10px 0; }
+}
+@media (max-width: 600px) {
+  #authScreen .landing-header { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 16px 0 12px; }
+  #authScreen .landing-brand > span { font-size: .875rem; letter-spacing: 2px; }
+  #authScreen .landing-brand small { font-size: 10px; letter-spacing: 4px; }
+  #authScreen .landing-brand svg { width: 28px; height: 36px; }
+  #authScreen .landing-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; width: 100%; font-size: .875rem; }
+  #authScreen .landing-nav a { min-width: 0; justify-content: center; text-align: center; padding: 8px 4px; overflow-wrap: anywhere; }
+  #authScreen .landing-nav a[href="#swiat"], #authScreen .landing-nav a[href="#klasy"] { display: none; }
+  #authScreen .landing-nav .landing-nav-play { padding: 8px 10px; background: #d7b47a; color: #15261e; }
+  #authScreen .landing-nav-play span { display: none; }
+  #authScreen .landing-subtitle { display: none; }
+  #authScreen .landing-cta { width: 100%; margin-top: 18px; }
+  #authScreen .landing-intro h1 { font-size: clamp(2.25rem, 9vw, 2.625rem); margin-top: 12px; }
+  #authScreen .landing-class-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  #authScreen .landing-class { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 6px 16px; padding: 20px 0; border: 0; border-bottom: 1px solid var(--landing-line); }
+  #authScreen .landing-class > img { grid-row: 1 / 4; width: 44px; height: 44px; margin: 0; }
+  #authScreen .landing-class .landing-class-role, #authScreen .landing-class p { margin: 0; }
+  #authScreen .landing-class h3 { font-size: 26px; }
+  #authScreen .landing-section-heading br, #authScreen .landing-world-copy h2 br { display: none; }
+  #authScreen .landing-class:nth-child(n) { border-bottom: 1px solid var(--landing-line); }
+  #authScreen .landing-login { padding: 24px 18px 18px; }
+  #authScreen .app-auth-actions { flex-wrap: wrap; }
+  #authScreen .app-auth-actions > button { flex: 1 1 130px; }
+}
