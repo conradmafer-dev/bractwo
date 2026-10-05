@@ -2017,6 +2017,9 @@ def _public_text_response(request, text, content_type="text/html"):
 async def _static_encoding(request, handler):
     response = await handler(request)
     if isinstance(response, web.FileResponse) and not response.prepared:
+        # Minimal deployment images may lack a system MIME entry for WebP.
+        if request.path.lower().endswith(".webp"):
+            response.content_type = "image/webp"
         # aiohttp 3.13 selects precompressed files by substring and otherwise
         # treats gzip;q=0 as acceptance. Normalize only the request used for
         # file delivery, preserving its native ranges, validators and guards.

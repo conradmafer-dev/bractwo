@@ -25,6 +25,20 @@ HEAD_MARKER = "<!-- SEO_HEAD -->"
 
 
 @dataclass(frozen=True)
+class PageImage:
+    """The publicly served image actually illustrating a document."""
+
+    path: str
+    alt: str
+    width: int
+    height: int
+    mime_type: str = "image/webp"
+
+
+DEFAULT_IMAGE = PageImage(IMAGE_PATH, IMAGE_ALT, 1920, 1080, "image/png")
+
+
+@dataclass(frozen=True)
 class PublicPage:
     """A published document; this registry also defines the sitemap and routes."""
 
@@ -36,6 +50,7 @@ class PublicPage:
     published_date: str | None = None
     category: str | None = None
     article_kind: str = "BlogPosting"
+    image: PageImage | None = None
 
 
 HOME_PAGE = PublicPage("/", "index.html", TITLE, DESCRIPTION, "Bractwo Krain")
@@ -54,6 +69,11 @@ BLOG_ARTICLES = (
         "stół i MMORPG w przeglądarce. Poznaj zasady D&D zaadaptowane w Bractwie Krain.",
         "D&D online po polsku — sesja RPG czy gra w przeglądarce?",
         published_date="2026-10-04", category="D&D online",
+        image=PageImage(
+            "/assets/screenshots/bractwo-krain-mmorpg-otwarty-swiat.png",
+            "Czarodziej przy drodze i zabudowaniach w Bractwie Krain, polskim MMORPG z mechaniką D&D.",
+            1920, 1080, "image/png",
+        ),
     ),
     PublicPage(
         "/blog/walka-k20", "blog/walka-k20.html",
@@ -62,6 +82,11 @@ BLOG_ARTICLES = (
         "i trafienia krytyczne dzięki obliczeniom i przykładom z Bractwa Krain.",
         "K20, Klasa Pancerza i trafienia krytyczne — jak działa walka?",
         published_date="2026-10-04", category="Zasady D&D",
+        image=PageImage(
+            "/assets/screenshots/bractwo-krain-zlote-wybrzeze.png",
+            "Walka w Bractwie Krain: czarodziej rzuca Błyskawicę w stronę minotaura i skorpiona na Złotym Wybrzeżu.",
+            1920, 1080, "image/png",
+        ),
     ),
     PublicPage(
         "/blog/magia-kregi-czarow", "blog/magia-kregi-czarow.html",
@@ -70,6 +95,11 @@ BLOG_ARTICLES = (
         "z druidem i poznaj adaptację magii do rozgrywki w Bractwie Krain.",
         "Czarodziej czy druid? Magia D&D w Bractwie Krain",
         published_date="2026-10-04", category="Magia D&D",
+        image=PageImage(
+            "/assets/screenshots/bractwo-krain-magiczny-pocisk.png",
+            "Czarodziej rzuca Magiczny pocisk przy kamiennych ruinach w Bractwie Krain — czar znany z D&D.",
+            1920, 1080, "image/png",
+        ),
     ),
     PublicPage(
         "/blog/atuty-rozwoj-postaci", "blog/atuty-rozwoj-postaci.html",
@@ -78,6 +108,11 @@ BLOG_ARTICLES = (
         "Zobacz, jak wybierać ulepszenia bohatera w Bractwie Krain.",
         "Atuty w D&D i Bractwie — jak rozwijać bohatera?",
         published_date="2026-10-04", category="Rozwój postaci",
+        image=PageImage(
+            "/assets/screenshots/bractwo-krain-druid-rozdarcie-demonow.png",
+            "Druid w Rozdarciu Demonów w Bractwie Krain, z paskiem zaklęć i zdolności postaci u dołu ekranu.",
+            1920, 1080, "image/png",
+        ),
     ),
 )
 NEWS_ARTICLES = (
@@ -88,6 +123,8 @@ NEWS_ARTICLES = (
         "Co ogłoszono o nowym MMORPG, czego jeszcze nie wiemy i co oznacza to dla graczy?",
         "RuneScape 4 zapowiedziane. Nowe MMORPG zacznie się w Ashenfall",
         published_date="2026-10-04", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/runescape-4-wyprawa-ilustracja-1200.webp",
+                        "Podróżnik patrzy ze skalnego tarasu na wulkaniczną dolinę — ilustracja do zapowiedzi RuneScape 4.", 1200, 675),
     ),
     PublicPage(
         "/blog/runescape-pluginy-beta", "blog/runescape-pluginy-beta.html",
@@ -96,6 +133,8 @@ NEWS_ARTICLES = (
         "62 zadania. Poznaj potwierdzone informacje i ograniczenia testów.",
         "RuneScape: beta pluginów 6 października. Quest Helper z 62 zadaniami",
         published_date="2026-10-04", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/runescape-pluginy-narzedzia-ilustracja-1200.webp",
+                        "Kompas, mapa i modułowe narzędzia na drewnianym stole — ilustracja do artykułu o pluginach RuneScape.", 1200, 675),
     ),
     PublicPage(
         "/blog/ddo-court-of-strahd", "blog/ddo-court-of-strahd.html",
@@ -104,6 +143,8 @@ NEWS_ARTICLES = (
         "Poznaj latarnie, zasady Hardcore i potwierdzone szczegóły wydarzenia.",
         "DDO: The Court of Strahd rusza 14 października. Latarnie i tryb Hardcore",
         published_date="2026-10-04", category="Newsy MMORPG · Dungeons & Dragons", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/ddo-court-of-strahd-latarnia-ilustracja-1200.webp",
+                        "Latarnia rozświetla mgłę na drodze do gotyckiego zamku — ilustracja do zapowiedzi The Court of Strahd w DDO.", 1200, 675),
     ),
     PublicPage(
         "/blog/pantheon-crafting-2027", "blog/pantheon-crafting-2027.html",
@@ -112,6 +153,8 @@ NEWS_ARTICLES = (
         "Sprawdzamy zapowiedzi twórców i rozróżniamy plany od gotowych funkcji.",
         "Pantheon: crafting planowany na 2027. Co ujawniono w Q&A z 2 października?",
         published_date="2026-10-04", category="Newsy MMORPG · Pantheon", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/pantheon-crafting-kuznia-ilustracja-1200.webp",
+                        "Kuźnia fantasy z młotem, sztabkami metalu i niedokończonym mieczem — ilustracja do zapowiedzi craftingu w Pantheon.", 1200, 675),
     ),
 )
 ALL_BLOG_ARTICLES = (*NEWS_ARTICLES, *BLOG_ARTICLES)
@@ -198,8 +241,10 @@ def metadata_head(config, page=HOME_PAGE):
     """Generate the crawlable head without user/session data or inline code."""
     canonical = config.origin + page.path
     homepage = config.canonical
-    image = config.origin + IMAGE_PATH
     is_news = page.article_kind == "NewsArticle"
+    page_image = page.image or (None if is_news else DEFAULT_IMAGE)
+    image_url = config.origin + page_image.path if page_image else None
+    image_id = canonical + "#image" if page.image else homepage + "#image"
     attributes = [
         ("property", "og:type", "article" if page.published_date else "website"),
         ("property", "og:locale", "pl_PL"),
@@ -207,19 +252,19 @@ def metadata_head(config, page=HOME_PAGE):
         ("property", "og:title", page.title),
         ("property", "og:description", page.description),
         ("property", "og:url", canonical),
-        ("name", "twitter:card", "summary" if is_news else "summary_large_image"),
+        ("name", "twitter:card", "summary_large_image" if page_image else "summary"),
         ("name", "twitter:title", page.title),
         ("name", "twitter:description", page.description),
     ]
-    if not is_news:
+    if page_image:
         attributes.extend([
-            ("property", "og:image", image),
-            ("property", "og:image:type", "image/png"),
-            ("property", "og:image:width", "1920"),
-            ("property", "og:image:height", "1080"),
-            ("property", "og:image:alt", IMAGE_ALT),
-            ("name", "twitter:image", image),
-            ("name", "twitter:image:alt", IMAGE_ALT),
+            ("property", "og:image", image_url),
+            ("property", "og:image:type", page_image.mime_type),
+            ("property", "og:image:width", str(page_image.width)),
+            ("property", "og:image:height", str(page_image.height)),
+            ("property", "og:image:alt", page_image.alt),
+            ("name", "twitter:image", image_url),
+            ("name", "twitter:image:alt", page_image.alt),
         ])
     if page.published_date:
         attributes.append(("property", "article:published_time", page.published_date))
@@ -242,7 +287,8 @@ def metadata_head(config, page=HOME_PAGE):
     }
     if not is_news:
         webpage["about"] = {"@id": homepage + "#game"}
-        webpage["primaryImageOfPage"] = {"@id": homepage + "#image"}
+    if page_image:
+        webpage["primaryImageOfPage"] = {"@id": image_id}
     if page.path == "/":
         webpage["mainEntity"] = {"@id": homepage + "#game"}
     else:
@@ -252,12 +298,16 @@ def metadata_head(config, page=HOME_PAGE):
         elif page.path == BLOG_PAGE.path:
             webpage["mainEntity"] = {"@id": canonical + "#collection"}
     structured = {"@context": "https://schema.org", "@graph": [webpage]}
+    if page_image and (page.image or page.path == "/"):
+        structured["@graph"].append({
+            "@type": "ImageObject", "@id": image_id, "url": image_url,
+            "contentUrl": image_url, "width": page_image.width, "height": page_image.height,
+            "encodingFormat": page_image.mime_type, "caption": page_image.alt,
+        })
     if page.path == "/":
         structured["@graph"].extend([
             {"@type": "WebSite", "@id": homepage + "#website", "url": homepage,
              "name": "Bractwo Krain", "inLanguage": "pl-PL", "description": DESCRIPTION},
-            {"@type": "ImageObject", "@id": homepage + "#image", "url": image,
-             "contentUrl": image, "width": 1920, "height": 1080, "caption": IMAGE_ALT},
             {"@type": "VideoGame", "@id": homepage + "#game", "url": homepage,
              "name": "Bractwo Krain", "description": DESCRIPTION,
              "keywords": ["polskie MMORPG", "gra w przeglądarce", "Dungeons & Dragons",
@@ -302,8 +352,8 @@ def metadata_head(config, page=HOME_PAGE):
             "mainEntityOfPage": {"@id": canonical + "#webpage"},
             "isPartOf": {"@id": config.origin + BLOG_PAGE.path + "#collection"},
         }
-        if not is_news:
-            article["image"] = image
+        if page_image:
+            article["image"] = image_url
         if page.category:
             article["articleSection"] = page.category
         structured["@graph"].append(article)
@@ -332,8 +382,12 @@ def robots_txt(config):
 
 
 def sitemap_xml(config):
-    urls = "".join(f'  <url><loc>{escape(config.origin + page.path)}</loc></url>\n'
-                   for page in PUBLIC_PAGES)
+    urls = []
+    for page in PUBLIC_PAGES:
+        image = (f'<image:image><image:loc>{escape(config.origin + page.image.path)}</image:loc>'
+                 '</image:image>' if page.image else "")
+        urls.append(f'  <url><loc>{escape(config.origin + page.path)}</loc>{image}</url>\n')
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
-            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
-            f'{urls}</urlset>\n')
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
+            'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
+            f'{"".join(urls)}</urlset>\n')

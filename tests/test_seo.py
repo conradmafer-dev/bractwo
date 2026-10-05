@@ -1,4 +1,5 @@
 """Crawlable documents, canonical URLs, indexing policy and HTTP delivery."""
+from dataclasses import replace
 import gzip
 from html import escape
 from html.parser import HTMLParser
@@ -93,6 +94,33 @@ class SEOConfigTests(unittest.TestCase):
         self.assertEqual(document.schemas[0]["@graph"][0]["name"], page.title)
         self.assertNotIn("<script>alert(1)</script>", output)
 
+    def test_news_uses_only_its_explicit_image_without_game_topic_fallback(self):
+        page = replace(seo.NEWS_ARTICLES[0], image=None)
+        document = Document(seo.metadata_head(seo.SEOConfig(), page))
+        graph = document.schemas[0]["@graph"]
+        article = next(item for item in graph if item["@type"] == "NewsArticle")
+        webpage = next(item for item in graph if item["@type"] == "WebPage")
+        self.assertNotIn("image", article)
+        self.assertNotIn("primaryImageOfPage", webpage)
+        self.assertNotIn("about", webpage)
+        self.assertFalse(document.find("meta", property="og:image"))
+        self.assertFalse(document.find("meta", name="twitter:image"))
+        self.assertEqual(document.find("meta", name="twitter:card")[0]["content"], "summary")
+
+        image = seo.PageImage("/assets/news/strahd.webp", "Ravenloft — widok zamku", 1600, 900)
+        page = replace(page, image=image)
+        document = Document(seo.metadata_head(seo.SEOConfig(), page))
+        graph = document.schemas[0]["@graph"]
+        article = next(item for item in graph if item["@type"] == "NewsArticle")
+        webpage = next(item for item in graph if item["@type"] == "WebPage")
+        image_object = next(item for item in graph if item["@type"] == "ImageObject")
+        self.assertEqual(article["image"], seo.DEFAULT_ORIGIN + image.path)
+        self.assertEqual(image_object["url"], article["image"])
+        self.assertEqual(webpage["primaryImageOfPage"]["@id"], image_object["@id"])
+        self.assertNotIn("about", webpage)
+        self.assertEqual(document.find("meta", name="twitter:card")[0]["content"], "summary_large_image")
+        self.assertEqual(document.find("meta", property="og:image:type")[0]["content"], "image/webp")
+
 
 class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
     async def asyncSetUp(self):
@@ -129,7 +157,8 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(document.find("meta", property="og:url")[0]["content"], self.origin + page.path)
                 self.assertEqual(document.find("meta", property="og:title")[0]["content"], page.title)
                 self.assertEqual(document.find("meta", name="twitter:card")[0]["content"],
-                                 "summary" if page.article_kind == "NewsArticle" else "summary_large_image")
+                                 "summary" if page.article_kind == "NewsArticle" and not page.image
+                                 else "summary_large_image")
                 self.assertEqual(len(document.find("meta", name="robots")), 1)
                 self.assertEqual(len(document.schemas), 1)
                 graph = document.schemas[0]["@graph"]
@@ -194,14 +223,19 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(article["publisher"], article["author"])
                 self.assertIn(article["author"]["name"], source)
                 if page.article_kind == "NewsArticle":
+                    self.assertNotIn("about", webpage)
+                else:
+                    self.assertEqual(webpage["about"]["@id"], self.origin + "/#game")
+                if page.image:
+                    self.assertEqual(article["image"], self.origin + page.image.path)
+                    self.assertEqual(webpage["primaryImageOfPage"]["@id"], self.origin + page.path + "#image")
+                elif page.article_kind == "NewsArticle":
                     self.assertNotIn("image", article)
                     self.assertNotIn("primaryImageOfPage", webpage)
-                    self.assertNotIn("about", webpage)
                     self.assertFalse(document.find("meta", property="og:image"))
                     self.assertFalse(document.find("meta", name="twitter:image"))
                 else:
                     self.assertEqual(article["image"], self.origin + seo.IMAGE_PATH)
-                    self.assertEqual(webpage["about"]["@id"], self.origin + "/#game")
                 self.assertEqual(article["articleSection"], page.category)
                 self.assertEqual(document.find("meta", property="og:type")[0]["content"], "article")
                 self.assertEqual(document.find("meta", property="article:published_time")[0]["content"],
@@ -209,6 +243,40 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual([item["position"] for item in breadcrumbs["itemListElement"]], [1, 2, 3])
                 self.assertEqual([item["item"] for item in breadcrumbs["itemListElement"]],
                                  [self.origin + "/", self.origin + "/blog", self.origin + page.path])
+
+    async def test_article_image_matches_visible_figure_metadata_and_public_asset(self):
+        for page in seo.ALL_BLOG_ARTICLES:
+            if page.image is None:
+                continue
+            with self.subTest(path=page.path):
+                response = await self.client.get(page.path)
+                self.assertEqual(response.status, 200)
+                document = Document(await response.text())
+                visible_images = document.find("img", src=page.image.path)
+                self.assertTrue(visible_images, "The article image must be visible in the document")
+                self.assertEqual(visible_images[0]["alt"], page.image.alt)
+                image_url = self.origin + page.image.path
+                self.assertEqual(document.find("meta", property="og:image")[0]["content"], image_url)
+                self.assertEqual(document.find("meta", property="og:image:alt")[0]["content"], page.image.alt)
+                self.assertEqual(document.find("meta", property="og:image:type")[0]["content"], page.image.mime_type)
+                self.assertEqual(document.find("meta", property="og:image:width")[0]["content"], str(page.image.width))
+                self.assertEqual(document.find("meta", property="og:image:height")[0]["content"], str(page.image.height))
+                self.assertEqual(document.find("meta", name="twitter:image")[0]["content"], image_url)
+                self.assertEqual(document.find("meta", name="twitter:image:alt")[0]["content"], page.image.alt)
+                image_object = next(item for item in document.schemas[0]["@graph"]
+                                    if item["@type"] == "ImageObject")
+                self.assertEqual(image_object["@id"], self.origin + page.path + "#image")
+                self.assertEqual(image_object["url"], image_url)
+                self.assertEqual(image_object["contentUrl"], image_url)
+                self.assertEqual(image_object["caption"], page.image.alt)
+                self.assertEqual(image_object["width"], page.image.width)
+                self.assertEqual(image_object["height"], page.image.height)
+                self.assertEqual(image_object["encodingFormat"], page.image.mime_type)
+                asset = await self.client.get(page.image.path)
+                self.assertEqual(asset.status, 200)
+                self.assertEqual(asset.content_type, page.image.mime_type)
+                self.assertNotIn("X-Robots-Tag", asset.headers)
+                self.assertTrue(await asset.read())
 
     async def test_sitemap_lists_only_successful_canonical_documents(self):
         response = await self.client.get("/sitemap.xml")
@@ -219,6 +287,13 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(locations, [self.origin + page.path for page in seo.PUBLIC_PAGES])
         self.assertEqual(len(locations), len(set(locations)))
         self.assertEqual(root.findall("{*}url/{*}lastmod"), [])
+        image_namespace = "http://www.google.com/schemas/sitemap-image/1.1"
+        for element, page in zip(root.findall("{*}url"), seo.PUBLIC_PAGES):
+            with self.subTest(path=page.path):
+                image_locations = [image.text for image in element.findall(
+                    "{" + image_namespace + "}image/{" + image_namespace + "}loc")]
+                self.assertEqual(image_locations,
+                                 [self.origin + page.image.path] if page.image else [])
         for location in locations:
             result = await self.client.head(urlsplit(location).path)
             self.assertEqual(result.status, 200)

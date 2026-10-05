@@ -39,6 +39,7 @@
 .blog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .blog-card { border: 1px solid var(--line); padding: 28px; background: #13261c88; border-radius: 3px; }
 .blog-card { min-width: 0; overflow-wrap: break-word; }
+.blog-card .blog-card-image { display: block; width: 100%; height: auto; margin: 0 0 22px; border: 1px solid var(--line); border-radius: 2px; }
 .blog-card .eyebrow { margin-bottom: 16px; }
 .blog-card h3 { font-size: 28px; margin: 0 0 18px; }
 .blog-card h3 a { text-decoration: none; }
