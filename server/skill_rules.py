@@ -1,4 +1,4 @@
-"""D&D 2024 skills with the existing Bractwo level conversion.
+"""D&D 2024 skills with character levels using the D&D numbering.
 
 The eighteen skills, class picks, proficiency and Expertise follow the 2024
 rules. Choosing any two background skills is Bractwo's custom-origin adapter;
@@ -214,9 +214,9 @@ def sheet(p):
         'class': 'Wybierz biegłości z listy swojej klasy. Każda dodaje premię z biegłości do testu.',
         'background': 'Wybierz dwie biegłości wynikające z pochodzenia. W Bractwie samodzielnie dobierasz tę parę.',
         'skilled': 'Każde wybranie atutu Wszechstronny daje trzy nowe biegłości w umiejętnościach.',
-        'expertise': ('Uczony: od poziomu 5 wybierz jedną ze swoich biegłości naukowych. Ekspertyza podwaja premię z biegłości.'
+        'expertise': ('Uczony: od poziomu 2 wybierz jedną ze swoich biegłości naukowych. Ekspertyza podwaja premię z biegłości.'
                       if p.class_id == 'mage' else
-                      'Od poziomu 5 wybierz jedną ekspertyzę, a od 40 dwie kolejne. Ekspertyza podwaja premię z biegłości.'),
+                      'Od poziomu 2 wybierz jedną ekspertyzę, a od 9 dwie kolejne. Ekspertyza podwaja premię z biegłości.'),
     }
     choices = []
     row_by_id = {row['id']: row for row in rows}

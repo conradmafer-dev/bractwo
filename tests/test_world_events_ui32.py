@@ -21,7 +21,7 @@ class WorldEvents(unittest.IsolatedAsyncioTestCase):
         self.g.legacy_enemies=[]
         self.addCleanup(self.g.db.close)
 
-    def hero(self,key='scout_first_aid',cls='ranger',level=20,pid='1'):
+    def hero(self,key='scout_first_aid',cls='ranger',level=5,pid='1'):
         p=self.player(cls,level,pid);site=self.g.skill_challenge_sites()[key]
         p.x,p.y,p.floor=site['x'],site['y']+55,site['floor']
         p.attack_cooldown_until=0;p.combat_until=p.pvp_combat_until=0
@@ -212,7 +212,7 @@ class WorldEvents(unittest.IsolatedAsyncioTestCase):
         self.clock.advance(100);self.assertEqual(self.row(p,s['id'])['completed_age'],60)
 
     async def test_cure_wounds_respects_selected_higher_circle(self):
-        p,s=self.hero(cls='druid',level=40)
+        p,s=self.hero(cls='druid',level=9)
         # The event resolves the same profile the spellbook presents, not a fixed cost.
         p.spell_circle_choices['cure_wounds']=3
         spec=spell_scaling.resolve(p,'cure_wounds');mana=p.mana;cost,_=self.g.circle_spell_cost(p,spec)

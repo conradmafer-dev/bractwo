@@ -36,7 +36,7 @@ def fixture():
                 dict(id='cave', name='Cave', x=4000, y=1000, floor=-1, to_floor=0, min_level=4)],
         CITIES=[dict(id='town', x=0, y=0)], SPAWNS=[('wolf', 1000, 1000, 0)],
         QUESTS_REF=[dict(objectives=[dict(type='discover', target='hunt', x=0, y=0)])])
-    enemies = dict(wolf=dict(name='Wolf', level=4))
+    enemies = dict(wolf=dict(name='Wolf', level=1))
     return content, landmarks, [], enemies
 
 

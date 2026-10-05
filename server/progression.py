@@ -56,7 +56,7 @@ def private_state(p,now):
       'skills':skill_progress(p),'runes':dict(p.runes),'soul':int(p.soul),'max_soul':200 if p.promoted else 100,
       'bank_gold':p.bank_gold,'depot':list(p.depot),'home_city':p.home_city,'blessed':p.blessed,
       'merchant':merchant_state(p),
-      'mastery':dict(p.mastery),'mastery_points':max(0,(p.level-50)//5+1-sum(p.mastery.values())) if p.level>=50 and p.promoted else 0,
+      'mastery':dict(p.mastery),'mastery_points':max(0,p.level-10-sum(p.mastery.values())) if p.level>=11 and p.promoted else 0,
       'spell_cooldowns':{key:round(max(0,until-now),1) for key,until in p.spell_cooldowns.items() if until>now},
       'haste_remaining':max(0,p.haste_until-now),'rune_cooldown':max(0,p.rune_ready-now)}
 
@@ -165,7 +165,7 @@ class ExpansionGame:
             port=self.near_service(p,'captain')
             target=next((c for c in content.CITIES if c['id']==data.get('city_id')),None)
             if not port:return await self.notice(p,'Podejdź do kapitana w mieście.')
-            if p.level<8:return await self.notice(p,'Rejsy są dostępne od poziomu 8.')
+            if p.level<2:return await self.notice(p,'Rejsy są dostępne od poziomu 2.')
             if target is None or port['city_id']==target['id']:return await self.notice(p,'Wybierz inne miasto.')
             cost=40+int(math.hypot(p.x-target['x'],p.y-target['y'])/1000)*8
             if p.gold<cost:return await self.notice(p,f'Koszt podróży: {cost} złota.')
@@ -201,12 +201,12 @@ class ExpansionGame:
                     return await self.notice(p,f'Promocja wymaga poziomu {PROMOTION_LEVEL} i {PROMOTION_COST} złota; można ją kupić tylko raz.')
                 p.gold-=PROMOTION_COST;p.promoted=True;p.soul=min(200,p.soul+100)
             elif kind=='bless':
-                if p.blessed or p.level<40 or p.gold<500:return await self.notice(p,'Błogosławieństwo: poziom 40, 500 złota; działa na jedną śmierć.')
+                if p.blessed or p.level<9 or p.gold<500:return await self.notice(p,'Błogosławieństwo: poziom 9, 500 złota; działa na jedną śmierć.')
                 p.gold-=500;p.blessed=True
             elif kind=='mastery':
                 branch=data.get('branch')
-                if p.level<50 or not p.promoted:return await self.notice(p,'Mistrzostwo wymaga promocji i poziomu 50.')
-                points=(p.level-50)//5+1-sum(p.mastery.values())
+                if p.level<11 or not p.promoted:return await self.notice(p,'Mistrzostwo wymaga promocji i poziomu 11.')
+                points=p.level-10-sum(p.mastery.values())
                 if not isinstance(branch,str) or branch not in ('power','focus') or points<1 or p.mastery.get(branch,0)>=20:
                     return await self.notice(p,'Brak punktu lub wybrana gałąź osiągnęła 20 punktów.')
                 p.mastery[branch]=p.mastery.get(branch,0)+1

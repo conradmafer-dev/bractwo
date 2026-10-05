@@ -74,7 +74,7 @@ class MagicItems(unittest.IsolatedAsyncioTestCase):
         p.form='wolf';self.assertEqual(env.movement_speed(p,90),45)
 
     def test_adamantine_changes_natural_twenty_to_normal_hit_not_miss(self):
-        p=self.player('knight',80);self.give(p,'adamantine_chain_mail')
+        p=self.player('knight',17);self.give(p,'adamantine_chain_mail')
         enemy=self.enemy();self.g.combat_rng=base.Dice(20,4)
         result=self.g.hit_player(enemy,p,dice=(2,6,3))
         self.assertTrue(result['hit']);self.assertFalse(result['critical'])

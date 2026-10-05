@@ -1,6 +1,6 @@
 """Shared requirements for the one-time profession promotion."""
 
-PROMOTION_LEVEL = 10
+PROMOTION_LEVEL = 3
 PROMOTION_COST = 2000
 
 

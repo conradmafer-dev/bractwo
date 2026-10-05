@@ -21,7 +21,7 @@ class RestRules(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         base.GameRules.setUp(self)
         self.e.alive = False
-        self.p = self.player('mage', 20)
+        self.p = self.player('mage', 5)
         self.p.hp = self.p.max_hp*.25
         self.p.mana = 0
         self.p.mana_recovery_until = self.clock()+100

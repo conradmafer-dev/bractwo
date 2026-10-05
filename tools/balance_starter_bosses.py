@@ -1,6 +1,7 @@
 """Seeded, server-driven solo starter-boss benchmark.
 
-python tools/balance_starter_bosses.py --trials 40 --output /tmp/balance.json
+python tools/balance_starter_bosses.py --trials 40 --level 3 --output /tmp/balance.json
+Level 3 is the native D&D equivalent of the old Bractwo level 10.
 Use the same script on both revisions: the original UI33 script was not saved.
 No combat math is duplicated: actions, movement, AI and damage use Game.
 """
@@ -79,7 +80,7 @@ def steer(game, player, enemy, dodge):
     player.dx, player.dy, player.input_time = vx, vy, game.time
 
 
-async def fight(boss, class_id, seed, level=10, dodge=True):
+async def fight(boss, class_id, seed, level=3, dodge=True):
     clock = Clock()
     game = Game(':memory:', clock=clock)
     try:
@@ -163,7 +164,7 @@ def summarize(runs):
     return result
 
 
-async def simulate(trials=40, seed_start=0, level=10, dodge=True):
+async def simulate(trials=40, seed_start=0, level=3, dodge=True):
     runs = []
     for boss in sa.BOSSES:
         for cls in CLASSES:
@@ -178,7 +179,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--trials', type=int, default=40)
     parser.add_argument('--seed-start', type=int, default=0)
-    parser.add_argument('--level', type=int, default=10)
+    parser.add_argument('--level', type=int, default=3)
     parser.add_argument('--no-dodge', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()

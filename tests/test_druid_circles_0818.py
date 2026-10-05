@@ -21,7 +21,7 @@ class CircleRules(unittest.IsolatedAsyncioTestCase):
 
     def tearDown(self): self.g.db.close()
 
-    def druid(self, circle, level=65, pid='1'):
+    def druid(self, circle, level=14, pid='1'):
         p = self.player('druid', level, pid)
         p.druid_circle = circle
         self.g.migrate_druid_circle(p)
@@ -32,7 +32,7 @@ class CircleRules(unittest.IsolatedAsyncioTestCase):
         for p in self.g.players.values(): p.current_wall_time = self.clock()
 
     def test_level_mapping_and_shape_resources(self):
-        p = self.druid('moon', 10)
+        p = self.druid('moon', 3)
         self.assertEqual(circles.effective_level(p), 3)
         self.assertEqual(circles.form_temp_hp(p), 9)
         self.assertEqual(circles.max_form_cr(p), 1)
@@ -43,12 +43,12 @@ class CircleRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(circles.shape_remaining(p), 1)
         self.g.on_circle_rest(p, 'long')
         self.assertEqual(circles.shape_remaining(p), 2)
-        p.level = 85
+        p.level = 18
         self.assertEqual(circles.max_form_cr(p), 6)
         self.assertEqual(circles.shape_max(p), 4)
 
     def test_bonus_spell_access_and_natural_recovery_commits_once(self):
-        p = self.druid('land', 25)
+        p = self.druid('land', 6)
         p.druid_circle_state.update(land='arid', natural_free_armed=True)
         self.assertIn('fireball', circles.bonus_spells(p))
         self.assertNotIn('cone_of_cold', circles.bonus_spells(p))
@@ -67,7 +67,7 @@ class CircleRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(circles.spent(p, 'natural_free'), 0)
 
     async def test_star_dragon_and_chalice_have_real_effects(self):
-        p = self.druid('stars', 45)
+        p = self.druid('stars', 10)
         await self.g.cast_circle_feature(p, 'circle_star_dragon')
         self.assertEqual(circles.roll_floor(p, 'constitution', 'concentration'), 10)
         self.assertEqual(circles.roll_floor(p, 'constitution', 'save'), 1)
@@ -83,7 +83,7 @@ class CircleRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(p.hp, 1+6+circles.wisdom(p))
 
     async def test_land_aid_damage_heal_and_invalid_target_no_resource(self):
-        p = self.druid('land', 10)
+        p = self.druid('land', 3)
         target = self.enemy(x=p.x+25, y=p.y)
         p.hp = 1
         initial = circles.shape_remaining(p)
@@ -95,7 +95,7 @@ class CircleRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(circles.shape_remaining(p), initial-1)
 
     async def test_sea_aura_damage_and_push_share_wild_shape_resource(self):
-        p = self.druid('sea', 25)
+        p = self.druid('sea', 6)
         target = self.enemy(x=p.x+20, y=p.y)
         start = target.x
         await self.g.cast_circle_feature(p, 'circle_wrath_of_sea', enemy_id=target.id)
@@ -122,7 +122,7 @@ class CircleRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(two['damage'], 5)
 
     def test_omen_reaction_respects_floor_range_and_uses(self):
-        p = self.druid('stars', 25)
+        p = self.druid('stars', 6)
         p.druid_circle_state.update(omen='weal', omen_armed=True)
         self.assertEqual(self.g.circle_roll_adjustment(p), 3)
         self.assertEqual(circles.spent(p, 'omen'), 1)
@@ -132,20 +132,20 @@ class CircleRules(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.g.circle_roll_adjustment(p), 0)
 
     def test_higher_beast_forms_have_progressive_cr_and_actual_poison(self):
-        p = self.druid('moon', 25)
+        p = self.druid('moon', 6)
         self.assertTrue(circles.form_allowed(p, 'polar_bear'))
         self.assertFalse(circles.form_allowed(p, 'giant_scorpion'))
-        p.level = 40; p.form = 'giant_scorpion'; p.form_attack_index = 2
+        p.level = 9; p.form = 'giant_scorpion'; p.form_attack_index = 2
         self.assertTrue(circles.form_allowed(p, p.form))
         hit = dict(hit=True, critical=False, damage=6, damage_type='piercing', damage_dice='1k8+3')
         self.g.circle_adjust_damage(p, self.enemy(), hit)
         self.assertEqual(hit['damage'], 12)
         self.assertEqual(hit['damage_components'][-1], dict(type='poison', damage=6))
-        p.druid_circle = 'land'; p.level = 95
+        p.druid_circle = 'land'; p.level = 20
         self.assertFalse(circles.form_allowed(p, 'polar_bear'))
 
     async def test_scorpion_grapple_releases_without_action(self):
-        p = self.druid('moon', 40); p.form = 'giant_scorpion'; p.form_until = self.clock()+100
+        p = self.druid('moon', 9); p.form = 'giant_scorpion'; p.form_until = self.clock()+100
         target = self.enemy(x=p.x+20, y=p.y); p.form_attack_index = 0
         self.g.beast_on_hit(p, target, dict(hit=True))
         self.assertEqual(target.conditions['grappled']['dc'], 13)

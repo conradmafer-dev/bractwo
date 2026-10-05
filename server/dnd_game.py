@@ -4,10 +4,10 @@ All costs, targets, ranges and cooldowns are checked on the authoritative server
 from dataclasses import dataclass, field
 from types import SimpleNamespace
 try:
-    from . import spell_geometry, spell_scaling, rest_rules, druid_circles, environment_rules
+    from . import spell_geometry, spell_scaling, rest_rules, druid_circles, environment_rules, level_rules
     from .ranger_magic import RangerMagic
 except ImportError:
-    import spell_geometry, spell_scaling, rest_rules, druid_circles, environment_rules
+    import spell_geometry, spell_scaling, rest_rules, druid_circles, environment_rules, level_rules
     from ranger_magic import RangerMagic
 import math
 import json
@@ -62,12 +62,13 @@ class Companion:
 
 class DNDGame(RangerMagic):
     def init_dnd(self):
+        level_rules.migrate_database(self.db)
         self.companions={};self.spell_fields=[];self._ranking_cache=None;self._ranking_until=0
         self.db.execute('CREATE TABLE IF NOT EXISTS leaderboard(player_id INTEGER PRIMARY KEY,name TEXT NOT NULL,class_id TEXT NOT NULL,level INTEGER NOT NULL,xp INTEGER NOT NULL,kills INTEGER NOT NULL,boss_kills INTEGER NOT NULL)')
         self.db.execute('CREATE INDEX IF NOT EXISTS leaderboard_order ON leaderboard(level DESC,xp DESC,kills DESC,player_id ASC)')
         for pid,name,encoded in self.db.execute('SELECT id,name,data FROM accounts'):
             s=json.loads(encoded)
-            self.db.execute('INSERT OR IGNORE INTO leaderboard VALUES(?,?,?,?,?,?,?)',(pid,name,'ranger' if s.get('class_id')=='paladin' else s.get('class_id','knight'),max(1,s.get('level',1)),max(0,s.get('xp',0)),max(0,s.get('kills',0)),max(0,s.get('boss_kills',0))))
+            self.db.execute('INSERT OR REPLACE INTO leaderboard VALUES(?,?,?,?,?,?,?)',(pid,name,'ranger' if s.get('class_id')=='paladin' else s.get('class_id','knight'),max(1,s.get('level',1)),max(0,s.get('xp',0)),max(0,s.get('kills',0)),max(0,s.get('boss_kills',0))))
         self.db.commit()
 
     def save_score(self,p):
@@ -94,7 +95,7 @@ class DNDGame(RangerMagic):
         if saved.get('rules_version',0)<8:
             old={'knight':(150,18),'ranger':(115,13),'paladin':(115,13),'mage':(85,9),'druid':(100,11)}.get(old_class,(150,15))
             # Legacy values are recorded in the migration docs; preserve death and approximate health percentage.
-            old_max=old[0]+(p.level-1)*old[1]+p.mastery.get('vitality',0)*12
+            old_max=old[0]+(level_rules.growth_level(p)-1)*old[1]+p.mastery.get('vitality',0)*12
             p.hp=max(0,min(p.max_hp,p.max_hp*float(saved.get('hp',old_max))/max(1,old_max)))
             p.haste_until=p.bulwark_until=0;p.spell_cooldowns={};p.spell_ready=0
             # Removed Tibian runes are refunded once; no equipment UIDs or quest flags change.
@@ -112,13 +113,14 @@ class DNDGame(RangerMagic):
             focus_bonus = max(0, min(20, int(p.mastery.get('focus', 0))))*4
             if old_mana_version < 1:
                 old_base,old_growth={'mage':(55,2.5),'druid':(50,2),'ranger':(35,1.5),'knight':(30,1)}[p.class_id]
-                old_max=int(old_base+(p.level-1)*old_growth+p.mastery.get('focus',0)*4)
+                old_max=int(old_base+(level_rules.growth_level(p)-1)*old_growth+p.mastery.get('focus',0)*4)
             elif old_mana_version == 1 and p.class_id == 'ranger':
-                old_slots=dnd.FULL_CASTER_SLOTS[min(9,1+(int(p.level)-20)//10)-1] if p.level>=20 else ()
+                old_level=level_rules.growth_level(p)
+                old_slots=dnd.FULL_CASTER_SLOTS[min(9,1+(old_level-20)//10)-1] if old_level>=20 else ()
                 old_base=sum(n*dnd.MANA_COSTS[i+1] for i,n in enumerate(old_slots)) if old_slots else 35
                 old_max=old_base+focus_bonus
             else:
-                old_max=dnd.legacy_base_mana(p.class_id,p.level)+focus_bonus
+                old_max=dnd.legacy_base_mana(p.class_id,level_rules.growth_level(p))+focus_bonus
             p.mana=max(0,min(1,float(saved['mana'])/max(1,old_max)))*p.max_mana
         p.ensnaring_armed=False
         # Forms/concentration need live world entities, so never resume orphaned effects after login/restart.
@@ -197,7 +199,7 @@ class DNDGame(RangerMagic):
         if p.pending_spell and not surge:
             if p.pending_spell.get('until',0)>=self.now():return
             p.pending_spell={}
-        if surge and (p.class_id!='knight' or p.level<5 or p.form):return
+        if surge and (p.class_id!='knight' or p.level<2 or p.form):return
         if surge and (rest_rules.remaining(p,'action_surge')<1 or p.rest_resources.get('surge_turn_until',0)>self.now()):
             return await self.notice(p,'Zryw akcji: brak użyć albo wykorzystano go już w tej turze. Użycia odnawia odpoczynek.')
         if target_id is not None and enemy_id is not None:return
@@ -302,7 +304,7 @@ class DNDGame(RangerMagic):
             return 'Czary wspierające działają na ciebie lub członka twojej drużyny.'
         if max(p.pvp_combat_until, target.pvp_combat_until) > self.now():
             if p.pvp_safety:return 'Wsparcie w walce PvP wymaga wyłączenia blokady PvP u rzucającego.'
-            if min(p.level, target.level) < 8 or self.in_safe(p) or self.in_safe(target):
+            if min(p.level, target.level) < 2 or self.in_safe(p) or self.in_safe(target):
                 return 'Nie można wspierać walki PvP ze strefy bezpiecznej ani z ochroną początkującego.'
         return ''
 

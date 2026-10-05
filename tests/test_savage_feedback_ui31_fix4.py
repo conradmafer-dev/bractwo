@@ -13,7 +13,7 @@ class ReceiptRules(unittest.TestCase):
             for first,second in ((2,6),(6,2),(4,4)):
                 for crit in (False,True):
                     with self.subTest(weapon=weapon,first=first,second=second,critical=crit):
-                        p=Player('1','Tester',class_id='ranger',level=15,origin_feat='savage_attacker')
+                        p=Player('1','Tester',class_id='ranger',level=4,origin_feat='savage_attacker')
                         wear(p,weapon)
                         count=2 if crit else 1
                         result=rules.roll_attack(Rolls(20 if crit else 15,*([first]*count)),10,1,rules.weapon_dice(p))
@@ -27,7 +27,7 @@ class ReceiptRules(unittest.TestCase):
                         json.dumps(result)
 
     def test_style_scored_sets_make_lower_raw_sum_choice_understandable(self):
-        p=Player('1','Tester',level=35,origin_feat='savage_attacker',fighting_style='great_weapon')
+        p=Player('1','Tester',level=8,origin_feat='savage_attacker',fighting_style='great_weapon')
         wear(p,'training_greatsword')
         r=rules.roll_attack(Rolls(15,1,6),20,10,rules.weapon_dice(p))
         rules.savage_attacker_damage(p,r,Rolls(4,4),1000)
@@ -56,7 +56,7 @@ class ReceiptIntegration(unittest.IsolatedAsyncioTestCase):
         self.g.legacy_enemies=[];self.addCleanup(self.g.db.close)
 
     async def test_horde_breaker_preserves_both_sets_in_private_snapshot_when_last_changes(self):
-        p=self.player('ranger',10);p.origin_feat='savage_attacker';p.promoted=True;p.martial_archetype='hunter';p.martial_state={'hunter_choice':'horde_breaker'}
+        p=self.player('ranger',3);p.origin_feat='savage_attacker';p.promoted=True;p.martial_archetype='hunter';p.martial_state={'hunter_choice':'horde_breaker'}
         a=self.enemy('first',p.x+150,p.y,'rat');b=self.enemy('second',p.x+198,p.y,'rat');a.hp=a.max_hp;b.hp=b.max_hp
         await self.g.dnd_attack(p,enemy_id=a.id)
         self.assertEqual(p.last_roll['action'],'Rozbijacz hord')
@@ -70,8 +70,8 @@ class ReceiptIntegration(unittest.IsolatedAsyncioTestCase):
         target=Path(__file__).parent/'fixtures'/'savage_horde_fix4.json';target.parent.mkdir(exist_ok=True)
         target.write_text(json.dumps({'id':state['id'],'last_roll':state['last_roll'],'combat_log':state['combat_log'],'simulation_time':self.g.time},ensure_ascii=False),encoding='utf-8')
 
-    async def test_two_level_twenty_attacks_do_not_overwrite_the_first_receipt(self):
-        p=self.player('ranger',20);p.origin_feat='savage_attacker';e=self.enemy('target',p.x+150,p.y)
+    async def test_two_level_five_attacks_do_not_overwrite_the_first_receipt(self):
+        p=self.player('ranger',5);p.origin_feat='savage_attacker';e=self.enemy('target',p.x+150,p.y)
         await self.g.dnd_attack(p,enemy_id=e.id)
         attacks=[r for r in p.combat_log if r.get('check')=='attack']
         self.assertEqual(len(attacks),2)

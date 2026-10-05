@@ -73,19 +73,19 @@ class DruidCircleGame:
             if p.form or p.combat_until > self.now(): return await self.notice(p, 'Zmień środowisko po odpoczynku, poza walką.')
             data['land'] = value; data['land_change_ready'] = False
         elif action == 'lunar_radiant':
-            if circle != 'moon' or p.level < 25 or type(value) is not bool: return
+            if circle != 'moon' or p.level < 6 or type(value) is not bool: return
             data['lunar_radiant'] = value
         elif action == 'omen_armed':
-            if circle != 'stars' or p.level < 25 or type(value) is not bool: return
+            if circle != 'stars' or p.level < 6 or type(value) is not bool: return
             data['omen_armed'] = value
         elif action == 'natural_free':
-            if circle != 'land' or p.level < 25 or type(value) is not bool: return
+            if circle != 'land' or p.level < 6 or type(value) is not bool: return
             data['natural_free_armed'] = value and circles.spent(p, 'natural_free') == 0
         elif action == 'star_map':
             if circle != 'stars' or type(value) is not bool or not data.get('map_owned', True): return
             data['map_equipped'] = value
         elif action == 'restore_moonlight_step':
-            if circle != 'moon' or p.level < 45 or circles.spent(p, 'moonlight_step') == 0: return
+            if circle != 'moon' or p.level < 10 or circles.spent(p, 'moonlight_step') == 0: return
             cost = dnd.MANA_COSTS[2]
             if p.mana < cost: return await self.notice(p, f'Przywrócenie Księżycowego kroku wymaga {cost} many (II krąg).')
             self.spend_mana(p, cost); data['moonlight_step_spent'] = circles.spent(p, 'moonlight_step')-1
@@ -93,7 +93,7 @@ class DruidCircleGame:
             if not isinstance(value, str): return
             ally = self.players.get(value) if value else None
             if ally and self.friendly_target_error(p, ally, 192 if action == 'chalice_target' else 64): return
-            if action == 'chalice_target' and circle != 'stars' or action == 'shared_moonlight_target' and (circle != 'moon' or p.level < 65): return
+            if action == 'chalice_target' and circle != 'stars' or action == 'shared_moonlight_target' and (circle != 'moon' or p.level < 14): return
             circles.runtime(p)[action] = value
         elif action == 'dismiss_star_form':
             p.buffs.pop('starry_form', None); circles.runtime(p).pop('starry_form', None)
@@ -126,7 +126,7 @@ class DruidCircleGame:
                 data['map_owned'] = True  # The replacement ceremony is performed during the rest.
         elif kind == 'short':
             data['shape_spent'] = max(0, circles.spent(p, 'shape')-1)
-            if circles.circle(p) == 'land' and p.level >= 25 and not circles.spent(p, 'natural_recovery') and p.mana < p.max_mana:
+            if circles.circle(p) == 'land' and p.level >= 6 and not circles.spent(p, 'natural_recovery') and p.mana < p.max_mana:
                 restored = min(p.max_mana-p.mana, caster.recovery_amount(p))
                 p.mana += restored; circles.spend(p, 'natural_recovery')
                 self.caster_message(p, f'Naturalne odzyskanie: +{restored:g} many.')
@@ -138,7 +138,7 @@ class DruidCircleGame:
         if circle == 'stars' and key == 'guiding_bolt' and circles.state(p).get('map_equipped', True) and circles.feature_remaining(p, 'guiding_bolt'):
             # Free casting grants the base spell, not a free higher-level slot.
             if spec.get('cast_circle', spec.get('circle', 1)) == 1: return 0, 'guiding_bolt'
-        if circle == 'land' and p.level >= 25 and circles.state(p).get('natural_free_armed') and not circles.spent(p, 'natural_free') and key in circles.bonus_spells(p) and spec.get('circle', 0) > 0:
+        if circle == 'land' and p.level >= 6 and circles.state(p).get('natural_free_armed') and not circles.spent(p, 'natural_free') and key in circles.bonus_spells(p) and spec.get('circle', 0) > 0:
             if spec.get('cast_circle', spec['circle']) == spec['circle']: return 0, 'natural_free'
         return spec.get('mana', 0), ''
 
@@ -154,7 +154,7 @@ class DruidCircleGame:
         valid = [q for q in candidates if q and q.hp < q.max_hp and not self.friendly_target_error(p, q, 192)]
         if not valid: return
         target = valid[0]
-        result = rules.roll_damage(self.combat_rng, (2 if p.level >= 45 else 1, 8, circles.wisdom(p)))
+        result = rules.roll_damage(self.combat_rng, (2 if p.level >= 10 else 1, 8, circles.wisdom(p)))
         amount = min(target.max_hp-target.hp, result['damage'])
         target.hp += amount; self.join_pvp_support(p, target)
         self.report_roll(p, target, dict(result, check='healing', hit=True, healing=amount, damage=0), 'Gwiezdny Kielich', p)
@@ -164,7 +164,7 @@ class DruidCircleGame:
         """Call before the d20, so an omen cannot be chosen after the outcome."""
         if not getattr(actor, 'alive', False): return 0
         for owner in sorted(self.players.values(), key=lambda q: str(q.id)):
-            if circles.circle(owner) != 'stars' or owner.level < 25 or not self._circle_available(owner, actions=False): continue
+            if circles.circle(owner) != 'stars' or owner.level < 6 or not self._circle_available(owner, actions=False): continue
             data = circles.state(owner)
             if not data.get('omen_armed') or circles.feature_remaining(owner, 'omen') <= 0: continue
             if owner.reaction_ready > self.now() or rules.active_buff(owner, 'no_reactions') or not same_floor(owner, actor) or distance(owner, actor) > 192 or not self._circle_visible(owner, actor): continue
@@ -195,7 +195,7 @@ class DruidCircleGame:
             result['damage'] += extra['damage']; result['damage_dice'] += ' + ' + rules.dice_text(rider['dice'])
             result['beast_extra_rolls'] = extra['damage_rolls']
             rules.record_damage_roll(result, extra, 'Cios przemiany')
-        if circles.circle(p) != 'moon' or p.level < 65 or not circles.wild_shape_active(p): return
+        if circles.circle(p) != 'moon' or p.level < 14 or not circles.wild_shape_active(p): return
         rt = circles.runtime(p); now = self.now()
         rules.begin_feat_turn(p, now)
         if rt.get('lunar_damage_turn') == p._feat_turn_until: return
@@ -355,7 +355,7 @@ class DruidCircleGame:
         friends.sort(key=lambda q: (q.id != target_id, q is not p, q.hp/max(1, q.max_hp)))
         if not foes and not any(q.hp < q.max_hp for q in friends): return await self.notice(p, 'Brak celu pomocy ziemi w tym miejscu.')
         if not circles.spend_shape(p): return await self.notice(p, 'Brak użyć Dzikiego kształtu.')
-        self.begin_action(p); dice = 2+(p.level >= 45)+(p.level >= 65)
+        self.begin_action(p); dice = 2+(p.level >= 10)+(p.level >= 14)
         for foe in foes: self._circle_damage(p, foe, key, (dice, 6, 0), 'necrotic', 'constitution', True)
         if friends:
             ally = next((q for q in friends if q.hp < q.max_hp), friends[0]); roll = rules.roll_damage(self.combat_rng, (dice, 6, 0))
@@ -386,7 +386,7 @@ class DruidCircleGame:
             if not self.blocked(point.x, point.y, floor=p.floor) and self._circle_visible(p, point) and not (p.pvp_combat_until > self.now() and self.in_safe(point)):
                 destination = point; break
         if destination is None: return await self.notice(p, 'Nie ma widocznego wolnego miejsca na teleport.')
-        companion = self.players.get(circles.runtime(p).get('shared_moonlight_target', '')) if p.level >= 65 else None
+        companion = self.players.get(circles.runtime(p).get('shared_moonlight_target', '')) if p.level >= 14 else None
         ally_dest = None
         if companion and not self.friendly_target_error(p, companion, 64):
             for ox, oy in ((32, 0), (-32, 0), (0, 32), (0, -32), (32, 32), (-32, -32)):
@@ -423,7 +423,7 @@ class DruidCircleGame:
             p.buffs['wrath_of_sea'] = dict(until=now+300, owner=p.id, level=p.level, wisdom=max(1, circles.wisdom(p)), dc=rules.spell_dc(p), spell_id=key)
         aura = p.buffs.get('wrath_of_sea', {})
         if aura.get('until', 0) <= now: return
-        radius = 64 if aura.get('level', 0) >= 25 else 32
+        radius = 64 if aura.get('level', 0) >= 6 else 32
         foes = [] if self.in_safe(p) else self._circle_hostiles(p, p, radius)
         selected = enemy_id or target_id or p.auto_enemy_id or p.auto_target_id
         foes.sort(key=lambda q: (q.id != selected, distance(p, q)))
@@ -446,7 +446,7 @@ class DruidCircleGame:
             form = key.rsplit('_', 1)[-1]
             if form not in ('archer', 'chalice', 'dragon'): return
             if form == current: return
-            switching = bool(current and p.level >= 45)
+            switching = bool(current and p.level >= 10)
             if switching:
                 if rt.get('star_switch_ready', 0) > now: return
                 rt['star_switch_ready'] = now+rules.ROUND_SECONDS
@@ -471,7 +471,7 @@ class DruidCircleGame:
                 await self.notice(p, 'W bezpiecznej osadzie nie można strzelać.' if self.in_safe(p) else 'Brak przeciwnika w zasięgu Gwiezdnej strzały.')
             return
         target = targets[0]
-        self._circle_damage(p, target, key, (2 if p.level >= 45 else 1, 8, circles.wisdom(p)), 'radiant', attack=True)
+        self._circle_damage(p, target, key, (2 if p.level >= 10 else 1, 8, circles.wisdom(p)), 'radiant', attack=True)
         self.spell_effect(p,'circle_star_arrow',target,[target],spec=dnd.SPELLS['circle_star_arrow'],visual_only=True)
         self.tag(p); await self._circle_kills([target])
 
@@ -480,7 +480,7 @@ class DruidCircleGame:
         if not circles.feature_allowed(p, key) or not self._circle_available(p): return
         if enemy_id is not None and not isinstance(enemy_id, str) or target_id is not None and not isinstance(target_id, str) or enemy_id and target_id: return
         spec = dnd.SPELLS[key]
-        switching = key.startswith('circle_star_') and key != 'circle_star_arrow' and circles.starry_form(p) and p.level >= 45
+        switching = key.startswith('circle_star_') and key != 'circle_star_arrow' and circles.starry_form(p) and p.level >= 10
         ready = p.bonus_cooldown_until if spec['action'] == 'bonus' else p.attack_cooldown_until
         if self.now() < ready and not switching: return
         self.cancel_rest(p); self.cancel_channel(p, '')

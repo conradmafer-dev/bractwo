@@ -41,7 +41,7 @@ class HordeBreakerTests(unittest.IsolatedAsyncioTestCase):
         self.g.legacy_enemies = []
         self.addCleanup(self.g.db.close)
 
-    def hero(self, level=10, weapon=None):
+    def hero(self, level=3, weapon=None):
         p = self.player('ranger', level)
         p.promoted = True
         p.martial_archetype = 'hunter'
@@ -117,8 +117,8 @@ class HordeBreakerTests(unittest.IsolatedAsyncioTestCase):
                             for fx in self.g.effects))
         self.assertGreater(p.martial_state['horde_until'], self.clock())
 
-    async def test_no_third_target_even_with_two_regular_attacks_at_level_20(self):
-        p = self.hero(20)
+    async def test_no_third_target_even_with_two_regular_attacks_at_level_5(self):
+        p = self.hero(5)
         a, b = self.pair(p, hp=999)
         third = self.enemy('fix3_third', x=a.x+60, kind='rat')
         third.hp = third.max_hp
@@ -202,18 +202,18 @@ class HordeBreakerTests(unittest.IsolatedAsyncioTestCase):
         p = self.hero()
         a, b = self.pair(p)
         b.alive = False
-        q = self.player('knight', 10, '2')
+        q = self.player('knight', 3, '2')
         q.x = a.x+48
         for mode in ('uninvolved', 'safety', 'party', 'low_level'):
             with self.subTest(mode=mode):
                 p.pvp_safety = mode == 'safety'
                 p.party_id = q.party_id = 'group' if mode == 'party' else ''
-                q.level = 1 if mode == 'low_level' else 10
+                q.level = 1 if mode == 'low_level' else 3
                 p.aggressors = {} if mode == 'uninvolved' else {q.id: self.clock()+20}
                 self.assertIsNone(self.g.martial_horde_breaker(p, a))
         p.pvp_safety = False
         p.party_id = q.party_id = ''
-        q.level = 10
+        q.level = 3
         before = q.hp
         self.assertIs(self.g.martial_horde_breaker(p, a), q)
         self.assertLess(q.hp, before)
@@ -236,13 +236,14 @@ class HordeBreakerTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn('może chybić', description)
         self.assertNotIn('stóp', description)
         tough = equipment_rules.GENERAL_FEATS['tough']['description']
-        self.assertIn('5 poziomów', tough)
+        self.assertIn('poziom', tough)
+        self.assertNotIn('5 poziomów', tough)
         self.assertNotIn('D&D', tough)
         self.assertNotIn('×', tough)
 
     def test_tough_description_change_does_not_change_its_health_bonus(self):
         p = self.hero()
-        for level, expected in ((1, 2), (5, 4), (10, 6), (23, 10), (95, 40), (500, 40)):
+        for level, expected in ((1, 2), (2, 4), (3, 6), (5, 10), (20, 40), (500, 40)):
             with self.subTest(level=level):
                 p.level = level
                 p.origin_feat = ''

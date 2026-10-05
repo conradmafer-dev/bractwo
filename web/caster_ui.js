@@ -44,7 +44,7 @@
   if(!p?.alive)return 'Krąg wybierzesz po odrodzeniu.';
   if(p.form)return 'Krąg wybierzesz po zakończeniu przemiany.';
   if(p.combat_remaining>0)return 'Krąg wybierzesz po zakończeniu walki.';
-  if(p.level<(c?.required_level||10))return 'Wybór od poziomu '+(c?.required_level||10)+'.';
+  if(p.level<(c?.required_level||3))return 'Wybór od poziomu '+(c?.required_level||3)+'.';
   if(c?.required_promotion&&!(c.promotion_met??p.promoted))return `Najpierw kup promocję u mistrza profesji w mieście: ${p.promotion?.cost??2000} złota.`;
   return c?.pending?'':'Wybór kręgu jest teraz niedostępny.';
  }
@@ -77,7 +77,7 @@
   box.append(node('h3','Krąg druida'));
   if(!c.id){
    const choice=circleCandidates.get(String(p.id))||{},candidate=choice.id||'',cards=node('div',undefined,'caster-order-grid');
-   box.append(node('small','Wybierz jeden krąg od poziomu '+(c.required_level||10)+(c.required_promotion?' po uzyskaniu promocji.':'.')+' Wybór jest stały.'));
+   box.append(node('small','Wybierz jeden krąg od poziomu '+(c.required_level||3)+(c.required_promotion?' po uzyskaniu promocji.':'.')+' Wybór jest stały.'));
    for(const option of c.options||[]){
     const b=button('',()=>{circleCandidates.set(String(p.id),{...choice,id:option.id});parent.replaceChildren();feats(parent,current(),h);});b.className='caster-order'+(candidate===option.id?' candidate':'');b.dataset.circle=option.id;b.setAttribute('aria-pressed',String(candidate===option.id));
     b.append(image(option.icon||circleIcons[option.id]),node('strong',option.name),node('small',option.description));cards.append(b);
@@ -111,7 +111,7 @@
   for(const action of c.actions||[]){
    const b=button(circleActionLabel(action,c),()=>{const latest=h.state?.().player||p,circle=latest.character_sheet?.caster?.circle,current=circle?.actions?.find(a=>a.id===action.id);if(!latest.alive||!current?.enabled)return;if(current.kind==='spell')h.cast(current.id);else h.send({type:'circle_command',action:current.id,...(current.kind==='toggle'?{value:!circleToggleValue(circle,current.id)}:{})});},!p.alive||!action.enabled);b.dataset.circleAction=action.id;if(action.kind==='toggle')b.setAttribute('aria-pressed',String(circleToggleValue(c,action.id)));buttons.append(b);
   }box.append(buttons);
-  const targetAction=c.id==='stars'?'chalice_target':c.id==='moon'&&p.level>=65?'shared_moonlight_target':'';
+  const targetAction=c.id==='stars'?'chalice_target':c.id==='moon'&&c.features?.some(f=>f.id==='lunar_form'&&f.unlocked)?'shared_moonlight_target':'';
   if(targetAction){
    const targets=node('div',undefined,'circle-target-controls');targets.append(node('small',targetAction==='chalice_target'?'Dodatkowe leczenie Kielicha · sojusznik w 30 stopach':'Wspólny Księżycowy krok · sojusznik w 10 stopach'));
    const choose=button('Użyj zaznaczonego sojusznika',()=>{const latest=h.state?.().player||p,ally=h.selectedAlly?.();if(circleTargetAllowed(latest,ally,targetAction))h.send({type:'circle_command',action:targetAction,value:String(ally.id)});});choose.dataset.circleTarget=targetAction;choose.dataset.circleTargetMode='selected';
@@ -128,7 +128,7 @@
   if(!p?.alive)return 'Szkołę wybierzesz po odrodzeniu.';
   if(p.form)return 'Szkołę wybierzesz po zakończeniu przemiany.';
   if(p.combat_remaining>0)return 'Szkołę wybierzesz po zakończeniu walki.';
-  if(p.level<(s?.required_level||10))return `Wybór od poziomu ${s?.required_level||10}. Promocja u mistrza profesji w mieście: ${p.promotion?.cost??2000} złota.`;
+  if(p.level<(s?.required_level||3))return `Wybór od poziomu ${s?.required_level||3}. Promocja u mistrza profesji w mieście: ${p.promotion?.cost??2000} złota.`;
   if(!(s?.promotion_met??p.promoted))return `Najpierw kup promocję u mistrza profesji w mieście: ${p.promotion?.cost??2000} złota.`;
   return s?.pending&&s.eligible!==false?'':'Wybór szkoły jest teraz niedostępny.';
  }
@@ -173,7 +173,7 @@
   box.append(node('h3','Szkoła czarodzieja'));
   if(!s.id){
    const choice=schoolCandidates.get(String(p.id))||{},cards=node('div',undefined,'caster-order-grid wizard-school-grid');
-   box.append(node('small','Jedna szkoła od poziomu '+(s.required_level||10)+', po uzyskaniu promocji na Arcymaga. Możesz wcześniej poznać wszystkie zdolności.'));
+   box.append(node('small','Jedna szkoła od poziomu '+(s.required_level||3)+', po uzyskaniu promocji na Arcymaga. Możesz wcześniej poznać wszystkie zdolności.'));
    for(const option of s.options||[]){
     const b=button('',()=>{const old=schoolCandidates.get(String(p.id));schoolCandidates.set(String(p.id),{id:option.id,confirmed:old?.id===option.id&&!!old.confirmed});parent.replaceChildren();feats(parent,current(),h);});
     b.className='caster-order wizard-school'+(choice.id===option.id?' candidate':'');b.dataset.school=option.id;b.setAttribute('aria-pressed',String(choice.id===option.id));
@@ -277,7 +277,7 @@
  function createPrompt(h){const p=node('section',undefined,'fighter-choice caster-choice');p.id='casterChoice';p.hidden=true;
   const head=node('header'),title=node('strong'),description=node('p'),choose=button('Wybierz',()=>h.open('feats'));head.append(title,button('×',close));p.append(head,description,choose);
   (document.getElementById('hudLeftRail')||document.getElementById('gameUI')).append(p);const closed=new Set();
-  function pending(x){const c=x?.character_sheet?.caster;return c?.school?.pending&&(c.school.promotion_met??x.promoted)&&x.level>=(c.school.required_level||10)?'school':c?.circle?.pending?'circle':c?.order_pending?'order':'';}
+  function pending(x){const c=x?.character_sheet?.caster;return c?.school?.pending&&(c.school.promotion_met??x.promoted)&&x.level>=(c.school.required_level||3)?'school':c?.circle?.pending?'circle':c?.order_pending?'order':'';}
   function key(x){return pending(x)==='school'?'bractwo-wizard-school-choice-v1:'+x.id:pending(x)==='circle'?'bractwo-druid-circle-choice-v1:'+x.id:'bractwo-druid-choice-v1:'+x.id;}
   function close(){const x=h.player();if(x){closed.add(key(x));try{localStorage.setItem(key(x),'1');}catch{}}sync();}
   function sync(){const x=h.player(),kind=pending(x);let hidden=!kind;if(x){hidden=hidden||closed.has(key(x));try{hidden=hidden||localStorage.getItem(key(x))==='1';}catch{}}p.hidden=hidden;title.textContent=kind==='school'?'Szkoła czarodzieja':kind==='circle'?'Krąg druida':'Ścieżka druida';description.textContent=kind==='school'?'Promocja odblokowała wybór szkoły magii. Poznaj cztery szkoły i wybierz jedną.':kind==='circle'?'Wybierz krąg Ziemi, Księżyca, Morza lub Gwiazd.':'Strażnik czy Mistyk natury?';choose.textContent=kind==='school'?'Wybierz szkołę':kind==='circle'?'Wybierz krąg':'Wybierz ścieżkę';}

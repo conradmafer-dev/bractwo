@@ -36,7 +36,7 @@ class GameIntegration(unittest.IsolatedAsyncioTestCase):
 
     def tearDown(self):self.game.db.close()
 
-    def player(self,class_id='knight',level=20):
+    def player(self,class_id='knight',level=5):
         city=next(c for c in content.CITIES if c['id']=='przystan')
         p=Player('1','Integration',WS(),class_id=class_id,level=level,x=city['x'],y=city['y'],gold=10000)
         self.game.starter(p);p.current_wall_time=self.clock();p.hp=p.max_hp;p.mana=p.max_mana

@@ -1,7 +1,7 @@
 """Warrior's permanent choices and weapon rules (0.8.13).
 
-Original Polish summaries. Cooldowns, automatic standing and the level mapping
-are Bractwo adaptations. Equipment, rolls and choices are server authoritative.
+Original Polish summaries. Cooldowns and automatic standing are Bractwo
+adaptations. Equipment, rolls and choices are server authoritative.
 """
 import math
 
@@ -91,7 +91,7 @@ def configure(items, spells, classes):
     classes['knight'].update(description='Styl walki, mistrzostwo broni, kolczuga i tarcza. Drugi oddech bez many.',
         ability_cost=0, ability_cooldown=0)
     spells['second_wind'].update(mana=0, cooldown=0,
-        description='Akcja dodatkowa: odzyskaj 1k10 + poziom D&D HP. Krótki odpoczynek odnawia jedno użycie, długi wszystkie.')
+        description='Akcja dodatkowa: odzyskaj 1k10 + poziom postaci HP (maks. +20). Krótki odpoczynek odnawia jedno użycie, długi wszystkie.')
     # The three implemented mastery types; variants retain their original damage.
     for key, item in items.items():
         if item.get('slot') != 'weapon': continue
@@ -124,7 +124,7 @@ def configure(items, spells, classes):
             spec=MASTERIES[item['weapon_type']]
             item.update(mastery_name=spec['effect_name'], mastery_description=spec['description'], mastery_icon=spec['icon'])
     spells['action_surge']=dict(id='action_surge', name='Zryw akcji', english='Action Surge', circle=0,
-        class_ids=['knight'], class_levels={'knight':5}, min_level=5, kind='surge', action='extra',
+        class_ids=['knight'], class_levels={'knight':2}, min_level=2, kind='surge', action='extra',
         description='Natychmiast wykonaj dodatkową akcję ataku przeciw wybranemu celowi. Obejmuje wszystkie twoje ataki; nie odnawia czarów ani Drugiego oddechu. Bez many. Odnowienie: 90 s.',
         feature=True, source='Zdolność klasy · adaptacja Bractwa', mana=0, cooldown=ACTION_SURGE_COOLDOWN,
         targeting='hostile', range=108, pvp=True, icon='assets/spells/action_surge.svg', effect='spell',

@@ -1,4 +1,4 @@
-"""Promotion archetypes: D&D 2014 combat features, with Bractwo level/turn mapping.
+"""Promotion archetypes: D&D 2014 combat features, with Bractwo turns.
 
 Selection and remaining resources are private to the owner. This release adds
 the starting combat package; the catalogue deliberately lists only implemented
@@ -11,7 +11,7 @@ except ImportError:
 
 ARCHETYPES = {
     'battle_master': dict(name='Mistrz Bitewny', class_id='knight', description='Wybierz trzy manewry. Kości przewagi odnawiasz podczas krótkiego lub długiego odpoczynku.'),
-    'champion': dict(name='Czempion', class_id='knight', description='Trafienia krytyczne bronią przy naturalnym 19–20. Od poziomu 70: 18–20. Nie obejmuje czarów i towarzysza.'),
+    'champion': dict(name='Czempion', class_id='knight', description='Trafienia krytyczne bronią przy naturalnym 19–20. Od poziomu 15: 18–20. Nie obejmuje czarów i towarzysza.'),
     'hunter': dict(name='Hunter · Myśliwy', class_id='ranger', description='Wybierz jedną technikę polowania. Dotychczasowe czary i wilczy towarzysz pozostają dostępne.'),
 }
 MANEUVERS = {
@@ -121,7 +121,7 @@ def sheet(p):
         reaction=data.get('reaction', '') if active == 'battle_master' else '',
         actions_available=bool(active and actions_available(p)), critical_threshold=critical_threshold(p),
         source='D&D 5e 2014 · początkowe zdolności bojowe',
-        scaling='Kości: 4k8 od poziomu 10; 5k8 od 30; 5k10 od 45; 6k10 od 70; 6k12 od 85.' if key == 'battle_master' else '')
+        scaling='Kości: 4k8 od poziomu 3; 5k8 od 7; 5k10 od 10; 6k10 od 15; 6k12 od 18.' if key == 'battle_master' else '')
 
 
 def configure(spells, statuses):

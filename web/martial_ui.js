@@ -22,7 +22,8 @@
   if(p.form)return 'Specjalizację wybierzesz po zakończeniu przemiany.';
   if(p.rest?.kind||p.rest?.remaining>0)return 'Najpierw zakończ odpoczynek.';
   if(p.combat_remaining>0)return 'Specjalizację wybierzesz po zakończeniu walki.';
-  if(!Number.isFinite(p.level)||p.level<10)return 'Wybór od poziomu 10 po uzyskaniu promocji.';
+  const required=s.required_level??p.promotion?.required_level??3;
+  if(!Number.isFinite(p.level)||p.level<required)return `Wybór od poziomu ${required} po uzyskaniu promocji.`;
   if(!(s.promotion_met===true||s.promotion_met===undefined&&p.promoted===true))return 'Najpierw kup promocję u mistrza profesji w mieście.';
   if(s.pending!==true||s.eligible!==true||!options(p).length)return s.selection_reason||'Wybór specjalizacji jest teraz niedostępny.';
   return '';
@@ -75,7 +76,7 @@
    box.append(node('h4',title),node('p',hint,'sheet-hint'));
    for(const m of entries){const row=node('article',undefined,'martial-control');row.dataset.martialControl=m.id;row.append(image(m.id));const text=node('div');text.append(node('strong',m.name||NAMES[m.id]),node('p',m.description||''),node('small',REACTIONS.includes(m.id)?'Koszt: 1 kość przewagi i reakcja.':'Koszt: 1 kość przewagi; część ataku bronią.'));const b=button(actionLabel(p,m.id),()=>{const packet=actionPacket(current(),m.id);if(packet)h.send(packet);});b.dataset.martialAction=m.id;text.append(b);row.append(text);box.append(row);}
   }
-  box.append(node('small','Pula rośnie do 5 kości na poziomie 30 i 6 na poziomie 70. Kości rosną do k10 na poziomie 45 i k12 na poziomie 85.','sheet-hint'));parent.append(box);sync(box,p);
+  box.append(node('small','Pula rośnie do 5 kości na poziomie 7 i 6 na poziomie 15. Kości rosną do k10 na poziomie 10 i k12 na poziomie 18.','sheet-hint'));parent.append(box);sync(box,p);
  }
  function feats(parent,p,h){
   if(!ARCHETYPES[p?.class_id])return;
@@ -86,11 +87,11 @@
    if(s.id){
     const id=s.id,chosen=options(latest).find(o=>o.id===id);if(!ARCHETYPES[latest.class_id]?.includes(id)){section.append(node('p','Specjalizacja jest teraz niedostępna.','sheet-hint'));return;}
     const title=node('div',undefined,'martial-current');title.append(image(id),node('strong',s.name||chosen?.name||NAMES[id]));section.append(title);
-    if(id==='champion'){const threshold=[18,19].includes(s.critical_threshold)?s.critical_threshold:19;section.append(node('p',`Trafienie krytyczne bronią przy naturalnym ${threshold===18?'18, 19 lub 20':'19 lub 20'} na k20.`),node('small','Od poziomu 70: trafienie krytyczne również przy naturalnym 18.','sheet-hint'));}
+    if(id==='champion'){const threshold=[18,19].includes(s.critical_threshold)?s.critical_threshold:19;section.append(node('p',`Trafienie krytyczne bronią przy naturalnym ${threshold===18?'18, 19 lub 20':'19 lub 20'} na k20.`),node('small','Od poziomu 15: trafienie krytyczne również przy naturalnym 18.','sheet-hint'));}
     if(id==='hunter'){const prey=preyOptions(latest).find(o=>o.id===s.prey);if(prey){const row=node('article',undefined,'martial-control');row.append(image(prey.id));const text=node('div');text.append(node('strong',prey.name||NAMES[prey.id]),node('p',prey.description||''),node('small',prey.id==='giant_killer'?'Działa automatycznie; zużywa dostępną reakcję.':'Działa automatycznie przy spełnieniu warunków.'));row.append(text);section.append(row);}}
     actions(section,latest,h);return;
    }
-   section.append(node('p','Od poziomu 10 po uzyskaniu promocji. Wybór jest bezpłatny i stały; nie zużywa punktu atutu.','sheet-hint'));
+   section.append(node('p',`Od poziomu ${s.required_level??latest.promotion?.required_level??3} po uzyskaniu promocji. Wybór jest bezpłatny i stały; nie zużywa punktu atutu.`,'sheet-hint'));
    const c=candidates.get(k)||{id:'',maneuvers:[],prey:'',confirmed:false},grid=node('div',undefined,'martial-options');grid.setAttribute('aria-label','Wybór specjalizacji');
    for(const o of options(latest)){const b=button('',()=>{const old=candidates.get(k);candidates.set(k,old?.id===o.id?old:{id:o.id,maneuvers:[],prey:'',confirmed:false});paint();});b.className='martial-option'+(c.id===o.id?' selected':'');b.dataset.martialArchetype=o.id;b.setAttribute('aria-pressed',String(c.id===o.id));b.append(image(o.id),node('strong',o.name||NAMES[o.id]),node('small',o.description||''));grid.append(b);}section.append(grid);
    const selected=options(latest).find(o=>o.id===c.id);

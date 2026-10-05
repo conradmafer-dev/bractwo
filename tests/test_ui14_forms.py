@@ -10,7 +10,7 @@ class OwnerForms(unittest.IsolatedAsyncioTestCase):
     def setUp(self):
         self.clock=base.Clock();self.g=Game(':memory:',clock=self.clock)
         self.g.combat_rng=base.Dice(d20=19)
-        self.p=self.player('druid',15);self.p.druid_circle='stars';self.g.migrate_druid_circle(self.p)
+        self.p=self.player('druid',4);self.p.druid_circle='stars';self.g.migrate_druid_circle(self.p)
     def tearDown(self):self.g.db.close()
     def public(self):return self.p.public(self.clock(),private=True)
     def advance(self,dt=3.1):self.clock.advance(dt);self.p.current_wall_time=self.clock()
@@ -59,7 +59,7 @@ class OwnerForms(unittest.IsolatedAsyncioTestCase):
         self.assertLess(enemy.hp,hp);self.assertEqual(circles.shape_remaining(self.p),0)
         self.assertEqual(self.p.mana,0);self.assertEqual(circles.starry_form(self.p),'archer')
     async def test_high_level_switch_updates_canonical_buff_and_status(self):
-        self.p.level=45;await self.g.cast_circle_feature(self.p,'circle_star_archer')
+        self.p.level=10;await self.g.cast_circle_feature(self.p,'circle_star_archer')
         self.advance();spent=circles.shape_remaining(self.p)
         await self.g.cast_circle_feature(self.p,'circle_star_dragon')
         self.assertEqual(self.p.buffs['starry_form']['form'],'dragon')

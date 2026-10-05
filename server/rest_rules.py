@@ -22,7 +22,7 @@ def maximum(p,key):
     if key=='arcane_recovery':return int(p.class_id=='mage')
     if key=='second_wind':return 2+int(level>=4)+int(level>=10) if p.class_id=='knight' else 0
     if key=='action_surge':return 1+int(level>=17) if p.class_id=='knight' and level>=2 else 0
-    if key=='animal_companion':return int(p.class_id=='ranger' and p.level>=10)
+    if key=='animal_companion':return int(p.class_id=='ranger' and p.level>=3)
     return 0
 
 def spent(p,key):

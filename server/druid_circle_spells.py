@@ -40,7 +40,7 @@ def configure(spells, statuses):
     """Called after base catalogue; deliberately no global class unlocks."""
     def add(key, name, circle, kind, range_ft, **kw):
         spec = dict(id=key, name=name, english=key.replace('_', ' ').title(), words=name,
-            circle=circle, class_ids=[], class_levels={}, class_min_levels={}, min_level=max(1,(circle-1)*10),
+            circle=circle, class_ids=[], class_levels={}, class_min_levels={}, min_level=max(1,2*circle-1),
             kind=kind, action='action', mana=dnd.MANA_COSTS[circle], cooldown=0,
             range=range_ft*FT, radius=0, shape='circle', targeting='enemy', source='PHB 2024',
             description='', icon=f'assets/spells/{key}.svg', effect='spell',

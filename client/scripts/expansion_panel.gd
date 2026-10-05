@@ -108,11 +108,13 @@ func refresh() -> void:
 		for milestone: Dictionary in w.get("class_progression", {}).get(str(p.get("class_id", "")), []):
 			text("%s Poziom %d · %s" % ["✓" if level >= int(milestone["level"]) else "◇", int(milestone["level"]), milestone["name"]], true)
 			text(str(milestone["description"]))
-		action("Promocja profesji · 2000 zł", {"type":"promote"}, master and level >= 20 and gold >= 2000 and not bool(p.get("promoted", false)))
-		text("Punkty specjalizacji: %d. Pierwszy na poziomie 50, następne co 5 poziomów. Maks. 20 na gałąź." % int(p.get("mastery_points", 0)), true)
+		var promotion: Dictionary = p.get("promotion", {})
+		var promotion_cost: int = int(promotion.get("cost", 2000))
+		action("Promocja profesji · %d zł" % promotion_cost, {"type":"promote"}, master and level >= int(promotion.get("required_level", 3)) and gold >= promotion_cost and not bool(p.get("promoted", false)))
+		text("Punkty specjalizacji: %d. Pierwszy na poziomie 11, następne co poziom. Maks. 20 na gałąź." % int(p.get("mastery_points", 0)), true)
 		for id: String in ["power", "vitality", "focus"]:
 			var descriptions: Dictionary = {"power":"Potęga: bez premii do Iskry i czarów" if str(p.get("class_id", "")) == "mage" else "Potęga: broń +1 obr./10 pkt (maks. +2), nie przemiany", "vitality":"Witalność: +2 HP", "focus":"Skupienie: +4 many"}
-			action("%s · %d/20 · dodaj" % [descriptions[id], int(p.get("mastery", {}).get(id, 0))], {"type":"mastery", "branch":id}, free and bool(p.get("promoted", false)) and level >= 50 and int(p.get("mastery_points", 0)) > 0 and int(p.get("mastery", {}).get(id, 0)) < 20)
+			action("%s · %d/20 · dodaj" % [descriptions[id], int(p.get("mastery", {}).get(id, 0))], {"type":"mastery", "branch":id}, free and bool(p.get("promoted", false)) and level >= 11 and int(p.get("mastery_points", 0)) > 0 and int(p.get("mastery", {}).get(id, 0)) < 20)
 		action("Wyzeruj specjalizację · 200 zł", {"type":"mastery_reset"}, master and gold >= 200)
 	elif tab == "Atlas":
 		text("Klik: przybliż · prawy klik: oddal · przeciągnij: przesuń. Atlas nie zamyka się po kliknięciu.")
@@ -171,13 +173,13 @@ func refresh() -> void:
 				route("%s · %s" % [npc["name"], host._direction_to(npc)], npc)
 		for city: Dictionary in w.get("cities", []):
 			var cost: int = 40 + int(here.distance_to(Vector2(city["x"], city["y"])) / 1000.0) * 8
-			action("Rejs: %s · %d zł" % [city["name"], cost], {"type":"travel", "city_id":city["id"]}, not captain.is_empty() and captain.get("city_id", "") != city["id"] and free and level >= 8 and gold >= cost)
+			action("Rejs: %s · %d zł" % [city["name"], cost], {"type":"travel", "city_id":city["id"]}, not captain.is_empty() and captain.get("city_id", "") != city["id"] and free and level >= 2 and gold >= cost)
 		text("Bank: %d zł · depozyt %d/120 · odrodzenie: %s" % [int(p.get("bank_gold", 0)), p.get("depot", []).size(), p.get("home_city", "przystan")], true)
 		action("Wpłać całe złoto", {"type":"bank_deposit", "amount":"all"}, not bank.is_empty() and free and gold > 0)
 		action("Wypłać 100 zł", {"type":"bank_withdraw", "amount":100}, not bank.is_empty() and free and int(p.get("bank_gold", 0)) >= 100)
 		action("Wypłać całe złoto", {"type":"bank_withdraw", "amount":"all"}, not bank.is_empty() and free and int(p.get("bank_gold", 0)) > 0)
 		action("Ustaw odrodzenie w tym mieście", {"type":"bind_city"}, not bank.is_empty() and free)
-		action("Błogosławieństwo · poz. 40 · 500 zł", {"type":"bless"}, master and level >= 40 and gold >= 500 and not bool(p.get("blessed", false)))
+		action("Błogosławieństwo · poz. 9 · 500 zł", {"type":"bless"}, master and level >= 9 and gold >= 500 and not bool(p.get("blessed", false)))
 		for item: Dictionary in p.get("inventory", []):
 			if not p.get("equipment", {}).values().has(item["uid"]):
 				action("Odłóż: " + str(item["name"]), {"type":"depot_store", "uid":item["uid"]}, not bank.is_empty() and free and p.get("depot", []).size() < 120)

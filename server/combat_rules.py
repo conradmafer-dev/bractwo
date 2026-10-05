@@ -1,5 +1,5 @@
 """Authoritative d20, explicit damage dice and bounded 5E-style statistics.
-Mana, 3-second rounds and delayed progression are documented Bractwo adaptations.
+Mana and 3-second rounds are documented Bractwo adaptations.
 """
 import math
 try:
@@ -8,12 +8,14 @@ try:
     from . import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment, magic_items
     from .dnd_content import circle_for
     from .progression import same_floor
+    from .level_rules import growth_level
 except ImportError:
     import world_content as content
     import fighter_rules as fighter
     import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment, magic_items
     from dnd_content import circle_for
     from progression import same_floor
+    from level_rules import growth_level
 
 ROUND_SECONDS=3.0
 HP_RULES_VERSION=1
@@ -21,9 +23,9 @@ RULES={'round_seconds':3.0,'attack_die':20,'critical':20,'automatic_miss':1,
        'manual_attacks':True,'auto_selected_target':True,'focus_auto_attack':False,'target_required':False,
        'shared_actions':['attack','cast_action'], 'bonus_action_seconds':3.0,
        'close_ranged_distance':72,'area_save':'spell_specific','save_damage':.5,
-       'circles_every_levels':10,'full_caster_circle_levels':[1,10,20,30,40,50,60,70,80],
+       'circles_every_levels':2,'full_caster_circle_levels':[1,3,5,7,9,11,13,15,17],
        'mana_budget':'per_level','mana_regen_in_combat':False,'hotbar_page_size':24,'hotbar_row_size':12,
-       'longstrider_rounds':600,'tabletop_round_seconds':6,'units_per_foot':6.4,'ranger_circles_every_levels':20,'ranger_circle_levels':[1,20,40,60,80],'cantrip_levels':[20,50,80],
+       'longstrider_rounds':600,'tabletop_round_seconds':6,'units_per_foot':6.4,'ranger_circles_every_levels':4,'ranger_circle_levels':[1,5,9,13,17],'cantrip_levels':[5,11,17],
        'mage_basic_dice':[1,4,0],'monster_returns_home':True,'monster_return_delay_seconds':24,'monster_chase_anchor':'current_position',
        'pvp_spells':True,'pvp_fields':True,'pvp_companions':True,'pvp_support':True,
        'rules_source':'SRD 5.2.1 + zasady własne Bractwa'}
@@ -38,7 +40,7 @@ def weapon_autoattack(p):
     return bool(p.form) or not gear.is_focus(gear.weapon(p))
 
 
-def effective_level(p): return min(20,max(1,1+int(p.level)//5))
+def effective_level(p): return min(20,max(1,int(p.level)))
 def proficiency(p): return 2+(effective_level(p)-1)//4
 
 def base_attributes(p):
@@ -52,7 +54,7 @@ def own_attributes(p):
     scores=base_attributes(p)
     # Only saved, pre-UI_28 level-up receipts replay their historical auto bonus.
     if getattr(p,'_legacy_auto_attributes',False):
-        scores[p.spec['primary']]=min(20,scores[p.spec['primary']]+2*(p.level>=20)+2*(p.level>=40))
+        scores[p.spec['primary']]=min(20,scores[p.spec['primary']]+2*(p.level>=5)+2*(p.level>=9))
     for ability,amount in gear.feat_ability_bonuses(p).items():
         scores[ability]=min(20,scores[ability]+amount)
     return scores
@@ -119,16 +121,16 @@ def legacy_max_hp(p):
     """Pre-UI_12 totals, retained for save migration and historical receipts."""
     # Wild Shape retains the druid's own maximum HP, even with a beast's CON.
     con=(own_attributes(p)['constitution']-10)//2
-    return (p.spec['hit_die']+con+((p.level-1)*(p.spec['hit_die']//2+1+con))//5+p.mastery.get('vitality',0)*2
+    return (p.spec['hit_die']+con+((growth_level(p)-1)*(p.spec['hit_die']//2+1+con))//5+p.mastery.get('vitality',0)*2
             +(2*effective_level(p) if gear.has_feat(p,'tough') else 0))
 
 
 def max_hp(p):
     if getattr(p,'hp_rules_version',HP_RULES_VERSION)<HP_RULES_VERSION:
         return legacy_max_hp(p)
-    # The first interval is 1 -> 5 (four advances), then 5 -> 10 -> ... -> 95.
-    # Round the accumulated gain once; individual level gains never lose fractions.
-    level=max(1,min(95,int(p.level)))
+    # Reuse the historical growth coordinate to preserve fractional HP earned
+    # between old milestones; new characters gain one hit die per level.
+    level=max(1,min(95,growth_level(p)))
     con=(own_attributes(p)['constitution']-10)//2
     die=p.spec['hit_die'];gain=max(1,die//2+1+con)
     numerator,denominator=(level-1,4) if level<5 else (level,5)
@@ -147,7 +149,7 @@ def migrate_hp(p):
     p._level_up_cache=None
     return refunded
 
-def cantrip_count(p):return 1+sum(p.level>=n for n in (20,50,80))
+def cantrip_count(p):return 1+sum(p.level>=n for n in (5,11,17))
 
 def equipped_item(p, slot):
     uid=p.equipment.get(slot, '')
@@ -175,8 +177,8 @@ def attack_range(p):
 
 def attacks_per_round(p):
     if p.form:return len(caster.form_spec(p).get('attacks',[1]))
-    if p.class_id=='knight':return 1+sum(p.level>=n for n in (20,50,95))
-    if p.class_id=='ranger':return 1+(p.level>=20)
+    if p.class_id=='knight':return 1+sum(p.level>=n for n in (5,11,20))
+    if p.class_id=='ranger':return 1+(p.level>=5)
     return 1
 
 def damage_type(p):

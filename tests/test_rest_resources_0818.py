@@ -24,7 +24,7 @@ class RestResources(unittest.IsolatedAsyncioTestCase):
         self.advance(REST_RULES[kind+'_seconds']+.01);self.g.tick_rest(p)
 
     async def test_short_10_seconds_heals_dice_and_arcane_once_per_long_rest(self):
-        p=self.player('mage',15);p.hp=1;p.mana=0
+        p=self.player('mage',4);p.hp=1;p.mana=0
         await self.g.start_rest(p,'short')
         self.assertEqual(p.rest_state['total'],10)
         self.advance(9.9);self.g.tick_rest(p)
@@ -36,14 +36,14 @@ class RestResources(unittest.IsolatedAsyncioTestCase):
         await self.finish(p,'short');self.assertEqual(p.mana,0)
 
     async def test_interrupt_does_not_spend_dice_or_reset_feature(self):
-        p=self.player('knight',15);p.hp=1;rest_rules.spend(p,'second_wind')
+        p=self.player('knight',4);p.hp=1;rest_rules.spend(p,'second_wind')
         before=dict(p.rest_resources)
         await self.g.start_rest(p,'short');self.advance(4);self.g.cancel_rest(p)
         self.advance(30);self.g.tick_rest(p)
         self.assertEqual(p.hp,1);self.assertEqual(p.rest_resources,before)
 
     async def test_long_30_seconds_recovers_all_in_field(self):
-        p=self.player('mage',15);p.hp=1;p.mana=0;rest_rules.spend(p,'arcane_recovery')
+        p=self.player('mage',4);p.hp=1;p.mana=0;rest_rules.spend(p,'arcane_recovery')
         await self.g.start_rest(p,'long');self.assertEqual(p.rest_state['total'],30)
         self.advance(29);self.g.tick_rest(p);self.assertEqual(p.mana,0)
         self.advance(1.1);self.g.tick_rest(p)
@@ -52,7 +52,7 @@ class RestResources(unittest.IsolatedAsyncioTestCase):
         await self.g.start_rest(p,'short');self.assertEqual(p.rest_state['kind'],'short')
 
     async def test_reconnect_preserves_uses_and_rest_deadline(self):
-        p=self.player('druid',25);p.druid_circle='land';dc.spend_shape(p,2)
+        p=self.player('druid',6);p.druid_circle='land';dc.spend_shape(p,2)
         rest_rules.spend(p,'hit_dice');p.rest_resources['long_ready']=self.clock()+60
         saved=json.loads(json.dumps(p.save_data()))
         q=self.g.load_player(p.id,p.name,base.WS(),saved)
@@ -61,7 +61,7 @@ class RestResources(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(q.rest_resources['long_ready'],p.rest_resources['long_ready'])
 
     async def test_warrior_short_rest_recovers_one_wind_and_all_surges(self):
-        p=self.player('knight',85)
+        p=self.player('knight',18)
         for key in ('second_wind','action_surge'):
             while rest_rules.spend(p,key):pass
         await self.finish(p,'short')
@@ -69,7 +69,7 @@ class RestResources(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(rest_rules.remaining(p,'action_surge'),2)
 
     async def test_moon_form_and_free_guiding_bolt_are_available_to_client(self):
-        p=self.player('druid',10);p.druid_circle='moon';dc.state(p)['land']='arid'
+        p=self.player('druid',3);p.druid_circle='moon';dc.state(p)['land']='arid'
         self.assertTrue(dnd.spell_allowed(p,'wild_shape_bear'))
         await self.g.cast_spell(p,'wild_shape_bear')
         self.assertEqual(p.form,'bear');self.assertEqual(p.temp_hp,9)
@@ -82,7 +82,7 @@ class RestResources(unittest.IsolatedAsyncioTestCase):
         json.dumps(view,allow_nan=False)
 
     async def test_heavy_armor_master_changes_real_attack_damage_only(self):
-        p=self.player('knight',15);p.training_feats={'heavy_armor_master':'constitution'};p.hp=p.max_hp
+        p=self.player('knight',4);p.training_feats={'heavy_armor_master':'constitution'};p.hp=p.max_hp
         hp=p.hp;self.g.damage_player(p,10,is_attack=True);self.assertEqual(hp-p.hp,8)
         hp=p.hp;self.g.damage_player(p,10,is_attack=False);self.assertEqual(hp-p.hp,10)
 

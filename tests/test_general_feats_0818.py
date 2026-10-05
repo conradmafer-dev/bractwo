@@ -22,7 +22,7 @@ class Rolls:
 
 class GeneralFeats(unittest.TestCase):
     def test_repeatable_asi_is_serializable_and_caps_each_allocation(self):
-        p=Player('1','A',level=35)
+        p=Player('1','A',level=8)
         self.assertEqual(gear.select_feat(p,'ability_score_improvement',abilities=['constitution','constitution']),'')
         self.assertEqual(gear.select_feat(p,'ability_score_improvement',abilities=['constitution','dexterity']),'')
         self.assertEqual(rules.attributes(p)['constitution'],17)
@@ -33,24 +33,24 @@ class GeneralFeats(unittest.TestCase):
         gear.sanitize_feats(p)
         self.assertEqual(p.training_feats,saved)
         self.assertIsInstance(hash(gear._preview_signature(p)),int)
-        p.level=55
+        p.level=12
         self.assertTrue(gear.select_feat(p,'ability_score_improvement',abilities=['strength','strength']))
         self.assertEqual(len(p.training_feats),2)
 
     def test_passives_require_a_point_and_cannot_be_repeated(self):
         p=Player('1','A',level=1)
         self.assertTrue(gear.select_feat(p,'tough'))
-        p.level=15
+        p.level=4
         self.assertEqual(gear.select_feat(p,'tough'),'')
         self.assertEqual(p.training_feats,{'tough':''})
-        p.level=35
+        p.level=8
         self.assertTrue(gear.select_feat(p,'tough'))
         self.assertEqual(gear.select_feat(p,'savage_attacker'),'')
         self.assertEqual(gear.feat_points(p),0)
         self.assertEqual({r['feat_id'] for r in gear.training_sheet(p)['chosen']},{'tough','savage_attacker'})
 
     def test_sanitizer_preserves_old_choices_and_rejects_invalid_allocations(self):
-        p=Player('1','A',class_id='mage',level=75)
+        p=Player('1','A',class_id='mage',level=16)
         p.training_feats={'lightly_armored':'dexterity','tough':'','ability_score_improvement':'wisdom+constitution',
                           'savage_attacker':['bad'],'ability_score_improvement_²':'strength+strength','unknown':''}
         gear.sanitize_feats(p)
@@ -60,7 +60,7 @@ class GeneralFeats(unittest.TestCase):
 
     def test_tough_uses_effective_level_and_druid_own_hp_in_form(self):
         p=Player('1','A',class_id='druid')
-        for level,bonus in ((15,8),(20,10),(95,40),(999,40)):
+        for level,bonus in ((4,8),(5,10),(20,40),(999,40)):
             p.level=level;p.training_feats={};normal=p.max_hp
             p.training_feats={'tough':''}
             self.assertEqual(p.max_hp,normal+bonus)
@@ -69,7 +69,7 @@ class GeneralFeats(unittest.TestCase):
             p.form=''
 
     def test_constitution_asi_increases_hp_without_using_wildshape_con(self):
-        p=Player('1','A',class_id='druid',level=15)
+        p=Player('1','A',class_id='druid',level=4)
         before=p.max_hp
         self.assertEqual(gear.select_feat(p,'ability_score_improvement','constitution'),'')
         self.assertGreater(p.max_hp,before)
@@ -77,9 +77,9 @@ class GeneralFeats(unittest.TestCase):
         self.assertEqual(p.max_hp,hp)
 
     def test_medium_master_needs_training_and_dexterity_sixteen(self):
-        p=Player('1','A',class_id='mage',level=55)
+        p=Player('1','A',class_id='mage',level=12)
         self.assertTrue(gear.select_feat(p,'medium_armor_master','dexterity'))
-        p=Player('1','A',level=55)
+        p=Player('1','A',level=12)
         wear(p,'hide_armor')
         p.training_feats={'ability_score_improvement':'dexterity+dexterity','medium_armor_master':'dexterity'}
         self.assertEqual(rules.attributes(p)['dexterity'],15)
@@ -89,7 +89,7 @@ class GeneralFeats(unittest.TestCase):
         self.assertEqual(p.armor_class,15)
 
     def test_heavy_master_requires_heavy_armor_and_attack_physical_damage(self):
-        p=Player('1','A',level=35)
+        p=Player('1','A',level=8)
         p.training_feats={'heavy_armor_master':'constitution'}
         heavy=next(k for k,v in ITEMS.items() if v.get('armor_kind')=='heavy')
         wear(p,heavy)
@@ -103,7 +103,7 @@ class GeneralFeats(unittest.TestCase):
         self.assertEqual(gear.heavy_armor_reduction(p,'slashing',True),0)
 
     def test_savage_chooses_a_whole_set_once_per_turn_and_includes_critical_dice(self):
-        p=Player('1','A',level=35)
+        p=Player('1','A',level=8)
         wear(p,'training_greatsword');p.training_feats={'savage_attacker':''}
         result=rules.roll_attack(Rolls(20,1,2,3,4),0,99,rules.weapon_dice(p))
         rules.begin_feat_turn(p,1000)
@@ -119,7 +119,7 @@ class GeneralFeats(unittest.TestCase):
         self.assertEqual(second['damage_rolls'],[6,6])
 
     def test_savage_style_comparison_happens_before_riders_and_excludes_focus_and_form(self):
-        p=Player('1','A',level=35);wear(p,'training_greatsword')
+        p=Player('1','A',level=8);wear(p,'training_greatsword')
         p.training_feats={'savage_attacker':''};p.fighting_style='great_weapon'
         result=rules.roll_attack(Rolls(15,1,6),20,10,rules.weapon_dice(p))
         # Raw 4+4 > 1+6, but the style makes 3+6 the better complete set.
@@ -127,7 +127,7 @@ class GeneralFeats(unittest.TestCase):
         self.assertEqual(result['damage_rolls'],[1,6])
         self.assertEqual(result['savage_chosen'],0)
         for mode in ('unarmed','focus','form'):
-            q=Player('2','B',class_id='mage',level=35);q.training_feats={'savage_attacker':''}
+            q=Player('2','B',class_id='mage',level=8);q.training_feats={'savage_attacker':''}
             if mode=='focus':wear(q,'mage_weapon_1')
             if mode=='form':q.form='wolf'
             hit={'hit':True,'damage_rolls':[1],'damage_modifier':0,'damage':1}

@@ -6,10 +6,10 @@ Ritual tags are explicit: e.g. Longstrider is NOT made free by this subsystem.
 from math import ceil
 from functools import lru_cache
 try:
-    from . import druid_circles as circles
+    from . import druid_circles as circles, level_rules
     from .druid_beasts import BEASTS
 except ImportError:
-    import druid_circles as circles
+    import druid_circles as circles, level_rules
     from druid_beasts import BEASTS
 
 VERSION=1
@@ -20,22 +20,22 @@ ORDERS={
     'magician':dict(name='Mistyk natury',description='+1 do ataku czarami druida i ST ich obrony.',icon='assets/feats/magician.svg'),
 }
 FORMS={
-    'wolf':dict(name='Wilk',level=5,ac=12,hp=11,beast_proficiency=2,darkvision=60,
+    'wolf':dict(name='Wilk',level=2,ac=12,hp=11,beast_proficiency=2,darkvision=60,
         mental_attributes={'intelligence':3,'wisdom':12,'charisma':6},attributes={'strength':14,'dexterity':15,'constitution':12},
         attacks=[[1,6,2]],damage='piercing',attack_bonus=4,speed=40,cr='1/4',trait='Taktyka watahy · przewraca mniejsze cele',size='medium'),
-    'cat':dict(name='Kot',level=5,ac=12,hp=2,beast_proficiency=2,darkvision=60,saves={'dexterity':4},
+    'cat':dict(name='Kot',level=2,ac=12,hp=2,beast_proficiency=2,darkvision=60,saves={'dexterity':4},
         mental_attributes={'intelligence':3,'wisdom':12,'charisma':7},attributes={'strength':3,'dexterity':15,'constitution':10},
         attacks=[[0,1,1]],damage='slashing',attack_bonus=4,speed=40,cr='0',trait='Szybka, niewielka postać zwiadowcza',size='tiny'),
-    'black_bear':dict(name='Niedźwiedź czarny',level=15,ac=11,hp=19,beast_proficiency=2,darkvision=60,swim=30,
+    'black_bear':dict(name='Niedźwiedź czarny',level=4,ac=11,hp=19,beast_proficiency=2,darkvision=60,swim=30,
         mental_attributes={'intelligence':2,'wisdom':12,'charisma':7},attributes={'strength':15,'dexterity':12,'constitution':14},
         attacks=[[1,6,2],[1,6,2]],attack_types=['slashing','slashing'],damage='slashing',attack_bonus=4,speed=30,cr='1/2',trait='Dwa uderzenia pazurami',size='medium'),
-    'bear':dict(name='Niedźwiedź brunatny',level=35,ac=11,hp=22,beast_proficiency=2,darkvision=60,
+    'bear':dict(name='Niedźwiedź brunatny',level=8,ac=11,hp=22,beast_proficiency=2,darkvision=60,
         mental_attributes={'intelligence':2,'wisdom':13,'charisma':7},attributes={'strength':17,'dexterity':12,'constitution':15},
         attacks=[[1,8,3],[1,4,3]],attack_types=['piercing','slashing'],damage='piercing',attack_bonus=5,speed=40,cr='1',trait='Ugryzienie i pazury · 2 ataki',size='large'),
 }
 FORMS.update(BEASTS)
 
-def effective_level(p):return min(20,max(1,1+int(p.level)//5))
+def effective_level(p):return min(20,max(1,int(p.level)))
 @lru_cache(maxsize=20)
 def _slot_recovery_amount(class_level):
     # Original recoverable-slot value supplies the unchanged milestone totals.
@@ -54,7 +54,7 @@ def _recovery_checkpoints():
     try: from . import dnd_content as dnd
     except ImportError: import dnd_content as dnd
     return tuple((level, _slot_recovery_amount(min(20, 1+level//5)))
-                 for level in dnd.MANA_GROWTH_LEVELS)
+                 for level in dnd.LEGACY_MANA_GROWTH_LEVELS)
 
 
 def recovery_amount(p):
@@ -62,7 +62,7 @@ def recovery_amount(p):
     except ImportError: import dnd_content as dnd
     if getattr(p, 'mana_rules_version', dnd.MANA_RULES_VERSION) < dnd.MANA_RULES_VERSION:
         return _slot_recovery_amount(effective_level(p))
-    return dnd.interpolate_growth(p.level, _recovery_checkpoints())
+    return dnd.interpolate_growth(level_rules.growth_level(p), _recovery_checkpoints())
 def form_duration(p):return effective_level(p)*900.0  # half-level hours, 6s -> 3s rounds
 
 def form_spec(p):return FORMS.get(getattr(p,'form',''),{})
@@ -77,7 +77,7 @@ def configure(spells,classes,statuses):
             description='',icon=f'assets/spells/{key}.svg',effect='spell',visual=dict(style=kind,theme='nature' if 'druid' in classes_ else 'force',colors=['#438c86','#b8e5cf','#eaffee'],shots=1))
         s.update(extra);spells[key]=s
     classes['mage']['description']='Sztuczki, I krąg, rytuały i Odzyskanie mocy od początku.'
-    classes['druid']['description']='Strażnik lub Mistyk natury. Lekki pancerz, tarcze i przemiany od poziomu 5.'
+    classes['druid']['description']='Strażnik lub Mistyk natury. Lekki pancerz, tarcze i przemiany od poziomu 2.'
     add('arcane_recovery','Odzyskanie mocy','recovery',['mage'],action='action',cooldown=0,
         description='Po krótkim odpoczynku odzyskujesz część many. Jedno użycie między długimi odpoczynkami.',
         visual=dict(style='recovery',theme='force',colors=['#546bb2','#aacfff','#eef7ff'],shots=1))
@@ -89,14 +89,14 @@ def configure(spells,classes,statuses):
     add('speak_with_animals','Rozmowa ze zwierzętami','animal_speech',['druid'],circle=1,mana=20,feature=False,
         ritual=True,ritual_seconds=10,channel_seconds=3,duration=300,
         description='Przez 100 rund rozumiesz spokojne zwierzęta. Podejdź do zwierzęcia i użyj E. Nie uspokaja atakujących potworów. Rytuał: 10 s bez many.')
-    add('wild_companion','Dziki towarzysz','wild_familiar',['druid'],5,cooldown=0,
+    add('wild_companion','Dziki towarzysz','wild_familiar',['druid'],2,cooldown=0,
         description='Przywołuje leśną sowę, zużywając użycie Dzikiego kształtu albo komórkę I kręgu. Nie atakuje. Znika po długim odpoczynku.')
     for form,f in FORMS.items():
         key='wild_shape_'+form
         add(key,'Dziki kształt · '+f['name'].lower(),'shape',['druid'],f['level'],action='bonus',form=form,
             cooldown=0,description=f['trait']+'. Zużywa użycie Dzikiego kształtu; krótki odpoczynek odnawia jedno, długi wszystkie. Zachowujesz koncentrację.',duration=1800,
             icon=f'assets/spells/wild_shape_{form if form not in BEASTS else "bear"}.svg')
-    add('beast_trample','Tratowanie','beast_action',['druid'],55,action='bonus',icon='assets/spells/wild_shape_bear.svg',description='Słoń lub mamut: tratowanie powalonego celu w zasięgu 5 stóp. Obrona Zręczności daje połowę obrażeń.')
+    add('beast_trample','Tratowanie','beast_action',['druid'],12,action='bonus',icon='assets/spells/wild_shape_bear.svg',description='Słoń lub mamut: tratowanie powalonego celu w zasięgu 5 stóp. Obrona Zręczności daje połowę obrażeń.')
     add('escape_grapple','Wyrwij się z chwytu','beast_action',['druid'],1,action='action',icon='assets/spells/entangle.svg',description='Akcja: próba Siły albo Zręczności przeciw ST chwytu.')
     statuses.update(
         ritual_channel=dict(name='Rytuał',icon='◈',description='Nie ruszaj się do końca rzucania.',harmful=False),
@@ -115,8 +115,8 @@ def feature_rows(p):
         feature('alarm','Rytuały','Alarm i Przywołanie chowańca. Rytuały nie zużywają many.')
     if p.class_id=='druid':
         feature('speak_with_animals','Druidyczny','Odczytujesz znaki druidów; znasz Rozmowę ze zwierzętami.')
-        feature('wild_shape_wolf','Dziki kształt','Użycia Dzikiego kształtu · krótki odpoczynek: +1 · długi: wszystkie',5)
-        feature('wild_companion','Dziki towarzysz','Leśny chowaniec; nie wykonuje ataków.',5)
+        feature('wild_shape_wolf','Dziki kształt','Użycia Dzikiego kształtu · krótki odpoczynek: +1 · długi: wszystkie',2)
+        feature('wild_companion','Dziki towarzysz','Leśny chowaniec; nie wykonuje ataków.',2)
     return result
 
 

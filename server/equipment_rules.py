@@ -46,7 +46,7 @@ GENERAL_FEATS = {
     'moderately_armored': dict(name='Średnio opancerzony', grants=['medium_armor'], requires=['light_armor'], abilities=['strength','dexterity'], description='Średnie pancerze. +1 Siła lub Zręczność.'),
     'heavily_armored': dict(name='Ciężko opancerzony', grants=['heavy_armor'], requires=['medium_armor'], abilities=['strength','constitution'], description='Ciężkie pancerze. +1 Siła lub Kondycja.'),
     'martial_weapon_training': dict(name='Szkolenie w broni żołnierskiej', grants=['martial_weapons'], requires=[], abilities=['strength','dexterity'], description='Biegłość w broni żołnierskiej. +1 Siła lub Zręczność.'),
-    'tough': dict(name='Twardy', grants=[], requires=[], abilities=[], category='origin', description='Zwiększa maksymalne zdrowie o 2 oraz o kolejne 2 za każde 5 poziomów, maksymalnie o 40.', icon='assets/feats/tough.svg'),
+    'tough': dict(name='Twardy', grants=[], requires=[], abilities=[], category='origin', description='Zwiększa maksymalne zdrowie o 2 za każdy poziom postaci, maksymalnie o 40.', icon='assets/feats/tough.svg'),
     'savage_attacker': dict(name='Zacięty atak', grants=[], requires=[], abilities=[], category='origin', description='Raz na turę, po trafieniu bronią, rzucasz jej kośćmi obrażeń dwa razy i wybierasz lepszy zestaw.', icon='assets/feats/savage_attacker.svg'),
     'skilled': dict(name='Wszechstronny', grants=[], requires=[], abilities=[], category='origin', repeatable=True, description='Wybierz biegłość w trzech kolejnych umiejętnościach. Atut można wybrać ponownie; nie zwiększa cech.', icon='assets/feats/skilled.svg'),
     'ability_score_improvement': dict(name='Rozwój cech', grants=[], requires=[], abilities=['strength','dexterity','constitution','intelligence','wisdom','charisma'], repeatable=True, ability_points=2, description='+2 do jednej cechy albo +1 do dwóch cech, maksymalnie 20.', icon='assets/feats/ability_score_improvement.svg'),
@@ -55,8 +55,8 @@ GENERAL_FEATS = {
 }
 GENERAL_FEATS.update(feat_rules.NEW_FEATS)
 
-FEAT_LEVELS = (15,35,55,75,90)  # D&D 2024 class 4/8/12/16/19.
-FIGHTER_FEAT_LEVELS = (15,25,35,55,65,75,90)  # Fighter also gets 6 and 14.
+FEAT_LEVELS = (4,8,12,16,19)
+FIGHTER_FEAT_LEVELS = (4,6,8,12,14,16,19)  # Fighter also gets 6 and 14.
 FEAT_RULES_VERSION = 1
 MAX_FEAT_CHOICES = len(FIGHTER_FEAT_LEVELS)
 ORIGIN_FEATS = tuple(k for k,v in GENERAL_FEATS.items() if v.get('category')=='origin')
@@ -157,8 +157,8 @@ def migrate_advancement(p):
     p.training_feats=kept
     p.feat_legacy_choices=archive
     notes=[]
-    if p.level>=20:
-        notes.append('Usunięto dawny automatyczny wzrost głównej cechy na poziomach 20 i 40. Rozwój cech i atuty korzystają teraz ze wspólnej puli wyborów D&D; zachowano wcześniej wybrane atuty.')
+    if p.level>=5:
+        notes.append('Usunięto dawny automatyczny wzrost głównej cechy na poziomach odpowiadających obecnym 5 i 9. Rozwój cech i atuty korzystają teraz ze wspólnej puli wyborów D&D; zachowano wcześniej wybrane atuty.')
     if archive:
         notes.append('Dawne wybory ponad limit lub nieprawidłowe zapisano poniżej bez aktywnych premii. Prawidłowy atut możesz wybrać ponownie, gdy zdobędziesz wolny wybór.')
     p.feat_migration_notice=' '.join(notes)
@@ -324,7 +324,7 @@ def training_sheet(p):
     scores=_rules().own_attributes(p)
     def row(key,value=None):
         base=feat_key(key);spec=GENERAL_FEATS[base]
-        data=dict(spec,id=key,feat_id=base,icon=spec.get('icon') or f"assets/feats/{spec['grants'][0]}.svg",min_level=15)
+        data=dict(spec,id=key,feat_id=base,icon=spec.get('icon') or f"assets/feats/{spec['grants'][0]}.svg",min_level=4)
         data['abilities']=eligible_abilities(p,base) if value is None else list(spec['abilities'])
         if value is not None:data.update(ability=value,allocation=feat_allocations(key,value) or {},active=key in active_feats(p))
         return data
@@ -336,10 +336,10 @@ def training_sheet(p):
     origin_options=[] if origin_chosen else [row(k) for k in ORIGIN_FEATS if feat_eligible(p,k)]
     for option in origin_options:option['min_level']=1
     return dict(granted=granted_rows(p),points=feat_points(p),levels=list(feat_levels(p)),
-        dnd_levels=[1+n//5 for n in feat_levels(p)],earned=feat_entitlement(p),spent=len(getattr(p,'training_feats',{})),score_cap=20,
+        dnd_levels=list(feat_levels(p)),earned=feat_entitlement(p),spent=len(getattr(p,'training_feats',{})),score_cap=20,
         migration_notice=getattr(p,'feat_migration_notice',''),archived=archived,
         origin=dict(chosen=origin_chosen,options=origin_options,points=0 if origin_chosen else int(p.level>=1 and getattr(p,'class_chosen',True))),
-        advancement_note='Rozwój cech (+2 albo +1/+1) i atut zużywają ten sam wybór. Na poziomie 90 można wybrać atut z dostępnego katalogu; epickie dary nie są jeszcze dostępne.',
+        advancement_note='Rozwój cech (+2 albo +1/+1) i atut zużywają ten sam wybór. Na poziomie 19 można wybrać atut z dostępnego katalogu; epickie dary nie są jeszcze dostępne.',
         chosen=[row(k,v) for k,v in getattr(p,'training_feats',{}).items() if feat_key(k)],
         options=[row(k) for k in GENERAL_FEATS if feat_eligible(p,k)],
         armor_penalty=armor_penalty(p),weapon_proficient=proficient(p),
