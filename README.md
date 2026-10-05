@@ -6,6 +6,11 @@ i potwierdzeniem. Istniejące postacie zachowują wybory i mogą odebrać niewyk
 pierwszy atut. Późniejsza pula cech/atutów pozostaje wspólna. Nie wymaga resetu.
 [Zasady, lista atutów, testy i wdrożenie UI_31](docs/UI_31_ATUTY.md).
 
+Początek gry jest łagodniejszy: szczury mają KP 8, a wilki KP 11.
+Przy Moście Wędrowców pozostał jeden ognik i dwa pająki, z większą przestrzenią
+przy wyjściu z przeprawy. Władca Twierdzy zadaje 2k4+3 obrażeń zwykłym atakiem
+(także dystansowym) oraz 3k6+3 atakiem obszarowym. Zmiana nie wymaga resetu postaci.
+
 ## Zachowana zawartość wcześniejszych aktualizacji
 
 **[Zagraj w Bractwo Krain](https://bractwo.up.railway.app/)** — polska gra RPG

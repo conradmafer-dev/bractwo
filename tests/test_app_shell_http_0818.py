@@ -71,6 +71,7 @@ class AppShellHTTPTests(unittest.IsolatedAsyncioTestCase):
         health = await self.client.get('/health')
         self.assertEqual(health.status, 200)
         self.assertIn(health.content_type, ('application/json',))
+        self.assertEqual((await health.json())['opening_balance_revision'], 1)
 
 
 if __name__ == '__main__':

@@ -293,12 +293,12 @@ def configure(items,enemies):
         if slot=='ring' and not item['attack'] and not item['ac_bonus']:item['description']='Ozdoba; bez premii bojowych.'
     # Early encounters use recognisable low-HP stat blocks. Regional variants stay custom.
     explicit={
-        'rat':(4,[1,6,1],[1,4,0],10,2), 'boar':(11,[2,8,2],[1,6,1],11,3),
-        'wolf':(11,[2,8,2],[2,4,2],13,4),'goblin':(7,[2,6,0],[1,6,2],13,4),
+        'rat':(4,[1,6,1],[1,4,0],8,2), 'boar':(11,[2,8,2],[1,6,1],11,3),
+        'wolf':(11,[2,8,2],[2,4,2],11,4),'goblin':(7,[2,6,0],[1,6,2],13,4),
         'spider':(16,[3,8,3],[1,6,2],13,4),'skeleton':(13,[2,8,4],[1,6,2],13,4),
         'bandit':(11,[2,8,2],[1,6,1],12,3),'bandit_archer':(11,[2,8,2],[1,8,1],12,3),
         'skeleton_archer':(13,[2,8,4],[1,6,2],13,4),'wisp':(18,[4,6,4],[1,8,2],13,4),
-        'guardian':(45,[6,8,18],[2,6,3],16,5),'boss':(90,[12,8,36],[2,6,3],16,5),
+        'guardian':(45,[6,8,18],[2,6,3],16,5),'boss':(90,[12,8,36],[2,4,3],16,5),
         'bear':(34,[4,10,12],[2,6,4],11,5),'ogre':(59,[7,10,21],[2,8,4],11,6),
         'ghoul':(22,[5,8,0],[2,4,2],12,4),
     }
@@ -323,6 +323,10 @@ def configure(items,enemies):
         s['saves']={a:s['save_bonus'] for a in ('strength','dexterity','constitution','intelligence','wisdom','charisma')}
         s['attack_interval']=2.7 if kind in ('wolf','frost_wolf','vampire','nightmare') else 3.4 if kind in ('golem','guardian','mummy','ogre') else 3.0
         s['ranged_interval']=max(3.0,s['ranged_interval'])
+        if kind=='boss':
+            # The starting fortress keeps its telegraphs, with a gentler AoE
+            # budget independent of the ordinary attack's smaller damage die.
+            s['special_dice']=[3,6,3]
 
 
 class CombatRounds:

@@ -242,13 +242,14 @@ ENEMY_TYPES = {
 content.STARTER_SPAWNS = [
     ("wolf", 600, 790), ("wolf", 650, 620), ("wolf", 970, 640), ("wolf", 1090, 870),
     ("wolf", 990, 280), ("wolf", 1280, 840),
-    ("wisp", 1940, 1010), ("wisp", 2140, 1240), ("wisp", 1880, 1530),
+    # Leave room to cross the bridge before engaging the remaining wisp.
+    ("wisp", 2140, 1240),
     ("guardian", 2500, 750), ("guardian", 2660, 1030), ("guardian", 2190, 510),
     ("boss", 2530, 1900),
     ("rat", 810, 1460), ("rat", 700, 1580), ("rat", 910, 1660),
     ("boar", 1060, 1840), ("boar", 1240, 1930), ("boar", 460, 530),
     ("goblin", 1320, 580), ("goblin", 1350, 390), ("goblin", 1160, 200),
-    ("spider", 1840, 1900), ("spider", 2120, 1740), ("spider", 2100, 1490),
+    ("spider", 1840, 1900), ("spider", 2120, 1740),
     ("skeleton", 2720, 520), ("skeleton", 2630, 320), ("skeleton", 2880, 980),
 ]
 content.configure(ITEMS, ZONES, NPCS, LANDMARKS, QUESTS, ENEMY_TYPES, OBSTACLES, MERCHANT)
@@ -2064,7 +2065,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_34","world_revision":getattr(content,"WORLD_REVISION",20),"level_rules_version":level_rules.VERSION})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_34","world_revision":getattr(content,"WORLD_REVISION",20),"level_rules_version":level_rules.VERSION,"opening_balance_revision":1})
 
     app.router.add_get("/health",health)
     async def ranking(request):

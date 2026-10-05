@@ -64,13 +64,18 @@ class DiscoveryChecks(unittest.TestCase):
         old_loop = next(n for n in old_init.body if isinstance(n, ast.For) and isinstance(n.iter, ast.Call)
                         and isinstance(n.iter.func, ast.Name) and n.iter.func.id == 'enumerate'
                         and isinstance(n.iter.args[0], ast.List))
-        self.assertEqual(content.STARTER_SPAWNS, ast.literal_eval(old_loop.iter.args[0]))
-        self.assertEqual(len(content.STARTER_SPAWNS), 28)
+        # The opening balance pass removes only two bridge wisps and the
+        # nearest spider; all retained kinds, coordinates and order stay put.
+        removed = {('wisp', 1940, 1010), ('wisp', 1880, 1530), ('spider', 2100, 1490)}
+        self.assertEqual(content.STARTER_SPAWNS,
+                         [s for s in ast.literal_eval(old_loop.iter.args[0]) if s not in removed])
+        self.assertEqual(len(content.STARTER_SPAWNS), 25)
         new_game = next(n for n in SOURCE.body if isinstance(n, ast.ClassDef) and n.name == 'Game')
         new_init = next(n for n in new_game.body if isinstance(n, ast.FunctionDef) and n.name == '__init__')
         new_loop = next(n for n in new_init.body if isinstance(n, ast.For) and isinstance(n.iter, ast.Call)
                         and isinstance(n.iter.args[0], ast.Attribute) and n.iter.args[0].attr == 'STARTER_SPAWNS')
-        # The unchanged loop body proves stable enemy IDs as well as list order/coordinates.
+        # Keep the same ID format. Enemy indices are transient and rebuilt on
+        # startup; removing residents does not change saved quest/character IDs.
         self.assertEqual(ast.dump(ast.Module(body=old_loop.body, type_ignores=[])),
                          ast.dump(ast.Module(body=new_loop.body, type_ignores=[])))
         self.assertEqual(ast.dump(old_loop.target), ast.dump(new_loop.target))
@@ -88,7 +93,7 @@ class DiscoveryChecks(unittest.TestCase):
         rewards = [p['reward']['xp'] for p in points]
         sample_ids = ['old_mill', 'fortress', named_grounds[0]['discovery_id'], max(points, key=lambda p:p['reward']['xp'])['id']]
         print(json.dumps(dict(catalogue=dict(historical=len(historical), total=len(points), named_grounds=len(named_grounds),
-                         stairs=len(content.STAIRS), cities=len(content.CITIES), starter_spawns_preserved=28,
+                         stairs=len(content.STAIRS), cities=len(content.CITIES), starter_spawns_preserved=len(content.STARTER_SPAWNS),
                          xp_min=min(rewards), xp_max=max(rewards),
                          examples={ident:index[ident]['reward'] for ident in sample_ids})), ensure_ascii=True))
 
