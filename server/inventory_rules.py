@@ -115,6 +115,25 @@ def consume(p, template, quantity=1):
     return False
 
 
+def remove_instance(p, uid):
+    """Transfer one unique owned weapon without generating a replacement UID."""
+    item=next((i for i in p.inventory if i.get('uid')==uid),None)
+    if item is None:return None
+    p.inventory.remove(item)
+    for slot,equipped_uid in p.equipment.items():
+        if equipped_uid==uid:p.equipment[slot]=''
+    return item
+
+
+def restore_instance(p, item, capacity):
+    """Return an instance atomically; duplicate identities never enter the bag."""
+    uid=item.get('uid')
+    if not isinstance(uid,str) or not uid or len(p.inventory)>=capacity:return False
+    if any(i.get('uid')==uid for i in p.inventory+getattr(p,'depot',[])):return False
+    p.inventory.append(item)
+    return True
+
+
 def discover(p, template, kind, enemies):
     # Only an actual, successfully delivered monster drop may call this.
     if kind not in enemies:return

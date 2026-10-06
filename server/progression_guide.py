@@ -68,6 +68,15 @@ def catalog():
                 details.append('C → Umiejętności: wybierz dwie kolejne ekspertyzy.')
             if class_id=='knight' and level==1:
                 details.append('Wybierz jeden styl walki w C → Atuty. Mistrzostwa: miecz długi, miecz dwuręczny, młot dwuręczny. Kolczuga i tarcza na start.')
+            if class_id=='ranger' and level==2:
+                titles.append('Styl walki')
+                details.append('C → Atuty: wybierz jeden z 10 stylów walki albo Druidycznego wojownika z dwiema sztuczkami druida używającymi Mądrości. Styl nie zużywa punktu atutu.')
+            if class_id=='druid' and level==7:
+                titles.append('Elemental Fury')
+                details.append('C → Atuty: wybierz Potent Spellcasting (+Mądrość do obrażeń sztuczek druida) albo Primal Strike (+1k8 zimna, ognia, błyskawic lub grzmotu raz w swojej turze po trafieniu bronią albo atakiem bestii).')
+            if class_id=='druid' and level==15:
+                titles.append('Improved Elemental Fury')
+                details.append('Primal Strike rośnie do 2k8. Potent Spellcasting wydłuża o 300 stóp zasięg sztuczek druida o zasięgu co najmniej 10 stóp; zasięg Własny i Dotyk nie rośnie.')
             if level==2:details.append('Rejsy i możliwość odblokowania PvP poza osadami.')
             if level==PROMOTION_LEVEL:
                 details.append(f'Możliwość promocji u mistrza: {PROMOTION_COST} złota.')

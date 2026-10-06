@@ -9,9 +9,9 @@ retain their paid-for casting profile, even across a level or preference change.
 import copy
 from math import ceil
 try:
-    from . import combat_rules as rules, dnd_content as dnd
+    from . import combat_rules as rules, dnd_content as dnd, elemental_fury
 except ImportError:
-    import combat_rules as rules, dnd_content as dnd
+    import combat_rules as rules, dnd_content as dnd, elemental_fury
 
 # Pure mechanics from the SRD; see LICENSE-SRD.txt and docs/SPELL_SCALING_0.8.7.md.
 UPCAST = {
@@ -130,6 +130,7 @@ def resolve(p, key, *, automatic=False, active=True):
         s.update(duration=rules.caster.form_duration(p),temporary_hp=dc.form_temp_hp(p),form_ac=max(f['ac'],13+dc.wisdom(p) if dc.circle(p)=='moon' else 0),form_attacks=f['attacks'])
     if s.get('duration'):
         s['duration_rounds'] = ceil(s['duration']/dnd.GAME_ROUND_SECONDS)
+    elemental_fury.augment_spell(p, s)
     # Repeated actions use the original paid profile; changing a preference or
     # gaining a circle must never improve an existing spell for zero mana.
     locked = getattr(p, 'concentration_profile', {})
@@ -179,6 +180,8 @@ def summary(s):
         unit = 'runda' if n == 1 else 'rundy' if n%10 in (2,3,4) and n%100 not in (12,13,14) else 'rund'
         parts.append(f'{n} {unit}')
     if s.get('id')=='ensnaring_strike':parts.append('Obrażenia co rundę · po trafieniu bronią')
+    if s.get('elemental_fury_range_bonus_feet'):
+        parts.append(f'+{s["elemental_fury_range_bonus_feet"]} stóp zasięgu (Potężne sztuczki)')
     if s.get('free_cast') or s.get('feature') and not s.get('mana'):parts.append(f'Bez many · odnowienie {s.get("cooldown",0):g} s')
     if s.get('recast_active'):
         parts.append('Utrzymywany czar · powtórzenie bez many')
@@ -208,6 +211,7 @@ def _changes(a, b):
     add('duration', b.get('duration_rounds',0)-a.get('duration_rounds',0), 'tur trwania efektu')
     add('mana', b['mana']-a['mana'], 'do kosztu many')
     add('restore_mana',b.get('restore_mana',0)-a.get('restore_mana',0),'many')
+    add('range_feet',(b.get('range',0)-a.get('range',0))/elemental_fury.UNITS_PER_FOOT,'stóp zasięgu')
     return result
 
 
@@ -248,7 +252,8 @@ def client_profiles(p):
     active=bool(p.concentration_until>getattr(p,'current_wall_time',0))
     signature=(p.class_id,p.level,getattr(p,'legacy_growth_level',0),getattr(p,'mana_rules_version',dnd.MANA_RULES_VERSION),p.primal_order,p.weapon_grip,tuple(sorted(p.training_feats.items())),rules.gear.weapon(p).get('weapon_type',''),tuple(sorted(getattr(p,'spell_circle_choices',{}).items())),
         rules.ability_modifier(p,rules.spell_ability(p)),p.gear_bonus('attack'),p.mastery.get('power',0),
-        p.concentration if active else '',locked.get('cast_circle',0) if active else 0)
+        p.concentration if active else '',locked.get('cast_circle',0) if active else 0,
+        elemental_fury.choice(p))
     try:
         from . import druid_circles as dc, rest_rules, martial_rules as martial
     except ImportError:
@@ -264,7 +269,8 @@ def client_profiles(p):
         return cache[1]
     result={}
     fields=('cast_circle','power_choice','power_options','mana','dice','extra_dice','weapon_dice','flat_heal',
-            'shots','max_targets','ally_targets','duration','duration_rounds','power_summary','recast_active','restore_mana','temporary_hp','form_ac','form_attacks')
+            'shots','max_targets','ally_targets','duration','duration_rounds','power_summary','recast_active','restore_mana','temporary_hp','form_ac','form_attacks',
+            'range','tabletop_range_feet','elemental_fury_damage_bonus','elemental_fury_range_bonus_feet')
     for key in dnd.SPELLS:
         if not dnd.spell_allowed(p,key):
             result[key]={'available':False}

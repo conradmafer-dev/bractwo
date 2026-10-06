@@ -79,6 +79,8 @@ class MartialCombat:
 
     def _martial_add_die(self, p, result, label, sides, metadata):
         extra = rules.roll_damage(self.combat_rng, (1, sides, 0), result.get('critical', False))
+        extra['damage_rolls'] = rules.ranger_styles.adjust_damage_dice(p,extra['damage_rolls'])
+        extra['damage'] = sum(extra['damage_rolls'])
         components = result.setdefault('damage_components', [dict(type=result['damage_type'], damage=result['damage'])])
         component = next((part for part in components if part['type'] == result['damage_type']), None)
         if component is None: components.append(dict(type=result['damage_type'], damage=extra['damage']))
@@ -163,21 +165,28 @@ class MartialCombat:
     def _martial_extra_attack(self, p, target, key):
         """No main action; legal defensive reactions consume their own shared slot."""
         if not self._martial_target_legal(p, target, melee=key == 'riposte'): return None
+        weapon=rules.weapon_actions.current_weapon(p)
+        throwing=rules.weapon_actions.is_thrown(p)
+        if throwing and rules.weapon_actions.throw_error(p,weapon):return None
         old = getattr(p, '_martial_extra', '')
         depth = getattr(self, '_martial_extra_depth', 0)
+        old_off_turn = getattr(p, '_off_turn_attack', False)
+        p._off_turn_attack = old_off_turn or key in ('riposte', 'giant_killer')
         p._martial_extra = key; self._martial_extra_depth = depth+1
         try:
             self.basic_effect(p, target); self.fighter_effect(p, target, key)
             self.tag(p, self.is_player_target(target))
             if self.is_player_target(target):
-                result = self.hit_player(p, target, pvp=True, action=NAMES[key])
+                result = self.hit_player(p, target, pvp=True, action=NAMES[key],melee=rules.gear.melee(p) and not throwing)
             else:
-                result = self.hit_enemy(p, target, action=NAMES[key], melee=rules.gear.melee(p))
+                result = self.hit_enemy(p, target, action=NAMES[key], melee=rules.gear.melee(p) and not throwing)
             self.trigger_ensnaring_strike(p, target, result)
             self.fighter_on_weapon_hit(p, target, result)
+            if throwing:rules.weapon_actions.throw_weapon(p,target,weapon)
             return result
         finally:
             p._martial_extra = old; self._martial_extra_depth = depth
+            p._off_turn_attack = old_off_turn
 
     def martial_after_incoming_attack(self, source, target, result):
         if (not result or result.get('check') != 'attack' or getattr(self, '_martial_extra_depth', 0) >= 32

@@ -8,7 +8,7 @@
   function image(path,alt=''){const e=node('img');e.src=path;e.alt=alt;e.width=48;e.height=48;return e;}
   function equipmentIcon(item,slot='empty'){
     if(item?.icon)return item.icon;
-    if(slot!=='weapon')return `assets/equipment/${['armor','ring','shield'].includes(slot)?slot:'empty'}.svg`;
+    if(!['weapon','offhand'].includes(slot))return `assets/equipment/${['armor','ring','shield'].includes(slot)?slot:'empty'}.svg`;
     // Ordinary weapons are shared between classes; art follows the actual type.
     const type=item?.weapon_type;
     if(type==='focus')return 'assets/equipment/staff.svg';
@@ -51,7 +51,7 @@
     let tab='inventory',signature='',bagPage=0,selectedItem='',restoreFocus=null;
     const sections={abilities:'values',stats:'general',skills:'list',feats:'general'};
     function close(){const wasOpen=!panel.hidden;panel.hidden=true;root.BractwoInventoryUI?.hide();signature='';if(!wasOpen)return;h.changed?.();if(restoreFocus?.isConnected&&restoreFocus.getClientRects().length)restoreFocus.focus({preventScroll:true});}
-    function open(which=tab,section){restoreFocus=document.activeElement;h.prepare();tab=which;if(section)sections[tab]=section;else if(which==='abilities')sections.abilities='growth';else if(which==='skills')sections.skills='list';else if(which==='feats')sections.feats='general';panel.hidden=false;signature='';render();panel.querySelector(`[data-character-tab="${tab}"]`)?.focus({preventScroll:true});h.changed?.();}
+    function open(which=tab,section){restoreFocus=document.activeElement;h.prepare();tab=which;if(section)sections[tab]=section;else if(which==='abilities')sections.abilities='growth';else if(which==='skills')sections.skills='list';else if(which==='feats')sections.feats='general';content.scrollTop=0;panel.hidden=false;signature='';render();panel.querySelector(`[data-character-tab="${tab}"]`)?.focus({preventScroll:true});h.changed?.();}
     function toggle(which){if(!panel.hidden&&(!which||which===tab))close();else open(which||tab);}
     for(const b of tabButtons)b.addEventListener('click',()=>{tab=b.dataset.characterTab;signature='';content.scrollTop=0;render();});
     panel.querySelector('.character-close').addEventListener('click',close);
@@ -62,14 +62,14 @@
     function equipment(p,w){
       const inv=p.inventory||[],worn=p.equipment||{},equippedIds=new Set(Object.values(worn).map(String));
       const wornGrid=node('div','sheet-equipped');heading('Założone przedmioty');
-      for(const[slot,label]of[['weapon','Broń'],['armor','Pancerz'],['shield','Tarcza'],['ring','Pierścień']]){
+      for(const[slot,label]of[['weapon','Broń'],['offhand','Druga broń'],['armor','Pancerz'],['shield','Tarcza'],['ring','Pierścień']]){
         const item=inv.find(i=>String(i.uid)===String(worn[slot])),cell=node('article','sheet-equipment-card');
         cell.append(image(equipmentIcon(item,slot)),node('small','',label),node('strong','',item?.name||'Brak'));
         if(item){cell.dataset.uid=item.uid;cell.tabIndex=0;cell.setAttribute('role','button');cell.setAttribute('aria-label','Podgląd: '+item.name);cell.classList.toggle('selected',String(item.uid)===String(selectedItem));
           const select=()=>selectItem(item.uid);cell.addEventListener('click',select);cell.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();select();}});
           root.BractwoInventoryUI.bind(cell,item,w);
         }wornGrid.append(cell);
-      }content.append(wornGrid);
+      }content.append(wornGrid);root.BractwoInventoryUI.weaponControls?.(content,p,h);
       const bag=inv.filter(i=>!equippedIds.has(String(i.uid))),pageSize=15,pages=Math.max(1,Math.ceil(bag.length/pageSize));bagPage=Math.min(bagPage,pages-1);
       const title=node('div','sheet-section-row');title.append(node('h3','sheet-section-title','Plecak'),node('small','',`${inv.length} / ${w.inventory_cap||40}`));content.append(title);
       const grid=node('div','sheet-bag-grid');grid.setAttribute('aria-label','Plecak — trzy rzędy');
@@ -82,6 +82,7 @@
       const item=inv.find(i=>String(i.uid)===String(selectedItem));
       if(item)content.append(root.BractwoInventoryUI.detail(item,p,w,h));
       else content.append(node('p','sheet-hint','Wybierz przedmiot z plecaka lub założonego wyposażenia, aby zobaczyć szczegóły.'));
+      root.BractwoInventoryUI.thrownWeapons?.(content,p,h);
     }
     function allocation(p){const points=p.mastery_points||0;if(!points)return;
       const box=node('section','sheet-allocation');box.append(node('h3','',`Punkty mistrzostwa do przydzielenia: ${points}`),node('p','',p.combat_remaining>0?'Punkty przydzielisz po zakończeniu walki.':'Wybierz, co chcesz wzmocnić.'));
@@ -154,12 +155,12 @@
       if(tab==='spells')root.BractwoCasterUI.syncCircle(content,p,h);
       if(tab==='feats'||tab==='spells')root.BractwoMartialUI?.sync(content,p);
       if(panel.contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
-      const next=JSON.stringify([tab,sections,bagPage,selectedItem,tab==='skills'&&sections.skills==='challenges'?p.last_roll:null,p.inventory,p.equipment,p.level,Math.floor(p.mana),Math.ceil(p.hp),p.hotbar,p.grouped_hotbar,p.attributes,p.character_sheet,h.state().skill_challenges,p.skills,p.mastery,p.mastery_points,p.combat_remaining>0,p.bonus_remaining>0,p.xp,p.xp_next,p.xp_total,p.xp_next_total,p.max_hp,p.max_mana,p.attack_bonus,p.damage_dice,p.armor_class,p.save_dc,p.attacks_per_round,p.bank_gold,p.soul,p.kills,p.boss_kills,p.gold,p.potions,p.potion_slots,p.form,p.shield_armed,p.ensnaring_armed,p.concentration,p.queued_spell,p.queued_spell?Math.ceil((p.action_remaining||0)*10):0,p.spell_cooldowns,p.spell_profiles,p.environment,p.rest_resources,p.status_effects?.map(e=>[e.id,Math.ceil(e.remaining)]),h.canTrade(),h.nearMaster?.()]);if(signature===next)return;signature=next;
+      const next=JSON.stringify([tab,sections,bagPage,selectedItem,tab==='skills'&&sections.skills==='challenges'?p.last_roll:null,p.inventory,p.equipment,p.level,Math.floor(p.mana),Math.ceil(p.hp),p.hotbar,p.grouped_hotbar,p.attributes,p.character_sheet,h.state().skill_challenges,p.skills,p.mastery,p.mastery_points,p.combat_remaining>0,p.bonus_remaining>0,p.xp,p.xp_next,p.xp_total,p.xp_next_total,p.max_hp,p.max_mana,p.attack_bonus,p.damage_dice,p.armor_class,p.save_dc,p.attacks_per_round,p.bank_gold,p.soul,p.kills,p.boss_kills,p.gold,p.potions,p.potion_slots,p.form,p.shield_armed,p.ensnaring_armed,p.concentration,p.queued_spell,p.queued_spell?Math.ceil((p.action_remaining||0)*10):0,p.spell_cooldowns,p.spell_profiles,p.environment,p.rest_resources,p.status_effects?.map(e=>[e.id,Math.ceil(e.remaining)]),p.thrown_weapons?.map(e=>[e.item?.uid,(e.floor||0)===(p.floor||0)&&Math.hypot(e.x-p.x,e.y-p.y)<=64]),h.canTrade(),h.nearMaster?.()]);if(signature===next)return;signature=next;
       document.getElementById('characterName').textContent=p.name;document.getElementById('characterSubtitle').textContent=`${p.profession||w.classes?.[p.class_id]?.name||''} · poziom ${p.level}`;
       tabButtons.forEach(b=>{const active=b.dataset.characterTab===tab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));});
       const scroll=content.scrollTop;content.replaceChildren();content.dataset.tab=tab;content.dataset.section=sections[tab]||'';
       if(tab==='inventory')equipment(p,w);else if(tab==='abilities')abilities(p);else if(tab==='stats')stats(p,w);else if(tab==='spells')spells(p,w);else if(tab==='skills'){subnav('skills',[['list','Lista'],['training','Biegłości'],['challenges','Wydarzenia']]);root.BractwoSkillsUI?.skills(content,p,{...h,open},sections.skills);}else {
-        subnav('feats',[['general','Atuty'],['class','Klasa'],['origin','Pochodzenie'],['training','Wyszkolenie']]);
+        const featTabs=[['general','Atuty'],['class','Klasa'],['origin','Pochodzenie'],['training','Wyszkolenie']];if(p.class_id==='ranger'&&p.character_sheet?.fighter)featTabs.splice(2,0,['ranger_style','Styl walki']);if(p.class_id==='druid'&&p.character_sheet?.caster?.elemental_fury)featTabs.splice(2,0,['elemental_fury','Furia żywiołów']);subnav('feats',featTabs);
         if(sections.feats==='origin')root.BractwoSkillsUI?.origin(content,p,{...h,open});else{const martial=node('div'),caster=node('div');content.append(martial,caster);if(sections.feats==='class')root.BractwoMartialUI?.feats(martial,p,h);root.BractwoCasterUI.feats(caster,p,{...h,open,featSection:sections.feats});}
       }
       content.scrollTop=scroll;

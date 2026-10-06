@@ -6,10 +6,10 @@ Ritual tags are explicit: e.g. Longstrider is NOT made free by this subsystem.
 from math import ceil
 from functools import lru_cache
 try:
-    from . import druid_circles as circles, level_rules
+    from . import druid_circles as circles, level_rules, elemental_fury
     from .druid_beasts import BEASTS
 except ImportError:
-    import druid_circles as circles, level_rules
+    import druid_circles as circles, level_rules, elemental_fury
     from druid_beasts import BEASTS
 
 VERSION=1
@@ -108,8 +108,8 @@ def configure(spells,classes,statuses):
 
 def feature_rows(p):
     result=[]
-    def feature(key,name,description,level=1):
-        if p.level>=level:result.append(dict(id=key,name=name,description=description,icon=f'assets/spells/{key}.svg',level=level,automatic=True))
+    def feature(key,name,description,level=1,icon=None):
+        if p.level>=level:result.append(dict(id=key,name=name,description=description,icon=icon or f'assets/spells/{key}.svg',level=level,automatic=True))
     if p.class_id=='mage':
         feature('arcane_recovery','Odzyskanie mocy',f'Do +{recovery_amount(p)} many po krótkim odpoczynku · raz na długi odpoczynek')
         feature('alarm','Rytuały','Alarm i Przywołanie chowańca. Rytuały nie zużywają many.')
@@ -117,6 +117,10 @@ def feature_rows(p):
         feature('speak_with_animals','Druidyczny','Odczytujesz znaki druidów; znasz Rozmowę ze zwierzętami.')
         feature('wild_shape_wolf','Dziki kształt','Użycia Dzikiego kształtu · krótki odpoczynek: +1 · długi: wszystkie',2)
         feature('wild_companion','Dziki towarzysz','Leśny chowaniec; nie wykonuje ataków.',2)
+        selected = elemental_fury.choice(p)
+        if selected:
+            feature('elemental_fury', 'Furia żywiołów · '+elemental_fury.OPTIONS[selected]['name'], elemental_fury.OPTIONS[selected]['description'], 7,
+                icon=elemental_fury.OPTIONS[selected]['icon'])
     return result
 
 
@@ -126,5 +130,5 @@ def sheet(p):
     return dict(order=getattr(p,'primal_order',''),order_pending=p.class_id=='druid' and not getattr(p,'primal_order',''),
         orders=[dict(id=k,**v) for k,v in ORDERS.items()] if p.class_id=='druid' else [],
         features=feature_rows(p),forms=[dict(id=k,**v,unlocked=circles.form_allowed(p,k),temp_hp=circles.form_temp_hp(p)) for k,v in FORMS.items()] if p.class_id=='druid' else [],
-        school=wizard_schools.sheet(p),circle=circles.sheet(p),arcane_recovery_remaining=rest_rules.remaining(p,'arcane_recovery'),
+        school=wizard_schools.sheet(p),circle=circles.sheet(p),elemental_fury=elemental_fury.sheet(p),arcane_recovery_remaining=rest_rules.remaining(p,'arcane_recovery'),
         familiar=getattr(p,'familiar_state',{}),channel=({k:v for k,v in getattr(p,'casting_channel',{}).items() if k in ('key','name','total','ritual')}|dict(remaining=round(max(0,getattr(p,'casting_channel',{}).get('until',0)-p.current_wall_time),1))) if getattr(p,'casting_channel',{}) else {},legacy_medium_grace=bool(getattr(p,'legacy_medium_grace',False)),recovery_amount=recovery_amount(p) if p.class_id=='mage' else 0)

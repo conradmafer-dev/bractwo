@@ -60,13 +60,17 @@ def shield_bonus(p):
 
 
 def style_active(p, style=None):
+    if getattr(p, 'class_id', '') == 'ranger':
+        try:from . import ranger_styles
+        except ImportError:import ranger_styles
+        return ranger_styles.style_active(p, style)
     if getattr(p, 'class_id', '') != 'knight' or getattr(p, 'form', ''): return False
     style = style if style is not None else getattr(p, 'fighting_style', '')
     if style == 'defense':
         return equipped(p, 'armor').get('armor_kind') in ('light', 'medium', 'heavy')
     weapon = equipped(p, 'weapon')
     melee = bool(weapon and weapon.get('weapon') != 'bow' and 'knight' in weapon.get('class_ids', []))
-    if style == 'dueling': return melee and not two_handed(p)
+    if style == 'dueling': return melee and not two_handed(p) and not equipped(p, 'offhand')
     if style == 'great_weapon': return melee and two_handed(p)
     return False
 
@@ -77,6 +81,10 @@ def mastery(p):
 
 
 def class_sheet(p):
+    if p.class_id == 'ranger':
+        try:from . import ranger_styles
+        except ImportError:import ranger_styles
+        return ranger_styles.class_sheet(p)
     if p.class_id != 'knight': return {}
     key = getattr(p, 'fighting_style', '')
     return dict(style=key, style_name=STYLES.get(key, {}).get('name', 'Nie wybrano'),
@@ -134,7 +142,11 @@ def configure(items, spells, classes):
 class FighterGame:
     def migrate_fighter(self, p, make_item):
         p.equipment.setdefault('shield','')
-        if getattr(p,'fighting_style','') not in STYLES: p.fighting_style=''
+        if p.class_id == 'ranger':
+            try:from . import ranger_styles
+            except ImportError:import ranger_styles
+            ranger_styles.sanitize(p)
+        elif getattr(p,'fighting_style','') not in STYLES: p.fighting_style=''
         if getattr(p,'weapon_grip','one') not in ('one','two'):p.weapon_grip='one'
         if p.class_id != 'knight': return
         if p.fighter_rules_version < VERSION:
@@ -161,7 +173,8 @@ class FighterGame:
             return 'Zmienisz styl bez opłaty u mistrza profesji w osadzie.'
         return ''
 
-    async def select_fighting_style(self,p,key):
+    async def select_fighting_style(self,p,key,cantrips=None):
+        if p.class_id == 'ranger':return await self.select_ranger_style(p,key,cantrips)
         if not isinstance(key,str) or key not in STYLES:return await self.notice(p,'Wybierz jeden z trzech stylów walki.')
         reason=self.fighter_choice_error(p)
         if reason:return await self.notice(p,reason)
@@ -192,7 +205,7 @@ class FighterGame:
 
     def fighter_adjust_damage(self,p,result):
         """Preserve the actual rolled dice; no new RNG draws and no spell bonus."""
-        if p.class_id!='knight' or p.form:return
+        if p.class_id not in ('knight','ranger') or p.form:return
         if result['hit'] and style_active(p) and p.fighting_style=='great_weapon':
             raw=list(result['damage_rolls'])
             result['raw_damage_rolls']=raw
