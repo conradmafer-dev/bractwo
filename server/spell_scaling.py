@@ -47,7 +47,12 @@ def caster_steps(level, every=1, start=1):
 
 def circle_options(p, key):
     s = dnd.SPELLS.get(key)
-    if not s or key not in UPCAST or not dnd.spell_allowed(p, key):
+    try:from . import wizard_spellbook
+    except ImportError:import wizard_spellbook
+    # Power preferences belong to a known spell and survive preparation swaps.
+    # Actual casting still goes through the prepared-spell gate.
+    known_book = p.class_id == 'mage' and wizard_spellbook.knows(p, key)
+    if not s or key not in UPCAST or not (dnd.spell_allowed(p, key) or known_book):
         return []
     highest = max(s['circle'], dnd.circle_for(p.class_id, p.level))
     if key == 'hunters_mark':
@@ -255,10 +260,11 @@ def client_profiles(p):
         p.concentration if active else '',locked.get('cast_circle',0) if active else 0,
         elemental_fury.choice(p))
     try:
-        from . import druid_circles as dc, rest_rules, martial_rules as martial
+        from . import druid_circles as dc, rest_rules, martial_rules as martial, wizard_spellbook
     except ImportError:
-        import druid_circles as dc, rest_rules, martial_rules as martial
+        import druid_circles as dc, rest_rules, martial_rules as martial, wizard_spellbook
     wizard_live=getattr(p,'wizard_school_runtime',{})
+    signature+=(wizard_spellbook.signature(p),)
     signature+=(getattr(p,'promoted',False),getattr(p,'wizard_school',''),repr(getattr(p,'wizard_school_state',{})),
         wizard_live.get('decoy_until',0)>getattr(p,'current_wall_time',0),
         wizard_live.get('shelter',{}).get('until',0)>getattr(p,'current_wall_time',0),
@@ -272,13 +278,20 @@ def client_profiles(p):
             'shots','max_targets','ally_targets','duration','duration_rounds','power_summary','recast_active','restore_mana','temporary_hp','form_ac','form_attacks',
             'range','tabletop_range_feet','elemental_fury_damage_bonus','elemental_fury_range_bonus_feet')
     for key in dnd.SPELLS:
-        if not dnd.spell_allowed(p,key):
+        available=dnd.spell_allowed(p,key)
+        book_preview=(p.class_id=='mage' and wizard_spellbook.is_book_spell(key)
+                      and p.level>=dnd.spell_level(dnd.SPELLS[key],p.class_id))
+        if not available and not book_preview:
             result[key]={'available':False}
             continue
         spec=resolve(p,key)
         result[key]={f:spec[f] for f in fields if f in spec}
         result[key]['next_upgrade']=next_upgrade(p,key)
-        result[key]['available']=True
+        result[key]['available']=available
+        if book_preview:
+            result[key]['known']=wizard_spellbook.knows(p,key)
+            result[key]['prepared']=wizard_spellbook.prepared(p,key)
+            result[key]['ritual_available']=wizard_spellbook.ritual_allowed(p,key)
         gate=dnd.spell_level(spec,p.class_id)
         if key in dc.bonus_spells(p):
             gate=min(gate,dc.bonus_spells(p)[key]) if p.class_id in spec['class_ids'] else dc.bonus_spells(p)[key]

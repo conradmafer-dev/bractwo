@@ -8,12 +8,12 @@ import math
 from dataclasses import dataclass
 from types import SimpleNamespace
 try:
-    from . import rest_rules, druid_circles as circles
+    from . import rest_rules, druid_circles as circles, wizard_spellbook
     from . import caster_rules as caster, equipment_rules as gear, combat_rules as rules, dnd_content as dnd, spell_scaling, world_content as content
     from .dnd_game import Companion
     from .progression import same_floor
 except ImportError:
-    import rest_rules, druid_circles as circles
+    import rest_rules, druid_circles as circles, wizard_spellbook
     import caster_rules as caster, equipment_rules as gear, combat_rules as rules, dnd_content as dnd, spell_scaling, world_content as content
     from dnd_game import Companion
     from progression import same_floor
@@ -112,7 +112,9 @@ class CasterGame:
 
     async def start_caster_channel(self,p,key,ritual=False):
         p.current_wall_time=now=self.now()
-        if not isinstance(key,str) or key not in dnd.SPELLS or not dnd.spell_allowed(p,key):return
+        if not isinstance(key,str) or key not in dnd.SPELLS:return
+        allowed = wizard_spellbook.ritual_allowed(p,key) if ritual and p.class_id=='mage' else dnd.spell_allowed(p,key)
+        if not allowed:return await self.notice(p,'Ten czar musi być znany z księgi i odpowiednio przygotowany; znane rytuały nie wymagają przygotowania.')
         s=spell_scaling.resolve(p,key)
         if ritual and not s.get('ritual'):return await self.notice(p,'Tego czaru nie można rzucać rytualnie.')
         if s['kind'] not in ('ritual_alarm','familiar','animal_speech'):return
@@ -147,7 +149,8 @@ class CasterGame:
         s=ch['profile'];key=ch['key'];now=self.now()
         if p.mana<ch['cost'] or p.gold<ch['gold']:
             self.cancel_channel(p,'Rzucanie przerwane: zabrakło many lub składników.');return
-        if not dnd.spell_allowed(p,key) or gear.armor_penalty(p):
+        allowed = wizard_spellbook.ritual_allowed(p,key) if ch.get('ritual') and p.class_id=='mage' else dnd.spell_allowed(p,key)
+        if not allowed or gear.armor_penalty(p):
             self.cancel_channel(p,'Rzucanie przerwane: zmieniły się wymagania.');return
         self.cancel_channel(p,'')
         self.spend_mana(p,ch['cost']);p.gold-=ch['gold']

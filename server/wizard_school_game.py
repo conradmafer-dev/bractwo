@@ -1,11 +1,11 @@
 """Selection, lifecycle and validated dispatch for all four wizard schools."""
 import math
 try:
-    from . import wizard_schools as schools
+    from . import wizard_schools as schools, wizard_spellbook
     from .wizard_offense import WizardOffense
     from .wizard_defense import WizardDefense
 except ImportError:
-    import wizard_schools as schools
+    import wizard_schools as schools, wizard_spellbook
     from wizard_offense import WizardOffense
     from wizard_defense import WizardDefense
 
@@ -41,6 +41,7 @@ class WizardSchoolGame(WizardOffense, WizardDefense):
         if not self._circle_available(p) or p.form or p.combat_until > self.now() or p.rest_state or p.casting_channel:
             return await self.notice(p, 'Wybierz szkołę poza walką, odpoczynkiem i rzucaniem czarów.')
         p.wizard_school = key; p.wizard_school_state = {}; p.wizard_school_runtime = {}
+        wizard_spellbook.sync(p)
         self.wizard_offense_rest(p, 'long')
         self.wizard_defense_rest(p, 'long')
         self.clear_caster_caches(p); p._level_up_cache = None

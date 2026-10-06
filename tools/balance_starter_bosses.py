@@ -17,7 +17,7 @@ from types import SimpleNamespace
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from server.server import Game, Player
-from server import starter_adventures as sa, combat_rules as rules, spell_scaling
+from server import starter_adventures as sa, combat_rules as rules, spell_scaling, dnd_content as dnd
 
 CLASSES = ('knight', 'ranger', 'mage', 'druid')
 DT = .05
@@ -97,6 +97,13 @@ async def fight(boss, class_id, seed, level=3, dodge=True):
                         x=enemy.x, y=enemy.y+(180 if boss == sa.CRYPT_BOSS else 230),
                         floor=enemy.floor)
         game.starter(player)
+        if class_id == 'mage':
+            # The duel assumes a completed starting choice, just like its
+            # equipped weapon. Use the real book commands, not a cast bypass.
+            await game.wizard_book_command(player, 'wizard_learn', {'spell': 'magic_missile'})
+            await game.wizard_book_command(player, 'wizard_prepare', {'spells': ['magic_missile']})
+            if not dnd.spell_allowed(player, 'magic_missile'):
+                raise AssertionError('The benchmark wizard must prepare Magic Missile')
         player.hp, player.mana = player.max_hp, player.max_mana
         player.current_wall_time = clock()
         game.players[player.id] = player

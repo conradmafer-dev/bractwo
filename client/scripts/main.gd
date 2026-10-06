@@ -927,7 +927,7 @@ func _update_hud() -> void:
 	ability_button.text = "F · " + str(ability_spec.get("name", "Czar")) + (" · " + favorite_queue if not favorite_queue.is_empty() else " · GOTOWE" if weapon_ready else " (%ds)" % ceili(cooldown) if cooldown > 0 else "")
 	var favorite_icon: String = "res://" + str(ability_spec.get("icon", ""))
 	ability_button.icon = load(favorite_icon) as Texture2D if ResourceLoader.exists(favorite_icon) else null
-	ability_button.disabled = ability_spec.is_empty() or not bool(player.get("alive", true)) or (not revert and not reaction and not weapon_ready and (cooldown > 0 or float(player.get("mana", 0)) < ability_cost or not str(player.get("form", "")).is_empty()))
+	ability_button.disabled = ability_spec.is_empty() or not character_sheet.wizard_book.prepared(player, favorite, ability_spec) or not bool(player.get("alive", true)) or (not revert and not reaction and not weapon_ready and (cooldown > 0 or float(player.get("mana", 0)) < ability_cost or not str(player.get("form", "")).is_empty()))
 	if ability_spec.get("kind", "") == "recovery":
 		ability_button.disabled = not preload("res://scripts/caster_sheet.gd").can_recover(player)
 	ability_button.tooltip_text = str(ability_spec.get("name", "Czar")) + "\nNajczęściej używany czar w ostatnich 100 udanych użyciach. Koszt: %d many." % ability_cost
@@ -1744,7 +1744,7 @@ func _refresh_journal() -> void:
 func _cast_level(level: int) -> void:
 	for id: String in world_data.get("spells", {}):
 		var spell: Dictionary = world_data["spells"][id]
-		if _spell_gate(spell) == level and spell.get("class_ids", []).has(player.get("class_id", "")):
+		if _spell_gate(spell) == level and spell.get("class_ids", []).has(player.get("class_id", "")) and character_sheet.wizard_book.prepared(player, id, spell):
 			_send({"type":"cast", "spell_id":id})
 			return
 
@@ -1811,7 +1811,7 @@ func _update_hotbar() -> void:
 			button.disabled = true
 			continue
 		var gate: int = _spell_gate(spec)
-		var unlocked: bool = int(player.get("level", 1)) >= gate
+		var unlocked: bool = int(player.get("level", 1)) >= gate and character_sheet.wizard_book.prepared(player, key, spec)
 		var cd: int = ceili(float(player.get("spell_cooldowns", {}).get(key, 0)))
 		var revert: bool = spec.get("kind", "") == "shape" and not str(player.get("form", "")).is_empty()
 		var reaction: bool = spec.get("kind", "") == "reaction"

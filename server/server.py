@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import contextlib
+import copy
 from collections import deque
 from dataclasses import dataclass, field
 import hashlib
@@ -40,7 +41,7 @@ try:
     from .fighter_rules import FighterGame
     from . import equipment_rules, caster_rules, magic_items, loot_economy
     from .caster_game import CasterGame
-    from . import wizard_schools
+    from . import wizard_schools, wizard_spellbook
     from . import town_services
     from .wizard_school_game import WizardSchoolGame
     from . import martial_rules, skill_rules, ability_rules
@@ -74,7 +75,7 @@ except ImportError:
     from fighter_rules import FighterGame
     import equipment_rules, caster_rules, magic_items, loot_economy
     from caster_game import CasterGame
-    import wizard_schools
+    import wizard_schools, wizard_spellbook
     import town_services
     from wizard_school_game import WizardSchoolGame
     import martial_rules, skill_rules, ability_rules
@@ -380,6 +381,7 @@ class Player:
     feat_migration_notice: str = ""
     wizard_school: str = ""
     wizard_school_state: dict = field(default_factory=dict)
+    wizard_spellbook: dict = field(default_factory=dict)
     wizard_school_runtime: dict = field(default_factory=dict)
     martial_archetype: str = ""
     martial_state: dict = field(default_factory=dict)
@@ -683,7 +685,7 @@ class Player:
             "ability_build", "skill_training", "skill_progress", "origin_feat",
             "feat_rules_version", "feat_legacy_choices", "feat_migration_notice",
             "world_revision", "magic_items_version", "magic_attunements",
-            "wizard_school", "wizard_school_state", "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "_piercer_used", "_slasher_used", "_crusher_used", "exhaustion",
+            "wizard_school", "wizard_school_state", "wizard_spellbook", "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "_piercer_used", "_slasher_used", "_crusher_used", "exhaustion",
             "martial_archetype", "martial_state",
             "fighting_style", "weapon_grip", "fighter_rules_version",
             "ranger_style_cantrips", "ranger_cantrip_replacement_level", "ranger_style_reaction_enabled",
@@ -879,6 +881,7 @@ class Game(StyleWeaponGame,RangerStyles,StarterAdventureGame,CharacterDevelopmen
         self.save_score(p)
 
     def starter(self, p):
+        wizard_spellbook.migrate(p)
         p.hotbar = [];dnd_content.sync_hotbar(p)
         p.inventory = [make_item(f"{p.class_id}_weapon_1"), make_item("druid_leather" if p.class_id=="druid" else "cloth")]
         p.equipment = {"weapon": p.inventory[0]["uid"], "armor": p.inventory[1]["uid"], "ring": ""}
@@ -904,6 +907,7 @@ class Game(StyleWeaponGame,RangerStyles,StarterAdventureGame,CharacterDevelopmen
             p.class_chosen = False
             p.class_id = "knight"
         starter_adventures.normalize(p)
+        wizard_spellbook.migrate(p, legacy="wizard_spellbook" not in saved)
         self.migrate_dnd(p,saved)
         if "inventory" not in saved:
             self.starter(p)
@@ -1123,6 +1127,8 @@ class Game(StyleWeaponGame,RangerStyles,StarterAdventureGame,CharacterDevelopmen
             p.xp = total - level_rules.xp_floor(new_level)
             level_up.record(p, p.level+1, new_level)
             p.level = new_level
+            wizard_spellbook.sync(p)
+            self.clear_caster_caches(p)
             p.hp = p.max_hp
             p.mana = p.max_mana
 
@@ -1217,9 +1223,28 @@ class Game(StyleWeaponGame,RangerStyles,StarterAdventureGame,CharacterDevelopmen
             self.caster_message(p, message)
         return True
 
-    async def start_rest(self, p, kind="short", recover=True):
+    async def wizard_book_command(self, p, kind, data):
+        if p.class_id != 'mage':
+            return await self.notice(p, 'Własna księga jest zdolnością czarodzieja.')
+        if (not p.alive or p.disconnected or p.form or p.rest_state or p.casting_channel
+                or max(p.combat_until, p.pvp_combat_until) > self.now()
+                or environment_rules.actions_blocked(p, self.now())
+                or ((p.dx or p.dy) and self.time-p.input_time <= .35)):
+            return await self.notice(p, 'Zatrzymaj się poza walką, odpoczynkiem i rzucaniem czarów, aby korzystać z księgi.')
+        error = (wizard_spellbook.learn(p, data.get('spell')) if kind == 'wizard_learn'
+                 else wizard_spellbook.fill(p, data.get('spells')))
+        if error:
+            return await self.notice(p, error)
+        self.clear_caster_caches(p);p._level_up_cache = None
+        with self.db:self.save_player(p)
+        await self.notice(p, 'Czar zapisano w księdze.' if kind == 'wizard_learn' else 'Uzupełniono wolne miejsca przygotowania.')
+
+    async def start_rest(self, p, kind="short", recover=True, wizard_preparation=None):
         if not isinstance(kind, str) or kind not in ("short", "long"):
             return await self.notice(p, "Wybierz krótki albo długi odpoczynek.")
+        error = wizard_spellbook.validate_rest(p, kind, wizard_preparation)
+        if error:
+            return await self.notice(p, error)
         if p.rest_state:
             return await self.notice(p, "Odpoczynek już trwa.")
         now = self.now()
@@ -1239,6 +1264,8 @@ class Game(StyleWeaponGame,RangerStyles,StarterAdventureGame,CharacterDevelopmen
         self.stop_auto(p)
         p.rest_state = {"kind": kind, "total": seconds, "until": now+seconds,
                         "x": p.x, "y": p.y, "floor": p.floor, "recover": bool(recover)}
+        if wizard_preparation:
+            p.rest_state['wizard_preparation'] = copy.deepcopy(wizard_preparation)
         await self.notice(p, f'{"Krótki" if kind=="short" else "Długi"} odpoczynek · {seconds} s. Ruch lub akcja przerywa odpoczynek.')
 
     def tick_rest(self, p):
@@ -1262,6 +1289,15 @@ class Game(StyleWeaponGame,RangerStyles,StarterAdventureGame,CharacterDevelopmen
         self.on_circle_rest(p,rest["kind"])
         self.wizard_school_rest(p,rest["kind"])
         self.martial_rest(p,rest["kind"])
+        plan = rest.get('wizard_preparation')
+        if plan:
+            error = wizard_spellbook.finish_rest(p, rest['kind'], plan)
+            if error:
+                self.caster_message(p, error)
+            else:
+                self.clear_caster_caches(p);p._level_up_cache = None
+                if not dnd_content.spell_allowed(p, 'shield'):p.shield_armed = False
+                self.caster_message(p, 'Przygotowano czary z księgi.' if rest['kind']=='long' else 'Memorize Spell: wymieniono jeden przygotowany czar.')
         p.rest_resources[rest["kind"]+"_ready"]=now+REST_RULES[rest["kind"]+"_cooldown_seconds"]
         p.rest_cooldown_until=0
         if rest["kind"]=="long":
@@ -1613,7 +1649,9 @@ class Game(StyleWeaponGame,RangerStyles,StarterAdventureGame,CharacterDevelopmen
         if kind == "magic_item":
             return await magic_items.command(self, p, data)
         if kind == "rest":
-            return await self.start_rest(p, data.get("kind", "short"),data.get("recover",True) is not False)
+            return await self.start_rest(p, data.get("kind", "short"),data.get("recover",True) is not False,data.get('wizard_preparation'))
+        if kind in ('wizard_learn', 'wizard_prepare'):
+            return await self.wizard_book_command(p, kind, data)
         if kind == "rest_cancel":
             self.cancel_rest(p)
             return
@@ -1744,6 +1782,7 @@ class Game(StyleWeaponGame,RangerStyles,StarterAdventureGame,CharacterDevelopmen
             if len(p.inventory) >= INVENTORY_CAP and not any(i["template"].endswith("_weapon_1") for i in p.inventory):
                 return await self.notice(p, "Zwolnij miejsce w plecaku na broń nowej klasy.")
             p.class_id, p.class_chosen = class_id, True
+            wizard_spellbook.migrate(p)
             skill_rules.normalize(p)
             # Replace only the zero-bonus starter weapon; keep all other earned gear.
             old_starter = next((i for i in p.inventory if i["template"].endswith("_weapon_1")), None)
@@ -2139,7 +2178,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_35","world_revision":getattr(content,"WORLD_REVISION",20),"level_rules_version":level_rules.VERSION,"opening_balance_revision":1})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_36","world_revision":getattr(content,"WORLD_REVISION",20),"level_rules_version":level_rules.VERSION,"opening_balance_revision":1})
 
     app.router.add_get("/health",health)
     async def ranking(request):
@@ -2177,7 +2216,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
                 raise web.HTTPNotFound()
             return web.FileResponse(path,headers={"Cache-Control":"no-cache","X-Content-Type-Options":"nosniff"})
         app.router.add_get("/"+filename,public_css)
-    for route,filename in [("/starter_adventures.js","starter_adventures.js"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/skills_ui.js","skills_ui.js"),("/feat_ui.js","feat_ui.js"),("/feat_ui.css","feat_ui.css"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/terrain_art.js","terrain_art.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
+    for route,filename in [("/wizard_spellbook_ui.js","wizard_spellbook_ui.js"),("/wizard_spellbook_ui.css","wizard_spellbook_ui.css"),("/starter_adventures.js","starter_adventures.js"),("/game.js","game.js"),("/runtime.js","runtime.js"),("/atlas_map.js","atlas_map.js"),("/style.css","style.css"),("/spell_vfx.js","spell_vfx.js"),("/character_sheet.js","character_sheet.js"),("/skills_ui.js","skills_ui.js"),("/feat_ui.js","feat_ui.js"),("/feat_ui.css","feat_ui.css"),("/character_sheet.css","character_sheet.css"),("/level_up.js","level_up.js"),("/level_up.css","level_up.css"),("/loot_ui.js","loot_ui.js"),("/loot_ui.css","loot_ui.css"),("/hud_layout.css","hud_layout.css"),("/windows.css","windows.css"),("/windows.js","windows.js"),("/mobile.js","mobile.js"),("/mobile.css","mobile.css"),("/rest_ui.js","rest_ui.js"),("/rest_ui.css","rest_ui.css"),("/app_shell.js","app_shell.js"),("/app_shell.css","app_shell.css"),("/manifest.webmanifest","manifest.webmanifest"),("/sw.js","sw.js"),("/offline.html","offline.html"),("/inventory_ui.js","inventory_ui.js"),("/fighter_ui.js","fighter_ui.js"),("/martial_ui.js","martial_ui.js"),("/martial.css","martial.css"),("/fighter_vfx.js","fighter_vfx.js"),("/fighter.css","fighter.css"),("/caster_ui.js","caster_ui.js"),("/caster_vfx.js","caster_vfx.js"),("/wizard_vfx.js","wizard_vfx.js"),("/service_ui.js","service_ui.js"),("/hud_icons.js","hud_icons.js"),("/service_ui.css","service_ui.css"),("/caster.css","caster.css"),("/circle_spell_ui.js","circle_spell_ui.js"),("/circle_vfx.js","circle_vfx.js"),("/hotbar_ui.js","hotbar_ui.js"),("/hotbar_ui.css","hotbar_ui.css"),("/world_geometry.js","world_geometry.js"),("/terrain_art.js","terrain_art.js"),("/google_auth.js","google_auth.js"),("/google_auth.css","google_auth.css"),("/adventure_ui.js","adventure_ui.js"),("/adventure_ui.css","adventure_ui.css")]:
         async def asset(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

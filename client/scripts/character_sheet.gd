@@ -13,6 +13,7 @@ var bag_page: int = 0
 var selected_item: String = ""
 var selected_style: String = ""
 var caster_content = preload("res://scripts/caster_sheet.gd").new()
+var wizard_book = preload("res://scripts/wizard_spellbook.gd").new()
 
 func setup(owner: Node) -> void:
 	host = owner
@@ -28,7 +29,7 @@ func setup(owner: Node) -> void:
 	box.add_child(heading)
 	var nav: HBoxContainer = HBoxContainer.new()
 	box.add_child(nav)
-	var names: Dictionary = {"inventory":"Ekwipunek", "stats":"Statystyki", "feats":"Atuty", "spells":"Czary"}
+	var names: Dictionary = {"inventory":"Ekwipunek", "stats":"Statystyki", "feats":"Atuty", "spells":"Czary", "book":"Księga"}
 	for key: String in names:
 		var b: Button = host._button(names[key], func() -> void: show_tab(key))
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -103,7 +104,10 @@ func refresh() -> void:
 	if host.get_viewport().gui_get_focus_owner() is OptionButton:
 		return
 	var p: Dictionary = host.player
-	var next: String = JSON.stringify([tab, bag_page, selected_item, p.get("inventory"), p.get("equipment"), p.get("character_sheet"), selected_style, not host.progression.near_service("master").is_empty(), p.get("attributes"), p.get("skills"), p.get("mastery"), p.get("mastery_points"), float(p.get("combat_remaining", 0)) > 0, float(p.get("bonus_remaining", 0)) > 0, p.get("alive"), p.get("hotbar"), p.get("level"), p.get("gold"), p.get("xp"), p.get("xp_total"), p.get("xp_next_total"), p.get("bank_gold"), p.get("soul"), p.get("kills"), p.get("boss_kills"), p.get("armor_class"), p.get("damage_dice"), p.get("attack_bonus"), p.get("potions"), p.get("potion_slots"), p.get("shield_armed"), p.get("ensnaring_armed"), p.get("concentration"), p.get("form"), int(p.get("mana", 0)), int(p.get("hp", 0)), p.get("queued_spell"), ceili(float(p.get("action_remaining", 0)) * 10) if not str(p.get("queued_spell", "")).is_empty() else 0, p.get("spell_cooldowns"), p.get("spell_profiles"), p.get("status_effects"), host.selected_enemy, host.selected_target, p.get("thrown_weapons"), int(p.get("x", 0)) / 32, int(p.get("y", 0)) / 32, p.get("action_remaining", 0) > 0])
+	tabs["book"].visible = wizard_book.metadata(p).get("enabled", false)
+	if tab == "book" and not tabs["book"].visible:
+		tab = "spells"
+	var next: String = JSON.stringify([tab, bag_page, selected_item, p.get("inventory"), p.get("equipment"), p.get("character_sheet"), selected_style, not host.progression.near_service("master").is_empty(), p.get("attributes"), p.get("skills"), p.get("mastery"), p.get("mastery_points"), float(p.get("combat_remaining", 0)) > 0, float(p.get("bonus_remaining", 0)) > 0, p.get("alive"), p.get("hotbar"), p.get("level"), p.get("gold"), p.get("xp"), p.get("xp_total"), p.get("xp_next_total"), p.get("bank_gold"), p.get("soul"), p.get("kills"), p.get("boss_kills"), p.get("armor_class"), p.get("damage_dice"), p.get("attack_bonus"), p.get("potions"), p.get("potion_slots"), p.get("shield_armed"), p.get("ensnaring_armed"), p.get("concentration"), p.get("form"), int(p.get("mana", 0)), int(p.get("hp", 0)), p.get("queued_spell"), ceili(float(p.get("action_remaining", 0)) * 10) if not str(p.get("queued_spell", "")).is_empty() else 0, p.get("spell_cooldowns"), p.get("spell_profiles"), p.get("status_effects"), host.selected_enemy, host.selected_target, p.get("thrown_weapons"), int(p.get("x", 0)) / 32, int(p.get("y", 0)) / 32, p.get("action_remaining", 0) > 0, p.get("rest", {}), p.get("rest_block_reason", ""), ceili(float(p.get("rest_short_remaining", 0))), ceili(float(p.get("rest_long_remaining", 0)))])
 	if signature == next:
 		return
 	signature = next
@@ -117,6 +121,7 @@ func refresh() -> void:
 		"inventory": equipment(p)
 		"stats": statistics(p)
 		"spells": spells(p)
+		"book": wizard_book.render(self, p)
 		"feats": caster_content.render(self, p)
 		_: text("Atuty", true); text("Nie masz jeszcze atutów.")
 
@@ -290,14 +295,19 @@ func statistics(p: Dictionary) -> void:
 
 func spells(p: Dictionary) -> void:
 	caster_content.controls(self, p)
+	if wizard_book.metadata(p).get("enabled", false):
+		list.add_child(host._button("Otwórz własną księgę · nauka i przygotowania", func() -> void: open("book")))
 	text("Krąg %d · Mana %d/%d" % [int(p.get("spell_circle", 0)), int(p.get("mana", 0)), int(p.get("max_mana", 0))], true)
 	text("F · " + str(host.world_data.get("spells", {}).get(p.get("favorite_spell", ""), {}).get("name", "—")))
 	for key: String in host.world_data.get("spells", {}):
 		var spec: Dictionary = host._spell_profile(key)
 		if not spec.get("class_ids", []).has(p.get("class_id", "")) and not p.get("character_sheet", {}).get("fighter", {}).get("chosen_cantrips", []).has(key):
 			continue
+		if not wizard_book.known(p, key, spec):
+			continue
 		var gate: int = host._spell_gate(spec)
 		var unlocked: bool = int(p.get("level", 1)) >= gate
+		var prepared: bool = wizard_book.prepared(p, key, spec)
 		var row: HBoxContainer = HBoxContainer.new()
 		list.add_child(row)
 		var art: TextureRect = TextureRect.new()
@@ -306,7 +316,7 @@ func spells(p: Dictionary) -> void:
 		art.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		art.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		row.add_child(art)
-		var title: Label = host._wrap_label(str(spec.get("name", "")) + (" · krąg %d" % int(spec.get("circle", 0)) if int(spec.get("circle", 0)) > 0 else " · sztuczka" if not spec.get("feature", false) else " · zdolność") + "\n%d many%s" % [host._spell_mana(key, spec), " · od poziomu %d" % gate if not unlocked else ""], 15)
+		var title: Label = host._wrap_label(str(spec.get("name", "")) + (" · krąg %d" % int(spec.get("circle", 0)) if int(spec.get("circle", 0)) > 0 else " · sztuczka" if not spec.get("feature", false) else " · zdolność") + "\n%d many%s" % [host._spell_mana(key, spec), " · od poziomu %d" % gate if not unlocked else " · nieprzygotowany" if not prepared else ""], 15)
 		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(title)
 		var queue_label: String = host._queued_spell_label(key)
@@ -314,7 +324,7 @@ func spells(p: Dictionary) -> void:
 		var reaction: bool = spec.get("kind", "") == "reaction"
 		var revert: bool = spec.get("kind", "") == "shape" and not str(p.get("form", "")).is_empty()
 		cast.text = queue_label if not queue_label.is_empty() else "Powrót" if revert else ("Wyłącz" if p.get("shield_armed", false) else "Włącz") if reaction else ("Anuluj" if p.get("ensnaring_armed", false) else "Przygotuj") if spec.get("kind", "") == "weapon_trigger" else "Użyj"
-		cast.disabled = not unlocked or not p.get("alive", true) or (not reaction and not revert and not (spec.get("kind", "") == "weapon_trigger" and p.get("ensnaring_armed", false)) and (float(p.get("mana", 0)) < host._spell_mana(key, spec) or float(p.get("spell_cooldowns", {}).get(key, 0)) > 0 or not str(p.get("form", "")).is_empty()))
+		cast.disabled = not unlocked or not prepared or not p.get("alive", true) or (not reaction and not revert and not (spec.get("kind", "") == "weapon_trigger" and p.get("ensnaring_armed", false)) and (float(p.get("mana", 0)) < host._spell_mana(key, spec) or float(p.get("spell_cooldowns", {}).get(key, 0)) > 0 or not str(p.get("form", "")).is_empty()))
 		if spec.get("kind", "") == "recovery":
 			cast.disabled = not caster_content.can_recover(p)
 		row.add_child(cast)
@@ -330,7 +340,7 @@ func spells(p: Dictionary) -> void:
 		var bar: Array = p.get("hotbar", [])
 		for i: int in range(bar.size()):
 			picker.add_item(host._hotbar_key_label(i) + (" ✓" if str(bar[i]) == key else ""))
-		picker.disabled = not unlocked
+		picker.disabled = not unlocked or not prepared
 		picker.item_selected.connect(func(index: int) -> void:
 			host._bind_hotbar(index, key)
 			picker.release_focus())

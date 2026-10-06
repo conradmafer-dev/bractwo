@@ -49,13 +49,13 @@
   function create(h){
     const panel=document.getElementById('characterPanel'),content=document.getElementById('characterContent'),tabButtons=[...panel.querySelectorAll('[data-character-tab]')];
     let tab='inventory',signature='',bagPage=0,selectedItem='',restoreFocus=null;
-    const sections={abilities:'values',stats:'general',skills:'list',feats:'general'};
+    const sections={abilities:'values',stats:'general',skills:'list',feats:'general',spells:'ready'};
     function close(){const wasOpen=!panel.hidden;panel.hidden=true;root.BractwoInventoryUI?.hide();signature='';if(!wasOpen)return;h.changed?.();if(restoreFocus?.isConnected&&restoreFocus.getClientRects().length)restoreFocus.focus({preventScroll:true});}
     function open(which=tab,section){restoreFocus=document.activeElement;h.prepare();tab=which;if(section)sections[tab]=section;else if(which==='abilities')sections.abilities='growth';else if(which==='skills')sections.skills='list';else if(which==='feats')sections.feats='general';content.scrollTop=0;panel.hidden=false;signature='';render();panel.querySelector(`[data-character-tab="${tab}"]`)?.focus({preventScroll:true});h.changed?.();}
     function toggle(which){if(!panel.hidden&&(!which||which===tab))close();else open(which||tab);}
     for(const b of tabButtons)b.addEventListener('click',()=>{tab=b.dataset.characterTab;signature='';content.scrollTop=0;render();});
     panel.querySelector('.character-close').addEventListener('click',close);
-    panel.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const list=[...panel.querySelectorAll('button:not(:disabled),select:not(:disabled),[tabindex="0"]')].filter(x=>x.offsetParent!==null),first=list[0],last=list.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}});
+    panel.addEventListener('keydown',e=>{if(e.key!=='Tab')return;const list=[...panel.querySelectorAll('button:not(:disabled),select:not(:disabled),input:not(:disabled),[tabindex="0"]')].filter(x=>x.offsetParent!==null),first=list[0],last=list.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}});
     function heading(text,parent=content){parent.append(node('h3','sheet-section-title',text));}
     function tiles(entries,parent=content){const grid=node('div','sheet-stat-grid');for(const [label,value]of entries){const e=node('div','sheet-stat');e.append(node('small','',label),node('strong','',String(value)));grid.append(e);}parent.append(grid);return grid;}
     function selectItem(uid){selectedItem=uid;signature='';render();content.querySelector('.sheet-item-detail > .item-actions')?.scrollIntoView({block:'nearest'});}
@@ -116,13 +116,16 @@
         if(p.form)content.append(node('p','',`Postać zwierzęca: ${({wolf:'wilk',cat:'kot',black_bear:'niedźwiedź czarny',bear:'niedźwiedź brunatny'}[p.form]||p.form)} · ${p.temp_hp||0} tymczasowych HP`));if(p.blessed)content.append(node('p','','Błogosławieństwo aktywne.'));
       }
     }
-    function spells(p,w){const bar=root.BractwoRuntime.displayHotbar(p);root.BractwoCasterUI.actions(content,p,h);const info=node('div','sheet-spell-summary');info.append(node('span','',`Krąg ${p.spell_circle||0} · mana ${Math.floor(p.mana)}/${p.max_mana}`),node('span','',`F · ${w.spells?.[p.favorite_spell]?.name||'—'}`));content.append(info);
+    function spells(p,w){const bar=root.BractwoRuntime.displayHotbar(p),book=root.BractwoWizardBookUI,bookActive=!!book?.book(p),bookSection=sections.spells||'ready',bookMode=book?.normalize(bookSection),bookHooks={...h,open,close,content,refresh:()=>{signature='';render();}};if(bookActive)book.header(content,p,w,bookHooks,bookSection);if(!bookActive||bookMode==='ready')root.BractwoCasterUI.actions(content,p,h);const info=node('div','sheet-spell-summary');info.append(node('span','',`Krąg ${p.spell_circle||0} · mana ${Math.floor(p.mana)}/${p.max_mana}`),node('span','',`F · ${w.spells?.[p.favorite_spell]?.name||'—'}`));content.append(info);
       const list=node('div','sheet-spell-list');list.setAttribute('aria-label','Czary według kręgów');
-      for(const section of spellSections(w,p,h.gate)){
+      const groups=bookActive?book.sections(spellSections(w,p,h.gate),p,bookSection):spellSections(w,p,h.gate);
+      if(bookActive&&!groups.length)content.append(node('p','wizard-book-empty',bookMode==='learn'?'Wszystkie czary z obecnego katalogu są już w twojej księdze.':bookMode==='ready'?'Wybierz czary do księgi w zakładce Nauka, a następnie przygotuj je w zakładce Przygotuj.':'Księga jest pusta. W zakładce Nauka wybierz pierwsze czary.'));
+      for(const section of groups){
         const title=node('h3','sheet-section-title',section.label);title.dataset.spellSection=section.id;list.append(title);
         for(const {id,spec:s,gate,unlocked}of section.entries){
-        const row=node('article','sheet-spell'+(unlocked?'':' locked'));row.dataset.spell=id;row.append(image(s.icon||`assets/spells/${id}.svg`));const text=node('div','sheet-spell-text');text.append(node('strong','',s.name));
-        const parts=[root.BractwoRuntime.spellCostText(s,p),s.kind==='martial_feature'?'Przygotowanie bez zużycia akcji':s.action==='bonus'?'Akcja dodatkowa':s.action==='reaction'?'Reakcja':s.action==='extra'?'Dodatkowa akcja':'Akcja'];if(s.gold)parts.push(s.gold+' zł');if(s.ritual)parts.push('Rytuał '+s.ritual_seconds+' s');if(!unlocked)parts.push(p.level<gate?`Od poziomu ${gate}`:'Czar obecnie niedostępny');text.append(node('small','',parts.join(' · ')));
+        const bookState=bookActive?book.state(p,s):null,normalAvailable=unlocked&&(!bookState||bookState.prepared),showCasting=!bookActive||['ready','book'].includes(bookMode),ritualAvailable=bookState?bookState.ritual:unlocked;
+        const row=node('article','sheet-spell'+(unlocked||bookState?.known?'':' locked'));row.dataset.spell=id;row.append(image(s.icon||`assets/spells/${id}.svg`));const text=node('div','sheet-spell-text');text.append(node('strong','',s.name));
+        const parts=[root.BractwoRuntime.spellCostText(s,p),s.kind==='martial_feature'?'Przygotowanie bez zużycia akcji':s.action==='bonus'?'Akcja dodatkowa':s.action==='reaction'?'Reakcja':s.action==='extra'?'Dodatkowa akcja':'Akcja'];if(s.gold)parts.push(s.gold+' zł');if(s.ritual)parts.push('Rytuał '+s.ritual_seconds+' s');if(!unlocked&&!bookState?.known)parts.push(p.level<gate?`Od poziomu ${gate}`:bookState?'Wymaga poznania i przygotowania':'Czar obecnie niedostępny');text.append(node('small','',parts.join(' · ')));
         // Player-facing original summaries; no implementation labels.
         const desc=String(s.description||'').replace(/W tej adaptacji /g,'').replace(/w adaptacji /g,'').replace(/(\d+) jednost(?:ek|ki)/g,(_,n)=>`${Math.round(Number(n)/6.4)} stóp`);
         if(s.power_summary)text.append(node('p','spell-power-summary',s.power_summary));
@@ -131,28 +134,29 @@
         if(warning)text.append(node('p','spell-concentration-warning',warning));
         if(unlocked&&s.next_upgrade)text.append(node('small','spell-next-upgrade',s.next_upgrade));
         row.append(text);const actions=node('div','sheet-spell-actions'),revert=s.kind==='shape'&&p.form;
-        const usable=unlocked&&(s.kind==='recovery'?root.BractwoCasterUI.canRecover(p):root.BractwoRuntime.spellUsable(s,p));
+        const usable=normalAvailable&&(s.kind==='recovery'?root.BractwoCasterUI.canRecover(p):root.BractwoRuntime.spellUsable(s,p));
         const use=button(s.kind==='martial_feature'?root.BractwoMartialUI?.actionLabel(p,s.martial_maneuver)||'Przygotuj na atak':root.BractwoRuntime.queuedSpellLabel(s,p)|| (revert?'Powrót':s.kind==='recovery'?'Odpocznij i odzyskaj':s.kind==='reaction'?(p.shield_armed?'Wyłącz':'Włącz'):s.kind==='weapon_trigger'?(p.ensnaring_armed?'Anuluj':'Przygotuj'):'Użyj'),()=>h.cast(id),!usable);
-        if(s.kind==='martial_feature'){use.dataset.martialAction=s.martial_maneuver;use.setAttribute('aria-pressed',String(!!s.armed));}actions.append(use);
-        root.BractwoCircleSpellUI?.append(actions,p,s,h,unlocked);
-        if(unlocked&&s.ritual)actions.append(button('Rytuał · 0 many',()=>h.send({type:'ritual',spell_id:id}),!p.alive||!!p.form||p.combat_remaining>0||!!p.character_sheet?.caster?.channel?.key||p.gold<(s.gold||0)||p.character_sheet?.training?.armor_penalty));
-        if(unlocked&&s.power_options?.length>1){
+        if(s.kind==='martial_feature'){use.dataset.martialAction=s.martial_maneuver;use.setAttribute('aria-pressed',String(!!s.armed));}if(showCasting)actions.append(use);
+        if(bookActive)book.row(actions,p,s,bookHooks,bookSection);
+        if(showCasting)root.BractwoCircleSpellUI?.append(actions,p,s,h,unlocked);
+        if(showCasting&&ritualAvailable&&s.ritual)actions.append(button('Rytuał · 0 many',()=>h.send({type:'ritual',spell_id:id}),!p.alive||!!p.form||p.combat_remaining>0||!!p.character_sheet?.caster?.channel?.key||p.gold<(s.gold||0)||p.character_sheet?.training?.armor_penalty));
+        if(showCasting&&normalAvailable&&s.power_options?.length>1){
           const power=node('select','spell-power-picker');power.setAttribute('aria-label',`Moc czaru: ${s.name}`);
           power.append(new Option('Auto · najwyższa moc','0'));
           for(const rank of s.power_options)power.append(new Option(`Krąg ${rank} · ${s.free_cast?0:p.mana_budget?.costs?.[rank]??'?'} many`,String(rank)));
           power.value=String(s.power_choice||0);
           power.addEventListener('change',()=>{h.send({type:'spell_power',spell_id:id,circle:Number(power.value)});power.blur();});actions.append(power);
         }
-        if(s.recast_active)actions.append(button('Zakończ czar',()=>h.send({type:'stop_concentration'})));
-        const select=node('select','slot-picker');select.setAttribute('aria-label',`Skrót: ${s.name}`);select.append(new Option('Przypisz skrót…',''));for(let i=0;i<(bar.length||24);i++)select.append(new Option(`${root.BractwoRuntime.hotbarLabel(i)}${bar[i]===root.BractwoRuntime.hotbarGroupForSpell(id,w)?' ✓':''} · ${w.hotbar_groups?.[bar[i]]?.name||w.spells?.[bar[i]]?.name||'Pusty'}`,String(i)));select.disabled=!unlocked;select.addEventListener('change',()=>{if(select.value!=='')h.send({type:'hotbar',slot:Number(select.value),spell_id:id,grouped:!!p.grouped_hotbar});select.blur();});actions.append(select);row.append(actions);list.append(row);
+        if(showCasting&&s.recast_active)actions.append(button('Zakończ czar',()=>h.send({type:'stop_concentration'})));
+        const select=node('select','slot-picker');select.setAttribute('aria-label',`Skrót: ${s.name}`);select.append(new Option('Przypisz skrót…',''));for(let i=0;i<(bar.length||24);i++)select.append(new Option(`${root.BractwoRuntime.hotbarLabel(i)}${bar[i]===root.BractwoRuntime.hotbarGroupForSpell(id,w)?' ✓':''} · ${w.hotbar_groups?.[bar[i]]?.name||w.spells?.[bar[i]]?.name||'Pusty'}`,String(i)));select.disabled=!normalAvailable;select.addEventListener('change',()=>{if(select.value!=='')h.send({type:'hotbar',slot:Number(select.value),spell_id:id,grouped:!!p.grouped_hotbar});select.blur();});if(showCasting)actions.append(select);row.append(actions);list.append(row);
         }
-      }content.append(list);
+      }content.append(list);if(bookActive)book.sync(content,p,bookHooks);
     }
     function render(){if(panel.hidden)return;const {player:p,world:w}=h.state();if(!p)return;
       // Native mobile pickers keep focus after selection: refresh gates without replacing them.
       if(tab==='feats')root.BractwoCasterUI.syncTraining(content,p,h);
       if(tab==='abilities'||tab==='skills'||tab==='feats')root.BractwoSkillsUI?.sync(content,p,{...h,open});
-      if(tab==='spells')root.BractwoCasterUI.syncCircle(content,p,h);
+      if(tab==='spells'){root.BractwoCasterUI.syncCircle(content,p,h);root.BractwoWizardBookUI?.sync(content,p,h);}
       if(tab==='feats'||tab==='spells')root.BractwoMartialUI?.sync(content,p);
       if(panel.contains(document.activeElement)&&document.activeElement.tagName==='SELECT')return;
       const next=JSON.stringify([tab,sections,bagPage,selectedItem,tab==='skills'&&sections.skills==='challenges'?p.last_roll:null,p.inventory,p.equipment,p.level,Math.floor(p.mana),Math.ceil(p.hp),p.hotbar,p.grouped_hotbar,p.attributes,p.character_sheet,h.state().skill_challenges,p.skills,p.mastery,p.mastery_points,p.combat_remaining>0,p.bonus_remaining>0,p.xp,p.xp_next,p.xp_total,p.xp_next_total,p.max_hp,p.max_mana,p.attack_bonus,p.damage_dice,p.armor_class,p.save_dc,p.attacks_per_round,p.bank_gold,p.soul,p.kills,p.boss_kills,p.gold,p.potions,p.potion_slots,p.form,p.shield_armed,p.ensnaring_armed,p.concentration,p.queued_spell,p.queued_spell?Math.ceil((p.action_remaining||0)*10):0,p.spell_cooldowns,p.spell_profiles,p.environment,p.rest_resources,p.status_effects?.map(e=>[e.id,Math.ceil(e.remaining)]),p.thrown_weapons?.map(e=>[e.item?.uid,(e.floor||0)===(p.floor||0)&&Math.hypot(e.x-p.x,e.y-p.y)<=64]),h.canTrade(),h.nearMaster?.()]);if(signature===next)return;signature=next;
