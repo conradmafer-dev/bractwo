@@ -11,7 +11,7 @@ const CLASS_DESCRIPTIONS: Dictionary = {
 	"mage":"Różdżka: 1k4. Darmowe sztuczki; I krąg od poziomu 1, II od 3, dalsze co 2.",
 	"druid":"Wybór Strażnika lub Mistyka natury; I krąg od 1., wilk i kot od 2. poziomu."
 }
-const SLOT_NAMES: Dictionary = {"weapon":"Broń", "armor":"Pancerz", "shield":"Tarcza", "ring":"Pierścień", "trophy":"Trofeum"}
+const SLOT_NAMES: Dictionary = {"weapon":"Broń", "offhand":"Druga ręka", "armor":"Pancerz", "shield":"Tarcza", "ring":"Pierścień", "trophy":"Trofeum"}
 const PAPER: Color = Color("eee6ce")
 const GOLD: Color = Color("dabb79")
 const GREEN: Color = Color("8ed6b5")
@@ -26,6 +26,8 @@ var progression = preload("res://scripts/expansion_panel.gd").new()
 var level_up_panels = preload("res://scripts/level_up.gd").new()
 var fighter_choice = preload("res://scripts/fighter_choice.gd").new()
 var caster_choice = preload("res://scripts/caster_choice.gd").new()
+var class_choice = preload("res://scripts/class_choice.gd").new()
+var weapon_actions = preload("res://scripts/weapon_actions.gd").new()
 var character_sheet = preload("res://scripts/character_sheet.gd").new()
 var navigation_goal: Dictionary = {}
 var player: Dictionary = {}
@@ -139,6 +141,8 @@ func _ready() -> void:
 	character_sheet.setup(self)
 	fighter_choice.setup(self)
 	caster_choice.setup(self)
+	class_choice.setup(self)
+	weapon_actions.setup(self)
 	safety_confirm = ConfirmationDialog.new()
 	safety_confirm.title = "Odblokować atakowanie graczy?"
 	safety_confirm.dialog_text = "PvP: broń, czary, obszary i wilk. Uważaj na osoby w obszarze.\nNieuzasadniona agresja i zabójstwa powodują kary.\nOsada i początkujący pozostają chronieni."
@@ -540,6 +544,7 @@ func _build_hud(root: Control) -> void:
 		potion_button.add_theme_font_size_override("font_size", 12)
 		potion_strip.add_child(potion_button)
 	utilities.add_child(_button("E · Rozmowa", _interact_nearby))
+	utilities.add_child(_button("Sposób ataku", func() -> void: weapon_actions.toggle()))
 	combat_roll_label = _wrap_label("", 12, GOLD)
 	combat_roll_label.custom_minimum_size.y = 32
 	combat_roll_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -731,6 +736,9 @@ func _handle_message(data: Dictionary) -> void:
 	match str(data.get("type", "")):
 		"welcome":
 			level_up_panels.reset()
+			class_choice.reset()
+			weapon_actions.reset()
+			character_sheet.caster_content.class_features.reset()
 			local_id = str(data.get("id", ""))
 			player = {}
 			selected_enemy = ""
@@ -947,6 +955,8 @@ func _update_hud() -> void:
 	character_sheet.refresh()
 	fighter_choice.refresh()
 	caster_choice.refresh()
+	class_choice.refresh()
+	weapon_actions.refresh()
 	level_up_panels.refresh()
 	_refresh_tracker()
 	window_layout.refresh()
@@ -1450,6 +1460,9 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_J:
 			_toggle_journal()
 		KEY_ESCAPE:
+			if weapon_actions.panel.visible:
+				weapon_actions.panel.hide()
+				return
 			if character_sheet.panel.visible:
 				character_sheet.panel.hide()
 				return
@@ -1501,7 +1514,7 @@ func _controls_blocked() -> bool:
 func _menu_open() -> bool:
 	if is_instance_valid(loot_dialog) and loot_dialog.visible:
 		return true
-	return safety_confirm.visible or inventory_panel.visible or party_panel.visible or journal_panel.visible or progression.panel.visible or character_sheet.panel.visible
+	return safety_confirm.visible or inventory_panel.visible or party_panel.visible or journal_panel.visible or progression.panel.visible or character_sheet.panel.visible or weapon_actions.panel.visible
 
 func _nearest_npc() -> Dictionary:
 	var here: Vector2 = Vector2(float(player.get("x", -1000)), float(player.get("y", -1000)))
@@ -1544,6 +1557,10 @@ func _interact_nearby() -> void:
 		if window.visible:
 			window.hide()
 			return
+	var thrown: Dictionary = _nearest_thrown_weapon()
+	if not thrown.is_empty():
+		_send({"type":"recover_thrown", "uid":thrown.get("item", {}).get("uid", "")})
+		return
 	for nature: Dictionary in world_data.get("nature_sites", []):
 		if int(nature.get("floor", 0)) == int(player.get("floor", 0)) and Vector2(float(nature.get("x", 0)), float(nature.get("y", 0))).distance_to(Vector2(float(player.get("x", 0)), float(player.get("y", 0)))) <= 110.0:
 			_send({"type":"nature_interact", "id":nature.get("id", "")})
@@ -1574,6 +1591,18 @@ func _interact_nearby() -> void:
 		_refresh_journal()
 	else:
 		progression.show_book("Atlas")
+
+func _nearest_thrown_weapon() -> Dictionary:
+	var entries: Array = player.get("thrown_weapons", weapon_actions.metadata(player).get("thrown_weapons", []))
+	var here: Vector2 = Vector2(float(player.get("x", 0)), float(player.get("y", 0)))
+	var best: Dictionary = {}
+	var distance: float = 64.0
+	for entry: Dictionary in entries:
+		var current: float = here.distance_to(Vector2(float(entry.get("x", 0)), float(entry.get("y", 0))))
+		if int(entry.get("floor", 0)) == int(player.get("floor", 0)) and current <= distance:
+			best = entry
+			distance = current
+	return best
 
 func _build_journal() -> void:
 	journal_panel = _window("DZIENNIK WYPRAW · ZADANIA I ODKRYCIA")

@@ -27,4 +27,4 @@ func setup(owner: Node) -> void:
 
 func refresh() -> void:
 	var id: String = str(host.player.get("id", ""))
-	panel.visible = not id.is_empty() and bool(host.player.get("character_sheet", {}).get("fighter", {}).get("pending", false)) and not dismissed.get(id, false) and not config.get_value("closed", id, false)
+	panel.visible = str(host.player.get("class_id", "")) == "knight" and not id.is_empty() and bool(host.player.get("character_sheet", {}).get("fighter", {}).get("pending", false)) and not dismissed.get(id, false) and not config.get_value("closed", id, false)

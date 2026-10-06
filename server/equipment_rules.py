@@ -25,9 +25,9 @@ CLASS_TRAINING = {
 }
 WEAPON_TYPES = {
     'quarterstaff': dict(name='Laska', category='simple', dice=[1,6], versatile=[1,8], damage='bludgeoning', appearance='staff'),
-    'club': dict(name='Maczuga', category='simple', dice=[1,4], damage='bludgeoning', appearance='staff'),
-    'dagger': dict(name='Sztylet', category='simple', dice=[1,4], damage='piercing', finesse=True, appearance='sword'),
-    'handaxe': dict(name='Toporek', category='simple', dice=[1,6], damage='slashing', appearance='sword'),
+    'club': dict(name='Maczuga', category='simple', dice=[1,4], damage='bludgeoning', light=True, appearance='staff'),
+    'dagger': dict(name='Sztylet', category='simple', dice=[1,4], damage='piercing', finesse=True, light=True, thrown=[20,60], appearance='sword'),
+    'handaxe': dict(name='Toporek', category='simple', dice=[1,6], damage='slashing', light=True, thrown=[20,60], appearance='sword'),
     'shortbow': dict(name='Krótki łuk', category='simple', dice=[1,6], damage='piercing', ranged=True, two=True, appearance='bow'),
     'longbow': dict(name='Długi łuk', category='martial', dice=[1,8], damage='piercing', ranged=True, two=True, heavy=True, appearance='bow'),
     'longsword': dict(name='Miecz długi', category='martial', dice=[1,8], versatile=[1,10], damage='slashing', appearance='sword'),
@@ -37,7 +37,7 @@ WEAPON_TYPES = {
     'greataxe': dict(name='Topór dwuręczny', category='martial', dice=[1,12], damage='slashing', two=True, heavy=True, appearance='sword'),
     'warhammer': dict(name='Młot bojowy', category='martial', dice=[1,8], versatile=[1,10], damage='bludgeoning', appearance='sword'),
     'rapier': dict(name='Rapier', category='martial', dice=[1,8], damage='piercing', finesse=True, appearance='sword'),
-    'scimitar': dict(name='Sejmitar', category='martial', dice=[1,6], damage='slashing', finesse=True, appearance='sword'),
+    'scimitar': dict(name='Sejmitar', category='martial', dice=[1,6], damage='slashing', finesse=True, light=True, appearance='sword'),
 }
 # These are genuine General Feats, separate from the class-granted training rows.
 # Their +1 is awarded ONLY when the feat is selected, not for a class/path grant.
@@ -191,6 +191,39 @@ def has(p,key): return key in training_sources(p)
 
 
 def weapon(p): return _rules().equipped_item(p,'weapon')
+
+
+def offhand(p): return _rules().equipped_item(p,'offhand')
+
+
+def check_offhand(p, item):
+    """Two light weapons occupy two distinct hands and inventory instances."""
+    error=check_equip(p,item)
+    if error:return error
+    if item.get('slot')!='weapon' or not item.get('light') or item.get('two_handed'):
+        return 'W drugiej ręce można trzymać tylko broń z właściwością Lekka.'
+    if p.equipment.get('shield') or getattr(p,'weapon_grip','one')=='two':
+        return 'Najpierw zwolnij drugą rękę: odłóż tarczę albo zmień chwyt.'
+    # Equip checks refer to hands, even when the player plans to kick/punch.
+    try:from . import weapon_actions
+    except ImportError:import weapon_actions
+    main=weapon_actions.held_item(p)
+    if not main.get('light') or main.get('two_handed'):
+        return 'W pierwszej ręce również potrzebujesz broni z właściwością Lekka.'
+    if item.get('uid')==p.equipment.get('weapon'):
+        return 'Wybierz inną sztukę broni niż ta w pierwszej ręce.'
+    return ''
+
+
+def equip_offhand(p, uid):
+    """Return an error without mutation, or equip the owned canonical instance."""
+    item=next((i for i in p.inventory if i.get('uid')==uid),None)
+    if not item:return 'Nie masz tej broni w plecaku.'
+    spec=dict(_content().ITEMS.get(item.get('template'),{}),uid=uid)
+    error=check_offhand(p,spec)
+    if error:return error
+    p.equipment['offhand']=uid
+    return ''
 
 
 def is_focus(item): return item.get('implement')=='arcane'
@@ -347,6 +380,15 @@ def training_sheet(p):
 
 
 def configure(items):
+    # These inexpensive weapons make every Light/Thrown style usable from the
+    # starting settlement. They follow the same canonical rules as loot weapons.
+    common=dict(class_ids=ALL_CLASSES[:],min_level=1,rarity='common',attack=0,attack_bonus=0,armor=0,ac_bonus=0)
+    for key,name,kind,price,icon in (
+        ('training_dagger','Sztylet podróżny','dagger',2,'echo_rapier'),
+        ('training_handaxe','Toporek podróżny','handaxe',5,'goblin_cleaver'),
+        ('training_scimitar','Sejmitar podróżny','scimitar',25,'bandit_sabre')):
+        items[key]=dict(common,name=name,slot='weapon',weapon_type=kind,value=max(1,price//3),price=price,
+            icon='assets/equipment/'+icon+'.svg',description='Broń lekka.'+(' Można rzucać: 20/60 stóp.' if kind!='scimitar' else ''))
     explicit={'goblin_cleaver':'handaxe','bandit_sabre':'rapier','orc_battleaxe':'battleaxe','orc_king_axe':'greataxe',
         'dwarf_hammer':'warhammer','crypt_blade':'longsword','captain_greatsword':'greatsword','abyss_blade':'greatsword',
         'skeleton_shortbow':'shortbow','training_maul':'maul'}
@@ -366,7 +408,10 @@ def configure(items):
             info=WEAPON_TYPES[kind]
             s.update(weapon_type=kind,weapon_name=info['name'],weapon_category=info['category'],weapon=info['appearance'],
                 weapon_dice=list(info['dice']),damage_dice=f'{info["dice"][0]}k{info["dice"][1]}',damage_type=info['damage'],
-                two_handed=bool(info.get('two')),ranged=bool(info.get('ranged')),finesse=bool(info.get('finesse')),heavy=bool(info.get('heavy')),class_ids=ALL_CLASSES[:])
+                two_handed=bool(info.get('two')),ranged=bool(info.get('ranged')),finesse=bool(info.get('finesse')),heavy=bool(info.get('heavy')),
+                light=bool(info.get('light')),thrown=bool(info.get('thrown')),class_ids=ALL_CLASSES[:])
+            if info.get('thrown'):s['thrown_range']=list(info['thrown'])
+            else:s.pop('thrown_range',None)
             if info.get('versatile'):s['versatile_dice']=list(info['versatile'])
             else:s.pop('versatile_dice',None)
             if old=='druid':s.update(focus_classes=['druid','ranger'],spell_bonus=s.get('attack_bonus',0))
@@ -378,7 +423,6 @@ def configure(items):
         elif s.get('slot') in ('armor','shield'):
             s['class_ids']=ALL_CLASSES[:]
             if s.get('armor_kind')=='heavy':s['strength_required']=15 if s.get('base_ac',0)>=17 else 13 if s.get('base_ac',0)>=16 else 0
-    common=dict(class_ids=ALL_CLASSES[:],min_level=1,rarity='common',attack=0,attack_bonus=0,armor=0,ac_bonus=0)
     items['druid_leather']=dict(common,name='Skórzany kaftan druida',slot='armor',armor_kind='light',base_ac=11,
         value=3,price=10,icon='assets/equipment/druid_leather.svg',armor_summary='Lekki · KP 11 + Zręczność')
     items['wooden_shield']=dict(common,name='Dębowa tarcza',slot='shield',shield_ac=2,value=3,price=10,
@@ -407,6 +451,8 @@ def preview(p,item):
     q.form=''  # clearly a gear preview, never the beast's attack
     if slot=='weapon':
         if canonical.get('two_handed'):q.equipment['shield']=''
+        q.equipment['offhand']=''
+        q.weapon_attack_mode='weapon'
         q.weapon_grip='one'
         result.update(spell_bonus=0,proficient=proficient(q,canonical),proficiency=r.proficiency(q),attack=r.attack_bonus(q),
             dice=r.dice_text(r.weapon_dice(q)),damage_type=r.damage_type(q),
@@ -437,7 +483,7 @@ def _preview_signature(p):
     return (p.class_id,p.level,getattr(p,'promoted',False),getattr(p,'wizard_school',''),getattr(p,'primal_order',''),tuple(sorted(getattr(p,'training_feats',{}).items())),
         getattr(p,'origin_feat',''),
         tuple(sorted(_rules().base_attributes(p).items())),
-        getattr(p,'weapon_grip','one'),getattr(p,'fighting_style',''),p.form,
+        getattr(p,'weapon_grip','one'),getattr(p,'fighting_style',''),getattr(p,'ranger_fighting_style',''),getattr(p,'weapon_attack_mode','weapon'),p.form,
         tuple(sorted(p.mastery.items())),tuple(sorted(p.equipment.items())),tuple(v.get('uid','') for v in getattr(p,'magic_attunements',[]) if isinstance(v,dict)),
         tuple((i.get('uid'),i.get('template')) for i in p.inventory if i.get('uid') in p.equipment.values()),
         tuple(sorted(k for k,v in p.buffs.items() if v.get('until',0)>p.current_wall_time)),

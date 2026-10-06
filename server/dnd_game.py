@@ -193,6 +193,9 @@ class DNDGame(RangerMagic):
     async def dnd_attack(self,p,target_id=None,enemy_id=None,quiet=False,surge=False):
         p.current_wall_time=self.now()
         if not p.alive or (not surge and self.now()<p.attack_cooldown_until):return
+        if rules.weapon_actions.mode(p)=='throw' and rules.weapon_actions.throw_error(p):
+            if not quiet:await self.notice(p,rules.weapon_actions.throw_error(p))
+            return
         # The input/WebSocket handler can run just before the simulation tick.
         # A held Space or repeated attack packet must not steal the queued spell's
         # newly available main action. Expired commands never lock attacks forever.
@@ -225,7 +228,7 @@ class DNDGame(RangerMagic):
             dnd.record_spell_use(p,'action_surge')
             self.fighter_effect(p,target,'surge')
         else:self.begin_action(p)
-        self.tag(p,bool(target_id));train(p,'melee' if rules.gear.melee(p) else 'magic' if rules.gear.is_focus(rules.gear.weapon(p)) else 'distance')
+        self.tag(p,bool(target_id));train(p,'melee' if rules.gear.melee(p) and not rules.weapon_actions.is_thrown(p) else 'magic' if rules.gear.is_focus(rules.gear.weapon(p)) else 'distance')
         unjust=self.begin_pvp_hostility(p,target) if target_id else False
         action_name = 'Zryw akcji' if surge else 'Iskra różdżki' if rules.gear.is_focus(rules.gear.weapon(p)) else 'Atak'
         touched={}
@@ -233,15 +236,20 @@ class DNDGame(RangerMagic):
             if not p.alive or p.hp<=0 or target.hp<=0:break
             chosen=self.circle_beast_target(p,target,i)
             if chosen is None or chosen.hp<=0:continue
+            item=rules.weapon_actions.current_weapon(p)
+            throwing=rules.weapon_actions.is_thrown(p)
+            if rules.weapon_actions.mode(p)=='throw' and rules.weapon_actions.throw_error(p,item):break
+            rules.weapon_actions.record_light_attack(p,item,self.now())
             touched[chosen.id]=chosen
             p.form_attack_index=i
             self.basic_effect(p,chosen)
-            if self.is_player_target(chosen):result=self.hit_player(p,chosen,pvp=True,unjust=unjust,action=action_name)
-            else:result=self.hit_enemy(p,chosen,action=action_name if p.class_id=='mage' or surge else f'Atak {i+1}/{rules.attacks_per_round(p)}',melee=rules.gear.melee(p))
+            if self.is_player_target(chosen):result=self.hit_player(p,chosen,pvp=True,unjust=unjust,action=action_name,melee=rules.gear.melee(p) and not throwing)
+            else:result=self.hit_enemy(p,chosen,action=action_name if p.class_id=='mage' or surge else f'Atak {i+1}/{rules.attacks_per_round(p)}',melee=rules.gear.melee(p) and not throwing)
             self.trigger_ensnaring_strike(p,chosen,result)
             self.fighter_on_weapon_hit(p,chosen,result)
             self.beast_on_hit(p,chosen,result)
-            if result is not None:
+            if throwing:rules.weapon_actions.throw_weapon(p,chosen,item)
+            if result is not None and not throwing:
                 extra=self.martial_horde_breaker(p,chosen)
                 if extra is not None:touched[extra.id]=extra
         p.form_attack_index=0
@@ -699,6 +707,7 @@ class DNDGame(RangerMagic):
                 if self.is_player_target(q):self.save_player(q)
 
     def tick_target_conditions(self, target):
+        self.ranger_tick_protection(target)
         now=self.now();conditions=self.target_conditions(target)
         for key,value in tuple(conditions.items()):
             owner=self.players.get(value.get('owner'))
@@ -721,6 +730,7 @@ class DNDGame(RangerMagic):
                 effect['ended']=True
 
     def tick_dnd(self,dt):
+        self.style_weapon_update()
         now=self.now()
         for p in tuple(self.players.values()):p.current_wall_time=now
         for p in tuple(self.players.values()):
@@ -800,10 +810,10 @@ class DNDGame(RangerMagic):
                 edis,eadv=self.environment_attack_flags(pet,target)
                 if player_target:
                     decoy_dis=self.wizard_attack_disadvantage(target)
-                    edis=bool(edis or decoy_dis)
+                    edis=bool(edis or decoy_dis or self.ranger_protection(pet,target))
                 result=rules.roll_attack(self.combat_rng,pet.attack_bonus,ac,pet.dice,
                     disadvantage=edis or player_target and self.target_condition(target,'foresight'),
-                    advantage=eadv or self.target_condition(target,'restrained') or self.target_condition(target,'blind'))
+                    advantage=eadv or self.target_condition(target,'restrained') or self.style_blind_disadvantage(target,pet))
                 result['damage_type']='piercing'
                 self.environment_adjust_damage(pet,target,result,pet.dice,True)
                 if player_target:

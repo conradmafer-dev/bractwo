@@ -51,6 +51,7 @@ func dismiss(id: String) -> void:
 func action_button(action: Dictionary) -> Button:
 	var tab_name: String = "feats" if str(action.get("tab", "stats")) == "feats" else "stats"
 	var b: Button = host._button(str(action.get("label", "Wybierz")), func() -> void: host.character_sheet.open(tab_name))
+	b.tooltip_text = str(action.get("description", ""))
 	b.set_meta("level_action", str(action.get("kind", "")))
 	b.set_meta("original_text", b.text)
 	b.custom_minimum_size.y = 32
@@ -127,9 +128,16 @@ func make_card(event: Dictionary) -> PanelContainer:
 
 func update_actions(node: Node) -> void:
 	if node is Button and node.has_meta("level_action"):
-		var assigned: bool = str(node.get_meta("level_action")) == "mastery" and int(host.player.get("mastery_points", 0)) <= 0
+		var kind: String = str(node.get_meta("level_action"))
+		var fighter: Dictionary = host.player.get("character_sheet", {}).get("fighter", {})
+		var fury: Dictionary = host.player.get("character_sheet", {}).get("caster", {}).get("elemental_fury", {})
+		var assigned: bool = kind == "mastery" and int(host.player.get("mastery_points", 0)) <= 0
+		if kind == "ranger_style":
+			assigned = not str(fighter.get("style", "")).is_empty()
+		elif kind == "elemental_fury":
+			assigned = not str(fury.get("id", fury.get("choice", ""))).is_empty()
 		node.disabled = assigned
-		node.text = "Przydzielono" if assigned else str(node.get_meta("original_text"))
+		node.text = ("Przydzielono" if kind == "mastery" else "Wybrano") if assigned else str(node.get_meta("original_text"))
 	for child: Node in node.get_children():
 		update_actions(child)
 

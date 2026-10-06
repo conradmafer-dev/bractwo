@@ -34,7 +34,9 @@ try:
     from .dnd_game import DNDGame
     from . import dnd_content
     from .monster_ai import MonsterAI
-    from . import level_up, spell_scaling, inventory_rules, fighter_rules
+    from . import level_up, spell_scaling, inventory_rules, fighter_rules, ranger_styles, weapon_actions
+    from .ranger_styles import RangerStyles
+    from .style_weapon_game import StyleWeaponGame
     from .fighter_rules import FighterGame
     from . import equipment_rules, caster_rules, magic_items, loot_economy
     from .caster_game import CasterGame
@@ -66,7 +68,9 @@ except ImportError:
     from dnd_game import DNDGame
     import dnd_content
     from monster_ai import MonsterAI
-    import level_up, spell_scaling, inventory_rules, fighter_rules
+    import level_up, spell_scaling, inventory_rules, fighter_rules, ranger_styles, weapon_actions
+    from ranger_styles import RangerStyles
+    from style_weapon_game import StyleWeaponGame
     from fighter_rules import FighterGame
     import equipment_rules, caster_rules, magic_items, loot_economy
     from caster_game import CasterGame
@@ -288,6 +292,7 @@ loot_economy.configure(ITEMS, ENEMY_TYPES)
 caster_rules.configure(dnd_content.SPELLS, CLASSES, dnd_content.STATUS_SPECS)
 druid_circles.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 configure_circle_spells(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
+ranger_styles.configure(dnd_content.SPELLS, CLASSES)
 rest_rules.configure(dnd_content.SPELLS)
 wizard_schools.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
 martial_rules.configure(dnd_content.SPELLS,dnd_content.STATUS_SPECS)
@@ -297,7 +302,12 @@ terrain_detail.configure(content, OBSTACLES, LANDMARKS)
 encounter_layout.configure(content, OBSTACLES, LANDMARKS)
 starter_adventures.configure(content, OBSTACLES, LANDMARKS, ZONES, ENEMY_TYPES)
 content.WORLD_REVISION = 33
-MERCHANT['stock'] = list(content.STARTER_MERCHANT_STOCK)
+for npc in NPCS:
+    if npc.get('kind')=='merchant' or 'stock' in npc:
+        npc.setdefault('stock',[])
+        for key in ('training_dagger','training_handaxe','training_scimitar'):
+            if key not in npc['stock']:npc['stock'].append(key)
+MERCHANT['stock'] = list(content.STARTER_MERCHANT_STOCK)+['training_dagger','training_handaxe','training_scimitar']
 content.STARTER_MERCHANT = MERCHANT
 world_levels.configure(content, ZONES, QUESTS, ITEMS, ENEMY_TYPES, LANDMARKS, NPCS, POTIONS, PVP_RULES)
 # Powerful rings are deliberate rewards; repeatable monster drops remain rare.
@@ -376,6 +386,8 @@ class Player:
     druid_circle: str = ""
     druid_circle_state: dict = field(default_factory=dict)
     druid_circle_runtime: dict = field(default_factory=dict)
+    elemental_fury: str = ""
+    elemental_damage_type: str = "cold"
     rest_resources: dict = field(default_factory=dict)
     submerged: bool = False
     breath_until: float = 0
@@ -394,6 +406,14 @@ class Player:
     caster_messages: list = field(default_factory=list)
     form_attack_index: int = 0
     fighting_style: str = ""
+    ranger_style_cantrips: list = field(default_factory=list)
+    ranger_cantrip_replacement_level: int = 0
+    ranger_style_reaction_enabled: bool = True
+    weapon_attack_mode: str = "weapon"
+    thrown_weapons: list = field(default_factory=list)
+    _light_attack_until: float = 0
+    _light_attack_uid: str = ""
+    _light_extra_used_until: float = 0
     weapon_grip: str = "one"
     fighter_rules_version: int = 0
     spell_cooldowns: dict = field(default_factory=dict)
@@ -422,7 +442,7 @@ class Player:
     chests: list = field(default_factory=list)
     starter_bosses: list = field(default_factory=list)
     inventory: list = field(default_factory=list)
-    equipment: dict = field(default_factory=lambda: {"weapon": "", "armor": "", "ring": "", "shield": ""})
+    equipment: dict = field(default_factory=lambda: {"weapon": "", "offhand": "", "armor": "", "ring": "", "shield": ""})
     inventory_rules_version: int = 0
     potion_slots: dict = field(default_factory=lambda: {"q":"health_potion"})
     loot_discoveries: dict = field(default_factory=dict)
@@ -506,7 +526,7 @@ class Player:
         slow=0.0 if combat_rules.active_buff(self,'restrained') else .25 if combat_rules.active_buff(self,'growth') else .5 if combat_rules.active_buff(self,'slow') else 1.0
         if combat_rules.active_buff(self,"prone"):return 0
         speed=(self.base_speed*(caster_rules.form_spec(self).get('speed',30)/30 if self.form else 1)-equipment_rules.armor_speed_penalty(self)+equipment_rules.feat_rules.speed_bonus(self)+(dnd_content.LONGSTRIDER_SPEED_BONUS if combat_rules.active_buff(self,'longstrider') else 0))*(1.2 if self.premium_demo_until > self.current_wall_time else 1)*(1.15 if self.wind_until > self.current_wall_time else 1)*(1.0 if freedom else slow)
-        return environment_rules.movement_speed(self,max(0,speed-self.exhaustion*5*100/30),surface)
+        return environment_rules.movement_speed(self,max(0,speed-self.exhaustion*5*100/30),surface)*(.5 if getattr(self,'_weapon_grapple_slow',False) else 1)
 
     @property
     def max_hp(self):
@@ -519,6 +539,11 @@ class Player:
     def gear_bonus(self, stat):
         if self.form:return 0
         equipped = set(self.equipment.values())
+        if stat in ('attack', 'attack_bonus'):
+            weapon = weapon_actions.current_weapon(self)
+            return (sum(ITEMS[i["template"]].get(stat, 0) for i in self.inventory
+                        if i["uid"] in equipped and ITEMS[i["template"]].get('slot') != 'weapon')
+                    + weapon.get(stat, 0))
         return sum(ITEMS[i["template"]].get(stat, 0) for i in self.inventory if i["uid"] in equipped)
 
     @property
@@ -618,6 +643,7 @@ class Player:
                            "auto_target_id": self.auto_target_id, "auto_enabled": self.auto_enabled,
                            "weapon_auto_attack": combat_rules.weapon_autoattack(self),
                            "queued_spell": self.pending_spell.get('spell',''),
+                           "weapon_attack_mode": weapon_actions.mode(self), "thrown_weapons": self.thrown_weapons,
                            "combat_log": self.combat_log[-8:]})
             result.update({"xp": self.xp, "xp_next": xp_next(self.level), "gold": self.gold,
                            "xp_total": level_rules.xp_floor(self.level) + self.xp,
@@ -660,6 +686,9 @@ class Player:
             "wizard_school", "wizard_school_state", "druid_circle", "druid_circle_state", "rest_resources", "_feat_turn_until", "_savage_attack_used", "_piercer_used", "_slasher_used", "_crusher_used", "exhaustion",
             "martial_archetype", "martial_state",
             "fighting_style", "weapon_grip", "fighter_rules_version",
+            "ranger_style_cantrips", "ranger_cantrip_replacement_level", "ranger_style_reaction_enabled",
+            "elemental_fury", "elemental_damage_type", "weapon_attack_mode", "thrown_weapons",
+            "_light_attack_until", "_light_attack_uid", "_light_extra_used_until",
             "level_up_batches", "rules_version", "level_rules_version", "legacy_growth_level", "level_migration_notice", "legacy_level_up_batches", "mana_rules_version", "hp_rules_version", "mana_recovery_until", "rest_cooldown_until", "hotbar", "spell_history", "spell_circle_choices", "bonus_cooldown_until", "reaction_ready", "shield_armed", "pvp_safety",
             "site_cooldowns", "wind_until", "ward_until", "premium_demo_until", "floor", "skill_tries", "promoted", "soul", "runes", "bank_gold", "depot", "home_city", "blessed", "mastery", "spell_cooldowns", "spell_ready", "rune_ready", "haste_until", "transition_ready",
             "x", "y", "hp", "mana", "level", "xp", "gold", "class_id", "class_chosen", "weapon", "kills", "boss_kills",
@@ -726,7 +755,7 @@ class Enemy:
                 "attack_until": self.attack_until, "facing": self.facing, "armor_class": spec["armor_class"], "attack_bonus": spec["attack_bonus"], "damage_dice": combat_rules.dice_text(spec["damage_dice"]), "statuses": [k for k,v in self.conditions.items() if v.get("until",0)>now], "status_effects": dnd_content.status_effects(self.conditions,now), "size": ENEMY_TYPES[self.kind].get("size", 1)}
 
 
-class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,EnvironmentGame,WizardSchoolGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
+class Game(StyleWeaponGame,RangerStyles,StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccountGame,MartialGame,MartialCombat,AdventureGame,EnvironmentGame,WizardSchoolGame,DruidCircleSpells,DruidCircleGame,CasterGame, FighterGame, DNDGame, CombatRounds, ExpansionGame, MonsterAI):
     def __init__(self, db_path, clock=None):
         self.clock = clock or time.time
         self.rng = random.Random()
@@ -818,19 +847,24 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
         pid = for_player.id if isinstance(for_player, Player) else str(for_player or "")
         now = self.now()
         viewer = self.players.get(pid)
+        view_range=1800
+        if viewer is not None and viewer.class_id=='druid' and viewer.level>=15 and viewer.elemental_fury=='potent_spellcasting':
+            view_range=max(view_range, max((spell_scaling.resolve(viewer,key).get('range',0)
+                for key,s in dnd_content.SPELLS.items() if s.get('circle')==0 and not s.get('feature')
+                and dnd_content.spell_allowed(viewer,key)),default=0)+64)
         def visible(obj):
-            return viewer is None or (same_floor(viewer, obj) and distance(viewer, obj) <= 1800)
+            return viewer is None or (same_floor(viewer, obj) and distance(viewer, obj) <= view_range)
         return {"type": "state", "tick": self.tick, "time": self.time,
                 "skill_challenges": self.skill_challenge_state(viewer) if viewer else {},
                 "players": [self.players[pid].public(now, self.time, True, self.parties.get(self.players[pid].party_id, [])) if entry["id"] == pid else entry for entry in public_players] if public_players is not None else
                            [p.public(now, self.time, p.id == pid, self.parties.get(p.party_id, [])) for p in self.players.values()],
                 "companions": [c.public() for c in (*self.companions.values(),*self.familiars.values()) if visible(c)],
                 "alarms": [dict(x=a["x"],y=a["y"],floor=a["floor"],remaining=max(0,a["until"]-now)) for owner,a in self.alarms.items() if owner==pid],
-                "enemies": [e.public(now) for e in (self.nearby_enemies(viewer, 1800) if viewer else self.enemies.values()) if visible(e)], "world": dict(self.flags),
+                "enemies": [e.public(now) for e in (self.nearby_enemies(viewer, view_range) if viewer else self.enemies.values()) if visible(e)], "world": dict(self.flags),
                 "active_field_effects": [f.get("effect_id", "") for f in self.environment_fields()],
                 "circle_fields": [self.circle_field_snapshot(f,now)
                     for f in getattr(self,'circle_spell_fields',[]) if f.get('until',0)>now and (viewer is None or same_floor(viewer,f) and point_distance(viewer,f)<=2200)],
-                "effects": [dict(effect) for effect in self.effects if self.time-effect["time"] <= max(1.5,effect.get("duration",0)) and (viewer is None or (same_floor(viewer, effect) and point_distance(viewer, effect) <= 1800))]}
+                "effects": [dict(effect) for effect in self.effects if self.time-effect["time"] <= max(1.5,effect.get("duration",0)) and (viewer is None or (same_floor(viewer, effect) and point_distance(viewer, effect) <= view_range))]}
 
     def persist(self, extra_players=()):
         with self.db:
@@ -849,6 +883,7 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
         p.inventory = [make_item(f"{p.class_id}_weapon_1"), make_item("druid_leather" if p.class_id=="druid" else "cloth")]
         p.equipment = {"weapon": p.inventory[0]["uid"], "armor": p.inventory[1]["uid"], "ring": ""}
         p.weapon = p.spec["weapon"]
+        weapon_actions.sanitize(p)
         self.migrate_fighter(p, make_item)
         self.migrate_caster(p)
         skill_rules.normalize(p)
@@ -882,6 +917,7 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
         p.bonus_cooldown_until = max(p.bonus_cooldown_until, p.potion_cooldown_until)
         p.potion_cooldown_until = 0
         inventory_rules.ensure(p, ITEMS, POTIONS, make_item)
+        weapon_actions.sanitize(p)
         self.migrate_fighter(p, make_item)
         self.migrate_caster(p)
         skill_rules.normalize(p)
@@ -971,7 +1007,7 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
         # Ordered WebSockets: send unchanged private catalogs only once per login.
         # Public actor fields always remain complete; legacy clients get full states.
         previous = self.owner_cache.setdefault(p.id, {})
-        private_keys = ("quests", "discoveries", "inventory", "equipment", "depot", "skills", "runes", "mastery", "potions", "hotbar", "grouped_hotbar", "character_sheet", "spell_profiles", "favorite_spell", "attributes", "combat_log", "pending_level_ups", "potion_slots", "known_loot", "item_previews")
+        private_keys = ("quests", "discoveries", "inventory", "equipment", "depot", "skills", "runes", "mastery", "potions", "hotbar", "grouped_hotbar", "character_sheet", "spell_profiles", "favorite_spell", "attributes", "combat_log", "pending_level_ups", "potion_slots", "known_loot", "item_previews", "thrown_weapons")
         own = next(entry for entry in packet["players"] if entry["id"] == p.id)
         for key in private_keys:
             encoded = json.dumps(own[key], ensure_ascii=False, separators=(",", ":"))
@@ -1363,6 +1399,12 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
     async def interact(self, p):
         if not p.alive:
             return
+        recoverable = [e for e in p.thrown_weapons if e.get('floor') == p.floor
+                       and math.hypot(p.x-e['x'], p.y-e['y']) <= 64
+                       and self.line_clear(p, SimpleNamespace(x=e['x'],y=e['y'],floor=e['floor']))]
+        if recoverable:
+            entry = min(recoverable, key=lambda e: math.hypot(p.x-e['x'],p.y-e['y']))
+            return await self.recover_weapon(p, entry['item']['uid'])
         if await self.nature_interaction(p):return
         sites = [site for site in content.POIS if near(p, site) and self.line_clear(p, SimpleNamespace(**site))]
         if sites:
@@ -1419,13 +1461,23 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
             spec = ITEMS[item["template"]]
             if spec["slot"] not in ("weapon", "armor", "ring", "shield"):
                 return await self.notice(p, "Trofeum można sprzedać lub przechować; nie jest wyposażeniem.")
+            if data.get('slot') == 'offhand':
+                reason = equipment_rules.equip_offhand(p, uid)
+                if reason:return await self.notice(p, reason)
+                self.cancel_channel(p)
+                with self.db:self.save_player(p)
+                return
             equip_error=equipment_rules.check_equip(p,spec)
             if equip_error:return await self.notice(p,equip_error)
             self.cancel_channel(p)
-            if spec["slot"] == "shield" and fighter_rules.two_handed(p):
+            held_weapon=weapon_actions.held_item(p)
+            occupied_two_hands=held_weapon.get('two_handed') or (held_weapon.get('versatile_dice') and p.weapon_grip=='two')
+            if spec["slot"] == "shield" and (occupied_two_hands or p.equipment.get("offhand")):
                 return await self.notice(p, "Najpierw wybierz broń jednoręczną lub chwyt jednorącz.")
             if spec["slot"] == "weapon":
                 p.weapon_grip = "one"
+                if p.equipment.get('offhand') == item['uid'] or not spec.get('light'):
+                    p.equipment['offhand'] = ''
                 if spec.get("two_handed"):
                     p.equipment["shield"] = ""
             p.equipment[spec["slot"]] = item["uid"]
@@ -1434,7 +1486,7 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
             if p.form:return await self.notice(p,"Zmień wyposażenie po zakończeniu przemiany.")
             self.cancel_channel(p)
             slot = data.get("slot")
-            if slot not in ("weapon", "armor", "ring", "shield"):
+            if slot not in ("weapon", "offhand", "armor", "ring", "shield"):
                 return await self.notice(p, "Nieznane miejsce wyposażenia.")
             p.equipment[slot] = ""
             if slot=="weapon":p.buffs.pop("shillelagh",None)
@@ -1589,7 +1641,27 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
         if kind == "familiar_command":return await self.familiar_command(p,data.get("mode"))
         if kind == "nature_interact":return await self.nature_interaction(p,data.get("id"))
         if kind == "fighting_style":
-            return await self.select_fighting_style(p,data.get("style"))
+            return await self.select_fighting_style(p,data.get("style"),data.get("cantrips"))
+        if kind == 'ranger_cantrip':
+            return await self.replace_ranger_cantrip(p, data.get('old_spell'), data.get('new_spell'))
+        if kind == 'style_reaction':
+            return await self.set_ranger_style_reaction(p, data.get('enabled'))
+        if kind == 'elemental_fury':
+            return await self.choose_elemental_fury(p, data.get('choice'))
+        if kind == 'elemental_strike':
+            return await self.set_elemental_strike_enabled(p,data.get('enabled'))
+        if kind == 'elemental_damage_type':
+            return await self.select_elemental_damage_type(p, data.get('damage_type'))
+        if kind == 'weapon_attack_mode':
+            return await self.choose_weapon_mode(p, data.get('mode'))
+        if kind == 'recover_thrown':
+            return await self.recover_weapon(p, data.get('uid'))
+        if kind == 'offhand_attack':
+            if environment_rules.actions_blocked(p, self.now()):return
+            return await self.offhand_attack(p, data.get('target_id'), data.get('enemy_id'))
+        if kind == 'grapple':
+            if environment_rules.actions_blocked(p, self.now()):return
+            return await self.grapple_attack(p, data.get('target_id'), data.get('enemy_id'))
         if kind == "weapon_grip":
             return await self.set_weapon_grip(p,data.get("grip"))
         if kind == "select_target":
@@ -1600,6 +1672,8 @@ class Game(StarterAdventureGame,CharacterDevelopmentGame,SkillGame,GoogleAccount
             with self.db:self.save_player(p)
             return
         if kind == "escape_restraint":
+            if p.buffs.get("grappled",{}).get("spell_id")=="weapon_grapple":
+                return await self.escape_weapon_grapple(p)
             return await self.escape_restraint(p,data.get("target_id"))
         if kind == "stop_concentration":
             self.break_concentration(p)
@@ -2065,7 +2139,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     app.router.add_get("/ws",websocket)
 
     async def health(request):
-        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_34","world_revision":getattr(content,"WORLD_REVISION",20),"level_rules_version":level_rules.VERSION,"opening_balance_revision":1})
+        return web.json_response({"ok":True,"players":len(app["game"].players),"version":content.VERSION,"ui_revision":"UI_35","world_revision":getattr(content,"WORLD_REVISION",20),"level_rules_version":level_rules.VERSION,"opening_balance_revision":1})
 
     app.router.add_get("/health",health)
     async def ranking(request):

@@ -4,7 +4,40 @@
  const button=(label,fn,disabled=false)=>{const b=node('button',label);b.type='button';b.disabled=disabled;b.onclick=fn;return b;};
  const image=path=>{const i=node('img');i.src=path;i.alt='';i.width=i.height=42;return i;};
  const abilityNames={strength:'Siła',dexterity:'Zręczność',constitution:'Kondycja',intelligence:'Inteligencja',wisdom:'Mądrość',charisma:'Charyzma'};
- const candidates=new Map(),circleCandidates=new Map(),schoolCandidates=new Map(),trainingChoices=new Map();
+ const candidates=new Map(),circleCandidates=new Map(),schoolCandidates=new Map(),trainingChoices=new Map(),elementalCandidates=new Map();
+ const elemental=p=>p?.character_sheet?.caster?.elemental_fury||{};
+ const elementalNames={potent_spellcasting:'Potężne sztuczki',primal_strike:'Pierwotne uderzenie'};
+ const elementalDamageNames={cold:'Zimno',fire:'Ogień',lightning:'Błyskawice',thunder:'Grzmot'};
+ function elementalReason(p,choice){const e=elemental(p);
+  if(p?.class_id!=='druid')return 'Furia żywiołów jest zdolnością druida.';
+  if(e.id)return 'Furia żywiołów została już wybrana.';
+  if(!p.alive)return 'Wybór po odrodzeniu.';
+  if(p.form||p.polymorph)return 'Wybór po zakończeniu przemiany.';
+  if(p.combat_remaining>0)return 'Wybór po zakończeniu walki.';
+  if(p.level<(e.required_level||7))return 'Wybór od poziomu '+(e.required_level||7)+'.';
+  if(!e.pending)return 'Wybór jest obecnie niedostępny.';
+  if(choice&&!e.options?.some(o=>o.id===choice))return 'Wybierz jedną dostępną opcję.';
+  return '';
+ }
+ function elementalPacket(p,choice){return choice&&!elementalReason(p,choice)?{type:'elemental_fury',choice}:null;}
+ function syncElemental(parent,p){const e=elemental(p);
+  for(const b of parent.querySelectorAll('[data-elemental-confirm]')){const reason=elementalReason(p,b.dataset.elementalConfirm);b.disabled=!!reason;b.title=reason;}
+  for(const hint of parent.querySelectorAll('[data-elemental-reason]'))hint.textContent=elementalReason(p);
+  for(const select of parent.querySelectorAll('[data-elemental-damage]')){select.disabled=!p?.alive||e.id!=='primal_strike';if(document.activeElement!==select)select.value=e.damage_type||'cold';}
+  for(const input of parent.querySelectorAll('[data-elemental-enabled]')){input.disabled=!p?.alive||e.id!=='primal_strike';input.checked=e.strike_enabled!==false;}
+ }
+ function elementalPanel(parent,p,h){const e=elemental(p);if(p.class_id!=='druid'||!Object.keys(e).length)return;
+  const box=node('section',undefined,'caster-elemental-fury'),current=()=>h.state?.().player||p;box.append(node('h3','Furia żywiołów · poziom '+(e.required_level||7)));
+  if(!e.id){const selected=elementalCandidates.get(String(p.id))||'',grid=node('div',undefined,'caster-order-grid');box.append(node('p','Wybierz jedną stałą zdolność: wzmocnienie sztuczek albo trafień bronią i ataków w przemianie. Wybór jest bezpłatny i nie zużywa atutu.','sheet-hint'));
+   for(const option of e.options||[]){const b=button('',()=>{elementalCandidates.set(String(p.id),option.id);box.remove();elementalPanel(parent,current(),h);});b.className='caster-order'+(selected===option.id?' candidate':'');b.dataset.elementalChoice=option.id;b.setAttribute('aria-pressed',String(selected===option.id));b.append(image(option.icon||'assets/spells/'+(option.id==='primal_strike'?'shillelagh':'produce_flame')+'.svg'),node('strong',option.name||elementalNames[option.id]),node('small',option.description||''));if(option.upgrade_description)b.append(node('small',`Poziom ${e.upgrade_level||15}: ${option.upgrade_description}`));grid.append(b);}box.append(grid);
+   if(selected){const choice=e.options?.find(o=>o.id===selected);if(choice){const confirm=button('Wybierz: '+(choice.name||elementalNames[selected]),()=>{const packet=elementalPacket(current(),selected);if(packet){confirm.disabled=true;h.send(packet);}},!!elementalReason(p,selected));confirm.dataset.elementalConfirm=selected;box.append(confirm);}}
+   const hint=node('p',elementalReason(p),'sheet-choice-reason');hint.dataset.elementalReason='';box.append(hint);
+  }else{const choice=e.options?.find(o=>o.id===e.id);box.append(node('strong',e.name||choice?.name||elementalNames[e.id]));if(e.description||choice?.description)box.append(node('p',e.description||choice.description,'sheet-hint'));if(e.upgrade_description||choice?.upgrade_description)box.append(node('p',`${p.level>=(e.upgrade_level||15)?'Ulepszenie aktywne':'Poziom '+(e.upgrade_level||15)}: ${e.upgrade_description||choice.upgrade_description}`,'sheet-hint'));if(e.id==='primal_strike')elementalDamagePicker(box,p,h);}
+  parent.append(box);syncElemental(box,p);
+ }
+ function elementalDamagePicker(parent,p,h){const e=elemental(p),label=node('label',undefined,'elemental-damage-picker'),select=node('select');label.append(node('span','Żywioł następnego Pierwotnego uderzenia'));select.setAttribute('aria-label','Żywioł Pierwotnego uderzenia');select.dataset.elementalDamage='';
+  for(const type of e.damage_types||['cold','fire','lightning','thunder']){const id=typeof type==='string'?type:type.id;select.append(new Option(typeof type==='string'?elementalDamageNames[id]||id:type.name||elementalDamageNames[id]||id,id));}select.value=e.damage_type||'cold';select.disabled=!p.alive;select.addEventListener('change',()=>{const latest=h.state?.().player||p;if(latest.alive&&elemental(latest).id==='primal_strike')h.send({type:'elemental_damage_type',damage_type:select.value});select.blur();});label.append(select);const toggle=node('label',undefined,'elemental-strike-toggle'),input=node('input');input.type='checkbox';input.dataset.elementalEnabled='';input.checked=e.strike_enabled!==false;input.disabled=!p.alive;input.addEventListener('change',()=>{const latest=h.state?.().player||p;if(latest.alive&&elemental(latest).id==='primal_strike')h.send({type:'elemental_strike',enabled:input.checked});});toggle.append(input,node('span','Pierwotne uderzenie przy trafieniu'));parent.append(label,toggle,node('small','Żywioł możesz zmienić przed kolejnym trafieniem. Wyłącz uderzenie, aby zachować je na późniejsze trafienie w tej turze. Działa raz na twoją turę.'));
+ }
  function canRecover(p){return !!p&&p.class_id==='mage'&&!!p.alive&&!p.form&&!p.character_sheet?.caster?.channel?.key&&p.mana<p.max_mana&&p.character_sheet?.caster?.arcane_recovery_remaining>0&&!(p.rest?.remaining>0)&&!(p.rest_short_remaining>0)&&!(p.rest_block_remaining>0)&&!p.rest_block_reason;}
  function hasShapeUse(p){const resource=p?.character_sheet?.caster?.circle?.resources?.find(r=>r.id==='shape');return !resource||resource.remaining>0;}
  function canChoose(p,nearMaster){return p.class_id==='druid'&&!!p.alive&&!p.form&&!(p.combat_remaining>0)&&(!p.character_sheet?.caster?.order||!!nearMaster);}
@@ -35,7 +68,7 @@
    const reason=trainingReason(p,feat,trainingSelection(row));
    confirm.disabled=!!reason;confirm.title=reason;
    row.querySelector('.training-reason').textContent=reason;
-  }syncCircle(parent,p,h);
+  }syncCircle(parent,p,h);root.BractwoFighterUI?.sync(parent,p,h);syncElemental(parent,p);
  }
  const circleIcons={land:'assets/spells/entangle.svg',moon:'assets/spells/moonbeam.svg',sea:'assets/spells/ray_of_frost.svg',stars:'assets/spells/starry_wisp.svg'};
  function circleReason(p){
@@ -69,7 +102,7 @@
   for(const hint of parent.querySelectorAll('[data-breath]'))hint.textContent=p?.environment?.submerged&&Number.isFinite(p.environment.breath_remaining)?`Pozostały oddech: ${Math.ceil(p.environment.breath_remaining)} s`:'';
   for(const b of parent.querySelectorAll('[data-study]'))b.disabled=!p?.alive||p.action_remaining>0||!h?.studyTarget?.();
   for(const b of parent.querySelectorAll('[data-search]'))b.disabled=!p?.alive||p.action_remaining>0;
-  syncSchool(parent,p,h);
+  syncSchool(parent,p,h);syncElemental(parent,p);
  }
  function circlePanel(parent,p,h){
   const c=p.character_sheet?.caster?.circle;if(!c)return;
@@ -232,13 +265,16 @@
   if(c.familiar?.max_hp>0){const row=node('section',undefined,'caster-familiar');row.append(image('assets/spells/find_familiar.svg'),node('strong','Chowaniec · '+(c.familiar.mode==='help'?'Pomaga':'Podąża')));
    for(const [mode,label] of [['follow','Za mną'],['help','Pomagaj'],['scout','Zwiad'],['dismiss','Odeślij']])row.append(button(label,()=>h.send({type:'familiar_command',mode}),!p.alive));parent.append(row);}
   circleActions(parent,p,h);schoolActions(parent,p,h);
+  if(elemental(p).id==='primal_strike'&&h.featSection!=='elemental_fury'){const box=node('section',undefined,'caster-elemental-actions');box.append(node('h3','Pierwotne uderzenie'));elementalDamagePicker(box,p,h);parent.append(box);}
   if(p.environment?.in_water){const box=node('section',undefined,'caster-water');box.append(node('strong','W wodzie'));const b=button(p.environment.submerged?'Wynurz się':'Zanurkuj',()=>{const latest=h.state?.().player||p;if(latest.alive&&latest.environment?.in_water)h.send({type:'environment_action',action:'dive',enabled:!latest.environment.submerged});},!p.alive);b.dataset.dive='';const breath=node('small',p.environment.submerged&&Number.isFinite(p.environment.breath_remaining)?`Pozostały oddech: ${Math.ceil(p.environment.breath_remaining)} s`:'');breath.dataset.breath='';box.append(b,breath);parent.append(box);}
   const exploration=node('section',undefined,'caster-exploration'),study=button('Zbadaj zaznaczony cel',()=>{const latest=h.state?.().player||p,target=h.studyTarget?.();if(latest.alive&&!(latest.action_remaining>0)&&target)h.send({type:'environment_action',action:'study',...target});},!p.alive||p.action_remaining>0||!h.studyTarget?.()),search=button('Rozejrzyj się',()=>{const latest=h.state?.().player||p;if(latest.alive&&!(latest.action_remaining>0))h.send({type:'environment_action',action:'search'});},!p.alive||p.action_remaining>0);study.dataset.study='';search.dataset.search='';exploration.append(study,search,node('small','Badanie i rozglądanie zużywają akcję. Wskazówki pomagają w teście wybranej umiejętności.'));parent.append(exploration);
  }
  function feats(parent,p,h){
   const c=p.character_sheet?.caster||{},tr=p.character_sheet?.training||{};
+  if(h.featSection==='ranger_style'){root.BractwoFighterUI.feats(parent,p,h);return;}
+  if(h.featSection==='elemental_fury'){elementalPanel(parent,p,h);return;}
   if(!['general','training'].includes(h.featSection)){
-  if(p.class_id==='knight')root.BractwoFighterUI.feats(parent,p,h);
+  if(['knight','ranger'].includes(p.class_id))root.BractwoFighterUI.feats(parent,p,h);
   if(p.class_id==='druid'){
    const box=node('section',undefined,'caster-orders');box.append(node('h3','Ścieżka druida'));
    const candidate=candidates.get(p.id)||c.order||'';
@@ -250,7 +286,7 @@
    else box.append(node('small','Jeden bezpłatny wybór. Strażnik nie dodaje pancerza do plecaka.'));
    if(c.legacy_medium_grace)box.append(node('p','Wybierz ścieżkę, zanim zaczną obowiązywać nowe wymagania twojego średniego pancerza.','caster-warning'));
    parent.append(box);
-   circlePanel(parent,p,h);
+   circlePanel(parent,p,h);elementalPanel(parent,p,h);
   }
   if(p.class_id==='mage')schoolPanel(parent,p,h);
   if(c.features?.length){const box=node('section',undefined,'caster-features');box.append(node('h3','Zdolności klasy'));
@@ -283,5 +319,5 @@
   function sync(){const x=h.player(),kind=pending(x);let hidden=!kind;if(x){hidden=hidden||closed.has(key(x));try{hidden=hidden||localStorage.getItem(key(x))==='1';}catch{}}p.hidden=hidden;title.textContent=kind==='school'?'Szkoła czarodzieja':kind==='circle'?'Krąg druida':'Ścieżka druida';description.textContent=kind==='school'?'Promocja odblokowała wybór szkoły magii. Poznaj cztery szkoły i wybierz jedną.':kind==='circle'?'Wybierz krąg Ziemi, Księżyca, Morza lub Gwiazd.':'Strażnik czy Mistyk natury?';choose.textContent=kind==='school'?'Wybierz szkołę':kind==='circle'?'Wybierz krąg':'Wybierz ścieżkę';}
   return{sync};
  }
- root.BractwoCasterUI={trainingReason,feats,actions,createPrompt,canChoose,canRecover,hasShapeUse,syncTraining,syncCircle,syncSchool};if(typeof module!=='undefined')module.exports={canChoose,canRecover,hasShapeUse,trainingReason,trainingSummary,circleReason,schoolReason,schoolTargetAllowed,portentAvailable};
+ root.BractwoCasterUI={trainingReason,feats,actions,createPrompt,canChoose,canRecover,hasShapeUse,syncTraining,syncCircle,syncSchool,elementalPanel,elementalReason,elementalPacket,syncElemental};if(typeof module!=='undefined')module.exports={canChoose,canRecover,hasShapeUse,trainingReason,trainingSummary,circleReason,schoolReason,schoolTargetAllowed,portentAvailable,elementalReason,elementalPacket};
 })(globalThis);

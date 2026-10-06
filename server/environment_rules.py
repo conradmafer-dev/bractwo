@@ -2,11 +2,11 @@
 import math
 from types import SimpleNamespace
 try:
-    from . import world_content as content, caster_rules as caster, druid_circles as circles, magic_items
+    from . import world_content as content, caster_rules as caster, druid_circles as circles, magic_items, ranger_styles
     from .living_world import segment_distance
     from .progression import same_floor
 except ImportError:
-    import world_content as content, caster_rules as caster, druid_circles as circles, magic_items
+    import world_content as content, caster_rules as caster, druid_circles as circles, magic_items, ranger_styles
     from living_world import segment_distance
     from progression import same_floor
 
@@ -313,7 +313,7 @@ class EnvironmentGame:
     def environment_raw_can_see(self,a,b):
         if not same_floor(a,b) or not self.line_clear(a,b):return False
         spec=enemy_spec(a) if not hasattr(a,'class_id') else caster.form_spec(a)
-        reach=float(spec.get('blindsight',0))*6.4
+        reach=max(float(spec.get('blindsight',0)),ranger_styles.blindsight(a))*6.4
         if reach and math.hypot(a.x-b.x,a.y-b.y)<=reach:return True
         # Blindness belongs to the observer; it does not hide that observer
         # from other creatures. Third Eye pierces magical cover, not blindness.
@@ -335,12 +335,17 @@ class EnvironmentGame:
             if math.hypot(a.x-b.x,a.y-b.y)>reach or not self.line_clear(a,b):return False
         return self.environment_raw_can_see(a,b)
 
+    def style_blind_disadvantage(self, observer, target):
+        return active(observer,'blind',self.now()) and not self.environment_can_see(observer,target)
+
     def environment_attack_flags(self,source,target):
         now=self.now();see=self.environment_can_see(source,target);seen=self.environment_can_see(target,source)
         dis=not see or any(active(source,k,now) for k in ('poisoned','web_restrained','elemental_restrained','stinking_poison'))
         adv=not seen or any(active(target,k,now) for k in ('paralyzed','unconscious','web_restrained','elemental_restrained'))
         spec=enemy_spec(source) if not hasattr(source,'class_id') else caster.form_spec(source)
-        if active(target,'blur',now) and not spec.get('blindsight') and not spec.get('truesight') and not self.wizard_third_eye(source):dis=True
+        blind_reach=max(spec.get('blindsight',0),ranger_styles.blindsight(source))*6.4
+        blind_sees=blind_reach and math.hypot(source.x-target.x,source.y-target.y)<=blind_reach and self.line_clear(source,target)
+        if active(target,'blur',now) and not blind_sees and not spec.get('truesight') and not self.wizard_third_eye(source):dis=True
         bolt=conditions(target).pop('guiding_bolt',{})
         adv=adv or bolt.get('until',0)>now or active(target,'feat_crusher_exposed',now)
         dis=dis or active(source,'feat_slasher_disadvantage',now)

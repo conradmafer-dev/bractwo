@@ -80,7 +80,8 @@
     actions.append(button('Wypij · akcja dodatkowa',()=>h.send({type:'potion',item:item.template}),!p.alive||p.level<(item.min_level||1)||p.bonus_remaining>0||!!p.character_sheet?.caster?.channel?.key));
    actions.append(button(p.potion_slots?.q===item.template?'✓ Q':'Przypisz Q',()=>h.send({type:'potion_bind',slot:'q',item:item.template}),!p.alive||p.level<(item.min_level||1)));
   }else if(worn)actions.append(button('Zdejmij',()=>h.send({type:'unequip',slot:worn[0]}),!p.alive||!!p.form));
-  else if(['weapon','armor','ring','shield'].includes(item.slot))actions.append(button('Załóż',()=>h.send({type:'equip',uid:item.uid}),!p.alive||!!p.form||!!item.preview?.equip_error||p.level<(item.min_level||1)));
+  else if(['weapon','armor','ring','shield'].includes(item.slot))actions.append(button(item.slot==='weapon'?'Załóż · główna ręka':'Załóż',()=>h.send({type:'equip',uid:item.uid}),!p.alive||!!p.form||!!item.preview?.equip_error||p.level<(item.min_level||1)));
+  if(item.slot==='weapon'&&item.light&&worn?.[0]!=='offhand')actions.append(button('Załóż · druga ręka',()=>h.send({type:'equip',uid:item.uid,slot:'offhand'}),!p.alive||!!p.form||!p.character_sheet?.weapon_actions?.can_equip_offhand||p.equipment?.weapon===item.uid||p.level<(item.min_level||1)));
    const magic=p.character_sheet?.magic_items,magicState=magic?.items?.find(i=>i.uid===item.uid);
    if(magicState){
     stats.prepend(node('div',magicState.active?'✓ Magiczna właściwość działa':magicState.requires_attunement&&!magicState.attuned?'Zestrój się z przedmiotem, aby używać jego magii.':'Załóż przedmiot, aby działał.'));
@@ -100,6 +101,8 @@
   }
   head.after(actions);return pane;
  }
+ function weaponControls(parent,p,h){const w=p?.character_sheet?.weapon_actions;if(!w)return;const box=node('section',undefined,'weapon-controls');box.append(node('h3','Sposób ataku'));const modes=node('div',undefined,'item-actions');for(const option of w.modes||[]){const labels={weapon:'Broń',throw:'Rzut bronią',unarmed:'Bez broni'},b=button((w.mode===option.id?'✓ ':'')+(labels[option.id]||option.id),()=>h.send({type:'weapon_attack_mode',mode:option.id}),!p.alive||!!p.form||!option.enabled||w.mode===option.id);b.dataset.weaponMode=option.id;b.setAttribute('aria-pressed',String(w.mode===option.id));modes.append(b);}box.append(modes,node('small',`Atak bez broni: ${w.unarmed_dice||'—'} · ST chwytu: ${w.grapple_dc||'—'}`));parent.append(box);}
+ function thrownWeapons(parent,p,h){const entries=p?.thrown_weapons||p?.character_sheet?.weapon_actions?.thrown_weapons||[];if(!entries.length)return;const box=node('section',undefined,'thrown-weapon-list');box.append(node('h3','Twoja rzucona broń'));for(const entry of entries){const near=(entry.floor||0)===(p.floor||0)&&Math.hypot(entry.x-p.x,entry.y-p.y)<=64,row=node('div',undefined,'thrown-weapon-row');row.append(node('span',entry.item?.name||'Rzucona broń'),button(near?'Podnieś':'Podejdź do broni',()=>h.send({type:'recover_thrown',uid:entry.item.uid}),!p.alive||!near));box.append(row);}box.append(node('small','Broń pozostaje w miejscu, gdzie upadła. Podejdź i naciśnij E albo kliknij ją w świecie.'));parent.append(box);}
  function createMerchant(h){
   const panel=node('section',undefined,'merchant-panel');panel.hidden=true;panel.id='merchantPanel';panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Kupiec');
   const header=node('header',undefined,'merchant-header');header.append(node('h2','Kupiec'),button('×',close));header.lastChild.setAttribute('aria-label','Zamknij handel');panel.append(header);
@@ -131,5 +134,5 @@
   }
   return {open,close,render,get visible(){return !panel.hidden;}};
  }
- const api={facts,bind,detail,hide,createMerchant};root.BractwoInventoryUI=api;if(typeof module!=='undefined')module.exports={facts};
+ const api={facts,bind,detail,hide,createMerchant,weaponControls,thrownWeapons};root.BractwoInventoryUI=api;if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

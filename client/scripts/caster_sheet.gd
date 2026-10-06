@@ -1,6 +1,7 @@
 extends RefCounted
 ## Class grants and purchases are distinct; the server owns all eligibility.
 var selected_order: String = ""
+var class_features = preload("res://scripts/class_features.gd").new()
 const ABILITIES: Dictionary = {"strength":"Siła", "dexterity":"Zręczność", "constitution":"Kondycja"}
 
 
@@ -30,7 +31,10 @@ func render(sheet, p: Dictionary) -> void:
 	var busy: bool = float(p.get("combat_remaining", 0)) > 0 or not str(p.get("form", "")).is_empty()
 	if str(p.get("class_id", "")) == "knight":
 		sheet.fighting_styles(p)
+	if str(p.get("class_id", "")) == "ranger":
+		class_features.ranger(sheet, p)
 	if str(p.get("class_id", "")) == "druid":
+		class_features.elemental(sheet, p)
 		sheet.text("Ścieżka druida", true)
 		var current: String = str(c.get("order", ""))
 		var candidate: String = current if selected_order.is_empty() else selected_order

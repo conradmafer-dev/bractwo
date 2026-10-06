@@ -5,14 +5,14 @@ import math
 try:
     from . import world_content as content
     from . import fighter_rules as fighter
-    from . import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment, magic_items
+    from . import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment, magic_items, weapon_actions, ranger_styles
     from .dnd_content import circle_for
     from .progression import same_floor
     from .level_rules import growth_level
 except ImportError:
     import world_content as content
     import fighter_rules as fighter
-    import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment, magic_items
+    import equipment_rules as gear, caster_rules as caster, druid_circles as circles, environment_rules as environment, magic_items, weapon_actions, ranger_styles
     from dnd_content import circle_for
     from progression import same_floor
     from level_rules import growth_level
@@ -77,6 +77,7 @@ def active_buff(p,key): return environment.active(p,key)
 def attack_ability(p):
     w=equipped_item(p,'weapon')
     if p.form:return 'dexterity' if p.form=='cat' else 'strength'
+    if weapon_actions.mode(p)=='unarmed':return 'strength'
     if gear.is_focus(w):return 'intelligence'
     if gear.shillelagh_applies(p):return 'wisdom'
     if w.get('ranged'):return 'dexterity'
@@ -89,7 +90,7 @@ def attack_bonus(p):
     if p.form:return caster.form_spec(p).get('attack_bonus',2)+max(0,proficiency(p)-caster.form_spec(p).get('beast_proficiency',2))
     w=equipped_item(p,'weapon')
     pb=proficiency(p) if gear.proficient(p,w) else 0
-    return pb+ability_modifier(p,attack_ability(p))+min(3,p.gear_bonus('attack_bonus'))
+    return pb+ability_modifier(p,attack_ability(p))+min(3,p.gear_bonus('attack_bonus'))+ranger_styles.attack_bonus(p)
 
 def armor_class(p):
     if getattr(p,'is_companion',False):return p.armor_class
@@ -152,6 +153,8 @@ def migrate_hp(p):
 def cantrip_count(p):return 1+sum(p.level>=n for n in (5,11,17))
 
 def equipped_item(p, slot):
+    if slot=='weapon' and not getattr(p,'form','') and not environment.polymorph(p):
+        return weapon_actions.current_weapon(p)
     uid=p.equipment.get(slot, '')
     return next((content.ITEMS.get(i['template'], {}) for i in p.inventory if i['uid']==uid), {})
 
@@ -162,8 +165,10 @@ def weapon_dice(p):
         return tuple(attacks[min(len(attacks)-1,int(getattr(p,'form_attack_index',0)))])
     weapon=equipped_item(p,'weapon')
     if gear.is_focus(weapon):return 1,4,0
-    mod=ability_modifier(p,attack_ability(p))+min(3,p.gear_bonus('attack'))+min(2,p.mastery.get('power',0)//10)
-    if not weapon:return 0,1,max(0,1+ability_modifier(p,'strength'))
+    if weapon_actions.mode(p)=='unarmed':return weapon_actions.unarmed_dice(p)
+    mod=weapon_actions.damage_ability_modifier(p,ability_modifier(p,attack_ability(p)))+min(3,p.gear_bonus('attack'))+min(2,p.mastery.get('power',0)//10)
+    mod+=ranger_styles.damage_modifier(p,thrown=weapon_actions.is_thrown(p))
+    if not weapon:return weapon_actions.unarmed_dice(p)
     if gear.shillelagh_applies(p):
         count=cantrip_count(p)
         return (2,6,mod) if count==4 else (1,(8,10,12)[count-1],mod)
@@ -172,6 +177,8 @@ def weapon_dice(p):
     return n,s,mod
 
 def attack_range(p):
+    reach=weapon_actions.ranges(p)
+    if reach:return reach[1]
     w=equipped_item(p,'weapon')
     return 108 if gear.melee(p) else 360 if gear.is_focus(w) else 310
 
@@ -186,6 +193,7 @@ def damage_type(p):
         if circles.lunar_damage_type(p):return circles.lunar_damage_type(p)
         f=caster.form_spec(p);types=f.get('attack_types',[f.get('damage','bludgeoning')])
         return types[min(len(types)-1,int(getattr(p,'form_attack_index',0)))]
+    if weapon_actions.mode(p)=='unarmed':return 'bludgeoning'
     if gear.shillelagh_applies(p):return 'force'
     return equipped_item(p,'weapon').get('damage_type','bludgeoning')
 
@@ -331,19 +339,22 @@ def configure(items,enemies):
 
 class CombatRounds:
     def begin_action(self,p,bonus=False):
+        previous=getattr(p,'_feat_turn_until',0)
         begin_feat_turn(p,self.now())
+        if p._feat_turn_until!=previous:self.style_weapon_begin_turn(p)
         if bonus:p.bonus_cooldown_until=self.now()+ROUND_SECONDS
         else:p.attack_cooldown_until=self.now()+ROUND_SECONDS
         p.attack_until=self.time+.3
 
     def close_threat(self, p, target=None, spell=False):
-        if not spell and gear.melee(p):return False
-        if target is not None and target.alive and same_floor(p,target) and math.hypot(p.x-target.x,p.y-target.y)<=72 and self.line_clear(p,target):return True
-        if any(e.alive and e.hp>0 and same_floor(p,e) and math.hypot(p.x-e.x,p.y-e.y)<=72 and self.line_clear(p,e)
-                for e in self.nearby_enemies(p,72)):return True
+        if not spell and gear.melee(p) and not weapon_actions.is_thrown(p):return False
+        close_distance=32 if not spell and weapon_actions.is_thrown(p) else 72
+        if target is not None and target.alive and same_floor(p,target) and math.hypot(p.x-target.x,p.y-target.y)<=close_distance and self.line_clear(p,target):return True
+        if any(e.alive and e.hp>0 and same_floor(p,e) and math.hypot(p.x-e.x,p.y-e.y)<=close_distance and self.line_clear(p,e)
+                for e in self.nearby_enemies(p,close_distance)):return True
         now=self.now()
         return any(q is not p and q.alive and same_floor(p,q) and not (p.party_id and p.party_id==q.party_id)
-            and math.hypot(p.x-q.x,p.y-q.y)<=72 and self.line_clear(p,q)
+            and math.hypot(p.x-q.x,p.y-q.y)<=close_distance and self.line_clear(p,q)
             and (p.aggressors.get(q.id,0)>now or q.aggressors.get(p.id,0)>now) for q in self.players.values())
 
     def add_hunters_mark(self, p, target, result):
@@ -352,6 +363,9 @@ class CombatRounds:
                 and getattr(p,'mark_target_kind','enemy')==target_kind and p.concentration=='hunters_mark'
                 and p.concentration_until>self.now()):
             mark=roll_damage(self.combat_rng,(1,6,0),result.get('critical',False))
+            if not result.get('is_spell'):
+                mark['damage_rolls']=ranger_styles.adjust_damage_dice(p,mark['damage_rolls'])
+                mark['damage']=sum(mark['damage_rolls'])
             components=result.setdefault('damage_components',[{'type':result['damage_type'],'damage':result['damage']}])
             components.append({'type':'force','damage':mark['damage']})
             result['damage']+=mark['damage'];result['damage_dice']+=' + 1k6 (Znak)';result['mark_rolls']=mark['damage_rolls']
@@ -370,8 +384,8 @@ class CombatRounds:
     def hit_enemy(self,p,enemy,multiplier=1,action='Atak',power=None,dice=None,spell=False,melee=False,damage_kind=None):
         spec=environment.enemy_spec(enemy)
         dice=tuple(dice or weapon_dice(p))
-        disadvantage=(not melee and self.close_threat(p,spell=spell)) or active_buff(p,'blind') or active_buff(p,'restrained')
-        advantage=active_buff(p,'foresight') or self.enemy_condition(enemy,'restrained') or self.enemy_condition(enemy,'blind')
+        disadvantage=(not melee and self.close_threat(p,spell=spell)) or self.style_blind_disadvantage(p,enemy) or active_buff(p,'restrained') or (not spell and weapon_actions.long_range_disadvantage(p,enemy))
+        advantage=active_buff(p,'foresight') or self.enemy_condition(enemy,'restrained') or self.style_blind_disadvantage(enemy,p)
         fdis,fadv=self.fighter_roll_flags(p,enemy)
         edis,eadv=self.environment_attack_flags(p,enemy)
         check_draws=[]
@@ -381,6 +395,7 @@ class CombatRounds:
             critical_threshold=self.martial_critical_threshold(p,spell))
         if check_draws:result['check_extra_rolls']=check_draws
         result['damage_type']=damage_kind or damage_type(p)
+        result['is_spell']=bool(spell)
         self.martial_precision(p,enemy,result,dice,spell)
         self.environment_adjust_damage(p,enemy,result,dice,melee)
         if not spell:
@@ -410,6 +425,7 @@ class CombatRounds:
     def resolve_player_hit(self, source, target, result, action, owner=None, unjust=False):
         """One damage path for weapon hits, spells and pets: resistance, forms, death and crimes."""
         self.tag(target,owner is not None)
+        self.ranger_interception(source,target,result)
         self.martial_parry(source,target,result)
         if result.get('hit') or result.get('graze') or result.get('potent_cantrip'):
             before=target.hp+getattr(target,'temp_hp',0)
@@ -438,21 +454,21 @@ class CombatRounds:
         else:
             if pvp:
                 is_melee=gear.melee(source) if melee is None else melee
-                dis=(not is_melee and self.close_threat(source,target,spell=spell)) or active_buff(source,'blind') or active_buff(source,'restrained')
-                adv=active_buff(source,'foresight') or active_buff(target,'restrained') or active_buff(target,'blind')
+                dis=(not is_melee and self.close_threat(source,target,spell=spell)) or self.style_blind_disadvantage(source,target) or active_buff(source,'restrained') or (not spell and weapon_actions.long_range_disadvantage(source,target))
+                adv=active_buff(source,'foresight') or active_buff(target,'restrained') or self.style_blind_disadvantage(target,source)
                 bonus=spell_bonus(source) if spell else attack_bonus(source)
                 dis=dis or (not spell and gear.weapon_disadvantage(source))
                 adv=adv or self.caster_attack_advantage(source,target)
             else:
-                dis=self.enemy_condition(source,'blind') or self.enemy_condition(source,'restrained')
-                adv=active_buff(target,'restrained') or active_buff(target,'blind')
+                dis=self.style_blind_disadvantage(source,target) or self.enemy_condition(source,'restrained')
+                adv=active_buff(target,'restrained') or self.style_blind_disadvantage(target,source)
                 bonus=spec['attack_bonus']
             fdis,fadv=self.fighter_roll_flags(source,target)
             edis,eadv=self.environment_attack_flags(source,target)
             check_draws=[]
             bonus+=self.circle_roll_adjustment(source,'attack',target=target,receipt=check_draws)-getattr(source,'exhaustion',0)*2
             decoy_dis=self.wizard_attack_disadvantage(target)
-            dis=bool(dis or decoy_dis)
+            dis=bool(dis or decoy_dis or self.ranger_protection(source,target))
             result=roll_attack(self.combat_rng,bonus,armor_class(target),chosen,dis or edis or active_buff(target,'foresight') or fdis,adv or fadv or eadv,
                 fixed_roll=self.wizard_take_portent(source,'attack') if pvp else None,
                 maximize=spell and self.wizard_maximize_spell(source,getattr(source,'_wizard_damage_spec',{})),

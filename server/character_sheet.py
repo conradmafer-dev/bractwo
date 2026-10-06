@@ -1,8 +1,8 @@
 """Owner-only character sheet; all bonuses use the actual combat calculations."""
 try:
-    from . import combat_rules as rules, dnd_content as dnd, fighter_rules as fighter, martial_rules as martial, skill_rules, ability_rules
+    from . import combat_rules as rules, dnd_content as dnd, fighter_rules as fighter, martial_rules as martial, skill_rules, ability_rules, weapon_actions
 except ImportError:
-    import combat_rules as rules, dnd_content as dnd, fighter_rules as fighter, martial_rules as martial, skill_rules, ability_rules
+    import combat_rules as rules, dnd_content as dnd, fighter_rules as fighter, martial_rules as martial, skill_rules, ability_rules, weapon_actions
 
 DAMAGE_NAMES = {'acid':'Kwas','bludgeoning':'Obuchowe','cold':'Zimno','fire':'Ogień',
     'force':'Moc','lightning':'Błyskawice','necrotic':'Nekrotyczne','piercing':'Kłute',
@@ -23,4 +23,4 @@ def build(p):
         hit_die='1k'+str(p.spec['hit_die']),critical_threshold=martial.critical_threshold(p),martial=martial.sheet(p),
         movement_per_round=round(p.speed*rules.ROUND_SECONDS/dnd.UNITS_PER_FOOT,1),
         round_seconds=rules.ROUND_SECONDS,ward_reduction=12 if p.ward_until>p.current_wall_time else 0,
-        fighter=fighter.class_sheet(p), feats=([dict(id=p.fighting_style,**fighter.STYLES[p.fighting_style])] if p.class_id=='knight' and getattr(p,'fighting_style','') in fighter.STYLES else []),favorite_spell=dnd.favorite_spell(p),spell_history_size=len(p.spell_history))
+        weapon_actions=weapon_actions.sheet(p, p.current_wall_time),fighter=fighter.class_sheet(p), feats=([dict(id=p.fighting_style,**fighter.STYLES[p.fighting_style])] if p.class_id=='knight' and getattr(p,'fighting_style','') in fighter.STYLES else []),favorite_spell=dnd.favorite_spell(p),spell_history_size=len(p.spell_history))

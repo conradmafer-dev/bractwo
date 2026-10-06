@@ -82,7 +82,7 @@ func equipment_icon(item: Dictionary, slot: String) -> Texture2D:
 	if item.has("icon"):
 		return icon(str(item["icon"]))
 	var kind: String = slot
-	if slot == "weapon":
+	if slot in ["weapon", "offhand"]:
 		var weapon_type: String = str(item.get("weapon_type", ""))
 		kind = "weapon"
 		if weapon_type == "focus":
@@ -103,7 +103,7 @@ func refresh() -> void:
 	if host.get_viewport().gui_get_focus_owner() is OptionButton:
 		return
 	var p: Dictionary = host.player
-	var next: String = JSON.stringify([tab, bag_page, selected_item, p.get("inventory"), p.get("equipment"), p.get("character_sheet"), selected_style, not host.progression.near_service("master").is_empty(), p.get("attributes"), p.get("skills"), p.get("mastery"), p.get("mastery_points"), float(p.get("combat_remaining", 0)) > 0, float(p.get("bonus_remaining", 0)) > 0, p.get("alive"), p.get("hotbar"), p.get("level"), p.get("gold"), p.get("xp"), p.get("xp_total"), p.get("xp_next_total"), p.get("bank_gold"), p.get("soul"), p.get("kills"), p.get("boss_kills"), p.get("armor_class"), p.get("damage_dice"), p.get("attack_bonus"), p.get("potions"), p.get("potion_slots"), p.get("shield_armed"), p.get("ensnaring_armed"), p.get("concentration"), p.get("form"), int(p.get("mana", 0)), int(p.get("hp", 0)), p.get("queued_spell"), ceili(float(p.get("action_remaining", 0)) * 10) if not str(p.get("queued_spell", "")).is_empty() else 0, p.get("spell_cooldowns"), p.get("spell_profiles"), p.get("status_effects")])
+	var next: String = JSON.stringify([tab, bag_page, selected_item, p.get("inventory"), p.get("equipment"), p.get("character_sheet"), selected_style, not host.progression.near_service("master").is_empty(), p.get("attributes"), p.get("skills"), p.get("mastery"), p.get("mastery_points"), float(p.get("combat_remaining", 0)) > 0, float(p.get("bonus_remaining", 0)) > 0, p.get("alive"), p.get("hotbar"), p.get("level"), p.get("gold"), p.get("xp"), p.get("xp_total"), p.get("xp_next_total"), p.get("bank_gold"), p.get("soul"), p.get("kills"), p.get("boss_kills"), p.get("armor_class"), p.get("damage_dice"), p.get("attack_bonus"), p.get("potions"), p.get("potion_slots"), p.get("shield_armed"), p.get("ensnaring_armed"), p.get("concentration"), p.get("form"), int(p.get("mana", 0)), int(p.get("hp", 0)), p.get("queued_spell"), ceili(float(p.get("action_remaining", 0)) * 10) if not str(p.get("queued_spell", "")).is_empty() else 0, p.get("spell_cooldowns"), p.get("spell_profiles"), p.get("status_effects"), host.selected_enemy, host.selected_target, p.get("thrown_weapons"), int(p.get("x", 0)) / 32, int(p.get("y", 0)) / 32, p.get("action_remaining", 0) > 0])
 	if signature == next:
 		return
 	signature = next
@@ -127,7 +127,7 @@ func equipment(p: Dictionary) -> void:
 	var slots: GridContainer = GridContainer.new()
 	slots.columns = 2
 	list.add_child(slots)
-	for slot: String in ["weapon", "armor", "shield", "ring"]:
+	for slot: String in ["weapon", "offhand", "armor", "shield", "ring"]:
 		var item: Dictionary = {}
 		for entry: Dictionary in items:
 			if str(entry.get("uid", "")) == str(worn.get(slot, "_")):
@@ -201,11 +201,19 @@ func equipment(p: Dictionary) -> void:
 				bind_button.disabled = use.disabled
 				row.add_child(bind_button)
 		elif is_worn:
-			row.add_child(host._button("Zdejmij", func() -> void: host._send({"type":"unequip", "slot":item["slot"]})))
+			var worn_slot: String = str(item.get("slot", ""))
+			for slot: String in worn:
+				if worn[slot] == item.get("uid"):
+					worn_slot = slot
+			row.add_child(host._button("Zdejmij", func() -> void: host._send({"type":"unequip", "slot":worn_slot})))
 		elif str(item.get("slot", "")) in ["weapon", "armor", "shield", "ring"]:
 			var equip_button: Button = host._button("Załóż", func() -> void: host._send({"type":"equip", "uid":item["uid"]}))
 			equip_button.disabled = not host._item_usable(item) or not p.get("alive", true)
 			row.add_child(equip_button)
+			if str(item.get("slot", "")) == "weapon" and bool(item.get("light", false)):
+				var offhand_button: Button = host._button("Załóż do drugiej ręki", func() -> void: host._send({"type":"equip", "uid":item["uid"], "slot":"offhand"}))
+				offhand_button.disabled = equip_button.disabled or not bool(host.weapon_actions.metadata(p).get("can_equip_offhand", false))
+				row.add_child(offhand_button)
 		if is_worn and item.get("slot", "") == "weapon" and item.has("versatile_dice"):
 			for grip: String in ["one", "two"]:
 				var grip_button: Button = host._button("Jednorącz" if grip == "one" else "Oburącz", func() -> void: host._send({"type":"weapon_grip", "grip":grip}))
@@ -219,6 +227,8 @@ func equipment(p: Dictionary) -> void:
 				var sell_stack: Button = host._button("Stos · %d zł" % (int(item.get("value", 0))*int(item["quantity"])), func() -> void: host._send({"type":"sell", "uid":item["uid"], "quantity":item["quantity"]}))
 				sell_stack.disabled = sell.disabled
 				row.add_child(sell_stack)
+	host.weapon_actions.render(list, p)
+	host.weapon_actions.recovery(self, p)
 
 func allocation(p: Dictionary) -> void:
 	var points: int = int(p.get("mastery_points", 0))
@@ -284,7 +294,7 @@ func spells(p: Dictionary) -> void:
 	text("F · " + str(host.world_data.get("spells", {}).get(p.get("favorite_spell", ""), {}).get("name", "—")))
 	for key: String in host.world_data.get("spells", {}):
 		var spec: Dictionary = host._spell_profile(key)
-		if not spec.get("class_ids", []).has(p.get("class_id", "")):
+		if not spec.get("class_ids", []).has(p.get("class_id", "")) and not p.get("character_sheet", {}).get("fighter", {}).get("chosen_cantrips", []).has(key):
 			continue
 		var gate: int = host._spell_gate(spec)
 		var unlocked: bool = int(p.get("level", 1)) >= gate

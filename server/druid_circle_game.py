@@ -7,12 +7,12 @@ import math
 from types import SimpleNamespace
 
 try:
-    from . import druid_circles as circles, combat_rules as rules, caster_rules as caster, dnd_content as dnd
+    from . import druid_circles as circles, combat_rules as rules, caster_rules as caster, dnd_content as dnd, elemental_fury
     from . import world_content as content
     from .progression import same_floor
     from .profession_rules import PROMOTION_LEVEL
 except ImportError:
-    import druid_circles as circles, combat_rules as rules, caster_rules as caster, dnd_content as dnd
+    import druid_circles as circles, combat_rules as rules, caster_rules as caster, dnd_content as dnd, elemental_fury
     import world_content as content
     from progression import same_floor
     from profession_rules import PROMOTION_LEVEL
@@ -23,6 +23,7 @@ def distance(a, b): return math.hypot(a.x-b.x, a.y-b.y)
 
 class DruidCircleGame:
     def migrate_druid_circle(self, p):
+        elemental_fury.sanitize(p)
         if p.class_id != 'druid' or getattr(p, 'druid_circle', '') not in circles.CIRCLES:
             p.druid_circle = ''
         data = circles.state(p)
@@ -44,6 +45,39 @@ class DruidCircleGame:
 
     def _circle_visible(self, source, target):
         return getattr(self, 'environment_can_see', self.line_clear)(source, target)
+
+    async def choose_elemental_fury(self, p, key):
+        if (p.class_id != 'druid' or p.level < elemental_fury.REQUIRED_LEVEL
+                or not isinstance(key, str) or key not in elemental_fury.OPTIONS):
+            return await self.notice(p, 'Furia żywiołów wymaga druida na poziomie 7 i poprawnego wyboru.')
+        if elemental_fury.choice(p):
+            return await self.notice(p, 'Furia żywiołów została już wybrana.')
+        if (not self._circle_available(p) or p.form
+                or max(p.combat_until, p.pvp_combat_until) > self.now()):
+            return await self.notice(p, 'Wybierz Furię żywiołów poza walką i przemianą.')
+        p.elemental_fury = key
+        p.elemental_damage_type = elemental_fury.damage_type(p)
+        self.clear_caster_caches(p)
+        self._circle_save(p)
+        await self.notice(p, 'Wybrano Furię żywiołów: '+elemental_fury.OPTIONS[key]['name']+'.')
+
+    async def select_elemental_damage_type(self, p, key):
+        # This preference may change in combat and Wild Shape, before each hit;
+        # it neither spends an action nor resets the once-per-own-turn limit.
+        if (elemental_fury.choice(p) != 'primal_strike' or not isinstance(key, str)
+                or key not in elemental_fury.DAMAGE_TYPES or not self._circle_available(p, beast=True)):
+            return await self.notice(p, 'Wybierz zimno, ogień, błyskawice albo grzmot dla Pierwotnego uderzenia.')
+        p.elemental_damage_type = key
+        self.clear_caster_caches(p)
+        self._circle_save(p)
+
+    async def set_elemental_strike_enabled(self, p, enabled):
+        if (elemental_fury.choice(p) != 'primal_strike' or type(enabled) is not bool
+                or not self._circle_available(p, beast=True)):
+            return await self.notice(p, 'Przygotowanie Pierwotnego uderzenia wymaga poprawnego wyboru druida.')
+        circles.state(p)['elemental_strike_enabled'] = enabled
+        self.clear_caster_caches(p)
+        self._circle_save(p)
 
     async def select_druid_circle(self, p, key, land='arid'):
         if not isinstance(key, str) or key not in circles.CIRCLES or p.class_id != 'druid' or p.level < PROMOTION_LEVEL:
@@ -184,7 +218,8 @@ class DruidCircleGame:
         return 0
 
     def circle_adjust_damage(self, p, target, result, weapon=True):
-        """Augment one successful beast attack before resistance/HP/death handling."""
+        """Augment weapon/beast hits before each component's resistance handling."""
+        elemental_fury.primal_strike(p, result, self.combat_rng, self.now(), weapon=weapon)
         if not weapon or not result.get('hit') or not p.form: return
         spec = caster.form_spec(p)
         rider = spec.get('extra_attacks', {}).get(getattr(p, 'form_attack_index', 0))

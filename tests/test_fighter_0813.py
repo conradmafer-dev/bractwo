@@ -9,10 +9,10 @@ from server import combat_rules as rules, dnd_content as dnd, fighter_rules as f
 from aiohttp.test_utils import TestClient, TestServer
 
 class FighterData(unittest.TestCase):
-    def test_only_knight_has_styles(self):
+    def test_knight_and_ranger_have_class_style_sheets(self):
         for cls in CLASSES:
             f=character_sheet.build(Player('1','T',class_id=cls))['fighter']
-            self.assertEqual(bool(f),cls=='knight')
+            self.assertEqual(bool(f),cls in ('knight','ranger'))
     def test_three_choice_styles_and_three_distinct_masteries(self):
         self.assertEqual(set(fighter.STYLES),{'dueling','defense','great_weapon'})
         self.assertEqual({m['effect'] for m in fighter.MASTERIES.values()},{'sap','graze','topple'})

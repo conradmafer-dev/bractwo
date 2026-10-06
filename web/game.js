@@ -6,7 +6,7 @@
   const mini = $("minimap"), mctx = mini.getContext("2d");
   const ui = Object.fromEntries(Array.from(document.querySelectorAll("[id]"), element => [element.id, element]));
   const revisionLabel=document.querySelector('.auth-foot');
-  if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_34';
+  if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_35';
   const classInfo = {
     knight: {name:"Rycerz",icon:"⚔",color:"#f8d377",cape:"#cc4845",ability:"Drugi oddech",weapon:"sword"},
     ranger: {name:"Łowca",icon:"➶",color:"#f1d99c",cape:"#9e682e",ability:"Znak łowcy",weapon:"bow"},
@@ -296,7 +296,7 @@
     updateEffects(target);
     updatePotionButtons();
     updateQuestTracker(); updateBattleList();
-    eventPanel?.render();characterSheet?.render();merchantPanel?.render();adventurePanel?.render();servicePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();martialPrompt?.sync();advancementPrompt?.sync();globalThis.BractwoFeatUI?.sync(me);
+    eventPanel?.render();characterSheet?.render();merchantPanel?.render();adventurePanel?.render();servicePanel?.render();restUI?.render();hudWindows?.sync(me.id);fighterPrompt?.sync();casterPrompt?.sync();martialPrompt?.sync();advancementPrompt?.sync();weaponMenu?.sync();globalThis.BractwoFeatUI?.sync(me);
     if(!ui.sidePanel.hidden){if(panelMode==="inventory")renderInventory();else if(panelMode==="journal")renderJournal();else if(panelMode==="progression")renderExpansion();else renderPlayers();}
   }
   function nearestSkillChallenge(){
@@ -539,6 +539,7 @@
     if(!canControl())return;
     for(const panel of [eventPanel,servicePanel,adventurePanel,merchantPanel])if(panel?.visible){panel.close();return;}
     if(!ui.sidePanel.hidden){ui.sidePanel.hidden=true;updateHUD();return;}
+    const thrown=(me.thrown_weapons||[]).filter(e=>sameFloor(me,e)&&distance(me,e)<=64).sort((a,b)=>distance(me,a)-distance(me,b))[0];if(thrown){send({type:'recover_thrown',uid:thrown.item.uid});return;}
     const npc=nearestNpc();
     if(npc?.service==='binding_stone'){talkTo(npc);return;}
     const skillSite=nearestSkillChallenge();
@@ -596,6 +597,7 @@
       const tree=pendingPointTarget.packet.action==='tree_step'&&grove;
       commitPointTarget({x:tree?grove.x+grove.w/2:x,y:tree?grove.y+grove.h:y,floor:me.floor||0});event.preventDefault();return;
     }
+    const thrown=(me.thrown_weapons||[]).find(e=>sameFloor(me,e)&&Math.hypot(e.x-x,e.y-y)<22);if(thrown){if(distance(me,thrown)<=64)send({type:'recover_thrown',uid:thrown.item.uid});else notice('Podejdź bliżej, aby podnieść rzuconą broń.');event.preventDefault();return;}
     const nearest=Runtime.hitActor(visuals.values(),x,y,myId,me.floor||0,camera.scale);
     if(nearest){if(nearest.kind==='e')selectEnemy(String(nearest.entity.id));else selectTarget(String(nearest.entity.id));}
     else {
@@ -615,7 +617,7 @@
   addEventListener("keydown",event=>{
     if(globalThis.BractwoFeatUI?.visible){if(event.code==="Escape"){event.preventDefault();globalThis.BractwoFeatUI.close();}return;}
     if(!playing||mobileHud?.blocksControls()||restUI?.blocksControls()||appShell?.blocksControls())return;
-    if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton, #hotbarGroupMenu button, .hotbar-group-toggle'))return;
+    if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton, #hotbarGroupMenu button, .hotbar-group-toggle, #weaponActionMenu button, #weaponActionMenu select, #weaponActionMenu input, #weaponActionToggle'))return;
     if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
     if(event.target.closest?.('#adventurePanel button, #servicePanel button, #merchantPanel button, #worldEventPanel button')&&['Enter','Space'].includes(event.code))return;
     if(eventPanel?.visible&&['Escape','KeyE'].includes(event.code)){event.preventDefault();eventPanel.close();return;}
@@ -1558,6 +1560,7 @@
     const trees=world.environment_trees||(world.obstacles||[]).filter(o=>o.type==='grove').map(o=>({x:o.x+o.w/2,y:o.y+o.h,floor:o.floor||0}));
     ctx.save();ctx.strokeStyle='#bcecbcb0';ctx.lineWidth=1.3;for(const tree of trees){if(!sameFloor(me,tree)||!inView(tree.x,tree.y))continue;ctx.beginPath();ctx.arc(tree.x,tree.y,8+Math.sin(t*2)*1.5,0,TAU);ctx.stroke();}ctx.restore();
   }
+  function drawThrownWeapon(entry,t){const{x,y}=entry;ellipse(ctx,x,y+3,13,6,'#15271f88');line(ctx,[[x-8,y+5],[x+8,y-8]],'#ddd8b4',4);line(ctx,[[x-8,y+5],[x-3,y]],'#906c45',4);ctx.save();ctx.strokeStyle='#e4c979aa';ctx.lineWidth=1;ctx.beginPath();ctx.arc(x,y,17+Math.sin(t*3),0,TAU);ctx.stroke();ctx.restore();if(distance(me,entry)<=64)label('E · Podnieś',x,y-25,'#ead7a0',10);}
   function stopRendering(){
     if(animationFrame!==null)cancelAnimationFrame(animationFrame);
     animationFrame=null;
@@ -1592,6 +1595,7 @@
       else if(entry.kind==='merchant'){if(inView(o.x,o.y))objects.push({y:o.y+12,draw:()=>drawMerchant(t)});}
     }
     for(const site of world.skill_challenge_catalog||[])if(sameFloor(me,site)&&inView(site.x,site.y))objects.push({y:site.y+9,draw:()=>drawWorldEvent(site,t)});
+    for(const entry of me.thrown_weapons||[])if(sameFloor(me,entry)&&inView(entry.x,entry.y))objects.push({y:entry.y+5,draw:()=>drawThrownWeapon(entry,t)});
     for(const v of visuals.values())if(sameFloor(me,v.entity)&&inView(v.x,v.y))objects.push({y:v.y+(v.kind==='p'?21:10),draw:()=>v.kind==='p'?drawPlayer(v,t):drawEnemy(v,t)});
     for(const entry of nearbyDrawables()){
       const o=entry.data;
@@ -1716,7 +1720,7 @@
   lootPanel=globalThis.BractwoLootUI.create({world:()=>world,player:()=>me,prepare:()=>{eventPanel?.close();characterSheet?.close();}});
   ui.targetLoot.addEventListener('click',()=>{const enemy=snapshot.enemies.find(e=>String(e.id)===selectedEnemy);if(enemy)lootPanel.open({...world.enemy_types?.[enemy.kind],kind:enemy.kind});});
   levelUpPanels=globalThis.BractwoLevelUp.create({send,ready:()=>playing&&socket?.readyState===WebSocket.OPEN,open:(tab,section)=>characterSheet.open(tab,section)});
-  let fighterPrompt=null,casterPrompt=null,martialPrompt=null,advancementPrompt=null;
+  let fighterPrompt=null,casterPrompt=null,martialPrompt=null,advancementPrompt=null,weaponMenu=null;
   characterSheet=globalThis.BractwoCharacterSheet.create({
     state:()=>({player:me,world,skill_challenges:snapshot.skill_challenges}),openEvent:site=>{characterSheet.close();eventPanel.open(site);},stop:()=>{eventPanel?.close();resetControls();},navigate:site=>{navigateTo(site,site.name);characterSheet.close();},send,cast,gate:spellGate,mana:spellMana,nearMaster:()=>!!nearbyService("master"),
     selectedAlly:()=>snapshot.players.find(q=>String(q.id)===String(selectedTarget)&&q.hp>0&&me?.party_id&&q.party_id===me.party_id)||null,
@@ -1724,12 +1728,12 @@
     beginPointAction,
     studyTarget:()=>selectedEnemy?{enemy_id:selectedEnemy}:selectedTarget?{target_id:selectedTarget}:null,
     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
-    prepare:()=>{eventPanel?.close();adventurePanel?.close();servicePanel?.close();merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
+    prepare:()=>{weaponMenu?.close();eventPanel?.close();adventurePanel?.close();servicePanel?.close();merchantPanel?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;},
     changed:()=>{if(me)updateHUD();}
   });
   merchantPanel=globalThis.BractwoInventoryUI.createMerchant({state:()=>({player:me,world}),send,rest:()=>restUI.open(),
     canTrade:()=>merchantNear()&&!(me?.combat_remaining>0),
-    prepare:()=>{eventPanel?.close();adventurePanel?.close();servicePanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
+    prepare:()=>{weaponMenu?.close();eventPanel?.close();adventurePanel?.close();servicePanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   adventurePanel=globalThis.BractwoAdventureUI.create({state:()=>({player:me,world}),send,
     trade:npc=>merchantPanel.open(npc),services:npc=>servicePanel.open(npc),
     track:id=>{saveTrackedQuest(id);navigationGoal=null;updateHUD();},
@@ -1744,6 +1748,7 @@
   fighterPrompt=globalThis.BractwoFighterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab,'class')});
   casterPrompt=globalThis.BractwoCasterUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab,'class')});
   martialPrompt=globalThis.BractwoMartialUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab,'class')});
+  weaponMenu=globalThis.BractwoFighterUI.createCombatMenu({player:()=>me,target:()=>selectedEnemy?{enemy_id:selectedEnemy}:selectedTarget?{target_id:selectedTarget}:null,send,stop:resetControls});
   mobileHud=globalThis.BractwoMobile.create({stop:resetControls,closeChat});
   restUI=globalThis.BractwoRestUI.create({state:()=>({player:me,world}),send,notice,stop:resetControls,clearTarget,
     prepare:()=>{eventPanel?.close();adventurePanel?.close();servicePanel?.close();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});

@@ -43,7 +43,7 @@ def threatened(h, x, y):
     return math.hypot(x-h['target_x'], y-h['target_y']) <= h['radius']+12
 
 
-def steer(game, player, enemy, dodge):
+def steer(game, player, enemy, dodge, reach=None):
     """Approach attack range; react to visible warnings after 250ms.
 
     Ranged characters hold position between warnings (no perfect kiting).
@@ -54,7 +54,8 @@ def steer(game, player, enemy, dodge):
               and threatened(h, player.x, player.y)] if dodge else []
     dx, dy = enemy.x-player.x, enemy.y-player.y
     distance = math.hypot(dx, dy)
-    reach = 170 if player.class_id == 'mage' else min(170, rules.attack_range(player)*.85)
+    if reach is None:
+        reach = 170 if player.class_id == 'mage' else min(170, rules.attack_range(player)*.85)
     vx, vy = (dx/distance, dy/distance) if distance > reach else (0, 0)
     if danger:
         candidates = []

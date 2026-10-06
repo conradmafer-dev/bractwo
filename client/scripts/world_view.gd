@@ -508,6 +508,7 @@ func _draw() -> void:
 		_draw_merchant()
 	_draw_npcs()
 	_draw_mill_blades()
+	_draw_thrown_weapons()
 	CASTER_VFX.world(self, world_data, snapshot, _local_player())
 	var actors: Array[Dictionary] = []
 	for enemy: Dictionary in snapshot.get("enemies", []) + snapshot.get("companions", []):
@@ -540,6 +541,21 @@ func _draw() -> void:
 
 func _local_player() -> Dictionary:
 	return _local
+
+func _draw_thrown_weapons() -> void:
+	var owner: Dictionary = _local_player()
+	var entries: Array = owner.get("thrown_weapons", owner.get("character_sheet", {}).get("weapon_actions", {}).get("thrown_weapons", []))
+	for entry: Dictionary in entries:
+		if int(entry.get("floor", 0)) != int(owner.get("floor", 0)):
+			continue
+		var p: Vector2 = Vector2(float(entry.get("x", 0)), float(entry.get("y", 0)))
+		if p.distance_squared_to(get_local_position()) > 1100 * 1100:
+			continue
+		draw_circle(p, 9, Color("624b2b"))
+		draw_line(p + Vector2(-5, 5), p + Vector2(5, -5), Color("ede2be"), 3, true)
+		draw_line(p + Vector2(-5, 0), p + Vector2(0, 5), Color("dabb79"), 2, true)
+		if p.distance_to(get_local_position()) <= 64:
+			draw_string(_font, p + Vector2(-31, -15), "E · podnieś", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("dabb79"))
 
 func _draw_safe_zone() -> void:
 	for zone: Dictionary in world_data.get("safe_zones", [world_data.get("safe_zone", {"x":560, "y":1180, "radius":260})]):

@@ -30,6 +30,9 @@ def record(p, first, last):
         feat_rules_version=rules.gear.FEAT_RULES_VERSION,origin_feat=getattr(p,'origin_feat',''),
         ability_build=getattr(p,'ability_build',{}),skill_training=getattr(p,'skill_training',{}),
         druid_circle=p.druid_circle,druid_circle_state=p.druid_circle_state,
+        elemental_fury=getattr(p,'elemental_fury',''),elemental_damage_type=getattr(p,'elemental_damage_type','cold'),
+        ranger_style_cantrips=getattr(p,'ranger_style_cantrips',[]),
+        weapon_attack_mode=getattr(p,'weapon_attack_mode','weapon'),
         wizard_school=p.wizard_school,wizard_school_state=p.wizard_school_state,
         martial_archetype=getattr(p,'martial_archetype',''),
         martial_state={k:v for k,v in getattr(p,'martial_state',{}).items() if k in ('maneuvers','hunter_choice')},
@@ -63,6 +66,7 @@ def permanent(p, level, context):
     q.legacy_growth_level=0
     q.fighting_style="";q.weapon_grip="one";q.primal_order='';q.training_feats={}
     q.origin_feat='';q.ability_build={};q.skill_training={}
+    q.elemental_fury='';q.elemental_damage_type='cold';q.ranger_style_cantrips=[];q.weapon_attack_mode='weapon'
     q._legacy_auto_attributes='feat_rules_version' not in context
     q.druid_circle='';q.druid_circle_state={};q.druid_circle_runtime={}
     q.wizard_school='';q.wizard_school_state={};q.wizard_school_runtime={}
@@ -88,6 +92,21 @@ def receipt(p, batch, level):
         if unit:entry['unit']=unit
         if icon:entry['icon']=icon
         rows.append(entry)
+    if after.class_id=='ranger' and level==2:
+        add('ranger_style','Styl walki lub Druidyczny wojownik','+ możliwość wyboru')
+        actions.append(dict(kind='ranger_style',label='Wybierz styl walki',tab='feats',section='ranger_style'))
+    if after.class_id=='druid' and level==7:
+        add('elemental_fury','Elemental Fury','+ Potent Spellcasting albo Primal Strike')
+        actions.append(dict(kind='elemental_fury',label='Wybierz Elemental Fury',tab='feats',section='elemental_fury'))
+    if after.class_id=='druid' and level==15:
+        selected=getattr(after,'elemental_fury','')
+        detail=('Primal Strike: 2k8 zamiast 1k8' if selected=='primal_strike' else
+                'Potent Spellcasting: +300 stóp zasięgu sztuczek o zasięgu co najmniej 10 stóp' if selected=='potent_spellcasting' else
+                'Primal Strike: 2k8; Potent Spellcasting: +300 stóp zasięgu wybranych sztuczek')
+        add('improved_elemental_fury','Improved Elemental Fury','+ '+detail)
+    if after.class_id=='ranger' and level>2 and getattr(after,'fighting_style','')=='druidic_warrior':
+        add('ranger_cantrip','Druidyczny wojownik','+ możliwość wymiany jednej sztuczki')
+        actions.append(dict(kind='ranger_cantrip',label='Sprawdź sztuczki',tab='feats',section='ranger_style'))
     try: from . import wizard_schools
     except ImportError: import wizard_schools
     selected=wizard_schools.school(after)
