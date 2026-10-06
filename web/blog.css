@@ -13,6 +13,7 @@
 .blog .article-image img { display: block; width: 100%; height: auto; border: 1px solid var(--line); }
 .blog .article-image figcaption { color: var(--muted); font-size: 14px; line-height: 1.6; margin-top: 10px; }
 .blog .toc { position: sticky; top: 28px; }
+@media (max-width: 850px) { .blog.article-first .toc { grid-row: auto; } }
 .blog .toc h2 { font-size: 14px; }
 .blog .table-scroll { max-width: 100%; overflow-x: auto; margin: 24px 0; border: 1px solid var(--line); border-radius: 3px; }
 .blog table { width: 100%; border-collapse: collapse; font-size: 16px; line-height: 1.6; }

@@ -117,6 +117,16 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/aion-2-rekord-steam-nagrody", "blog/aion-2-rekord-steam-nagrody.html",
+        "AION 2: rekord Steam, darmowy voucher i nagrody | Bractwo Krain",
+        "AION 2 po premierze: 397 905 graczy jednocześnie na Steam, darmowy Customization Voucher "
+        "i prezenty za 400 tysięcy aktywnych użytkowników. Sprawdź źródła i menu Closet.",
+        "AION 2: rekord na Steam i darmowy Customization Voucher po premierze",
+        published_date="2026-10-06", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/aion-2-start-skrzydla-ilustracja-1200.webp",
+                        "Skrzydlata postać nad chmurami przed podniebną cytadelą — ilustracja redakcyjna do wiadomości o AION 2.", 1200, 675),
+    ),
+    PublicPage(
         "/blog/aion-2-start-polska", "blog/aion-2-start-polska.html",
         "AION 2: start 5 października — godzina w Polsce | Bractwo Krain",
         "Globalny start AION 2 zaplanowano na 5 października 2026. Sprawdź godzinę w Polsce, "
