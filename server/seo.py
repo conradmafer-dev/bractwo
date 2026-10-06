@@ -123,8 +123,8 @@ NEWS_ARTICLES = (
         "i prezenty za 400 tysięcy aktywnych użytkowników. Sprawdź źródła i menu Closet.",
         "AION 2: rekord na Steam i darmowy Customization Voucher po premierze",
         published_date="2026-10-06", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
-        image=PageImage("/assets/blog/aion-2-start-skrzydla-ilustracja-1200.webp",
-                        "Skrzydlata postać nad chmurami przed podniebną cytadelą — ilustracja redakcyjna do wiadomości o AION 2.", 1200, 675),
+        image=PageImage("/assets/blog/aion-2-customization-voucher-oficjalna-800.webp",
+                        "Zwierzęca postać w białym stroju obok logo AION 2 — oficjalna grafika komunikatu o Customization Voucher.", 800, 450),
     ),
     PublicPage(
         "/blog/aion-2-start-polska", "blog/aion-2-start-polska.html",
