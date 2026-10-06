@@ -553,7 +553,10 @@ class DNDGame(RangerMagic):
         p.current_wall_time=now=self.now()
         s=dnd.SPELLS.get(key) if isinstance(key,str) else None
         if not p.alive or s is None:return
-        if not dnd.spell_allowed(p,key):return await self.notice(p,f'{s["name"]}: wymaga właściwej klasy i poziomu {dnd.spell_level(s,p.class_id)}.')
+        if not dnd.spell_allowed(p,key):
+            if p.class_id=='mage' and 'mage' in s.get('class_ids',()) and s.get('circle',0)>0 and not s.get('feature') and p.level>=dnd.spell_level(s,p.class_id):
+                return await self.notice(p,f'{s["name"]}: naucz się i przygotuj ten czar w swojej księdze (K → Czary).')
+            return await self.notice(p,f'{s["name"]}: wymaga właściwej klasy i poziomu {dnd.spell_level(s,p.class_id)}.')
         s=spell_scaling.resolve(p,key)
         if s['kind']=='reaction':
             p.shield_armed=not p.shield_armed

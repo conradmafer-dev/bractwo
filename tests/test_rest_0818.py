@@ -204,6 +204,8 @@ class RestRules(unittest.IsolatedAsyncioTestCase):
     async def test_rejected_spell_preserves_rest_but_executed_spell_cancels(self):
         p = self.p
         p.mana = p.max_mana
+        await self.g.on_packet(p.ws, {'type':'wizard_learn', 'spell':'longstrider'})
+        await self.g.on_packet(p.ws, {'type':'wizard_prepare', 'spells':['longstrider']})
         await self.g.start_rest(p)
         await self.g.cast_spell(p, 'fire_bolt', self.e.id)
         self.assertTrue(p.rest_state)
@@ -214,6 +216,7 @@ class RestRules(unittest.IsolatedAsyncioTestCase):
     async def test_real_ritual_cancels_rest_and_blocks_a_new_rest(self):
         p = self.p
         p.mana = p.max_mana
+        await self.g.on_packet(p.ws, {'type':'wizard_learn', 'spell':'alarm'})
         await self.g.start_rest(p)
         await self.g.start_caster_channel(p, 'alarm', ritual=True)
         self.assertFalse(p.rest_state)

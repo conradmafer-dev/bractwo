@@ -55,7 +55,8 @@
     const head=el('header');head.append(el('strong',null,'Odpoczynek'),button('restMenuClose','×',close));
     const shortButton=button('restShortButton','',()=>open('short')),longButton=button('restLongButton','',()=>open('long'));
     const shortInfo=el('small','restShortInfo'),longInfo=el('small','restLongInfo'),restriction=el('p','restRestriction');
-    menu.append(head,shortButton,shortInfo,longButton,longInfo,restriction);ui.append(menu);
+    const wizardButton=button('restWizardBook','Przygotuj czary z księgi…',()=>{close();h.openBook?.('prepare');});wizardButton.hidden=true;
+    menu.append(head,shortButton,shortInfo,longButton,longInfo,wizardButton,restriction);ui.append(menu);
     const book = document.getElementById('bookSpell');
     const toolbar = book.closest('.hotbar-toolbar');
     const combat = ui.querySelector('.combat-controls');
@@ -116,6 +117,7 @@
       shortButton.textContent=`Krótki · ${m.shortSeconds} s · R${m.shortCooldown?' · za '+m.shortCooldown+' s':''}`;shortButton.disabled=!m.canShort;shortButton.title=m.shortRestriction;
       shortInfo.textContent='Leczenie z kości zdrowia'+(m.hitDice?` (${m.hitDice.remaining}/${m.hitDice.maximum})`:'')+', część użyć zdolności i dostępne odzyskanie many.';
       longButton.textContent=`Długi · ${m.longSeconds} s · Shift+R${m.longCooldown?' · za '+m.longCooldown+' s':''}`;longButton.disabled=!m.canLong;longButton.title=m.longRestriction;
+      wizardButton.hidden=!root.BractwoWizardBookUI?.book(player);wizardButton.disabled=!player?.alive||!h.openBook;
       longInfo.textContent=(m.longNeedsCity?'Tylko w mieście: ':'')+'Całe HP i mana oraz wszystkie zasoby odpoczynku.';
       restriction.textContent=m.restriction||(!m.longPlaceAllowed?'Wróć do miasta, aby rozpocząć długi odpoczynek.':'');restriction.hidden=!restriction.textContent;
       if(m.active)close();else if(!menu.hidden)positionMenu();

@@ -6,7 +6,7 @@
   const mini = $("minimap"), mctx = mini.getContext("2d");
   const ui = Object.fromEntries(Array.from(document.querySelectorAll("[id]"), element => [element.id, element]));
   const revisionLabel=document.querySelector('.auth-foot');
-  if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_35';
+  if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_36';
   const classInfo = {
     knight: {name:"Rycerz",icon:"⚔",color:"#f8d377",cape:"#cc4845",ability:"Drugi oddech",weapon:"sword"},
     ranger: {name:"Łowca",icon:"➶",color:"#f1d99c",cape:"#9e682e",ability:"Znak łowcy",weapon:"bow"},
@@ -619,7 +619,7 @@
     if(!playing||mobileHud?.blocksControls()||restUI?.blocksControls()||appShell?.blocksControls())return;
     if(['Enter','Space'].includes(event.code)&&event.target.closest?.('#hudVisibility, #restMenu, #restMenuButton, #restButton, .quest-track-button, #atlasButton, #topAtlasButton, #minimapButton, #merchantPanel .item-actions button, #fullscreenButton, #mobileFullscreenButton, #installAppButton, #hotbarGroupMenu button, .hotbar-group-toggle, #weaponActionMenu button, #weaponActionMenu select, #weaponActionMenu input, #weaponActionToggle'))return;
     if(event.target.closest?.('.window-grip')&&event.code.startsWith('Arrow'))return;
-    if(event.target.closest?.('#adventurePanel button, #servicePanel button, #merchantPanel button, #worldEventPanel button')&&['Enter','Space'].includes(event.code))return;
+    if(event.target.closest?.('#adventurePanel button, #servicePanel button, #merchantPanel button, #worldEventPanel button, #characterPanel button, #characterPanel input, #characterPanel select')&&['Enter','Space'].includes(event.code))return;
     if(eventPanel?.visible&&['Escape','KeyE'].includes(event.code)){event.preventDefault();eventPanel.close();return;}
     if(servicePanel?.visible&&event.code==='Escape'){event.preventDefault();servicePanel.close();return;}
     if(adventurePanel?.visible&&event.code==='Escape'){event.preventDefault();adventurePanel.close();return;}
@@ -1750,7 +1750,7 @@
   martialPrompt=globalThis.BractwoMartialUI.createPrompt({player:()=>me,open:tab=>characterSheet.open(tab,'class')});
   weaponMenu=globalThis.BractwoFighterUI.createCombatMenu({player:()=>me,target:()=>selectedEnemy?{enemy_id:selectedEnemy}:selectedTarget?{target_id:selectedTarget}:null,send,stop:resetControls});
   mobileHud=globalThis.BractwoMobile.create({stop:resetControls,closeChat});
-  restUI=globalThis.BractwoRestUI.create({state:()=>({player:me,world}),send,notice,stop:resetControls,clearTarget,
+  restUI=globalThis.BractwoRestUI.create({state:()=>({player:me,world}),send,notice,stop:resetControls,clearTarget,openBook:section=>characterSheet.open('spells',section),
     prepare:()=>{eventPanel?.close();adventurePanel?.close();servicePanel?.close();closeChat();merchantPanel?.close();characterSheet?.close();lootPanel?.close();ui.sidePanel.hidden=true;ui.helpPanel.hidden=true;}});
   appShell=globalThis.BractwoAppShell.create({stop:()=>{resetControls();closeChat();restUI.close();}});
   globalThis.BractwoHUDIcons.apply(document);

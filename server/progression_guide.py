@@ -5,10 +5,10 @@ no character/inventory/loot data and does not alter progression or balance.
 """
 from types import SimpleNamespace
 try:
-    from . import combat_rules as rules, dnd_content as dnd
+    from . import combat_rules as rules, dnd_content as dnd, wizard_spellbook
     from .profession_rules import PROMOTION_LEVEL, PROMOTION_COST
 except ImportError:
-    import combat_rules as rules, dnd_content as dnd
+    import combat_rules as rules, dnd_content as dnd, wizard_spellbook
     from profession_rules import PROMOTION_LEVEL, PROMOTION_COST
 
 ATTRIBUTE_NAMES = {'strength':'Siła', 'dexterity':'Zręczność', 'constitution':'Kondycja',
@@ -33,8 +33,25 @@ def catalog():
             unlocked=[(key,s) for key,s in dnd.SPELLS.items()
                       if class_id in s['class_ids'] and dnd.spell_level(s,class_id)==level]
             if unlocked:
-                if not titles:titles.append('Nowe zdolności' if all(s.get('feature') for _,s in unlocked) else 'Nowe czary')
-                details.append(', '.join(s['name'] for _,s in unlocked)+'.')
+                learnable=[(key,s) for key,s in unlocked if class_id=='mage' and wizard_spellbook.is_book_spell(key)]
+                granted=[(key,s) for key,s in unlocked if (key,s) not in learnable]
+                if not titles:
+                    titles.append('Czary do nauki' if learnable and not granted else
+                                  'Nowe zdolności' if all(s.get('feature') for _,s in unlocked) else 'Nowe czary')
+                if granted:details.append(', '.join(s['name'] for _,s in granted)+'.')
+                if learnable:details.append('Możliwe do nauki w księdze: '+', '.join(s['name'] for _,s in learnable)+'.')
+            if class_id=='mage' and level<=20:
+                limit=wizard_spellbook.prepared_limit(level)
+                if level==1:
+                    titles.append('Własna księga')
+                    details.append('Wybierz 6 czarów I kręgu do własnej księgi i przygotuj 4. Sztuczki nie zajmują miejsca na przygotowane czary. Rytuały zapisane w księdze można rzucać bez przygotowania.')
+                else:
+                    details.append(f'Dopisz 2 wybrane czary do księgi, maksymalnie {circle}. kręgu. Limit przygotowanych czarów: {limit}.')
+                if level==1 or limit>wizard_spellbook.prepared_limit(level-1):
+                    details.append('Uzupełnij wolne miejsca przygotowanych czarów w C → Czary. Całą listę można zmienić po długim odpoczynku.')
+                if level==5:
+                    titles.append('Memorize Spell')
+                    details.append('Po ukończeniu krótkiego odpoczynku możesz wymienić jeden przygotowany czar na inny zapisany w księdze. Wybierz wymianę w C → Czary przed odpoczynkiem; nie zwiększa ona limitu przygotowania.')
             attacks=rules.attacks_per_round(after)
             if level>1 and attacks!=rules.attacks_per_round(before):
                 titles.append(f'{attacks} ataki' if attacks<5 else f'{attacks} ataków')

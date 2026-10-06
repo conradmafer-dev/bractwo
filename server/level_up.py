@@ -8,9 +8,9 @@ without transient spells, forms, terrain or later equipment changes.
 import copy
 import uuid
 try:
-    from . import combat_rules as rules, dnd_content as dnd, spell_scaling
+    from . import combat_rules as rules, dnd_content as dnd, spell_scaling, wizard_spellbook
 except ImportError:
-    import combat_rules as rules, dnd_content as dnd, spell_scaling
+    import combat_rules as rules, dnd_content as dnd, spell_scaling, wizard_spellbook
 
 VISIBLE_LIMIT = 32
 ATTRIBUTES = {'strength':'Siła','dexterity':'Zręczność','constitution':'Kondycja',
@@ -34,6 +34,7 @@ def record(p, first, last):
         ranger_style_cantrips=getattr(p,'ranger_style_cantrips',[]),
         weapon_attack_mode=getattr(p,'weapon_attack_mode','weapon'),
         wizard_school=p.wizard_school,wizard_school_state=p.wizard_school_state,
+        wizard_spellbook=getattr(p,'wizard_spellbook',{}),
         martial_archetype=getattr(p,'martial_archetype',''),
         martial_state={k:v for k,v in getattr(p,'martial_state',{}).items() if k in ('maneuvers','hunter_choice')},
         mana_rules_version=p.mana_rules_version,hp_rules_version=p.hp_rules_version,
@@ -70,12 +71,16 @@ def permanent(p, level, context):
     q._legacy_auto_attributes='feat_rules_version' not in context
     q.druid_circle='';q.druid_circle_state={};q.druid_circle_runtime={}
     q.wizard_school='';q.wizard_school_state={};q.wizard_school_runtime={}
+    q.wizard_spellbook={}
+    # Old receipts describe the former catalogue-based casting rules. The flag
+    # exists only on this projection, never on the real character or save.
+    q._legacy_wizard_catalog='wizard_spellbook' not in context
     q.martial_archetype='';q.martial_state={}
     # Pre-0.8.16 receipts have no mana-version stamp: preserve their earned gains.
     q.mana_rules_version=2
     q.hp_rules_version=0  # Preserve HP deltas in receipts earned before UI_12.
     for key,value in context.items():
-        setattr(q,key,value)
+        setattr(q,key,copy.deepcopy(value))
     q.level=level
     q.form='';q.buffs={};q.current_wall_time=0
     return q
@@ -92,6 +97,20 @@ def receipt(p, batch, level):
         if unit:entry['unit']=unit
         if icon:entry['icon']=icon
         rows.append(entry)
+    if after.class_id=='mage' and 'wizard_spellbook' in batch['context'] and 1<=level<=20:
+        choices=6 if level==1 else 2
+        circle=dnd.circle_for('mage',level)
+        noun='czarów' if choices==6 else 'czary'
+        add('wizard_book_learning','Własna księga',f'+{choices} {noun} do wybrania (do {circle}. kręgu)')
+        actions.append(dict(kind='wizard_book',label='Wybierz czary do księgi',tab='spells',section='learn'))
+        previous_limit=wizard_spellbook.prepared_limit(level-1) if level>1 else 0
+        prepared_gain=wizard_spellbook.prepared_limit(level)-previous_limit
+        add('wizard_prepared_slots','Przygotowane czary',prepared_gain)
+        if prepared_gain:
+            actions.append(dict(kind='wizard_book',label='Uzupełnij przygotowane czary',tab='spells',section='prepare'))
+        if level==5:
+            add('memorize_spell','Memorize Spell','+ wymiana jednego przygotowanego czaru po krótkim odpoczynku')
+            actions.append(dict(kind='wizard_book',label='Sprawdź Memorize Spell',tab='spells',section='memorize'))
     if after.class_id=='ranger' and level==2:
         add('ranger_style','Styl walki lub Druidyczny wojownik','+ możliwość wyboru')
         actions.append(dict(kind='ranger_style',label='Wybierz styl walki',tab='feats',section='ranger_style'))
@@ -142,6 +161,10 @@ def receipt(p, batch, level):
     add('movement','Ruch', (after.base_speed-before.base_speed)*rules.ROUND_SECONDS/dnd.UNITS_PER_FOOT,'stopy / rundę')
     count_delta=rules.cantrip_count(after)-rules.cantrip_count(before)
     for key,s in dnd.SPELLS.items():
+        if (after.class_id=='mage' and 'wizard_spellbook' in batch['context']
+                and wizard_spellbook.is_book_spell(key) and dnd.spell_level(s,'mage')==level):
+            add('learn_'+key,'Możliwy do nauki','+ '+s['name'],icon=s.get('icon',''))
+            continue
         if not dnd.spell_allowed(after,key):
             continue
         was=dnd.spell_allowed(before,key)

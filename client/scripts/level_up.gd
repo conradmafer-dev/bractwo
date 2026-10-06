@@ -49,10 +49,17 @@ func dismiss(id: String) -> void:
 	refresh()
 
 func action_button(action: Dictionary) -> Button:
-	var tab_name: String = "feats" if str(action.get("tab", "stats")) == "feats" else "stats"
-	var b: Button = host._button(str(action.get("label", "Wybierz")), func() -> void: host.character_sheet.open(tab_name))
+	var target: String = str(action.get("tab", "stats"))
+	if str(action.get("kind", "")) == "wizard_book":
+		target = "book"
+	var tab_name: String = target if target in ["feats", "spells", "book"] else "stats"
+	var b: Button = host._button(str(action.get("label", "Wybierz")), func() -> void:
+		if tab_name == "book":
+			host.character_sheet.wizard_book.mode = str(action.get("section", "prepare"))
+		host.character_sheet.open(tab_name))
 	b.tooltip_text = str(action.get("description", ""))
 	b.set_meta("level_action", str(action.get("kind", "")))
+	b.set_meta("level_section", str(action.get("section", "")))
 	b.set_meta("original_text", b.text)
 	b.custom_minimum_size.y = 32
 	return b
@@ -136,6 +143,10 @@ func update_actions(node: Node) -> void:
 			assigned = not str(fighter.get("style", "")).is_empty()
 		elif kind == "elemental_fury":
 			assigned = not str(fury.get("id", fury.get("choice", ""))).is_empty()
+		elif kind == "wizard_book":
+			var book: Dictionary = host.player.get("character_sheet", {}).get("caster", {}).get("spellbook", {})
+			var section: String = str(node.get_meta("level_section", ""))
+			assigned = not book.get("pending_learning", false) if section == "learn" else int(book.get("free_preparations", 0)) <= 0 if section == "prepare" else false
 		node.disabled = assigned
 		node.text = ("Przydzielono" if kind == "mastery" else "Wybrano") if assigned else str(node.get_meta("original_text"))
 	for child: Node in node.get_children():

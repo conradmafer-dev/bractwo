@@ -297,13 +297,13 @@ DEFAULT_HOTBARS = {
 
 
 def hotbar_signature(p):
-    try:from . import druid_circles as dc, martial_rules as martial
-    except ImportError:import druid_circles as dc, martial_rules as martial
+    try:from . import druid_circles as dc, martial_rules as martial, wizard_spellbook
+    except ImportError:import druid_circles as dc, martial_rules as martial, wizard_spellbook
     learned=martial.state(p).get('maneuvers',[])
     learned=tuple(k for k in learned if isinstance(k,str)) if isinstance(learned,list) else ()
     style_cantrips=getattr(p,'ranger_style_cantrips',[])
     style_cantrips=tuple(c for c in style_cantrips if isinstance(c,str)) if isinstance(style_cantrips,list) else ()
-    return (p.class_id,p.level,getattr(p,'promoted',False),getattr(p,'wizard_school',''),getattr(p,'druid_circle',''),getattr(p,'form',''),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),dc.active(p,'grappled'),martial.path(p),learned,getattr(p,'fighting_style',''),style_cantrips)
+    return (p.class_id,p.level,getattr(p,'promoted',False),getattr(p,'wizard_school',''),getattr(p,'druid_circle',''),getattr(p,'form',''),dc.land(p),dc.starry_form(p),dc.feature_allowed(p,'circle_wrath_strike'),dc.active(p,'grappled'),martial.path(p),learned,getattr(p,'fighting_style',''),style_cantrips,wizard_spellbook.signature(p))
 
 def sync_hotbar(p):
     """Preserve valid custom positions, but never hide unlocked spells off-bar."""
@@ -427,6 +427,10 @@ def spell_allowed(p, key):
     if key in dc.SPELL_FEATURES:return dc.feature_allowed(p,key)
     if key in dc.bonus_spells(p):return True
     if key.startswith('wild_shape_') and hasattr(dc,'form_allowed'):return dc.form_allowed(p,key)
+    if p.class_id=='mage' and not getattr(p,'_legacy_wizard_catalog',False):
+        try:from . import wizard_spellbook
+        except ImportError:import wizard_spellbook
+        if wizard_spellbook.is_book_spell(key):return wizard_spellbook.prepared(p,key)
     return bool(s and p.class_id in s['class_ids'] and p.level>=spell_level(s,p.class_id))
 
 
