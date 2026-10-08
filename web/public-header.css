@@ -30,11 +30,10 @@
 .public-header__brand svg { flex: 0 0 auto; }
 .public-header__brand > span { font: 14px/1.15 Georgia, "Times New Roman", serif; letter-spacing: 2px; }
 .public-header__brand small { display: block; margin-top: 5px; font: 10px/1.1 system-ui, sans-serif; letter-spacing: 4px; }
-.public-header__nav { grid-area: nav; display: flex; align-items: center; justify-content: flex-end; gap: 24px; min-width: 0; }
+.public-header__nav { grid-area: nav; display: flex; align-items: center; justify-content: flex-start; min-width: 0; }
 :is(.public-content, #authScreen) .public-header__nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 0; color: #c5cdbf; white-space: nowrap; }
 :is(.public-content, #authScreen) .public-header__nav a:hover,
 :is(.public-content, #authScreen) .public-header__nav a[aria-current] { color: #f6deb1; }
-:is(.public-content, #authScreen) .public-header__nav .public-header__play { gap: 14px; padding: 8px 18px; border: 1px solid #bda77877; border-radius: 3px; color: #f0d6a5; }
 :is(.public-content, #authScreen) .public-header__count {
   grid-area: count;
   margin: 0;
@@ -51,16 +50,10 @@
 @media (max-width: 1000px) {
   .shell.public-shell, #authScreen .public-shell { padding: 0 24px; }
   :is(.public-content, #authScreen) .public-header { gap: 18px; }
-  .public-header__nav { gap: 16px; }
-  :is(.public-content, #authScreen) .public-header__nav .public-header__extra { display: none; }
 }
 @media (max-width: 600px) {
   .shell.public-shell, #authScreen .public-shell { padding: 0 20px; }
   :is(.public-content, #authScreen) .public-header { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "brand count" "nav nav"; gap: 10px 12px; min-height: 0; padding: 14px 0 12px; }
   :is(.public-content, #authScreen) .public-header__brand { gap: 9px; }
   .public-header__brand svg { width: 28px; height: 36px; }
-  .public-header__nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  :is(.public-content, #authScreen) .public-header__nav a { padding: 8px 4px; }
-  :is(.public-content, #authScreen) .public-header__nav .public-header__play { padding: 8px 10px; background: #d7b47a; color: #15261e; }
-  .public-header__play span { display: none; }
 }

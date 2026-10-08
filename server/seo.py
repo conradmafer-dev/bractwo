@@ -416,7 +416,7 @@ def public_header(page):
     blog_current = ' aria-current="page"' if page.path == "/blog" else ""
     return f'''<header class="public-header">
   <a class="public-header__brand" href="/" aria-label="Bractwo Krain — strona główna"><svg viewBox="0 0 36 44" width="30" height="38" aria-hidden="true"><path d="M18 2 33 9v13c0 9-8 16-15 20C11 38 3 31 3 22V9Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M18 8v25m-7-9h14m-11 9h8m-8-18 4-7 4 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><span>BRACTWO<small>KRAIN</small></span></a>
-  <nav class="public-header__nav" aria-label="Główna nawigacja"><a class="public-header__extra" href="/#swiat">Świat</a><a class="public-header__extra" href="/#klasy">Klasy</a><a href="/#poradniki">Poradniki</a><a href="/blog"{blog_current}>Blog MMO</a><a class="public-header__play" href="/#wejscie">Zagraj <span aria-hidden="true">↗</span></a></nav>
+  <nav class="public-header__nav" aria-label="Główna nawigacja"><a href="/blog"{blog_current}>Blog MMO</a></nav>
   <p class="public-header__count" data-character-count hidden><strong data-character-count-value></strong><span data-character-count-label>stworzonych postaci</span></p>
 </header>'''
 
@@ -426,7 +426,7 @@ def render_page(template, config, page):
     html = template.replace(HEAD_MARKER, metadata_head(config, page), 1)
     if HEADER_MARKER in html:
         html = html.replace(HEADER_MARKER, public_header(page), 1)
-        assets = ('  <link rel="stylesheet" href="/public-header.css?v=20261008">\n'
+        assets = ('  <link rel="stylesheet" href="/public-header.css?v=20261008-2">\n'
                   '  <script src="/public-header.js?v=20261008" defer></script>\n')
         html = html.replace("</head>", assets + "</head>", 1)
     return html
