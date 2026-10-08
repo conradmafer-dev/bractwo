@@ -1,5 +1,5 @@
 /* Phone layout shares the same breakpoint with mobile.js. */
-.mobile-control, #mobileMenu { display: none; }
+.mobile-control, #mobileMenu, #mobileRailScroll { display: none; }
 
 @media (max-width: 700px), (max-width: 1100px) and (max-height: 600px), (pointer: coarse) and (max-width: 1400px) and (max-height: 900px) {
   #gameUI.mobile-hud {
@@ -261,9 +261,43 @@
   #gameUI.mobile-hud .joystick { width: calc(100 * var(--mobile-unit, 1px)); height: calc(100 * var(--mobile-unit, 1px)); }
   #gameUI.mobile-hud .attack-button { width: calc(84 * var(--mobile-unit, 1px)); height: calc(84 * var(--mobile-unit, 1px)); }
   #gameUI.mobile-hud #weaponActionToggle { right: calc(92 * var(--mobile-unit, 1px)); }
-  #gameUI.mobile-hud #hudLeftRail { max-height: calc(78 * var(--mobile-unit, 1px)); }
+  #gameUI.mobile-hud { --mobile-rail-width: min(220px, calc(100% - 116px)); }
+  #gameUI.mobile-hud #hudLeftRail {
+    width: var(--mobile-rail-width);
+    max-height: min(52dvh, calc(100dvh - var(--mobile-top) - var(--mobile-bottom) - calc(290 * var(--mobile-unit, 1px))));
+    overflow-x: hidden; overflow-y: auto; touch-action: pan-y; scrollbar-width: none;
+  }
+  #gameUI.mobile-hud #hudLeftRail::-webkit-scrollbar { display: none; }
+  #gameUI.mobile-hud #hudLeftRail > #advancementChoice {
+    position: relative; inset: auto; width: 100%; max-height: none; overflow: visible; margin: 0;
+  }
+  #gameUI.mobile-hud #hudLeftRail > :is(#fighterChoice, #casterChoice, #martialChoice):not(.hud-floating) {
+    padding: 8px 10px;
+  }
+  #gameUI.mobile-hud #hudLeftRail :is(#fighterChoice, #casterChoice, #martialChoice) header button {
+    min-width: 32px; min-height: 32px;
+  }
+  #gameUI.mobile-hud #mobileRailScroll:not([hidden]) {
+    display: block; position: absolute; z-index: 7; width: 22px; min-width: 0; min-height: 0;
+    margin: 0; padding: 0; border: 0; border-radius: 8px; background: #10291fa8;
+    writing-mode: vertical-lr; direction: ltr; appearance: none; -webkit-appearance: none;
+    pointer-events: auto; touch-action: none; cursor: ns-resize;
+  }
+  #gameUI.mobile-hud #mobileRailScroll::-webkit-slider-runnable-track {
+    width: 5px; height: 100%; background: #73815b; border-radius: 5px;
+  }
+  #gameUI.mobile-hud #mobileRailScroll::-webkit-slider-thumb {
+    appearance: none; -webkit-appearance: none; width: 15px; height: 34px;
+    margin-left: -5px; border: 1px solid #f4dea1; border-radius: 7px; background: #d6b675;
+  }
+  #gameUI.mobile-hud #mobileRailScroll::-moz-range-track { width: 5px; height: 100%; background: #73815b; border-radius: 5px; }
+  #gameUI.mobile-hud #mobileRailScroll::-moz-range-thumb { width: 15px; height: 34px; border: 1px solid #f4dea1; border-radius: 7px; background: #d6b675; }
+  #gameUI.mobile-hud #mobileRailScroll:focus-visible { outline: 2px solid #f4dea1; outline-offset: 2px; }
+
   #gameUI.mobile-hud #effectsPanel {
-    left: var(--mobile-left); right: var(--mobile-right); top: calc(var(--mobile-top) + calc(163 * var(--mobile-unit, 1px)));
+    left: calc(var(--mobile-left) + var(--mobile-rail-width) + 29px); right: var(--mobile-right);
+    top: calc(var(--mobile-top) + calc(163 * var(--mobile-unit, 1px)));
+    max-height: 32dvh; overflow-y: auto; touch-action: pan-y;
   }
   #gameUI.mobile-hud .notice-feed {
     left: var(--mobile-left); right: var(--mobile-right); top: auto;

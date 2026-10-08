@@ -81,11 +81,56 @@
       }
     }, true);
 
+    // In portrait, all pending choices share one scrollable column.
+    const rail = document.getElementById('hudLeftRail');
+    const advancement = document.getElementById('advancementChoice');
+    const scrollControl = document.createElement('input');
+    scrollControl.id = 'mobileRailScroll'; scrollControl.type = 'range';
+    scrollControl.min = '0'; scrollControl.max = '1'; scrollControl.step = '1'; scrollControl.value = '0';
+    scrollControl.hidden = true; scrollControl.setAttribute('orient', 'vertical');
+    scrollControl.setAttribute('aria-orientation', 'vertical');
+    scrollControl.setAttribute('aria-label', 'Przewiń zadania i wybory rozwoju');
+    scrollControl.setAttribute('aria-controls', 'hudLeftRail');
+    scrollControl.title = 'Przeciągnij, aby przewinąć panel'; ui.append(scrollControl);
+    scrollControl.addEventListener('input', () => { rail.scrollTop = Number(scrollControl.value); });
+    scrollControl.addEventListener('keydown', event => event.stopPropagation());
+    scrollControl.addEventListener('pointerdown', () => stop());
+    let railQueued = false;
+    function queueRail() {
+      if (railQueued) return;
+      railQueued = true;
+      requestAnimationFrame(() => { railQueued = false; updateRail(); });
+    }
+    function updateRail() {
+      const portrait = active() && innerWidth <= 700 && innerWidth < innerHeight;
+      const parent = portrait ? rail : ui;
+      if (advancement.parentElement !== parent) parent.append(advancement);
+      const maximum = Math.max(0, rail.scrollHeight - rail.clientHeight);
+      const visible = portrait && !ui.hidden && maximum > 1;
+      if (scrollControl.hidden === visible) scrollControl.hidden = !visible;
+      if (!visible) return;
+      const rect = rail.getBoundingClientRect();
+      scrollControl.style.left = (rect.right + 3) + 'px';
+      scrollControl.style.top = rect.top + 'px';
+      scrollControl.style.height = rect.height + 'px';
+      scrollControl.max = String(maximum); scrollControl.value = String(Math.round(rail.scrollTop));
+      scrollControl.setAttribute('aria-valuetext', Math.round(100 * rail.scrollTop / maximum) + '% panelu');
+    }
+    rail.addEventListener('scroll', queueRail, { passive: true });
+    const railResize = new ResizeObserver(queueRail);
+    railResize.observe(rail);
+    for (const panel of [...rail.children, advancement]) railResize.observe(panel);
+    const railChanges = new MutationObserver(mutations => {
+      if (mutations.some(m => m.type === 'attributes' || [...m.addedNodes, ...m.removedNodes].some(n => n.nodeType === 1))) queueRail();
+    });
+    railChanges.observe(ui, { subtree: true, childList: true, attributes: true, attributeFilter: ['hidden', 'data-hud-hidden'] });
+
     function visualSize() {
       refreshViewport();
       const view = root.visualViewport;
       ui.style.setProperty('--mobile-visual-height', (view?.height || innerHeight) + 'px');
       ui.style.setProperty('--mobile-visual-top', (view?.offsetTop || 0) + 'px');
+      queueRail();
     }
     function sync() {
       stop(); setOpen(false, false);
