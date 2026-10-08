@@ -84,8 +84,29 @@
         help('Zainstaluj Bractwo Krain', ['W menu przeglądarki poszukaj „Zainstaluj aplikację”, „Zainstaluj tę stronę jako aplikację” lub „Dodaj do ekranu głównego”. Nazwa opcji zależy od przeglądarki.', 'Jeśli tej opcji nie ma, otwórz stronę w Chrome lub Edge albo dodaj ją do zakładek. Instalacja przez przeglądarkę wymaga bezpiecznego adresu HTTPS.', 'Po dodaniu aplikacji uruchomisz grę z jej ikony. Gra wieloosobowa wymaga internetu.']);
       }
     }
+    let landscapeRequested = false;
+    function releaseOrientation() {
+      if (!landscapeRequested) return;
+      landscapeRequested = false;
+      try { root.screen?.orientation?.unlock?.(); } catch (_) { /* Optional browser capability. */ }
+    }
+    async function preferLandscape() {
+      if (!root.BractwoMobile?.active?.() || !inFullscreen()) return;
+      const orientation = root.screen?.orientation;
+      if (typeof orientation?.lock === 'function') {
+        landscapeRequested = true;
+        try {
+          await orientation.lock('landscape');
+          // A browser Back/Escape can leave fullscreen while the lock is pending.
+          if (!inFullscreen()) releaseOrientation();
+          return;
+        } catch (_) { landscapeRequested = false; }
+      }
+      if (root.innerWidth < root.innerHeight) announce('Pełny ekran włączony. Obróć telefon poziomo.');
+    }
     function refresh() {
       const full = inFullscreen(), label = full ? 'Opuść pełny ekran' : 'Pełny ekran';
+      if (!full) releaseOrientation();
       for (const button of fullscreenButtons) {
         button.setAttribute('aria-pressed', String(full)); button.setAttribute('aria-label', label);
         button.title = label; button.dataset.mobileLabel = label;
@@ -111,6 +132,7 @@
           }
           // Call before any await: fullscreen must start during the user's gesture.
           await request.call(doc.documentElement);
+          await preferLandscape();
         }
         refresh();
       } catch (_) {

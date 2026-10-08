@@ -71,12 +71,11 @@
       const pages = document.getElementById('hotbarPages').getBoundingClientRect();
       let width = b.width, x = b.left, y = Math.min(b.top, pages.height ? pages.top : b.top) - b.height - 6;
       if (mobile) {
-        const talk = document.getElementById('interactButton').getBoundingClientRect();
+        const style = getComputedStyle(ui), unit = parseFloat(style.getPropertyValue('--mobile-unit')) || 1;
         width = document.getElementById('abilityButton').getBoundingClientRect().width;
-        x = talk.left + (talk.width - width) / 2; y = b.top;
-        const t = toolbar.getBoundingClientRect();
-        // Narrow portrait screens need a separate row to keep the existing controls clear.
-        if (x < t.right && x + width > t.left) y = t.top - b.height - 8;
+        // Keep Rest at the right edge, above the spell toolbar in both orientations.
+        x = combat.getBoundingClientRect().right - width;
+        y = Math.min(b.top, toolbar.getBoundingClientRect().top) - b.height - 8 * unit;
       }
       const values = { left: x, top: y, width, height: b.height };
       for (const [key, value] of Object.entries(values)) {

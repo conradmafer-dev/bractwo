@@ -69,6 +69,60 @@ test('fullscreen is requested by a click and browser events synchronize every co
   assert.equal(a.stops(), 2);
 });
 
+test('mobile fullscreen locks landscape and releases it on browser-driven exit', async () => {
+  const a = app(), calls = [];
+  a.root.BractwoMobile = { active: () => true };
+  a.root.screen = { orientation: { lock: async mode => { calls.push(mode); }, unlock: () => calls.push('unlock') } };
+  a.doc.documentElement.requestFullscreen = async () => { a.doc.fullscreenElement = a.doc.documentElement; };
+  await a.button('mobileFullscreenButton').emit('click');
+  assert.deepEqual(calls, ['landscape']);
+  assert.equal(a.api.blocksControls(), false);
+  a.doc.fullscreenElement = null;
+  await a.doc.emit('fullscreenchange');
+  assert.deepEqual(calls, ['landscape', 'unlock']);
+  await a.doc.emit('fullscreenchange');
+  assert.equal(calls.length, 2);
+});
+
+test('orientation refusal leaves fullscreen working and permits another attempt', async () => {
+  const a = app(); let attempts = 0;
+  a.root.BractwoMobile = { active: () => true };
+  a.root.innerWidth = 390; a.root.innerHeight = 844;
+  a.root.screen = { orientation: { lock: async () => { attempts++; throw new Error('NotSupportedError'); } } };
+  a.doc.documentElement.requestFullscreen = async () => { a.doc.fullscreenElement = a.doc.documentElement; };
+  a.doc.exitFullscreen = async () => { a.doc.fullscreenElement = null; };
+  await a.button('mobileFullscreenButton').emit('click');
+  assert.equal(a.button('mobileFullscreenButton').getAttribute('aria-pressed'), 'true');
+  assert.equal(a.api.blocksControls(), false);
+  assert.match(a.button('appShellStatus').textContent, /Obróć telefon/);
+  await a.button('mobileFullscreenButton').emit('click');
+  await a.button('mobileFullscreenButton').emit('click');
+  assert.equal(attempts, 2);
+});
+
+test('desktop fullscreen never requests orientation lock', async () => {
+  const a = app(); let locks = 0;
+  a.root.BractwoMobile = { active: () => false };
+  a.root.screen = { orientation: { lock: async () => { locks++; } } };
+  a.doc.documentElement.requestFullscreen = async () => { a.doc.fullscreenElement = a.doc.documentElement; };
+  await a.button('fullscreenButton').emit('click');
+  assert.equal(locks, 0);
+});
+
+test('browser exit during a pending orientation lock cancels the lock', async () => {
+  const a = app(); let finish, started, unlocks = 0;
+  const ready = new Promise(resolve => { started = resolve; });
+  a.root.BractwoMobile = { active: () => true };
+  a.root.screen = { orientation: { lock: () => new Promise(resolve => { finish = resolve; started(); }), unlock: () => { unlocks++; } } };
+  a.doc.documentElement.requestFullscreen = async () => { a.doc.fullscreenElement = a.doc.documentElement; };
+  const pending = a.button('mobileFullscreenButton').emit('click');
+  await ready;
+  a.doc.fullscreenElement = null; await a.doc.emit('fullscreenchange');
+  finish(); await pending;
+  assert.equal(unlocks, 1);
+  assert.equal(a.button('mobileFullscreenButton').getAttribute('aria-pressed'), 'false');
+});
+
 test('fullscreen denial opens dismissible help, stops movement and permits retry', async () => {
   const a = app();
   a.doc.documentElement.requestFullscreen = async () => { throw new Error('NotAllowedError'); };
@@ -147,7 +201,7 @@ function worker() {
 test('worker precaches only disconnected page and icons, and preserves unrelated caches', async () => {
   const w = worker(); await w.lifecycle('install'); await w.lifecycle('activate');
   assert.deepEqual(w.cached, ['/offline.html', '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png']);
-  assert.deepEqual(w.deleted, ['bractwo-app-shell-0.8.17', 'bractwo-app-shell-0.8.18-ui31']);
+  assert.deepEqual(w.deleted, ['bractwo-app-shell-0.8.17', 'bractwo-app-shell-0.8.18-ui31', 'bractwo-app-shell-0.8.18-ui34']);
   assert.deepEqual(w.counts(), { claimed: 1, skipped: 1 });
 });
 

@@ -86,48 +86,6 @@
       const view = root.visualViewport;
       ui.style.setProperty('--mobile-visual-height', (view?.height || innerHeight) + 'px');
       ui.style.setProperty('--mobile-visual-top', (view?.offsetTop || 0) + 'px');
-      queueJoystick();
-    }
-    // Centre the default joystick in the free left-hand rectangle. In portrait
-    // the full-width spell row sits above the bottom controls instead of beside them.
-    let joystickQueued = false;
-    function queueJoystick() {
-      if (joystickQueued) return;
-      joystickQueued = true;
-      requestAnimationFrame(() => { joystickQueued = false; positionJoystick(); });
-    }
-    function positionJoystick() {
-      if (!active() || ui.hidden) return;
-      const movement = ui.querySelector('.movement-controls');
-      if (movement.classList.contains('hud-floating')) return;
-      const joystick = document.getElementById('joystick').getBoundingClientRect();
-      const bar = document.getElementById('spellbar').getBoundingClientRect();
-      const visible = el => el && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden' && !el.hasAttribute('data-hud-hidden');
-      const padding = 8, gap = 8;
-      const style = getComputedStyle(ui);
-      const edge = parseFloat(style.getPropertyValue('--mobile-screen-left')) || 0;
-      const floor = innerHeight - (parseFloat(style.getPropertyValue('--mobile-screen-bottom')) || 0);
-      let right = bar.left, top;
-      if (right - edge >= joystick.width + padding + gap) {
-        const rail = document.getElementById('hudLeftRail');
-        const candidates = [ui.querySelector('.player-card'), ...rail.children].filter(visible);
-        top = Math.max(padding, ...candidates.map(el => el.getBoundingClientRect().bottom));
-      } else {
-        const interact = document.getElementById('interactButton').getBoundingClientRect();
-        right = interact.left;
-        top = bar.bottom + gap;
-      }
-      const left = Math.max(edge + padding, (edge + right - joystick.width) / 2);
-      const y = Math.max(padding, Math.min(floor - padding - joystick.height, (top + floor - joystick.height) / 2));
-      ui.style.setProperty('--mobile-joystick-x', Math.round(left) + 'px');
-      ui.style.setProperty('--mobile-joystick-y', Math.round(y) + 'px');
-      if (!ui.classList.contains('joystick-centered')) ui.classList.add('joystick-centered');
-    }
-    const joystickResize = new ResizeObserver(queueJoystick);
-    for (const id of ['questTracker', 'hudLeftRail', 'actionDock', 'spellbar', 'interactButton']) joystickResize.observe(document.getElementById(id));
-    const joystickChanges = new MutationObserver(queueJoystick);
-    for (const el of [ui, ui.querySelector('.movement-controls'), document.getElementById('questTracker')]) {
-      joystickChanges.observe(el, { attributes: true, attributeFilter: ['hidden', 'class', 'data-hud-hidden'] });
     }
     function sync() {
       stop(); setOpen(false, false);

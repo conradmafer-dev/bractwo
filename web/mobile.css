@@ -13,9 +13,6 @@
   }
   .mobile-hud *, .mobile-hud *::before, .mobile-hud *::after { box-sizing: border-box; }
   .mobile-hud button { touch-action: manipulation; }
-  #gameUI.mobile-hud.joystick-centered .movement-controls:not(.hud-floating) {
-    left: var(--mobile-joystick-x); top: var(--mobile-joystick-y); bottom: auto;
-  }
   .mobile-hud .window-grip, .mobile-hud #controlTip, .mobile-hud kbd,
   .mobile-hud .brand, .mobile-hud #connectionStatus { display: none !important; }
   .mobile-hud .window-handle { cursor: default; touch-action: auto !important; }
@@ -112,11 +109,29 @@
   .mobile-hud.mobile-menu-open #mobileMenuButton { visibility: hidden; }
 
   /* Reserve both lower corners for thumbs. Only spells scroll sideways. */
-  #gameUI.mobile-hud .movement-controls { left: var(--mobile-left); bottom: var(--mobile-bottom); }
+  #gameUI.mobile-hud .movement-controls { left: var(--mobile-left); top: auto; bottom: var(--mobile-bottom); }
   #gameUI.mobile-hud .joystick { display: block; width: calc(88 * var(--mobile-unit, 1px)); height: calc(88 * var(--mobile-unit, 1px)); touch-action: none; }
   #gameUI.mobile-hud .combat-controls { right: var(--mobile-right); bottom: var(--mobile-bottom); gap: calc(8 * var(--mobile-unit, 1px)); }
   #gameUI.mobile-hud .attack-button { width: calc(76 * var(--mobile-unit, 1px)); height: calc(76 * var(--mobile-unit, 1px)); border-radius: 50%; touch-action: none; }
   #gameUI.mobile-hud .interact-button { width: calc(52 * var(--mobile-unit, 1px)); height: calc(52 * var(--mobile-unit, 1px)); margin: 0; border-radius: 50%; }
+  /* The weapon menu sits above Talk, outside the Attack touch target. */
+  #gameUI.mobile-hud #weaponActionToggle {
+    top: auto; right: calc(84 * var(--mobile-unit, 1px)); bottom: calc(60 * var(--mobile-unit, 1px));
+    width: calc(52 * var(--mobile-unit, 1px)); height: calc(44 * var(--mobile-unit, 1px));
+    min-width: 0; min-height: 0; color: #f1dfa8; border: 1px solid #b7a57488;
+    background: linear-gradient(#354936f5, #1a2c23fa); font-size: calc(18 * var(--mobile-unit, 1px));
+    pointer-events: auto; touch-action: manipulation;
+  }
+  #gameUI.mobile-hud #advancementChoice {
+    top: calc(var(--mobile-top) + calc(158 * var(--mobile-unit, 1px)));
+    left: var(--mobile-left); right: auto; width: min(300px, calc(100% - var(--mobile-left) - var(--mobile-right)));
+    padding: 8px 10px; max-height: calc(100dvh - 290px); overflow-y: auto; overscroll-behavior: contain;
+  }
+  #gameUI.mobile-hud #advancementChoice header strong { font-size: 15px; }
+  #gameUI.mobile-hud #advancementChoice p { font-size: 11px; margin: 5px 0 7px; }
+  #gameUI.mobile-hud #advancementChoice header button { min-width: 34px; min-height: 34px; }
+  #gameUI.mobile-hud #advancementChoice .advancement-choice-actions button { min-height: 36px; }
+
   .mobile-hud .attack-button > span { font-size: calc(28 * var(--mobile-unit, 1px)); line-height: calc(32 * var(--mobile-unit, 1px)); }
   .mobile-hud .interact-button > span { font-size: calc(20 * var(--mobile-unit, 1px)); line-height: calc(22 * var(--mobile-unit, 1px)); }
   .mobile-hud .action-button small { font-size: calc(9 * var(--mobile-unit, 1px)); letter-spacing: 0; }
@@ -245,6 +260,7 @@
   }
   #gameUI.mobile-hud .joystick { width: calc(100 * var(--mobile-unit, 1px)); height: calc(100 * var(--mobile-unit, 1px)); }
   #gameUI.mobile-hud .attack-button { width: calc(84 * var(--mobile-unit, 1px)); height: calc(84 * var(--mobile-unit, 1px)); }
+  #gameUI.mobile-hud #weaponActionToggle { right: calc(92 * var(--mobile-unit, 1px)); }
   #gameUI.mobile-hud #hudLeftRail { max-height: calc(78 * var(--mobile-unit, 1px)); }
   #gameUI.mobile-hud #effectsPanel {
     left: var(--mobile-left); right: var(--mobile-right); top: calc(var(--mobile-top) + calc(163 * var(--mobile-unit, 1px)));
@@ -282,3 +298,11 @@
 /* Keep user-facing dialogs and the typing field readable; compactness is for HUD. */
 #gameUI.mobile-hud { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 #gameUI.mobile-hud #chatInput { font-size: 16px; min-height: 44px; }
+
+@media (orientation: landscape) {
+  #gameUI.mobile-hud #advancementChoice {
+    top: var(--mobile-top); left: calc(var(--mobile-left) + calc(232 * var(--mobile-unit, 1px)));
+    width: min(300px, calc(100% - calc(400 * var(--mobile-unit, 1px))));
+    max-height: calc(100dvh - calc(160 * var(--mobile-unit, 1px)));
+  }
+}
