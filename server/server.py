@@ -2158,7 +2158,7 @@ async def _search_response_headers(request, response):
         if "accept-encoding" not in vary and "*" not in vary:
             response.headers.add("Vary", "Accept-Encoding")
     technical = (request.path.startswith(("/auth/", "/api/comments"))
-                 or request.path in ("/health", "/ranking", "/ws", "/offline.html"))
+                 or request.path in ("/health", "/ranking", "/api/public-stats", "/ws", "/offline.html"))
     if technical or response.status >= 400:
         response.headers["X-Robots-Tag"] = "noindex, nofollow"
         response.headers.setdefault("Cache-Control", "no-store")
@@ -2184,6 +2184,12 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
     async def ranking(request):
         return web.json_response(app["game"].ranking(), headers={"Cache-Control":"no-store"})
     app.router.add_get("/ranking",ranking)
+    async def public_stats(request):
+        # Legacy `accounts` rows hold saved characters, not Google identities
+        # or connected players. No historical count of deleted saves exists.
+        count=app["game"].db.execute("SELECT COUNT(*) FROM accounts").fetchone()[0]
+        return web.json_response({"characters_created":count}, headers={"Cache-Control":"public, max-age=60"})
+    app.router.add_get("/api/public-stats",public_stats)
     web_dir=Path(__file__).resolve().parents[1]/"web"
     async def index_redirect(request):
         raise web.HTTPMovedPermanently(location=request.rel_url.with_path("/",keep_query=True))
@@ -2209,7 +2215,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
                 raise web.HTTPMovedPermanently(location=request.rel_url.with_path(page.path,keep_query=True))
             app.router.add_get(page.path+"/",page_redirect)
             app.router.add_get(page.path+".html",page_redirect)
-    for filename in ("landing.css","guide.css","blog.css","comments.css","comments.js"):
+    for filename in ("landing.css","guide.css","blog.css","comments.css","comments.js","public-header.css","public-header.js"):
         async def public_css(request,filename=filename):
             path=web_dir/filename
             if not path.is_file():

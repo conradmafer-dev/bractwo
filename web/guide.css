@@ -16,12 +16,6 @@ a:focus-visible, main:focus-visible { outline: 2px solid var(--gold); outline-of
 .skip-link { position: absolute; top: 8px; left: 16px; padding: 10px 18px; background: #172a20; z-index: 1; transform: translateY(-160%); }
 .skip-link:focus { transform: translateY(0); }
 .shell { width: min(1120px, 100%); margin: 0 auto; padding: 0 40px; }
-.site-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; padding: 25px 0; border-bottom: 1px solid var(--line); }
-.brand { color: var(--gold); font: 21px/1.2 Georgia, "Times New Roman", serif; text-decoration: none; letter-spacing: .5px; }
-.brand small { display: block; margin-top: 7px; color: var(--muted); font: 10px/1.5 system-ui, sans-serif; letter-spacing: 2.4px; text-transform: uppercase; }
-.header-links { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; font-size: 13px; }
-.header-links a { display: inline-block; padding: 8px 0; text-decoration: none; }
-.header-links .play-link { border: 1px solid #bda77888; padding: 8px 16px; border-radius: 3px; }
 .breadcrumb { padding: 24px 0 0; color: var(--muted); font-size: 13px; }
 .breadcrumb ol { display: flex; flex-wrap: wrap; gap: 6px 12px; list-style: none; margin: 0; padding: 0; }
 .breadcrumb li + li::before { content: "/"; margin-right: 12px; color: #78917b; }
@@ -77,9 +71,6 @@ kbd { font: 500 .85em/1.5 system-ui, sans-serif; color: #e2ddc8; white-space: no
 @media (max-width: 560px) {
   :root { font-size: 15px; }
   .shell { padding: 0 22px; }
-  .site-header { align-items: flex-start; gap: 16px; padding: 22px 0; }
-  .header-links { width: 100%; gap: 8px 20px; }
-  .header-links .play-link { margin-left: auto; }
   h1 { letter-spacing: -.8px; }
   .lead { font-size: 17px; }
   .guide-layout { padding-bottom: 38px; }

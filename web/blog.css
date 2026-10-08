@@ -1,8 +1,6 @@
 .blog { font-size: 16px; }
 .blog .shell { width: min(1200px, 100%); }
-.blog .brand small { font-size: 14px; letter-spacing: .2px; text-transform: none; }
-.blog .header-links, .blog .breadcrumb, .blog .toc a, .blog .site-footer, .blog .related-links span { font-size: 14px; }
-.blog .header-links a { min-height: 44px; display: inline-flex; align-items: center; }
+.blog .breadcrumb, .blog .toc a, .blog .site-footer, .blog .related-links span { font-size: 14px; }
 .blog .eyebrow { font-size: 13px; }
 .blog h1 { font-size: clamp(32px, 4vw, 50px); overflow-wrap: break-word; }
 .blog .guide-layout { grid-template-columns: minmax(0, 760px) minmax(180px, 1fr); gap: 48px; }
@@ -23,19 +21,9 @@
 .blog td { color: var(--muted); }
 .blog tr:last-child td { border-bottom: 0; }
 .blog .sources { font-size: 15px; }
-.blog-intro { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 44px; align-items: center; padding: 44px 0; }
-.blog-intro h1 { margin-bottom: 20px; }
-.blog-intro .lead { margin-bottom: 0; }
-.blog-intro figure { margin: 0; }
-.blog-topics { display: flex; flex-wrap: wrap; gap: 12px 24px; margin-top: 24px; font-size: 15px; }
-.blog-topics a { display: inline-flex; align-items: center; min-height: 44px; }
 .blog-list { padding: 12px 0 48px; }
 .blog-list > h2 { margin: 0 0 26px; }
 .news-list { scroll-margin-top: 24px; }
-.news-heading { max-width: 760px; margin-bottom: 26px; }
-.news-heading .eyebrow { margin-bottom: 12px; }
-.news-heading h2 { margin: 0 0 16px; }
-.news-heading > p:last-child { color: var(--muted); margin-bottom: 0; }
 .news-facts { font-size: 15px; }
 .blog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
 .blog-card { border: 1px solid var(--line); padding: 28px; background: #13261c88; border-radius: 3px; }
@@ -68,18 +56,15 @@
 @media (max-width: 850px) {
   .blog .guide-layout { grid-template-columns: minmax(0, 1fr); gap: 28px; }
   .blog .toc { position: static; }
-  .blog-intro { grid-template-columns: minmax(0, 1fr); gap: 24px; }
-  .blog-intro figure { max-width: 640px; }
 }
 @media (max-width: 600px) {
   .blog .shell { padding: 0 20px; }
   .blog-grid, #authScreen .landing-blog-grid { grid-template-columns: minmax(0, 1fr); }
   .blog-card { padding: 22px; }
   .blog .game-recommendation { padding: 22px; }
-  .blog-intro { padding: 30px 0; }
   .blog .table-scroll table { min-width: 460px; }
-  .blog .header-links { gap: 6px 16px; }
-  .blog .header-links .play-link { margin-left: 0; }
   .blog .toc ol { display: block; }
   .blog .toc li + li { margin-top: 2px; }
 }
+
+.blog-index #newsy-mmorpg { padding-top: 24px; }
