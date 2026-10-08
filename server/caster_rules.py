@@ -76,8 +76,8 @@ def configure(spells,classes,statuses):
             range=128,radius=0,shape='self',targeting='self',feature=True,source='SRD 5.2.1 · adaptacja Bractwa',
             description='',icon=f'assets/spells/{key}.svg',effect='spell',visual=dict(style=kind,theme='nature' if 'druid' in classes_ else 'force',colors=['#438c86','#b8e5cf','#eaffee'],shots=1))
         s.update(extra);spells[key]=s
-    classes['mage']['description']='Sztuczki, I krąg, rytuały i Odzyskanie mocy od początku.'
-    classes['druid']['description']='Strażnik lub Mistyk natury. Lekki pancerz, tarcze i przemiany od poziomu 2.'
+    classes['mage']['description']='Magia'
+    classes['druid']['description']='Magia i kostur'
     add('arcane_recovery','Odzyskanie mocy','recovery',['mage'],action='action',cooldown=0,
         description='Po krótkim odpoczynku odzyskujesz część many. Jedno użycie między długimi odpoczynkami.',
         visual=dict(style='recovery',theme='force',colors=['#546bb2','#aacfff','#eef7ff'],shots=1))

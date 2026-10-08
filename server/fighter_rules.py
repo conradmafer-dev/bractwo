@@ -96,7 +96,7 @@ def class_sheet(p):
 
 def configure(items, spells, classes):
     """Called after the older loot/rarity passes; do not clobber their bonuses."""
-    classes['knight'].update(description='Styl walki, mistrzostwo broni, kolczuga i tarcza. Drugi oddech bez many.',
+    classes['knight'].update(description='Broń i style walki',
         ability_cost=0, ability_cooldown=0)
     spells['second_wind'].update(mana=0, cooldown=0,
         description='Akcja dodatkowa: odzyskaj 1k10 + poziom postaci HP (maks. +20). Krótki odpoczynek odnawia jedno użycie, długi wszystkie.')

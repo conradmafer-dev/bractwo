@@ -40,7 +40,7 @@
     const current = serial => generation === serial && allowed();
     const googleApi = () => root.google?.accounts?.id;
     const atLimit = () => (account?.characters?.length || 0) >= 4;
-    const names = {knight:'Rycerz',ranger:'Łowca',mage:'Czarodziej',druid:'Druid'};
+    const names = {knight:'Wojownik',ranger:'Łowca',mage:'Czarodziej',druid:'Druid'};
 
     function status(message, error = false) {
       ui.googleStatus.textContent = message || '';

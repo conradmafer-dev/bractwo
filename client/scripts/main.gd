@@ -4,12 +4,12 @@ const WORLD_SCRIPT = preload("res://scripts/world_view.gd")
 const PAD_SCRIPT = preload("res://scripts/input_pad.gd")
 const MINIMAP_SCRIPT = preload("res://scripts/minimap.gd")
 const CLASS_IDS: Array[String] = ["knight", "ranger", "mage", "druid"]
-const CLASS_NAMES: Dictionary = {"knight":"Rycerz", "ranger":"Łowca", "mage":"Czarodziej", "druid":"Druid"}
+const CLASS_NAMES: Dictionary = {"knight":"Wojownik", "ranger":"Łowca", "mage":"Czarodziej", "druid":"Druid"}
 const CLASS_DESCRIPTIONS: Dictionary = {
-	"knight":"Wybór stylu, mistrzostwo broni, kolczuga i tarcza. Drugi oddech bez many.",
-	"ranger":"Łuk, I krąg i bezpłatny Znak łowcy od początku; wilk od poziomu 3.",
-	"mage":"Różdżka: 1k4. Darmowe sztuczki; I krąg od poziomu 1, II od 3, dalsze co 2.",
-	"druid":"Wybór Strażnika lub Mistyka natury; I krąg od 1., wilk i kot od 2. poziomu."
+	"knight":"Broń i style walki",
+	"ranger":"Style walki i towarzysz",
+	"mage":"Magia",
+	"druid":"Magia i kostur"
 }
 const SLOT_NAMES: Dictionary = {"weapon":"Broń", "offhand":"Druga ręka", "armor":"Pancerz", "shield":"Tarcza", "ring":"Pierścień", "trophy":"Trofeum"}
 const PAPER: Color = Color("eee6ce")

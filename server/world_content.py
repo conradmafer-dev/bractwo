@@ -9,7 +9,7 @@ import random
 VERSION = '0.8.9'
 WIDTH, HEIGHT = 16000, 9216
 REGIONS, CITIES, STAIRS, DUNGEONS, SPAWNS, ROADS = [], [], [], [], [], []
-PROMOTIONS = {'knight':'Elitarny Rycerz', 'ranger':'Królewski Łowca',
+PROMOTIONS = {'knight':'Elitarny Wojownik', 'ranger':'Królewski Łowca',
               'mage':'Mistrz Magii', 'druid':'Starszy Druid'}
 # Combat content is supplied by dnd_content.configure after world construction.
 # Keep a single live catalogue: no old incantations or rune bypasses.

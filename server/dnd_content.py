@@ -7,16 +7,16 @@ except ImportError:
     import level_rules
 
 CLASS_SPECS = {
-    'knight': dict(name='Rycerz', description='Wojownik: miecz, wytrzymałość i dodatkowe ataki.', weapon='sword', hp=12, hp_growth=1.6, mana=30, mana_growth=1,
+    'knight': dict(name='Wojownik', description='Broń i style walki', weapon='sword', hp=12, hp_growth=1.6, mana=30, mana_growth=1,
                    damage=7.5, armor=0, hit_die=10, ability_name='Drugi oddech', ability_cost=5, ability_cooldown=30,
                    attributes=dict(strength=16, dexterity=12, constitution=14, intelligence=10, wisdom=10, charisma=10), primary='strength', saves=['strength','constitution'], default_ability='second_wind'),
-    'ranger': dict(name='Łowca', description='Łuk i I krąg od początku. Darmowy Znak łowcy; wilczy towarzysz od poziomu 3.', weapon='bow', hp=12, hp_growth=1.6, mana=40, mana_growth=0,
+    'ranger': dict(name='Łowca', description='Style walki i towarzysz', weapon='bow', hp=12, hp_growth=1.6, mana=40, mana_growth=0,
                    damage=7.5, armor=0, hit_die=10, ability_name='Znak łowcy', ability_cost=0, ability_cooldown=30,
                    attributes=dict(strength=12, dexterity=16, constitution=14, intelligence=10, wisdom=14, charisma=10), primary='dexterity', saves=['strength','dexterity'], default_ability='hunters_mark'),
-    'mage': dict(name='Czarodziej', description='Różdżka: iskra 1k4. Darmowe sztuczki i I krąg od 1. poziomu.', weapon='staff', hp=8, hp_growth=1.2, mana=40, mana_growth=0,
+    'mage': dict(name='Czarodziej', description='Magia', weapon='staff', hp=8, hp_growth=1.2, mana=40, mana_growth=0,
                    damage=2.5, armor=0, hit_die=6, ability_name='Promień mrozu', ability_cost=0, ability_cooldown=0,
                    attributes=dict(strength=8, dexterity=14, constitution=14, intelligence=16, wisdom=12, charisma=10), primary='intelligence', saves=['intelligence','wisdom'], default_ability='ray_of_frost'),
-    'druid': dict(name='Druid', description='Laska wręcz, I krąg magii natury od 1. poziomu; przemiana od 2.', weapon='staff', hp=10, hp_growth=1.4, mana=40, mana_growth=0,
+    'druid': dict(name='Druid', description='Magia i kostur', weapon='staff', hp=10, hp_growth=1.4, mana=40, mana_growth=0,
                    damage=5.5, armor=0, hit_die=8, ability_name='Shillelagh', ability_cost=0, ability_cooldown=0,
                    attributes=dict(strength=14, dexterity=12, constitution=14, intelligence=10, wisdom=16, charisma=10), primary='wisdom', saves=['intelligence','wisdom'], default_ability='shillelagh'),
 }
@@ -446,14 +446,14 @@ def configure(content, classes, potions):
     content.MILESTONES = [(1,'I krąg / sztuczki i broń','Czarodziej, druid i łowca: I krąg od początku. Kości obrażeń, KP i cechy. Sztuczki nie kosztują many.'),
         (2,'Rejsy i PvP','Dostęp do statków i świadomie włączanego PvP poza osadami.'),
         (3,'II krąg / wilczy towarzysz','Czarodziej i druid: II krąg. Łowca: wilczy towarzysz.'),
-        (5,'III krąg / dodatkowy atak','Czarodziej i druid: III krąg (Kula ognia / Wezwanie błyskawicy). Łowca: II krąg. Rycerz i łowca: 2 ataki.'),
+        (5,'III krąg / dodatkowy atak','Czarodziej i druid: III krąg (Kula ognia / Wezwanie błyskawicy). Łowca: II krąg. Wojownik i łowca: 2 ataki.'),
         (7,'IV krąg','Uschnięcie, Lodowa burza i Kamienna skóra.'),
         (9,'V krąg','Czarodziej i druid: V krąg. Łowca: III krąg.'),
-        (11,'VI krąg / 3 ataki','Rycerz: 3 ataki. Czarodziej i druid: VI krąg.'),
+        (11,'VI krąg / 3 ataki','Wojownik: 3 ataki. Czarodziej i druid: VI krąg.'),
         (13,'VII krąg','Palec śmierci i Burza ognia; łowca: IV krąg.'),
         (15,'VIII krąg','Rozbłysk słońca i Zapalająca chmura.'),
         (17,'IX krąg','Rój meteorów i Przewidywanie; łowca: V krąg. Ostatni wzrost kości sztuczek.'),
-        (20,'4 ataki rycerza','Rycerz wykonuje 4 niezależne rzuty ataku w jednej akcji.'),
+        (20,'4 ataki wojownika','Wojownik wykonuje 4 niezależne rzuty ataku w jednej akcji.'),
         (21,'Dalsza wędrówka','Poziomy postaci nadal nie mają limitu.')]
     for i, dice in enumerate(([2,4,2],[4,4,4],[8,4,8],[10,4,20]),1):
         key='health_potion'+('' if i==1 else '_'+str(i))

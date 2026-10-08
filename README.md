@@ -14,7 +14,7 @@ przy wyjściu z przeprawy. Władca Twierdzy zadaje 2k4+3 obrażeń zwykłym atak
 ## Zachowana zawartość wcześniejszych aktualizacji
 
 **[Zagraj w Bractwo Krain](https://bractwo.up.railway.app/)** — polska gra RPG
-online w przeglądarce na komputerze i telefonie. Wybierz rycerza, łowcę,
+online w przeglądarce na komputerze i telefonie. Wybierz wojownika, łowcę,
 czarodzieja lub druida, odkrywaj świat i wyruszaj na wyprawy w drużynie.
 Do gry potrzebujesz konta Google i połączenia z internetem.
 

@@ -8,7 +8,7 @@
   const revisionLabel=document.querySelector('.auth-foot');
   if(revisionLabel)revisionLabel.textContent='BRACTWO KRAIN 0.8.18 · UI_36';
   const classInfo = {
-    knight: {name:"Rycerz",icon:"⚔",color:"#f8d377",cape:"#cc4845",ability:"Drugi oddech",weapon:"sword"},
+    knight: {name:"Wojownik",icon:"⚔",color:"#f8d377",cape:"#cc4845",ability:"Drugi oddech",weapon:"sword"},
     ranger: {name:"Łowca",icon:"➶",color:"#f1d99c",cape:"#9e682e",ability:"Znak łowcy",weapon:"bow"},
     mage: {name:"Czarodziej",icon:"✧",color:"#b6c7ff",cape:"#4d65bd",ability:"Promień mrozu",weapon:"staff"},
     druid: {name:"Druid",icon:"❋",color:"#c0e895",cape:"#478e4d",ability:"Shillelagh",weapon:"staff"}
@@ -217,7 +217,7 @@
 
   function distance(a, b) { return Math.hypot(a.x - b.x, a.y - b.y); }
   function ownClass() { return classInfo[me?.class_id] || classInfo.knight; }
-  function className(id) { return world.classes?.[id]?.name || classInfo[id]?.name || "Rycerz"; }
+  function className(id) { return world.classes?.[id]?.name || classInfo[id]?.name || "Wojownik"; }
   function inSafeZone(player) {return (world.safe_zones||[world.safe_zone]).some(zone=>zone&&sameFloor(player,zone)&&distance(player,zone)<=zone.radius);}
   function merchantNear() { return !!me && me.hp > 0 && sameFloor(me,nearestMerchant()) && distance(me,nearestMerchant()) <= (nearestMerchant().radius || 150); }
   function formatNumber(value) { return numberFormat.format(Number(value)||0); }

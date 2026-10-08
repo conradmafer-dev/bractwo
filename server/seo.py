@@ -210,8 +210,8 @@ PUBLIC_PAGES = (
     ),
     PublicPage(
         "/poradniki/klasy-postaci", "poradniki/klasy-postaci.html",
-        "Klasy postaci w Bractwie Krain – rycerz, łowca, czarodziej i druid",
-        "Porównaj cztery klasy postaci w Bractwie Krain. Poznaj styl walki rycerza, "
+        "Klasy postaci w Bractwie Krain – wojownik, łowca, czarodziej i druid",
+        "Porównaj cztery klasy postaci w Bractwie Krain. Poznaj styl walki wojownika, "
         "łowcy, czarodzieja i druida oraz wybierz bohatera na pierwszą przygodę.",
         "Klasy postaci",
     ),

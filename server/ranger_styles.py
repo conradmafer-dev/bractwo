@@ -74,7 +74,7 @@ def configure(spells, classes):
         spec.setdefault('class_min_levels', {})['ranger'] = REQUIRED_LEVEL
         spec.setdefault('class_levels', {})['ranger'] = REQUIRED_LEVEL
         spec['ranger_style_required'] = 'druidic_warrior'
-    classes['ranger']['description'] = 'Łuk i magia natury. Styl walki lub dwie sztuczki druida od poziomu 2; wilczy towarzysz od poziomu 3.'
+    classes['ranger']['description'] = 'Style walki i towarzysz'
 
 
 def available_cantrips():
