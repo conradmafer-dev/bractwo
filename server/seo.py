@@ -117,6 +117,16 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/aion-2-nowe-serwery-eu-nathara-tassin", "blog/aion-2-nowe-serwery-eu-nathara-tassin.html",
+        "AION 2: nowe serwery EU i konserwacja 9 października | Bractwo Krain",
+        "Nathara dla Elyos i Tassin dla Asmodian: nowe serwery EU w AION 2. "
+        "Sprawdź godziny w Polsce, konserwację 9 października o 08:30 i zmiany skrzydeł.",
+        "AION 2: nowe serwery EU Nathara i Tassin. Konserwacja 9 października",
+        published_date="2026-10-08", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/aion-2-nowe-serwery-eu-oficjalna-800.webp",
+                        "Logo AION 2 i napis „New Servers Opening!” przed portalem — oficjalna grafika nowych serwerów EU Nathara i Tassin.", 800, 450),
+    ),
+    PublicPage(
         "/blog/aion-2-rekord-steam-nagrody", "blog/aion-2-rekord-steam-nagrody.html",
         "AION 2: rekord Steam, darmowy voucher i nagrody | Bractwo Krain",
         "AION 2 po premierze: 397 905 graczy jednocześnie na Steam, darmowy Customization Voucher "
