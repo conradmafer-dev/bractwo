@@ -117,10 +117,20 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/black-desert-poziom-75-exp-8-pazdziernika", "blog/black-desert-poziom-75-exp-8-pazdziernika.html",
+        "Black Desert: poziom 75 i zmiany EXP — 8 października | Bractwo Krain",
+        "Aktualizacja Black Desert NA/EU z 8 października 2026: poziom 75, premie PvE od 70, "
+        "limity EXP za potwory i Combat Secret Books planowane na 15 października.",
+        "Black Desert: poziom 75 i przebudowa EXP w aktualizacji 8 października",
+        published_date="2026-10-08", category="Newsy MMORPG · Black Desert", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/black-desert-aktualizacja-8-pazdziernika-880.webp",
+                        "Postać na koniu na leśnej drodze w jesiennym krajobrazie Black Desert — oficjalny baner aktualizacji.", 880, 355),
+    ),
+    PublicPage(
         "/blog/aion-2-nowe-serwery-eu-nathara-tassin", "blog/aion-2-nowe-serwery-eu-nathara-tassin.html",
         "AION 2: nowe serwery EU i konserwacja 9 października | Bractwo Krain",
         "Nathara dla Elyos i Tassin dla Asmodian: nowe serwery EU w AION 2. "
-        "Sprawdź godziny w Polsce, konserwację 9 października o 08:30 i zmiany skrzydeł.",
+        "Godziny w Polsce, konserwacja 9 października o 08:30, zmiany skrzydeł i rekompensata za awarię EU.",
         "AION 2: nowe serwery EU Nathara i Tassin. Konserwacja 9 października",
         published_date="2026-10-08", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
         image=PageImage("/assets/blog/aion-2-nowe-serwery-eu-oficjalna-800.webp",
