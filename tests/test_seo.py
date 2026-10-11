@@ -216,7 +216,13 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(article["mainEntityOfPage"]["@id"], webpage["@id"])
                 self.assertEqual(webpage["mainEntity"]["@id"], article["@id"])
                 self.assertEqual(article["datePublished"], page.published_date)
-                self.assertNotIn("dateModified", article)
+                if page.modified_date:
+                    self.assertEqual(article["dateModified"], page.modified_date)
+                    self.assertTrue(document.find("time", datetime=page.modified_date))
+                    self.assertEqual(document.find("meta", property="article:modified_time")[0]["content"],
+                                     page.modified_date)
+                else:
+                    self.assertNotIn("dateModified", article)
                 self.assertTrue(document.find("time", datetime=article["datePublished"]))
                 self.assertEqual(article["author"], {"@type": "Organization",
                                  "name": "Zespół Bractwa Krain", "url": self.origin + "/"})
@@ -286,7 +292,8 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
         locations = [element.text for element in root.findall("{*}url/{*}loc")]
         self.assertEqual(locations, [self.origin + page.path for page in seo.PUBLIC_PAGES])
         self.assertEqual(len(locations), len(set(locations)))
-        self.assertEqual(root.findall("{*}url/{*}lastmod"), [])
+        self.assertEqual([element.text for element in root.findall("{*}url/{*}lastmod")],
+                         [page.modified_date for page in seo.PUBLIC_PAGES if page.modified_date])
         image_namespace = "http://www.google.com/schemas/sitemap-image/1.1"
         for element, page in zip(root.findall("{*}url"), seo.PUBLIC_PAGES):
             with self.subTest(path=page.path):

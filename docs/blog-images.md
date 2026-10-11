@@ -46,3 +46,18 @@ Built-in ImageGen output, published as `web/assets/blog/aion-2-start-skrzydla-il
 Prompt:
 
 Use case: stylized-concept. Create an original editorial hero illustration for a Polish MMO blog article about the global launch of AION 2. Wide 16:9 composition, high-quality atmospheric fantasy digital painting with finely detailed painterly textures. A winged humanoid adventurer viewed from behind glides above a sea of clouds toward a grand airy citadel on a floating rocky island, warm dawn sunlight, immense sense of altitude, detailed pale stone spires, luminous sky and soft mist. A refined restrained palette of desaturated blue, warm gold and forest green, matching a dark-green gaming editorial website. Wing anatomy coherent, two wings attached to the character's upper back, clear elegant silhouette. No text, logos, interface, fake screenshot, or recognizable official game characters or locations. This is a conceptual editorial illustration and will be visibly labeled AI-generated, not actual gameplay. No elements from any supplied official promotional artwork.
+
+## AION 2 account restrictions — 2026-10-11
+
+Official editorial image from NC's Steam announcement, **Account Restrictions — Operation Policy Violations and Temporary Security Locks**. The page's Open Graph metadata points to this artwork; it shows the AION 2 logo beside a tall ruined tower, not an account ban interface or a depiction of cheating.
+
+- Announcement: https://store.steampowered.com/news/app/3393110/view/712288859283524485
+- Original image: https://clan.fastly.steamstatic.com/images/46074831/bdbc6a516755d3ba1d4f644f5254f69cee2f972f.png
+- Downloaded and visually inspected: 2026-10-11. Original PNG dimensions: 800×450.
+- Local hero: `web/assets/blog/aion-2-komunikat-ograniczenia-kont-800.webp` (800×450).
+- Responsive card: `web/assets/blog/aion-2-komunikat-ograniczenia-kont-640.webp` (640×360).
+- Processing: WebP quality 85; only encoding and proportional downscaling, with no crop, retouching or added elements.
+- Suggested alt: `Logo AION 2 na tle wysokiej zrujnowanej wieży — oficjalna grafika NC`.
+- Visible caption should identify it as NC's official artwork accompanying the account-restrictions announcement and link to the source. This is attributed publisher artwork, not original or public-domain artwork.
+
+The PLAYNC notice also includes an 1800×150 “Announcements” banner. It was inspected but not used for the article hero because its very wide aspect ratio would require inappropriate cropping or distortion.

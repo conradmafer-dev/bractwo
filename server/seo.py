@@ -52,6 +52,7 @@ class PublicPage:
     category: str | None = None
     article_kind: str = "BlogPosting"
     image: PageImage | None = None
+    modified_date: str | None = None
 
 
 HOME_PAGE = PublicPage("/", "index.html", TITLE, DESCRIPTION, "Bractwo Krain")
@@ -118,6 +119,16 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika", "blog/aion-2-boty-rmt-4996-kont-11-pazdziernika.html",
+        "AION 2: 4996 kont z ograniczeniami za boty i RMT | Bractwo Krain",
+        "NC objęło ograniczeniami 4996 kont AION 2. Komunikat z 11 października: boty, RMT, "
+        "blokady bezpieczeństwa oraz potwierdzone terminy transferów postaci.",
+        "AION 2: 4996 kont z ograniczeniami. NC uderza w boty i RMT",
+        published_date="2026-10-11", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/aion-2-komunikat-ograniczenia-kont-800.webp",
+                        "Logo AION 2 na tle wysokiej zrujnowanej wieży — oficjalna grafika NC", 800, 450),
+    ),
+    PublicPage(
         "/blog/black-desert-poziom-75-exp-8-pazdziernika", "blog/black-desert-poziom-75-exp-8-pazdziernika.html",
         "Black Desert: poziom 75 i zmiany EXP — 8 października | Bractwo Krain",
         "Aktualizacja Black Desert NA/EU z 8 października 2026: poziom 75, premie PvE od 70, "
@@ -134,6 +145,7 @@ NEWS_ARTICLES = (
         "Godziny w Polsce, konserwacja 9 października o 08:30, zmiany skrzydeł i rekompensata za awarię EU.",
         "AION 2: nowe serwery EU Nathara i Tassin. Konserwacja 9 października",
         published_date="2026-10-08", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
+        modified_date="2026-10-11",
         image=PageImage("/assets/blog/aion-2-nowe-serwery-eu-oficjalna-800.webp",
                         "Logo AION 2 i napis „New Servers Opening!” przed portalem — oficjalna grafika nowych serwerów EU Nathara i Tassin.", 800, 450),
     ),
@@ -144,6 +156,7 @@ NEWS_ARTICLES = (
         "i prezenty za 400 tysięcy aktywnych użytkowników. Sprawdź źródła i menu Closet.",
         "AION 2: rekord na Steam i darmowy Customization Voucher po premierze",
         published_date="2026-10-06", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
+        modified_date="2026-10-11",
         image=PageImage("/assets/blog/aion-2-customization-voucher-oficjalna-800.webp",
                         "Zwierzęca postać w białym stroju obok logo AION 2 — oficjalna grafika komunikatu o Customization Voucher.", 800, 450),
     ),
@@ -154,6 +167,7 @@ NEWS_ARTICLES = (
         "harmonogram przerwy technicznej i zmiany w aktualizacji premierowej.",
         "AION 2: globalny start 5 października. O której ruszą serwery w Polsce?",
         published_date="2026-10-05", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
+        modified_date="2026-10-11",
         image=PageImage("/assets/blog/aion-2-start-skrzydla-ilustracja-1200.webp",
                         "Skrzydlata postać nad chmurami przed podniebną cytadelą — ilustracja redakcyjna do artykułu o starcie AION 2.", 1200, 675),
     ),
@@ -309,6 +323,8 @@ def metadata_head(config, page=HOME_PAGE):
         ])
     if page.published_date:
         attributes.append(("property", "article:published_time", page.published_date))
+        if page.modified_date:
+            attributes.append(("property", "article:modified_time", page.modified_date))
         if page.category:
             attributes.append(("property", "article:section", page.category))
     if config.google_verification:
@@ -396,6 +412,8 @@ def metadata_head(config, page=HOME_PAGE):
         }
         if page_image:
             article["image"] = image_url
+        if page.modified_date:
+            article["dateModified"] = page.modified_date
         if page.category:
             article["articleSection"] = page.category
         structured["@graph"].append(article)
@@ -444,7 +462,8 @@ def sitemap_xml(config):
     for page in PUBLIC_PAGES:
         image = (f'<image:image><image:loc>{escape(config.origin + page.image.path)}</image:loc>'
                  '</image:image>' if page.image else "")
-        urls.append(f'  <url><loc>{escape(config.origin + page.path)}</loc>{image}</url>\n')
+        modified = f'<lastmod>{escape(page.modified_date)}</lastmod>' if page.modified_date else ""
+        urls.append(f'  <url><loc>{escape(config.origin + page.path)}</loc>{modified}{image}</url>\n')
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n'
