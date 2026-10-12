@@ -58,9 +58,9 @@ class PublicPage:
 HOME_PAGE = PublicPage("/", "index.html", TITLE, DESCRIPTION, "Bractwo Krain")
 BLOG_PAGE = PublicPage(
     "/blog", "blog/index.html",
-    "Blog MMO — newsy MMORPG i poradniki | Bractwo Krain",
-    "Blog MMO Bractwa Krain: sprawdzone aktualności MMORPG, premiery i aktualizacje gier. "
-    "Czytaj najnowsze newsy oraz poradniki D&D po polsku.",
+    "Blog MMO — najnowsze informacje ze świata MMORPG",
+    "Najnowsze informacje o MMORPG: Aion 2, Black Desert, RuneScape i inne gry MMO. "
+    "Premiery, aktualizacje i wiadomości po polsku.",
     "Blog MMO — aktualności MMORPG i poradniki",
 )
 BLOG_ARTICLES = (
@@ -442,6 +442,10 @@ def public_header(page):
 def render_page(template, config, page):
     """Use the same document for visitors, previews and search engine crawlers."""
     html = template.replace(HEAD_MARKER, metadata_head(config, page), 1)
+    if page.published_date and page.path.startswith("/blog/"):
+        latest_link = ('<p class="blog-latest"><a href="/blog">'
+                       'Zobacz najnowsze informacje ze świata MMORPG</a></p>\n')
+        html = html.replace("</article>", latest_link + "</article>", 1)
     if HEADER_MARKER in html:
         html = html.replace(HEADER_MARKER, public_header(page), 1)
         assets = ('  <link rel="stylesheet" href="/public-header.css?v=20261008-2">\n'
