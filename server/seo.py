@@ -119,6 +119,16 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/runescape-2027-dragon-slayer-2-arposandra", "blog/runescape-2027-dragon-slayer-2-arposandra.html",
+        "RuneScape 2027: Dragon Slayer II, Arposandra i Agility | Bractwo Krain",
+        "Plany RuneScape na 2027: Dragon Slayer II, Arposandra, przebudowa Agility i rajd na Karamji. "
+        "Sprawdź trzy cykle aktualizacji oraz ogłoszone terminy.",
+        "RuneScape 2027: Dragon Slayer II, Arposandra i przebudowa Agility",
+        published_date="2026-10-12", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/runescape-2027-roadmap-1200.webp",
+                        "Złoty smok, miasto gnomów i wyprawa w dżungli — oficjalna ilustracja planów RuneScape na 2027 rok", 1200, 675),
+    ),
+    PublicPage(
         "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika", "blog/aion-2-boty-rmt-4996-kont-11-pazdziernika.html",
         "AION 2: 4996 kont z ograniczeniami za boty i RMT | Bractwo Krain",
         "NC objęło ograniczeniami 4996 kont AION 2. Komunikat z 11 października: boty, RMT, "
@@ -177,7 +187,7 @@ NEWS_ARTICLES = (
         "Jagex zapowiedział RuneScape 4 z początkiem przygody w Ashenfall. "
         "Co ogłoszono o nowym MMORPG, czego jeszcze nie wiemy i co oznacza to dla graczy?",
         "RuneScape 4 zapowiedziane. Nowe MMORPG zacznie się w Ashenfall",
-        published_date="2026-10-04", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+        published_date="2026-10-04", modified_date="2026-10-12", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
         image=PageImage("/assets/blog/runescape-4-wyprawa-ilustracja-1200.webp",
                         "Podróżnik patrzy ze skalnego tarasu na wulkaniczną dolinę — ilustracja do zapowiedzi RuneScape 4.", 1200, 675),
     ),
@@ -187,7 +197,7 @@ NEWS_ARTICLES = (
         "Beta pluginów RuneScape rusza 6 października 2026. Quest Helper obejmie "
         "62 zadania. Poznaj potwierdzone informacje i ograniczenia testów.",
         "RuneScape: beta pluginów 6 października. Quest Helper z 62 zadaniami",
-        published_date="2026-10-04", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+        published_date="2026-10-04", modified_date="2026-10-12", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
         image=PageImage("/assets/blog/runescape-pluginy-narzedzia-ilustracja-1200.webp",
                         "Kompas, mapa i modułowe narzędzia na drewnianym stole — ilustracja do artykułu o pluginach RuneScape.", 1200, 675),
     ),

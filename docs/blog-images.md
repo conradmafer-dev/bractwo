@@ -61,3 +61,16 @@ Official editorial image from NC's Steam announcement, **Account Restrictions �
 - Visible caption should identify it as NC's official artwork accompanying the account-restrictions announcement and link to the source. This is attributed publisher artwork, not original or public-domain artwork.
 
 The PLAYNC notice also includes an 1800×150 “Announcements” banner. It was inspected but not used for the article hero because its very wide aspect ratio would require inappropriate cropping or distortion.
+
+## RuneScape 2027 roadmap — 2026-10-12
+
+Official Jagex editorial artwork accompanying **RuneScape 2027 Roadmap**, published on 3 October 2026. The three-panel composition shows a golden dragon, the gnome city, and adventurers exploring a jungle; it is concept artwork, not a gameplay screenshot.
+
+- Announcement: https://secure.runescape.com/m=news/runescape-2027-roadmap-
+- Original image: https://cdn.runescape.com/assets/img/external/news/2026/10/blogB5456/BigThumb.jpg
+- Downloaded and visually inspected: 2026-10-12. Original JPEG dimensions: 1920×1080.
+- Local hero: `web/assets/blog/runescape-2027-roadmap-1200.webp` (1200×675).
+- Responsive card: `web/assets/blog/runescape-2027-roadmap-640.webp` (640×360).
+- Processing: WebP quality 85; proportional downscaling and format conversion only, with no crop, retouching or added elements.
+- Suggested alt: `Złoty smok, miasto gnomów i wyprawa w dżungli — oficjalna ilustracja planów RuneScape na 2027 rok`.
+- Visible caption should identify this as official Jagex concept artwork accompanying the 2027 roadmap and link to the source. This is attributed publisher artwork, not original or public-domain artwork.
