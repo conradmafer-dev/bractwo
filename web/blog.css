@@ -76,3 +76,10 @@
 .alien-colonies-article .browser-play { display: inline-flex; align-items: center; min-height: 44px; }
 .alien-colonies-article .alien-downloads a:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
 @media (max-width: 600px) { .alien-colonies-article .android-download { width: 100%; } }
+.alien-colonies-article .alien-screenshot-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px; margin: 24px 0 34px; }
+.alien-colonies-article .gameplay-screenshot { min-width: 0; margin: 0; }
+.alien-colonies-article .gameplay-screenshot a { display: block; }
+.alien-colonies-article .gameplay-screenshot img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; }
+.alien-colonies-article .gameplay-screenshot figcaption { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+.alien-colonies-article .gameplay-screenshot a:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
+@media (max-width: 600px) { .alien-colonies-article .alien-screenshot-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; } }

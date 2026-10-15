@@ -96,3 +96,11 @@ Style/medium: Premium cinematic sci-fi painted illustration with convincing deta
 Composition/framing: Landscape 16:9 composition, characters medium close-up across the lower two thirds, planetary panorama and star clearly visible behind them in the upper third. Leave generous safe margins around all three heads, faces large enough to read in a thumbnail. Balanced blue, red, green accents against deep navy cosmic background.
 Lighting/mood: Warm star rim light and subtle colored local illumination, sense of interstellar discovery and rivalry, strong clear forms, beautiful luminous space.
 Constraints: No text, no lettering, no logo, no watermark, no interface, no borders. Not a gameplay screenshot. No recognizable existing franchise characters. Do not add extra foreground characters.
+
+### Alien Colonies Android gameplay screenshots — 2026-10-15
+
+Two authentic gameplay screenshots supplied by the game owner for this article. Original JPEGs copied without cropping, retouching, upscaling or changing the visible interface. Each is 720×1600. Article screenshots load lazily and link to the full-size image.
+
+- `web/assets/blog/alien-colonies-android-rozwoj-kolonii.jpg`: colony Boreas 3, resource/energy values and infrastructure. Supplied as `Screenshot_2026-10-15-15-07-31-083_com.conradmafer.aliencolonies.jpg` (525190 bytes).
+- `web/assets/blog/alien-colonies-android-mapa-galaktyki.jpg`: galaxy Aurora and star-system overview with players/Swarm markers. Supplied as `Screenshot_2026-10-15-15-07-22-747_com.conradmafer.aliencolonies.jpg` (312776 bytes).
+- Visible captions identify both as Android gameplay. Alt text describes each actual screen; the separate AI hero remains explicitly labelled promotional illustration.
