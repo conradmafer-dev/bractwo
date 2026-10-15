@@ -68,3 +68,11 @@
 }
 
 .blog-index #newsy-mmorpg { padding-top: 24px; }
+
+.alien-colonies-article .alien-downloads { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 24px; margin: 22px 0; }
+.alien-colonies-article .android-download { justify-content: space-between; min-height: 64px; max-width: 100%; padding: 12px 22px; color: #10231e; background: #b6ed65; border-color: #cff38c; font-size: 17px; line-height: 1.4; }
+.alien-colonies-article .android-download:hover { background: #cdf58d; }
+.alien-colonies-article .android-download small { display: block; margin-top: 2px; font-size: 12px; font-weight: 500; }
+.alien-colonies-article .browser-play { display: inline-flex; align-items: center; min-height: 44px; }
+.alien-colonies-article .alien-downloads a:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+@media (max-width: 600px) { .alien-colonies-article .android-download { width: 100%; } }

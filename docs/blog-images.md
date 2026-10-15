@@ -74,3 +74,25 @@ Official Jagex editorial artwork accompanying **RuneScape 2027 Roadmap**, publis
 - Processing: WebP quality 85; proportional downscaling and format conversion only, with no crop, retouching or added elements.
 - Suggested alt: `Złoty smok, miasto gnomów i wyprawa w dżungli — oficjalna ilustracja planów RuneScape na 2027 rok`.
 - Visible caption should identify this as official Jagex concept artwork accompanying the 2027 roadmap and link to the source. This is attributed publisher artwork, not original or public-domain artwork.
+
+## Alien Colonies — three races, 2026-10-15
+
+Original AI-generated promotional illustration made with the built-in ImageGen tool for `/blog/alien-colonies-gra-podobna-do-ogame-android`. No external art was used as input. It depicts a blue Zetan, a red Automaton and a green Symbiont against planets and a bright star. The visible article caption identifies it as promotional AI artwork, not gameplay.
+
+- Hero/social image: `web/assets/blog/alien-colonies-trzy-rasy-planety-1200.webp` (1200×675, 255218 bytes).
+- Responsive card/mobile image: `web/assets/blog/alien-colonies-trzy-rasy-planety-640.webp` (640×360, 87820 bytes).
+- Source generation: 1672×941 PNG; proportional web conversion with the full composition preserved. No semantic retouching.
+- Alt: `Zetan, Automaton i Symbiont — trzy rasy Alien Colonies na tle planet i jasnej gwiazdy`.
+- Verified Android destination: https://play.google.com/store/apps/details?id=com.conradmafer.aliencolonies
+
+Prompt:
+
+Use case: ads-marketing
+Asset type: Hero illustration for a Polish article introducing Alien Colonies, a new space empire strategy game. Original promotional concept art, not a screenshot.
+Primary request: Three distinct science-fiction species in the foreground with beautiful planets and a luminous star in deep space behind them.
+Scene/backdrop: Wide cinematic outer-space panorama, richly detailed Earth-size worlds with varied surfaces, a ringed planet farther back, brilliant warm white-gold star above the planetary horizon, delicate nebula haze and scattered stars. Keep the celestial bodies recognizable and separate, with depth and scale.
+Subject: Exactly three principal figures seen from waist or chest up, each individually readable: a slender intelligent blue Zetan alien with smooth blue skin, an elongated elegant head and refined advanced technology; a strong red Automaton with heavy dark metallic robotic armor and glowing red energy details, unmistakably a machine; and a green Symbiont with organic living armor, graceful alien anatomy and green bioluminescent growth, unmistakably biological. Each occupies a balanced third of the composition with distinct silhouettes and no overlap of faces. Serious intriguing expressions.
+Style/medium: Premium cinematic sci-fi painted illustration with convincing detailed materials, striking yet tasteful game cover art. Original character designs, sophisticated atmosphere, crisp focal details, not cartoon.
+Composition/framing: Landscape 16:9 composition, characters medium close-up across the lower two thirds, planetary panorama and star clearly visible behind them in the upper third. Leave generous safe margins around all three heads, faces large enough to read in a thumbnail. Balanced blue, red, green accents against deep navy cosmic background.
+Lighting/mood: Warm star rim light and subtle colored local illumination, sense of interstellar discovery and rivalry, strong clear forms, beautiful luminous space.
+Constraints: No text, no lettering, no logo, no watermark, no interface, no borders. Not a gameplay screenshot. No recognizable existing franchise characters. Do not add extra foreground characters.

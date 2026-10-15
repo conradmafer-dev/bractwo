@@ -119,6 +119,16 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/alien-colonies-gra-podobna-do-ogame-android", "blog/alien-colonies-gra-podobna-do-ogame-android.html",
+        "Alien Colonies — nowa gra podobna do OGame na Androida",
+        "Alien Colonies to nowa gra podobna do OGame: trzy rasy, kolonie, badania i floty. "
+        "Pobierz na Androida z Google Play lub graj w przeglądarce.",
+        "Alien Colonies — nowa gra podobna do OGame na Androida",
+        published_date="2026-10-15", category="Nowe gry MMO · Alien Colonies", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/alien-colonies-trzy-rasy-planety-1200.webp",
+                        "Zetan, Automaton i Symbiont — trzy rasy Alien Colonies na tle planet i jasnej gwiazdy", 1200, 675),
+    ),
+    PublicPage(
         "/blog/runescape-2027-dragon-slayer-2-arposandra", "blog/runescape-2027-dragon-slayer-2-arposandra.html",
         "RuneScape 2027: Dragon Slayer II, Arposandra i Agility | Bractwo Krain",
         "Plany RuneScape na 2027: Dragon Slayer II, Arposandra, przebudowa Agility i rajd na Karamji. "
