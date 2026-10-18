@@ -119,6 +119,16 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/vampir-premiera-polska-pobieranie-wymagania", "blog/vampir-premiera-polska-pobieranie-wymagania.html",
+        "VAMPIR: premiera w Polsce, pobieranie i wymagania PC",
+        "VAMPIR ma ruszyć 28 października o 03:00 w Polsce. Sprawdź wcześniejsze pobieranie, "
+        "wymagania PC, linki do sklepów i różnicę w terminie iOS.",
+        "VAMPIR: kiedy premiera w Polsce? Start, pobieranie i wymagania",
+        published_date="2026-10-18", category="Nowe MMORPG · VAMPIR", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/vampir-premiera-polska-pc-android-1200.webp",
+                        "Bohaterowie VAMPIR na tle czerwonego księżyca — grafika promocyjna wampirzego MMORPG Netmarble", 1200, 630),
+    ),
+    PublicPage(
         "/blog/alien-colonies-gra-podobna-do-ogame-android", "blog/alien-colonies-gra-podobna-do-ogame-android.html",
         "Alien Colonies — nowa gra podobna do OGame na Androida",
         "Alien Colonies to nowa gra podobna do OGame: trzy rasy, kolonie, badania i floty. "

@@ -104,3 +104,18 @@ Two authentic gameplay screenshots supplied by the game owner for this article. 
 - `web/assets/blog/alien-colonies-android-rozwoj-kolonii.jpg`: colony Boreas 3, resource/energy values and infrastructure. Supplied as `Screenshot_2026-10-15-15-07-31-083_com.conradmafer.aliencolonies.jpg` (525190 bytes).
 - `web/assets/blog/alien-colonies-android-mapa-galaktyki.jpg`: galaxy Aurora and star-system overview with players/Swarm markers. Supplied as `Screenshot_2026-10-15-15-07-22-747_com.conradmafer.aliencolonies.jpg` (312776 bytes).
 - Visible captions identify both as Android gameplay. Alt text describes each actual screen; the separate AI hero remains explicitly labelled promotional illustration.
+
+
+## VAMPIR — global launch, 2026-10-18
+
+
+Source page: https://vampirgb.netmarble.com/en/preorder
+Asset source: https://sgimage.netmarble.com/images/netmarble/thered/20260812/sosz1786525938635.jpg
+Retrieved: 2026-10-18
+Source: public official Netmarble website og:image (metadata verified with live Firecrawl scrape).
+Copyright: © 2025 Netmarble Corp. & Netmarble Neo Inc. All Rights Reserved (visible in original).
+Original: 1200×630 JPEG, downloaded without authentication; no Games Press gated assets accessed.
+Changes: resized to 640×336 for responsive display; original dimensions retained for 1200px version; converted to WebP quality 85. No crop, compositing, overlays, or content edits. Existing publisher logo, game title and copyright preserved.
+Caption (PL): VAMPIR — oficjalna grafika promocyjna gry. Źródło: Netmarble.
+Alt (PL): Bohaterowie VAMPIR na tle czerwonego księżyca — grafika promocyjna wampirzego MMORPG Netmarble.
+Visual inspection: landscape artwork, five fantasy characters with weapons, red moon, bats, prominent VAMPIR wordmark; official Netmarble logo top-left and rights credit at bottom. Not gameplay screenshot.
