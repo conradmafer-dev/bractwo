@@ -30,10 +30,13 @@
 .public-header__brand svg { flex: 0 0 auto; }
 .public-header__brand > span { font: 14px/1.15 Georgia, "Times New Roman", serif; letter-spacing: 2px; }
 .public-header__brand small { display: block; margin-top: 5px; font: 10px/1.1 system-ui, sans-serif; letter-spacing: 4px; }
-.public-header__nav { grid-area: nav; display: flex; align-items: center; justify-content: flex-start; min-width: 0; }
+.public-header__nav { grid-area: nav; display: flex; align-items: center; justify-content: flex-start; gap: 22px; min-width: 0; }
 :is(.public-content, #authScreen) .public-header__nav a { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 8px 0; color: #c5cdbf; white-space: nowrap; }
 :is(.public-content, #authScreen) .public-header__nav a:hover,
 :is(.public-content, #authScreen) .public-header__nav a[aria-current] { color: #f6deb1; }
+.public-header__languages { display: inline-flex; align-items: center; gap: 4px; padding-left: 14px; border-left: 1px solid #bdc7a829; font-size: 12px; letter-spacing: .04em; }
+:is(.public-content, #authScreen) .public-header__languages a { min-width: 36px; padding: 8px 4px; }
+:is(.public-content, #authScreen) .public-header__languages a[aria-current] { text-decoration: underline; text-underline-offset: 4px; }
 :is(.public-content, #authScreen) .public-header__count {
   grid-area: count;
   margin: 0;

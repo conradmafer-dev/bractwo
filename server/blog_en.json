@@ -1,0 +1,189 @@
+{
+  "/blog": {
+    "path": "/en/blog",
+    "title": "MMO Blog — Latest MMORPG News, Releases and D&D Guides",
+    "description": "Latest MMORPG news in English: AION 2, RuneScape, Black Desert and new online games. Release dates, updates, official sources and D&D guides.",
+    "name": "MMO Blog — latest MMORPG news and guides",
+    "category": "MMORPG news and D&D guides",
+    "image_alt": "Bractwo Krain gameplay: Solna Przystań and a desert region",
+    "card_kicker": "MMORPG news",
+    "card_description": "MMORPG news, releases, updates and D&D guides in English.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika": {
+    "path": "/en/blog/aion-2-bots-rmt-4996-accounts-october-11",
+    "title": "AION 2: 4,996 Accounts Restricted over Bots and RMT",
+    "description": "NC restricted 4,996 AION 2 accounts on 11 October. Read the official reasons, the distinction from security locks and the announced free transfer dates.",
+    "name": "AION 2: 4,996 accounts restricted as NC tackles bots and RMT",
+    "category": "MMORPG News",
+    "image_alt": "AION 2 logo in front of a tall ruined tower — official NC artwork",
+    "card_kicker": "AION 2 · Account restrictions",
+    "card_description": "NC announced restrictions on 4,996 accounts over bots and RMT. We explain security locks and the character transfer schedule.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/aion-2-nowe-serwery-eu-nathara-tassin": {
+    "path": "/en/blog/aion-2-new-eu-servers-nathara-tassin",
+    "title": "AION 2: New EU Servers Nathara and Tassin",
+    "description": "AION 2 announced EU servers Nathara and Tassin on 8 October. See faction assignments, maintenance times, wing buffs and EU outage compensation details.",
+    "name": "AION 2: new EU servers Nathara and Tassin, plus 9 October maintenance",
+    "category": "MMORPG News",
+    "image_alt": "AION 2 logo and “New Servers Opening!” text in front of a portal — official artwork for EU servers Nathara and Tassin",
+    "card_kicker": "AION 2 · European servers",
+    "card_description": "New EU servers for Elyos and Asmodians, the 9 October maintenance plan, quest wing buffs and compensation for the EU outage.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/aion-2-rekord-steam-nagrody": {
+    "path": "/en/blog/aion-2-steam-record-free-voucher-rewards",
+    "title": "AION 2 Steam Record: Free Voucher and Launch Rewards",
+    "description": "AION 2 reached 397,905 concurrent Steam players on 5 October. Read about the free Customization Voucher and the official 300,000 and 400,000 user gifts.",
+    "name": "AION 2: Steam record and a free Customization Voucher after launch",
+    "category": "MMORPG News",
+    "image_alt": "Animal-like character in white clothing beside the AION 2 logo — official Customization Voucher announcement artwork",
+    "card_kicker": "AION 2 · Launch rewards",
+    "card_description": "A 397,905-player Steam peak, a free cosmetic voucher and milestone gifts: a recap of AION 2’s launch-day announcements.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/aion-2-start-polska": {
+    "path": "/en/blog/aion-2-global-launch-poland-time",
+    "title": "AION 2 Global Launch: 5 October Server Times in Poland",
+    "description": "AION 2 launched globally on PC on 5 October 2026. Revisit the Poland-time server schedule, the maintenance notice and the announced launch update changes.",
+    "name": "AION 2 global launch on 5 October: what time did servers open in Poland?",
+    "category": "MMORPG News",
+    "image_alt": "Winged character above the clouds facing a sky citadel — editorial illustration for the AION 2 launch article",
+    "card_kicker": "AION 2 · Global launch",
+    "card_description": "The original 5 October global launch schedule in Poland time, with maintenance details, character deletion changes and quest fixes.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/runescape-2027-dragon-slayer-2-arposandra": {
+    "path": "/en/blog/runescape-2027-dragon-slayer-2-arposandra",
+    "title": "RuneScape 2027: Dragon Slayer II, Arposandra & Agility",
+    "description": "Explore RuneScape's 2027 roadmap: Dragon Slayer II, the Agility rework, Arposandra, new bosses and a Karamja raid. Dates and official Jagex sources.",
+    "name": "RuneScape 2027: Dragon Slayer II, Arposandra and the Agility rework",
+    "category": "MMORPG news",
+    "image_alt": "A golden dragon, a gnome city and a jungle expedition in the official artwork for RuneScape's 2027 roadmap",
+    "card_kicker": "RuneScape · 2027 roadmap",
+    "card_description": "Dragon Slayer II, an Agility rework, Arposandra and a new Karamja raid: a guide to Jagex's three planned story cycles.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/runescape-4-zapowiedz": {
+    "path": "/en/blog/runescape-4-announcement",
+    "title": "RuneScape 4 Announced: Ashenfall, Release and Beta Plans",
+    "description": "Jagex has revealed RS4, a new RuneScape MMORPG set to begin in Ashenfall. What is confirmed about its setting, release plans and registration for updates?",
+    "name": "RuneScape 4 announced: the new MMORPG will begin in Ashenfall",
+    "category": "MMORPG news",
+    "image_alt": "A traveller looks out from a rocky terrace over a volcanic valley in an illustration for the RuneScape 4 announcement",
+    "card_kicker": "RuneScape · New MMORPG",
+    "card_description": "Jagex's new MMORPG will begin in Ashenfall. We separate confirmed RS4 information from assumptions about its release and beta.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/runescape-pluginy-beta": {
+    "path": "/en/blog/runescape-plugins-beta",
+    "title": "RuneScape Plugin Beta: Quest Helper and the First Five Plugins",
+    "description": "RuneScape's official plugin beta was announced for 6 October, with Quest Helper supporting 62 quests. See the five plugins and planned RS Plugin Hub controls.",
+    "name": "RuneScape plugin beta on 6 October: Quest Helper supports 62 quests",
+    "category": "MMORPG news",
+    "image_alt": "A compass, map and modular tools on a wooden table in an illustration for the RuneScape plugins article",
+    "card_kicker": "RuneScape · Plugins",
+    "card_description": "The original beta announcement: Quest Helper with 62 quests, four other plugins and the planned in-game RS Plugin Hub.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/dnd-online": {
+    "path": "/en/blog/dnd-online",
+    "title": "D&D Online: Tabletop Sessions, VTTs or a Browser RPG?",
+    "name": "D&D online: a tabletop session or a browser RPG?",
+    "description": "Compare online D&D sessions, virtual tabletops and browser RPGs. Learn how Bractwo Krain adapts d20 combat, classes and magic in its own multiplayer world.",
+    "category": "D&D guides",
+    "card_kicker": "D&D online",
+    "card_description": "A Dungeon Master, a virtual tabletop or an MMORPG? Understand the differences and choose the way you want to play.",
+    "image_alt": "A Wizard beside a road and buildings in Bractwo Krain, a Polish MMORPG with adapted D&D mechanics.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/walka-k20": {
+    "path": "/en/blog/d20-armor-class-critical-hits",
+    "title": "D20, Armor Class and Critical Hits: D&D Combat Explained",
+    "name": "D20, Armor Class and critical hits: how does combat work?",
+    "description": "Understand d20 attack rolls, Armor Class, damage, critical hits and saving throws with worked examples from D&D and the Bractwo Krain browser MMORPG.",
+    "category": "D&D guides",
+    "card_kicker": "Combat rules",
+    "card_description": "Calculate your chance to hit, separate attacks from damage and understand when you need a saving throw.",
+    "image_alt": "Combat in Bractwo Krain: a Wizard casts Lightning Bolt toward a minotaur and scorpion on the Golden Coast.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/magia-kregi-czarow": {
+    "path": "/en/blog/wizard-druid-dnd-magic",
+    "title": "Wizard or Druid? D&D Magic in Bractwo Krain Explained",
+    "name": "Wizard or Druid? D&D magic in Bractwo Krain",
+    "description": "Compare Wizard and Druid magic in Bractwo Krain. Understand spell levels, cantrips, mana, Concentration, Wild Shape and how the game adapts D&D rules.",
+    "category": "D&D guides",
+    "card_kicker": "D&D magic",
+    "card_description": "Spell levels, Concentration and resting: compare the Wizard and Druid and learn how Bractwo adapts D&D magic.",
+    "image_alt": "A Wizard casts Magic Missile near stone ruins in Bractwo Krain, adapting the familiar D&D spell.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/atuty-rozwoj-postaci": {
+    "path": "/en/blog/dnd-feats-character-progression",
+    "title": "D&D Feats and Character Progression in Bractwo Krain",
+    "name": "Feats in D&D and Bractwo: how to develop your character",
+    "description": "Learn how ability scores, proficiencies and feats shape your Bractwo Krain character. Compare practical choices for Fighters, Rangers, Wizards and Druids.",
+    "category": "D&D guides",
+    "card_kicker": "Character progression",
+    "card_description": "Ability scores, proficiencies and feats: learn what they change and how to make decisions about your character’s progression.",
+    "image_alt": "A Druid in the Demon Rift in Bractwo Krain, with the character’s spells and abilities along the bottom of the screen.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/vampir-premiera-polska-pobieranie-wymagania": {
+    "path": "/en/blog/vampir-release-date-download-system-requirements",
+    "title": "VAMPIR Release Date, Download and PC Requirements | MMO Blog",
+    "description": "VAMPIR launches on 28 October in Poland. Check the CET start time, pre-download date, official PC and mobile links, requirements and the iOS date discrepancy.",
+    "name": "VAMPIR release date: Poland launch time, download and requirements",
+    "category": "New MMORPGs",
+    "image_alt": "VAMPIR characters beneath a red moon — promotional artwork for Netmarble’s vampire MMORPG",
+    "card_kicker": "Release · VAMPIR",
+    "card_description": "Poland launch times, pre-download, official store links and PC requirements, with a note on the Polish iOS listing.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/alien-colonies-gra-podobna-do-ogame-android": {
+    "path": "/en/blog/alien-colonies-new-game-like-ogame-android",
+    "title": "Alien Colonies: A New Game Like OGame for Android | MMO Blog",
+    "description": "Discover Alien Colonies, a new space strategy game like OGame. Choose from three races, develop colonies and fleets, and play on Android or in your browser.",
+    "name": "Alien Colonies — a new game like OGame for Android",
+    "category": "New MMO games",
+    "image_alt": "Zetan, Automaton and Symbiont — the three Alien Colonies races against planets and a bright star",
+    "card_kicker": "New game · Space strategy",
+    "card_description": "A space strategy game for OGame fans: three races, colonies, fleets and a shared empire on Android and in your browser.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/ddo-court-of-strahd": {
+    "path": "/en/blog/ddo-court-of-strahd",
+    "title": "DDO The Court of Strahd: Lanterns and Hardcore Rules | MMO Blog",
+    "description": "Read our DDO Court of Strahd preview: the announced 14 October launch, lantern progression, the Hardcore death rule and details confirmed by the developers.",
+    "name": "DDO: The Court of Strahd’s 14 October launch, lanterns and Hardcore",
+    "category": "MMORPG news",
+    "image_alt": "A lantern lights the mist on a path to a gothic castle — an illustration for DDO’s The Court of Strahd preview.",
+    "card_kicker": "Dungeons & Dragons Online",
+    "card_description": "Our 4 October preview of The Court of Strahd: lantern progression, the announced launch and the Hardcore death rule.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/pantheon-crafting-2027": {
+    "path": "/en/blog/pantheon-crafting-2027",
+    "title": "Pantheon Crafting Planned for 2027: Developer Q&A | MMO Blog",
+    "description": "Pantheon’s developers target 2027 for revamped crafting, outside Combat & Progression. Read what the 2 October Q&A says about stability, balance and timing.",
+    "name": "Pantheon crafting planned for 2027: what the 2 October Q&A revealed",
+    "category": "MMORPG news",
+    "image_alt": "A fantasy forge with a hammer, metal ingots and an unfinished sword — an illustration for Pantheon’s crafting plans.",
+    "card_kicker": "Pantheon: Rise of the Fallen",
+    "card_description": "The 2 October Q&A puts revamped crafting in 2027, while stability and level 1–50 balance take priority.",
+    "modified_date": "2026-10-18"
+  },
+  "/blog/black-desert-poziom-75-exp-8-pazdziernika": {
+    "path": "/en/blog/black-desert-level-75-exp-october-8",
+    "title": "Black Desert: level 75 cap and EXP overhaul — October 8",
+    "description": "Black Desert NA/EU raised the cap to level 75 on October 8, 2026. See PvE bonuses, per-monster EXP limits and the announced Combat Secret Books schedule.",
+    "name": "Black Desert: level 75 cap and EXP overhaul in the October 8 update",
+    "category": "MMORPG news · Black Desert",
+    "image_alt": "A rider on a forest path in an autumn Black Desert landscape — official update artwork",
+    "card_kicker": "Update · Black Desert Online",
+    "card_description": "The October 8 NA/EU update introduced a level 75 cap, PvE bonuses from level 70 and EXP limits. See the changes and original reward schedule.",
+    "modified_date": "2026-10-18"
+  }
+}

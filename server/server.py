@@ -2106,7 +2106,7 @@ def _accepts_gzip(value):
     return qualities.get("gzip", qualities.get("*", 0)) > 0
 
 
-def _public_text_response(request, text, content_type="text/html"):
+def _public_text_response(request, text, content_type="text/html", language="pl"):
     """Revalidate public documents and compress without varying on cookies."""
     digest = hashlib.sha256(text.encode("utf-8")).hexdigest()
     headers = {
@@ -2117,7 +2117,7 @@ def _public_text_response(request, text, content_type="text/html"):
         "Vary": "Accept-Encoding",
     }
     if content_type == "text/html":
-        headers.update({"Content-Language": "pl", "Referrer-Policy": "strict-origin-when-cross-origin",
+        headers.update({"Content-Language": language, "Referrer-Policy": "strict-origin-when-cross-origin",
                         "Cross-Origin-Opener-Policy": "same-origin-allow-popups"})
     if request.if_none_match and any(tag.value in (digest, "*") for tag in request.if_none_match):
         return web.Response(status=304, headers=headers)
@@ -2208,7 +2208,7 @@ def create_app(db_path="world.sqlite3", clock=None, google_auth_service=None):
             html=seo.render_page(path.read_text(encoding="utf-8"),seo_config,page)
             if page.path == "/":
                 html=html.replace("<!-- COMMENTS_LIST -->",app["comments"].render_public_list(),1)
-            return _public_text_response(request,html)
+            return _public_text_response(request,html,language=page.language)
         app.router.add_get(page.path,public_page)
         if page.path != "/":
             async def page_redirect(request,page=page):

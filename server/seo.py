@@ -6,11 +6,13 @@ broken or attacker-controlled canonical, social or sitemap URLs.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
+from datetime import date
 from html import escape
 from ipaddress import ip_address
 import json
 import os
+from pathlib import Path
 import re
 from urllib.parse import urlsplit
 
@@ -53,6 +55,7 @@ class PublicPage:
     article_kind: str = "BlogPosting"
     image: PageImage | None = None
     modified_date: str | None = None
+    language: str = "pl"
 
 
 HOME_PAGE = PublicPage("/", "index.html", TITLE, DESCRIPTION, "Bractwo Krain")
@@ -144,7 +147,7 @@ NEWS_ARTICLES = (
         "Plany RuneScape na 2027: Dragon Slayer II, Arposandra, przebudowa Agility i rajd na Karamji. "
         "Sprawdź trzy cykle aktualizacji oraz ogłoszone terminy.",
         "RuneScape 2027: Dragon Slayer II, Arposandra i przebudowa Agility",
-        published_date="2026-10-12", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+        published_date="2026-10-12", modified_date="2026-10-18", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
         image=PageImage("/assets/blog/runescape-2027-roadmap-1200.webp",
                         "Złoty smok, miasto gnomów i wyprawa w dżungli — oficjalna ilustracja planów RuneScape na 2027 rok", 1200, 675),
     ),
@@ -243,6 +246,75 @@ NEWS_ARTICLES = (
     ),
 )
 ALL_BLOG_ARTICLES = (*NEWS_ARTICLES, *BLOG_ARTICLES)
+
+
+def _english_blog_pages():
+    """Build translated documents from one metadata file and the original assets.
+
+    A missing file is tolerated while a checkout is being prepared. A present
+    file must describe every blog document, so partial translations cannot
+    silently generate mismatched language links or an incomplete collection.
+    """
+    metadata_path = Path(__file__).with_name("blog_en.json")
+    if not metadata_path.is_file():
+        return None, (), {}
+    try:
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as error:
+        raise ValueError(f"Cannot read English blog metadata: {metadata_path.name}") from error
+    originals = (BLOG_PAGE, *ALL_BLOG_ARTICLES)
+    expected = {page.path for page in originals}
+    if not isinstance(metadata, dict) or set(metadata) != expected:
+        raise ValueError("blog_en.json must contain exactly the Polish blog index and all article paths")
+    translated = []
+    language_paths = {}
+    required = ("path", "title", "description", "name")
+    for original in originals:
+        entry = metadata[original.path]
+        if (not isinstance(entry, dict)
+                or any(not isinstance(entry.get(field), str) or not entry[field].strip()
+                       for field in required)):
+            raise ValueError(f"Invalid English blog metadata for {original.path}: required text is missing")
+        path = entry["path"]
+        if (not re.fullmatch(r"/en/blog(?:/[a-z0-9]+(?:-[a-z0-9]+)*)?", path)
+                or (original is BLOG_PAGE) != (path == "/en/blog")):
+            raise ValueError(f"Invalid English blog path for {original.path}: {path}")
+        if path in language_paths:
+            raise ValueError(f"Duplicate English blog path: {path}")
+        image = original.image
+        if image:
+            image_alt = entry.get("image_alt")
+            if not isinstance(image_alt, str) or not image_alt.strip():
+                raise ValueError(f"Missing English image_alt for {original.path}")
+            image = replace(image, alt=image_alt)
+        category = entry.get("category", original.category)
+        if category is not None and not isinstance(category, str):
+            raise ValueError(f"Invalid English category for {original.path}")
+        modified_date = entry.get("modified_date", original.modified_date or original.published_date)
+        if modified_date is not None:
+            try:
+                if not isinstance(modified_date, str) or len(modified_date) != 10:
+                    raise ValueError("Expected an ISO calendar date")
+                date.fromisoformat(modified_date)
+            except ValueError as error:
+                raise ValueError(f"Invalid English modified_date for {original.path}") from error
+            if any(modified_date < source_date for source_date in
+                   (original.published_date, original.modified_date) if source_date):
+                raise ValueError(f"English modified_date predates the original document: {original.path}")
+        elif original.published_date or original.modified_date:
+            raise ValueError(f"Missing English modified_date for {original.path}")
+        translated.append(replace(
+            original, path=path,
+            template="en/blog/index.html" if original is BLOG_PAGE else path.lstrip("/") + ".html",
+            title=entry["title"], description=entry["description"], name=entry["name"],
+            category=category, image=image, modified_date=modified_date, language="en",
+        ))
+        language_paths[original.path] = {"pl": original.path, "en": path}
+        language_paths[path] = language_paths[original.path]
+    return translated[0], tuple(translated[1:]), language_paths
+
+
+EN_BLOG_PAGE, EN_ALL_BLOG_ARTICLES, BLOG_LANGUAGE_PATHS = _english_blog_pages()
 PUBLIC_PAGES = (
     HOME_PAGE,
     PublicPage(
@@ -268,6 +340,8 @@ PUBLIC_PAGES = (
     ),
     BLOG_PAGE,
     *ALL_BLOG_ARTICLES,
+    *((EN_BLOG_PAGE,) if EN_BLOG_PAGE else ()),
+    *EN_ALL_BLOG_ARTICLES,
 )
 
 
@@ -326,13 +400,19 @@ def metadata_head(config, page=HOME_PAGE):
     """Generate the crawlable head without user/session data or inline code."""
     canonical = config.origin + page.path
     homepage = config.canonical
+    english = page.language == "en"
+    language_tag = "en" if english else "pl-PL"
+    blog_page = EN_BLOG_PAGE if english else BLOG_PAGE
+    blog_articles = EN_ALL_BLOG_ARTICLES if english else ALL_BLOG_ARTICLES
     is_news = page.article_kind == "NewsArticle"
     page_image = page.image or (None if is_news else DEFAULT_IMAGE)
+    if english and page.image is None and page_image:
+        page_image = replace(page_image, alt="Bractwo Krain gameplay: Solna Przystań and a desert region")
     image_url = config.origin + page_image.path if page_image else None
-    image_id = canonical + "#image" if page.image else homepage + "#image"
+    image_id = canonical + "#image" if page.image or english else homepage + "#image"
     attributes = [
         ("property", "og:type", "article" if page.published_date else "website"),
-        ("property", "og:locale", "pl_PL"),
+        ("property", "og:locale", "en_US" if english else "pl_PL"),
         ("property", "og:site_name", "Bractwo Krain"),
         ("property", "og:title", page.title),
         ("property", "og:description", page.description),
@@ -341,6 +421,8 @@ def metadata_head(config, page=HOME_PAGE):
         ("name", "twitter:title", page.title),
         ("name", "twitter:description", page.description),
     ]
+    if page.path in BLOG_LANGUAGE_PATHS:
+        attributes.append(("property", "og:locale:alternate", "pl_PL" if english else "en_US"))
     if page_image:
         attributes.extend([
             ("property", "og:image", image_url),
@@ -366,11 +448,13 @@ def metadata_head(config, page=HOME_PAGE):
         f'<link rel="canonical" href="{escape(canonical, quote=True)}">',
         '<link rel="icon" href="/favicon.ico" type="image/vnd.microsoft.icon" sizes="16x16 32x32 48x48 64x64 128x128 256x256">',
     ]
+    for language, path in BLOG_LANGUAGE_PATHS.get(page.path, {}).items():
+        lines.append(f'<link rel="alternate" hreflang="{language}" href="{escape(config.origin + path, quote=True)}">')
     lines.extend(f'<meta {kind}="{name}" content="{escape(value, quote=True)}">'
                  for kind, name, value in attributes)
     webpage = {
         "@type": "WebPage", "@id": canonical + "#webpage", "url": canonical,
-        "name": page.title, "description": page.description, "inLanguage": "pl-PL",
+        "name": page.title, "description": page.description, "inLanguage": language_tag,
         "isPartOf": {"@id": homepage + "#website"},
     }
     if not is_news:
@@ -383,10 +467,10 @@ def metadata_head(config, page=HOME_PAGE):
         webpage["breadcrumb"] = {"@id": canonical + "#breadcrumb"}
         if page.published_date:
             webpage["mainEntity"] = {"@id": canonical + "#article"}
-        elif page.path == BLOG_PAGE.path:
+        elif blog_page and page.path == blog_page.path:
             webpage["mainEntity"] = {"@id": canonical + "#collection"}
     structured = {"@context": "https://schema.org", "@graph": [webpage]}
-    if page_image and (page.image or page.path == "/"):
+    if page_image and (page.image or page.path == "/" or english):
         structured["@graph"].append({
             "@type": "ImageObject", "@id": image_id, "url": image_url,
             "contentUrl": image_url, "width": page_image.width, "height": page_image.height,
@@ -395,7 +479,8 @@ def metadata_head(config, page=HOME_PAGE):
     if page.path == "/":
         structured["@graph"].extend([
             {"@type": "WebSite", "@id": homepage + "#website", "url": homepage,
-             "name": "Bractwo Krain", "inLanguage": "pl-PL", "description": DESCRIPTION},
+             "name": "Bractwo Krain", "inLanguage": ["pl-PL", "en"] if EN_BLOG_PAGE else "pl-PL",
+             "description": DESCRIPTION},
             {"@type": "VideoGame", "@id": homepage + "#game", "url": homepage,
              "name": "Bractwo Krain", "description": DESCRIPTION,
              "keywords": ["polskie MMORPG", "gra w przeglądarce", "Dungeons & Dragons",
@@ -411,34 +496,34 @@ def metadata_head(config, page=HOME_PAGE):
         ]
         if page.published_date:
             breadcrumbs.append({"@type": "ListItem", "position": 2,
-                                "name": BLOG_PAGE.name, "item": config.origin + BLOG_PAGE.path})
+                                "name": blog_page.name, "item": config.origin + blog_page.path})
         breadcrumbs.append({"@type": "ListItem", "position": len(breadcrumbs) + 1,
                             "name": page.name, "item": canonical})
         structured["@graph"].append({
             "@type": "BreadcrumbList", "@id": canonical + "#breadcrumb",
             "itemListElement": breadcrumbs,
         })
-    if page.path == BLOG_PAGE.path:
+    if blog_page and page.path == blog_page.path:
         structured["@graph"].extend([
             {"@type": "CollectionPage", "@id": canonical + "#collection", "url": canonical,
-             "name": page.name, "description": page.description, "inLanguage": "pl-PL",
+             "name": page.name, "description": page.description, "inLanguage": language_tag,
              "isPartOf": {"@id": homepage + "#website"},
              "mainEntity": {"@id": canonical + "#articles"}},
             {"@type": "ItemList", "@id": canonical + "#articles",
              "itemListElement": [
                  {"@type": "ListItem", "position": position, "name": article.name,
                   "url": config.origin + article.path}
-                 for position, article in enumerate(ALL_BLOG_ARTICLES, start=1)
+                 for position, article in enumerate(blog_articles, start=1)
              ]},
         ])
     elif page.published_date:
-        author = {"@type": "Organization", "name": "Zespół Bractwa Krain", "url": homepage}
+        author = {"@type": "Organization", "name": "Bractwo Krain Team" if english else "Zespół Bractwa Krain", "url": homepage}
         article = {
             "@type": page.article_kind, "@id": canonical + "#article", "url": canonical,
-            "headline": page.name, "description": page.description, "inLanguage": "pl-PL",
+            "headline": page.name, "description": page.description, "inLanguage": language_tag,
             "datePublished": page.published_date, "author": author, "publisher": author,
             "mainEntityOfPage": {"@id": canonical + "#webpage"},
-            "isPartOf": {"@id": config.origin + BLOG_PAGE.path + "#collection"},
+            "isPartOf": {"@id": config.origin + blog_page.path + "#collection"},
         }
         if page_image:
             article["image"] = image_url
@@ -446,6 +531,12 @@ def metadata_head(config, page=HOME_PAGE):
             article["dateModified"] = page.modified_date
         if page.category:
             article["articleSection"] = page.category
+        if english and page.path in BLOG_LANGUAGE_PATHS:
+            original_url = config.origin + BLOG_LANGUAGE_PATHS[page.path]["pl"]
+            article["translationOfWork"] = {
+                "@type": page.article_kind, "@id": original_url + "#article",
+                "url": original_url, "inLanguage": "pl-PL",
+            }
         structured["@graph"].append(article)
     # A JSON script remains safe even if future editable text contains </script>.
     payload = json.dumps(structured, ensure_ascii=False, separators=(",", ":"))
@@ -461,25 +552,44 @@ def render_index(template, config):
 
 def public_header(page):
     """One public navigation bar for the landing page, blog and guides."""
-    blog_current = ' aria-current="page"' if page.path == "/blog" else ""
+    english = page.language == "en"
+    blog_path = "/en/blog" if english else "/blog"
+    blog_current = ' aria-current="page"' if page.path == blog_path else ""
+    brand_label = "Bractwo Krain — home" if english else "Bractwo Krain — strona główna"
+    navigation_label = "Main navigation" if english else "Główna nawigacja"
+    blog_label = "MMO Blog" if english else "Blog MMO"
+    count_label = "characters created" if english else "stworzonych postaci"
+    language_switch = ""
+    if EN_BLOG_PAGE:
+        paths = BLOG_LANGUAGE_PATHS.get(page.path, {"pl": BLOG_PAGE.path, "en": EN_BLOG_PAGE.path})
+        language_label = "Language" if english else "Język"
+        links = []
+        for language, label, accessible_label in (("pl", "PL", "Polski"), ("en", "EN", "English")):
+            current = ' aria-current="true"' if page.language == language else ""
+            links.append(f'<a href="{escape(paths[language], quote=True)}" lang="{language}" '
+                         f'hreflang="{language}" aria-label="{accessible_label}"{current}>{label}</a>')
+        language_switch = (f'<span class="public-header__languages" role="group" aria-label="{language_label}">'
+                           + "".join(links) + "</span>")
     return f'''<header class="public-header">
-  <a class="public-header__brand" href="/" aria-label="Bractwo Krain — strona główna"><svg viewBox="0 0 36 44" width="30" height="38" aria-hidden="true"><path d="M18 2 33 9v13c0 9-8 16-15 20C11 38 3 31 3 22V9Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M18 8v25m-7-9h14m-11 9h8m-8-18 4-7 4 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><span>BRACTWO<small>KRAIN</small></span></a>
-  <nav class="public-header__nav" aria-label="Główna nawigacja"><a href="/blog"{blog_current}>Blog MMO</a></nav>
-  <p class="public-header__count" data-character-count hidden><strong data-character-count-value></strong><span data-character-count-label>stworzonych postaci</span></p>
+  <a class="public-header__brand" href="/" aria-label="{brand_label}"><svg viewBox="0 0 36 44" width="30" height="38" aria-hidden="true"><path d="M18 2 33 9v13c0 9-8 16-15 20C11 38 3 31 3 22V9Z" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M18 8v25m-7-9h14m-11 9h8m-8-18 4-7 4 7" fill="none" stroke="currentColor" stroke-width="1.4"/></svg><span>BRACTWO<small>KRAIN</small></span></a>
+  <nav class="public-header__nav" aria-label="{navigation_label}"><a href="{blog_path}"{blog_current}>{blog_label}</a>{language_switch}</nav>
+  <p class="public-header__count" data-character-count hidden><strong data-character-count-value></strong><span data-character-count-label>{count_label}</span></p>
 </header>'''
 
 
 def render_page(template, config, page):
     """Use the same document for visitors, previews and search engine crawlers."""
     html = template.replace(HEAD_MARKER, metadata_head(config, page), 1)
-    if page.published_date and page.path.startswith("/blog/"):
-        latest_link = ('<p class="blog-latest"><a href="/blog">'
-                       'Zobacz najnowsze informacje ze świata MMORPG</a></p>\n')
+    if page.published_date and page.path.startswith(("/blog/", "/en/blog/")):
+        blog_path = "/en/blog" if page.language == "en" else "/blog"
+        latest_label = ("Read the latest MMORPG news" if page.language == "en"
+                        else "Zobacz najnowsze informacje ze świata MMORPG")
+        latest_link = f'<p class="blog-latest"><a href="{blog_path}">{latest_label}</a></p>\n'
         html = html.replace("</article>", latest_link + "</article>", 1)
     if HEADER_MARKER in html:
         html = html.replace(HEADER_MARKER, public_header(page), 1)
-        assets = ('  <link rel="stylesheet" href="/public-header.css?v=20261008-2">\n'
-                  '  <script src="/public-header.js?v=20261008" defer></script>\n')
+        assets = ('  <link rel="stylesheet" href="/public-header.css?v=20261018">\n'
+                  '  <script src="/public-header.js?v=20261018" defer></script>\n')
         html = html.replace("</head>", assets + "</head>", 1)
     return html
 
