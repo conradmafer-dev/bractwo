@@ -119,3 +119,70 @@ Changes: resized to 640×336 for responsive display; original dimensions retaine
 Caption (PL): VAMPIR — oficjalna grafika promocyjna gry. Źródło: Netmarble.
 Alt (PL): Bohaterowie VAMPIR na tle czerwonego księżyca — grafika promocyjna wampirzego MMORPG Netmarble.
 Visual inspection: landscape artwork, five fantasy characters with weapons, red moon, bats, prominent VAMPIR wordmark; official Netmarble logo top-left and rights credit at bottom. Not gameplay screenshot.
+
+
+## Four original MMO editorial illustrations — 2026-10-20
+
+Created with built-in ImageGen without external reference artwork. These original concept illustrations accompany the English and Polish articles; visible captions identify AI-generated editorial art and distinguish it from actual gameplay and official artwork. All source images were visually inspected. The full composition was retained in the proportional WebP conversions (1200×675 hero and 640×360 card). No semantic edits were made.
+
+
+### eve-fractured-skies-fleet
+
+- Hero: `web/assets/blog/eve-fractured-skies-fleet-1200.webp` (1200×675).
+- Responsive card: `web/assets/blog/eve-fractured-skies-fleet-640.webp` (640×360).
+- Original generation: 1672×941 PNG.
+
+Prompt:
+
+Use case: stylized-concept
+Asset type: original editorial hero illustration for a space MMO blog article.
+Primary request: Create a cinematic, detailed, wide landscape illustration in a 16:9 composition, designed to accompany an analysis of a space MMO expansion called Fractured Skies.
+Scene: A vast luminous deep-blue and teal nebula over the curved limb of a blue planet, with a broken ring of distant asteroid fragments and subtle starlight. Four powerful, original sleek battlecruisers emerge from the clouds above the planet.
+Subject: Exactly four visually distinct spacecraft, all fully original designs: one long tapered blade-like cruiser with split forward prongs; one broad crescent-shaped armored cruiser; one vertical-fin cruiser with an asymmetric silhouette; and one compact geometric cruiser with swept outriggers. Clearly differentiated readable silhouettes, all coherent as sophisticated space warships without resembling named ships or exact designs from any existing game.
+Composition: Cinematic panoramic establishing shot. Main ship at center left, three supporting ships at staggered depth to its right and behind, enough separation to count all four. Strong perspective and clear focal point, planet occupying the lower edge, breathing space around the fleet. Preserve the entire scene within the 16:9 frame, no cropped ship noses or fins.
+Style: High-quality original painterly science-fiction concept illustration, sophisticated art direction, richly detailed hull surfaces and atmospheric scale, epic but restrained. Not a screenshot and not official game art.
+Lighting: Cold blue/teal nebula light on metallic hulls, restrained warm amber engines and running lights, atmospheric volumetric light, crisp subject edges against cloud layers.
+Palette: Deep midnight blue, teal, cool silver and small warm thruster accents.
+Constraints: No text, letters, UI, logos, watermarks, labels, official characters, recognizable branded spacecraft, or game screenshot elements. Do not recreate EVE Online ships. No explosions, no giant weapons firing. Original editorial concept art only.
+
+
+### archeage-chronicles-adventurers
+
+- Hero: `web/assets/blog/archeage-chronicles-adventurers-1200.webp` (1200×675).
+- Responsive card: `web/assets/blog/archeage-chronicles-adventurers-640.webp` (640×360).
+- Original generation: 1672×941 PNG.
+
+Prompt:
+
+Use case: stylized-concept
+Asset type: original editorial hero illustration for a fantasy MMO blog article.
+Primary request: Create an original high-quality detailed cinematic painterly fantasy landscape in a wide 16:9 landscape composition, depicting a cooperative expedition setting out to explore a new world.
+Scene: A vast sunlit green valley with terraced wildflower meadows, a winding river, dramatic distant blue mountains and a far-off busy medieval port at the coast. At the focal point in the middle distance, an enormous weathered ancient stone gateway stands over the path, carved with abstract non-letter geometric details and partially reclaimed by ivy. The gateway is architectural ruins, not a glowing magic portal.
+Subjects: Exactly four original adult adventurers, viewed mostly from behind and in three-quarter profile in the lower foreground: a warrior with a round shield and sheathed sword; a ranger with a longbow and hood pushed back; a broad-shouldered berserker with a large axe carried safely over the shoulder; and a mage with a wooden staff and a deep-blue cloak. Distinct readable silhouettes and equipment, practical layered travel clothing, no masks, no recognizable existing characters. They look across the valley together, ready for a cooperative journey, with subtle varied body language.
+Composition: The four travelers clustered loosely on a rocky grassy overlook across the lower left and center, separated enough to count. Valley path leads the eye to the ancient gateway, then the far port. Broad scenic view with attractive depth, clear focal point and full bodies visible. Preserve all important subjects within the 16:9 frame; no cropped heads, feet, bows or axes.
+Style: Luminous sophisticated hand-painted fantasy concept art with a believable natural world, detailed foliage and stone texture, painterly edges and strong readable shapes, editorial illustration rather than photorealism. Not official game art or a gameplay screenshot.
+Lighting: Warm early morning sun from upper right, soft golden rim light on the adventurers, light atmospheric haze, bright hopeful sense of discovery.
+Palette: Rich natural greens, warm gold, pale blue mountains and a deep-blue cloak accent.
+Constraints: No text, letters, UI, logos, watermarks, labels, official characters, branded costumes, huge weapons in combat poses, or game screenshot elements. No floating interface or icons. Entirely original scene, not a recreation of any specific game location.
+
+
+### osrs-fractured-archive-raid
+
+- Hero: `web/assets/blog/osrs-fractured-archive-raid-1200.webp` (1200×675).
+- Responsive card: `web/assets/blog/osrs-fractured-archive-raid-640.webp` (640×360).
+- Original generation: 1672×941 PNG.
+
+Prompt:
+
+Use case: stylized-concept. Asset type: original editorial hero illustration for a fantasy MMO blog article about a raid in a fractured magical archive. Create a premium, richly textured painterly fantasy illustration, landscape 16:9. Deep underground, an enormous ancient magical archive built from fractured stone arches and weathered carved pillars. A sealed circular relic vault stands at the far end, glowing with restrained amber light. Luminous teal and emerald crystals grow through cracks in the stone, reflected in faint mist over the floor. Exactly four small adventurers seen mostly from behind approach together in the lower foreground, each with a distinct readable silhouette: shield-bearing warrior, hooded archer, robed mage, and agile scout. A tall mysterious guardian silhouette waits near the vault, distant enough to feel monumental and unknown. Strong central composition, layered depth, clear focal point on the sealed vault and guardian, cinematic but believable light, jewel-like green and warm gold palette, tactile stone and fabric. Original conceptual fantasy art, suitable as editorial illustration; do not reproduce any existing RuneScape or Old School RuneScape creature, boss, character design or location. No text, letters, title, labels, logos, game UI, HUD, border, watermark or screenshot styling. Preserve full composition with room around the adventurers.
+
+
+### runescape-plugin-hub-tools
+
+- Hero: `web/assets/blog/runescape-plugin-hub-tools-1200.webp` (1200×675).
+- Responsive card: `web/assets/blog/runescape-plugin-hub-tools-640.webp` (640×360).
+- Original generation: 1672×941 PNG.
+
+Prompt:
+
+Use case: stylized-concept. Asset type: original editorial hero illustration for a fantasy MMO blog article about community plugins and navigation tools. Create a premium, richly textured painterly illustration, landscape 16:9, with tactile materials and a restrained emerald green and warm gold palette. Close three-quarter overhead view of an explorer's oak workbench in an atmospheric fantasy study. At the center lies a broad hand-drawn parchment map containing rivers, forests, mountain outlines and paths, completely without writing. Exactly five clearly distinguishable interlocking brass-and-crystal tool modules form a small elegant connected mechanism across the center of the map: a luminous crystal lens, a compass wheel, a faceted green prism, a brass gear ring, and a small amber crystal beacon. They should look like handcrafted physical instruments, not technology screens. A separate beautiful compass and a rolled parchment sit near the edges. Several subtle translucent emerald map-tile markers rise magically above the map, gently illuminated, suggesting community-made navigation and tools. Clear central focal point on the five connected modules, believable warm window light, luminous reflections, detailed wood grain, aged parchment and polished brass. Sophisticated editorial fantasy art, original conceptual illustration, no reproduction of any actual RuneScape item, character or location, no actual game screenshot. No readable text or letters, titles, labels, numbers, logos, game UI, HUD, screens, border or watermark. Compose the full map and apparatus inside the frame with breathing space.

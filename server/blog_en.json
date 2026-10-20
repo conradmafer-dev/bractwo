@@ -85,7 +85,7 @@
     "image_alt": "A compass, map and modular tools on a wooden table in an illustration for the RuneScape plugins article",
     "card_kicker": "RuneScape · Plugins",
     "card_description": "The original beta announcement: Quest Helper with 62 quests, four other plugins and the planned in-game RS Plugin Hub.",
-    "modified_date": "2026-10-18"
+    "modified_date": "2026-10-20"
   },
   "/blog/dnd-online": {
     "path": "/en/blog/dnd-online",
@@ -185,5 +185,49 @@
     "card_kicker": "Update · Black Desert Online",
     "card_description": "The October 8 NA/EU update introduced a level 75 cap, PvE bonuses from level 70 and EXP limits. See the changes and original reward schedule.",
     "modified_date": "2026-10-18"
+  },
+  "/blog/archeage-chronicles-demo-klasy-walka": {
+    "path": "/en/blog/archeage-chronicles-demo-classes-combat",
+    "title": "ArcheAge Chronicles: classes, combat, PvP and demo guide",
+    "description": "Explore ArcheAge Chronicles classes, weapon traits, PvP and Throne of Hinnon. Get the official demo dates, download link and confirmed release status.",
+    "name": "ArcheAge Chronicles: classes, combat, PvP and demo guide",
+    "category": "ArcheAge Chronicles · Classes and combat",
+    "image_alt": "Four fantasy adventurers overlooking a sunlit valley and an ancient stone gateway",
+    "card_kicker": "ArcheAge Chronicles · Classes and combat",
+    "card_description": "Four classes, weapon traits, first PvP and Throne of Hinnon: what to test in the demo and what is confirmed about the release.",
+    "modified_date": "2026-10-20"
+  },
+  "/blog/eve-online-fractured-skies-dodatek": {
+    "path": "/en/blog/eve-online-fractured-skies-expansion",
+    "title": "EVE Online Fractured Skies: release date, ships and Conquests",
+    "description": "EVE Online: Fractured Skies explained: 10 November 2026 release, navy battlecruisers, Synchronizer rigs, HUD preview and the 2027 Conquests roadmap.",
+    "name": "EVE Online: Fractured Skies — release date, navy ships and the road to Conquests",
+    "category": "EVE Online",
+    "image_alt": "Four original battlecruisers emerging from a blue nebula above a planet — editorial illustration for EVE Online: Fractured Skies",
+    "card_kicker": "EVE Online · Fractured Skies",
+    "card_description": "Navy ships, rigs and the HUD arrive first. Understand the roadmap to 2027 Conquests and plan your next steps as a new or returning pilot.",
+    "modified_date": "2026-10-20"
+  },
+  "/blog/osrs-fractured-archive-raid-poradnik": {
+    "path": "/en/blog/osrs-fractured-archive-raid-guide",
+    "title": "OSRS Fractured Archive Guide: Requirements & Rewards | MMO Blog",
+    "description": "Prepare for OSRS The Fractured Archive: quest requirements, team scaling, boss choices, death rules, Practice Mode and the key raid rewards explained.",
+    "name": "OSRS The Fractured Archive guide: requirements, teams and rewards",
+    "category": "Old School RuneScape · Raids",
+    "image_alt": "Four adventurers approach a glowing relic vault in a crystal-lit underground archive — fantasy illustration.",
+    "card_kicker": "Old School RuneScape · New raid",
+    "card_description": "Quest requirements, team sizes, route choices and rewards: what to check before your first trip into The Fractured Archive.",
+    "modified_date": "2026-10-20"
+  },
+  "/blog/runescape-pluginy-hub-quest-helper": {
+    "path": "/en/blog/runescape-plugins-hub-quest-helper",
+    "title": "RuneScape Plugin Hub: install plugins and use Quest Helper",
+    "description": "How to install RuneScape plugins through the official Plugin Hub, start Quest Helper with 69 quests and understand RS3 plugin limits.",
+    "name": "RuneScape Plugin Hub: how to install plugins and use Quest Helper",
+    "category": "RuneScape",
+    "image_alt": "Five brass and crystal tools connect across a fantasy map with glowing green navigation markers",
+    "card_kicker": "RuneScape · Plugins",
+    "card_description": "Find the official RS3 Plugin Hub, start Quest Helper with 69 quests and choose interface tools while understanding their limits.",
+    "modified_date": "2026-10-20"
   }
 }

@@ -122,6 +122,42 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/archeage-chronicles-demo-klasy-walka", "blog/archeage-chronicles-demo-klasy-walka.html",
+        "ArcheAge Chronicles: klasy, walka, PvP i demo | Bractwo Krain",
+        "Warrior, Ranger, Berserker i Mage, PvP oraz Throne of Hinnon. Sprawdź demo ArcheAge Chronicles, system rozwoju i potwierdzony status premiery.",
+        "ArcheAge Chronicles: klasy, walka, PvP i poradnik do dema",
+        published_date="2026-10-20", category="ArcheAge Chronicles · Klasy i walka", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/archeage-chronicles-adventurers-1200.webp",
+                        "Czworo poszukiwaczy przygód spogląda na słoneczną dolinę i starożytną kamienną bramę", 1200, 675),
+    ),
+    PublicPage(
+        "/blog/eve-online-fractured-skies-dodatek", "blog/eve-online-fractured-skies-dodatek.html",
+        "EVE Online Fractured Skies: premiera, okręty i Conquests",
+        "Co zmienia EVE Online: Fractured Skies? Premiera 10 listopada 2026, navy battlecruisers, Synchronizer rigs, nowy HUD i plan Conquests na 2027 rok.",
+        "EVE Online: Fractured Skies — premiera, nowe okręty i droga do Conquests",
+        published_date="2026-10-20", category="EVE Online", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/eve-fractured-skies-fleet-1200.webp",
+                        "Cztery autorskie krążowniki bojowe wyłaniające się z błękitnej mgławicy nad planetą — ilustracja redakcyjna do EVE Online: Fractured Skies", 1200, 675),
+    ),
+    PublicPage(
+        "/blog/osrs-fractured-archive-raid-poradnik", "blog/osrs-fractured-archive-raid-poradnik.html",
+        "OSRS The Fractured Archive — wymagania i nagrody | Blog MMO",
+        "Jak przygotować się do The Fractured Archive w OSRS? Wymagany quest, skalowanie drużyny, wybór bossów, śmierć, Practice Mode i najważniejsze nagrody.",
+        "OSRS The Fractured Archive: wymagania, drużyna i nagrody z raidu",
+        published_date="2026-10-20", category="Old School RuneScape · Raidy", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/osrs-fractured-archive-raid-1200.webp",
+                        "Czworo poszukiwaczy przygód zbliża się do świetlistego skarbca w podziemnym archiwum — ilustracja fantasy.", 1200, 675),
+    ),
+    PublicPage(
+        "/blog/runescape-pluginy-hub-quest-helper", "blog/runescape-pluginy-hub-quest-helper.html",
+        "Pluginy RuneScape: Plugin Hub i Quest Helper — poradnik",
+        "Jak włączyć pluginy RuneScape? Instalacja przez Plugin Hub, Quest Helper z 69 zadaniami, Tilemarkers i ograniczenia oficjalnych dodatków RS3.",
+        "Pluginy RuneScape: jak włączyć Plugin Hub i Quest Helper",
+        published_date="2026-10-20", category="RuneScape", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/runescape-plugin-hub-tools-1200.webp",
+                        "Pięć mosiężnych i kryształowych narzędzi połączonych nad mapą fantasy ze świetlistymi znacznikami nawigacji", 1200, 675),
+    ),
+    PublicPage(
         "/blog/vampir-premiera-polska-pobieranie-wymagania", "blog/vampir-premiera-polska-pobieranie-wymagania.html",
         "VAMPIR: premiera w Polsce, pobieranie i wymagania PC",
         "VAMPIR ma ruszyć 28 października o 03:00 w Polsce. Sprawdź wcześniejsze pobieranie, "
@@ -220,7 +256,7 @@ NEWS_ARTICLES = (
         "Beta pluginów RuneScape rusza 6 października 2026. Quest Helper obejmie "
         "62 zadania. Poznaj potwierdzone informacje i ograniczenia testów.",
         "RuneScape: beta pluginów 6 października. Quest Helper z 62 zadaniami",
-        published_date="2026-10-04", modified_date="2026-10-12", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+        published_date="2026-10-04", modified_date="2026-10-20", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
         image=PageImage("/assets/blog/runescape-pluginy-narzedzia-ilustracja-1200.webp",
                         "Kompas, mapa i modułowe narzędzia na drewnianym stole — ilustracja do artykułu o pluginach RuneScape.", 1200, 675),
     ),
