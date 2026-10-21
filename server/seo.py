@@ -122,6 +122,15 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/runescape-3-czy-osrs-od-czego-zaczac", "blog/runescape-3-czy-osrs-od-czego-zaczac.html",
+        "RuneScape 3 czy OSRS? Różnice i poradnik na start",
+        "RuneScape 3 czy Old School RuneScape? Porównaj walkę, rozwój, darmową grę, abonament i wersje mobilne. Wybierz MMO i zaplanuj pierwsze kroki.",
+        "RuneScape 3 czy Old School RuneScape? Różnice i od czego zacząć",
+        published_date="2026-10-22", category="RuneScape · Porównanie", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/runescape-rs3-osrs-crossroads-1200.webp",
+                        "Podróżnik na rozstaju dróg prowadzących do średniowiecznego miasta i magicznej krainy", 1200, 675),
+    ),
+    PublicPage(
         "/blog/archeage-chronicles-demo-klasy-walka", "blog/archeage-chronicles-demo-klasy-walka.html",
         "ArcheAge Chronicles: klasy, walka, PvP i demo | Bractwo Krain",
         "Warrior, Ranger, Berserker i Mage, PvP oraz Throne of Hinnon. Sprawdź demo ArcheAge Chronicles, system rozwoju i potwierdzony status premiery.",

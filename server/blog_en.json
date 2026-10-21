@@ -1,4 +1,15 @@
 {
+  "/blog/runescape-3-czy-osrs-od-czego-zaczac": {
+    "path": "/en/blog/runescape-3-vs-osrs-which-to-play",
+    "title": "RuneScape 3 vs OSRS: Which Should You Play?",
+    "description": "RuneScape 3 or Old School RuneScape? Compare combat, progression, free play, membership and mobile support, then choose a version and plan your first steps.",
+    "name": "RuneScape 3 vs Old School RuneScape: which should you play?",
+    "category": "RuneScape · Comparison",
+    "image_alt": "An adventurer at a crossroads leading to a medieval town and a magical realm",
+    "card_kicker": "RuneScape · Compare and get started",
+    "card_description": "Combat, progression, membership and playing on desktop or mobile. Compare both versions and choose the first goal for your adventure.",
+    "modified_date": "2026-10-22"
+  },
   "/blog": {
     "path": "/en/blog",
     "title": "MMO Blog — Latest MMORPG News, Releases and D&D Guides",

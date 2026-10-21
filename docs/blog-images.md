@@ -1,5 +1,27 @@
 # Blog image assets
 
+## RuneScape 3 versus OSRS — 2026-10-22
+
+Original AI-generated editorial artwork created with the built-in ImageGen tool for the paired Polish and English comparison guides. No external image was used as input. The illustration shows a traveller at branching paths towards a medieval settlement and a magical city, not an actual RuneScape location or interface. The article captions identify it as AI-generated editorial art.
+
+- Hero/social image: `web/assets/blog/runescape-rs3-osrs-crossroads-1200.webp` (1200×675, 250866 bytes).
+- Responsive card: `web/assets/blog/runescape-rs3-osrs-crossroads-640.webp` (640×360, 84634 bytes).
+- Delivery processing: proportional resizing and WebP encoding only; no semantic edits. Both variants were visually inspected.
+- Polish alt: `Podróżnik na rozstaju dróg prowadzących do średniowiecznego miasta i magicznej krainy`.
+- English alt: `An adventurer at a crossroads leading to a medieval town and a magical realm`.
+
+Prompt:
+
+Use case: stylized-concept.
+Asset type: original editorial hero illustration for an MMO blog comparing RuneScape 3 and Old School RuneScape.
+Primary request: a beautiful wide 16:9 fantasy illustration of a young cloaked traveller seen from behind at a clear fork in a path. One equally inviting route leads into a cozy medieval village with a stone bridge, timber houses and green hills. The other leads toward a grand magical fantasy city with elegant stone towers and subtle blue arcane light. These are two appealing ways to explore a fantasy world; neither route should appear inferior.
+Style/medium: polished hand-painted digital fantasy concept art, atmospheric depth, tangible stone and cloth textures, restrained cinematic detail, readable silhouette and broad masses that work on a small article card.
+Lighting/mood: warm morning sunshine and a sense of discovery; fresh greens, warm sandstone and small brass accents on the traveller's equipment.
+Composition/framing: landscape 16:9, a single traveller in the lower central foreground, readable branching paths, both destinations visible in the middle distance, no split-screen divider. The scene should feel coherent, calm and inviting, with no distracting close-up objects.
+Constraints: no text, no labels, no signs with writing, no logos, no watermark, no interface or HUD. This is an original editorial fantasy concept, not a screenshot or a representation of an exact in-game location.
+
+## Earlier assets
+
 Added 2026-10-05. Guide illustrations are existing Bractwo Krain screenshots, visibly identified as an earlier game version. Their original PNGs and responsive WebP variants remain at the same asset URLs.
 
 The four news illustrations are original AI-generated editorial artwork, created with the built-in ImageGen tool. They do not depict the actual games, interfaces, future systems, or confirmed locations. Each article explicitly identifies the illustration as AI-generated; alt text describes visible content and its editorial context. Official web images were researched with Firecrawl, but are not copied or modified in these assets.
