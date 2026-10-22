@@ -122,6 +122,15 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/vampir-swiat-klasy-mechaniki", "blog/vampir-swiat-klasy-mechaniki.html",
+        "VAMPIR: świat, klasy postaci i mechaniki rozgrywki",
+        "Poznaj świat Nocturne, pięć klas VAMPIR oraz walkę, rozwój postaci i rywalizację między graczami. Co potwierdzają oficjalne materiały Netmarble?",
+        "VAMPIR: świat wampirów, klasy postaci i mechaniki rozgrywki",
+        published_date="2026-10-22", category="VAMPIR · Świat i rozgrywka", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/vampir-class-choice-1200.webp",
+                        "Podróżnik w płaszczu przed gotyckimi arkadami pod czerwonym księżycem", 1200, 675),
+    ),
+    PublicPage(
         "/blog/runescape-3-czy-osrs-od-czego-zaczac", "blog/runescape-3-czy-osrs-od-czego-zaczac.html",
         "RuneScape 3 czy OSRS? Różnice i poradnik na start",
         "RuneScape 3 czy Old School RuneScape? Porównaj walkę, rozwój, darmową grę, abonament i wersje mobilne. Wybierz MMO i zaplanuj pierwsze kroki.",

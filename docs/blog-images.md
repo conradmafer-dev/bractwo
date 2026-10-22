@@ -1,5 +1,25 @@
 # Blog image assets
 
+## VAMPIR — world, classes and gameplay, 2026-10-22
+
+Original AI-generated editorial illustration created with built-in ImageGen without external reference images. A cloaked traveller faces gothic archways beneath a crimson moon. It illustrates the atmosphere of vampire fantasy, not an exact VAMPIR location, class, interface or mechanic. Both language versions visibly identify it as AI-generated editorial art, not a screenshot or official artwork.
+
+- Hero/social image: `web/assets/blog/vampir-class-choice-1200.webp` (1200×675, 176298 bytes).
+- Responsive card: `web/assets/blog/vampir-class-choice-640.webp` (640×360, 60102 bytes).
+- Original generation: 1672×941 PNG. Delivery processing: proportional resizing and WebP encoding only; no semantic edits. The 640px variant was visually inspected for thumbnail legibility.
+- Polish alt: `Podróżnik w płaszczu przed gotyckimi arkadami pod czerwonym księżycem`.
+- English alt: `A cloaked traveler before gothic archways beneath a red moon`.
+
+Prompt:
+
+Use case: stylized-concept.
+Asset type: original editorial hero illustration for a beginner and class-choice article about VAMPIR, the dark fantasy MMORPG.
+Primary request: a sophisticated, atmospheric gothic fantasy illustration in a wide 16:9 landscape composition. A single cloaked traveller stands in a moonlit stone courtyard before three branching gothic archways, each suggesting a different possible adventure. A distant crimson moon hangs above the ruined cathedral skyline. The traveller is the clear focal point, shown from behind or in a restrained three-quarter rear view, with a strong readable silhouette and a silver-lit edge to the cloak. A small old armory alcove in the courtyard quietly hints at preparation, without dominating the composition.
+Style/medium: polished painterly fantasy key art with convincing stone and cloth textures, layered atmospheric depth, elegant restrained detail and a strong composition that remains legible as a small thumbnail.
+Lighting/mood: moody moonlight and faint warm lantern light; mysterious, dignified and inviting rather than frightening. Charcoal, muted crimson and silver palette.
+Composition/framing: 16:9 wide landscape, traveller in the lower central foreground, branching archways clearly visible across the middle ground, crimson moon in the upper background; use broad shapes and balanced negative space, not a crowded montage. Keep the full traveller and the meaningful archway silhouettes comfortably inside the frame.
+Constraints: original generic vampire-fantasy editorial concept, not official artwork and not a screenshot. Do not imitate any exact game character, costume or location. No text, no lettering, no logos, no interface, no HUD, no watermark, no gore, no blood, no visible victims.
+
 ## RuneScape 3 versus OSRS — 2026-10-22
 
 Original AI-generated editorial artwork created with the built-in ImageGen tool for the paired Polish and English comparison guides. No external image was used as input. The illustration shows a traveller at branching paths towards a medieval settlement and a magical city, not an actual RuneScape location or interface. The article captions identify it as AI-generated editorial art.

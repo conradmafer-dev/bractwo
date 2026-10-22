@@ -1,4 +1,15 @@
 {
+  "/blog/vampir-swiat-klasy-mechaniki": {
+    "path": "/en/blog/vampir-world-classes-gameplay",
+    "title": "VAMPIR: World, Classes and Gameplay Explained",
+    "description": "Explore Nocturne, VAMPIR’s five character classes, combat, progression and player competition through official Netmarble materials.",
+    "name": "VAMPIR: the vampire world, character classes and gameplay",
+    "category": "VAMPIR · World and gameplay",
+    "image_alt": "A cloaked traveler before gothic archways beneath a red moon",
+    "card_kicker": "VAMPIR · World and gameplay",
+    "card_description": "A guide to Nocturne, the five classes, combat, character progression and player competition based on official information.",
+    "modified_date": "2026-10-22"
+  },
   "/blog/runescape-3-czy-osrs-od-czego-zaczac": {
     "path": "/en/blog/runescape-3-vs-osrs-which-to-play",
     "title": "RuneScape 3 vs OSRS: Which Should You Play?",
