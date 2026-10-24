@@ -34,14 +34,14 @@
   },
   "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika": {
     "path": "/en/blog/aion-2-bots-rmt-4996-accounts-october-11",
-    "title": "AION 2: 4,996 Accounts Restricted over Bots and RMT",
-    "description": "NC restricted 4,996 AION 2 accounts on 11 October. Read the official reasons, the distinction from security locks and the announced free transfer dates.",
-    "name": "AION 2: 4,996 accounts restricted as NC tackles bots and RMT",
+    "title": "AION 2 RMT Bans: Kinah Buying, Penalties and Appeals",
+    "description": "Can buying Kinah get you banned in AION 2? Read the global RMT policy: 30/90-day penalties, security locks and the 15-day deadline to appeal.",
+    "name": "AION 2 RMT bans: buying Kinah, penalties and account appeals",
     "category": "MMORPG News",
     "image_alt": "AION 2 logo in front of a tall ruined tower — official NC artwork",
-    "card_kicker": "AION 2 · Account restrictions",
-    "card_description": "NC announced restrictions on 4,996 accounts over bots and RMT. We explain security locks and the character transfer schedule.",
-    "modified_date": "2026-10-18"
+    "card_kicker": "AION 2 · RMT bans",
+    "card_description": "Can Kinah buyers be banned? Global RMT penalties, security locks and how to appeal within the policy deadline.",
+    "modified_date": "2026-10-24"
   },
   "/blog/aion-2-nowe-serwery-eu-nathara-tassin": {
     "path": "/en/blog/aion-2-new-eu-servers-nathara-tassin",
@@ -243,13 +243,13 @@
   },
   "/blog/runescape-pluginy-hub-quest-helper": {
     "path": "/en/blog/runescape-plugins-hub-quest-helper",
-    "title": "RuneScape Plugin Hub: install plugins and use Quest Helper",
-    "description": "How to install RuneScape plugins through the official Plugin Hub, start Quest Helper with 69 quests and understand RS3 plugin limits.",
-    "name": "RuneScape Plugin Hub: how to install plugins and use Quest Helper",
+    "title": "RS3 Plugin Hub: How to Enable Plugins and Release Date",
+    "description": "Find the RS3 Plugin Hub, install and enable plugins in Manage, fix a missing toolbox and check the 6 October beta and 19 October 2026 release dates.",
+    "name": "RS3 Plugin Hub: how to enable plugins and release date",
     "category": "RuneScape",
     "image_alt": "Five brass and crystal tools connect across a fantasy map with glowing green navigation markers",
-    "card_kicker": "RuneScape · Plugins",
-    "card_description": "Find the official RS3 Plugin Hub, start Quest Helper with 69 quests and choose interface tools while understanding their limits.",
-    "modified_date": "2026-10-20"
+    "card_kicker": "RS3 · Plugin guide",
+    "card_description": "Access the RS3 Plugin Hub, enable installed plugins, fix common problems and distinguish the beta from the live release.",
+    "modified_date": "2026-10-24"
   }
 }
