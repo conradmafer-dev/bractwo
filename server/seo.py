@@ -65,6 +65,7 @@ BLOG_PAGE = PublicPage(
     "Najnowsze informacje o MMORPG: Aion 2, Black Desert, RuneScape i inne gry MMO. "
     "Premiery, aktualizacje i wiadomości po polsku.",
     "Blog MMO — aktualności MMORPG i poradniki",
+    modified_date="2026-10-24",
 )
 BLOG_ARTICLES = (
     PublicPage(
