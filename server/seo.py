@@ -65,7 +65,7 @@ BLOG_PAGE = PublicPage(
     "Najnowsze informacje o MMORPG: Aion 2, Black Desert, RuneScape i inne gry MMO. "
     "Premiery, aktualizacje i wiadomości po polsku.",
     "Blog MMO — aktualności MMORPG i poradniki",
-    modified_date="2026-10-24",
+    modified_date="2026-11-04",
 )
 BLOG_ARTICLES = (
     PublicPage(
@@ -122,6 +122,24 @@ BLOG_ARTICLES = (
     ),
 )
 NEWS_ARTICLES = (
+    PublicPage(
+        "/blog/guild-wars-afterlife-premiera-cena-unformed", "blog/guild-wars-afterlife-premiera-cena-unformed.html",
+        "Guild Wars Afterlife: premiera, cena i nowy loch",
+        "Guild Wars Afterlife zadebiutuje 13 stycznia 2027. Sprawdź, jak działa Unformed, ile kosztuje DLC i co muszą wiedzieć wracający gracze.",
+        "Guild Wars Afterlife: nowy dodatek po niemal 20 latach",
+        published_date="2026-11-04", category="Guild Wars", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/guild-wars-afterlife-misty-ruins-1200.webp",
+                        "Troje podróżników spogląda na porośnięte dżunglą ruiny z turkusowym portalem ponad mgłą", 1200, 675),
+    ),
+    PublicPage(
+        "/blog/runescape-3-nowe-pluginy-listopad-2026", "blog/runescape-3-nowe-pluginy-listopad-2026.html",
+        "RuneScape 3: nowe pluginy planowane na 5 listopada",
+        "Nowe pluginy RuneScape 3: lista zatwierdzonych dodatków, plan wydania na 5 listopada, oczekujące projekty oraz instrukcja dostępu do Plugin Hub.",
+        "RuneScape 3: cztery nowe pluginy zatwierdzone. Wydanie planowane na 5 listopada",
+        published_date="2026-11-04", category="RuneScape", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/runescape-plugin-hub-tools-1200.webp",
+                        "Pięć mosiężnych i kryształowych narzędzi połączonych nad mapą fantasy ze świetlistymi znacznikami nawigacji", 1200, 675),
+    ),
     PublicPage(
         "/blog/vampir-swiat-klasy-mechaniki", "blog/vampir-swiat-klasy-mechaniki.html",
         "VAMPIR: świat, klasy postaci i mechaniki rozgrywki",

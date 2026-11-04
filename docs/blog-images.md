@@ -1,5 +1,21 @@
 # Blog image assets
 
+## Guild Wars Afterlife and RuneScape plugin news — 2026-11-04
+
+Guild Wars Afterlife uses original AI-generated editorial art showing three travelers before jungle-covered ruins and a turquoise portal above mist. It is a fantasy illustration, not an exact in-game location, screenshot or official Guild Wars artwork; both language versions say this in the caption.
+
+- Hero/social: `web/assets/blog/guild-wars-afterlife-misty-ruins-1200.webp` (1200×675).
+- Responsive card: `web/assets/blog/guild-wars-afterlife-misty-ruins-640.webp` (640×360).
+- Original: 1672×941 PNG, generated with built-in ImageGen, no reference image. Delivery processing: resizing to 16:9 at integer pixel dimensions and WebP encoding at quality 85, with no semantic edits.
+- Polish alt: `Troje podróżników spogląda na porośnięte dżunglą ruiny z turkusowym portalem ponad mgłą`.
+- English alt: `Three travelers overlook jungle-covered ruins with a turquoise portal above the mist`.
+
+Prompt:
+
+Create a polished, original editorial illustration for an MMO news article about a new adventure in an old fantasy world. Wide 16:9 landscape composition, no text, no logos, no UI. A tiny cloaked traveler and two companions stand at the lower left overlooking a lush jungle island suspended among misty clouds. Weathered Mesoamerican-inspired stone terraces and vine-covered ruins lead toward a mysterious luminous turquoise doorway in the middle distance. Muted golden evening sunlight, deep green foliage, pale spectral blue mist, painterly high-detail fantasy concept art, atmospheric depth, inviting sense of rediscovery. Keep important subjects within the central 80% so proportional web display works. This is clearly an imaginative editorial illustration, not a screenshot or official game artwork. Landscape 16:9.
+
+The November RuneScape plugin news reuses the existing `runescape-plugin-hub-tools-1200.webp` and `-640.webp` illustration, its translated alt text and explicit AI editorial caption. The provenance of that original asset is documented below.
+
 ## VAMPIR — world, classes and gameplay, 2026-10-22
 
 Original AI-generated editorial illustration created with built-in ImageGen without external reference images. A cloaked traveller faces gothic archways beneath a crimson moon. It illustrates the atmosphere of vampire fantasy, not an exact VAMPIR location, class, interface or mechanic. Both language versions visibly identify it as AI-generated editorial art, not a screenshot or official artwork.
