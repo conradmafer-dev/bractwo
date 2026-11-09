@@ -1,5 +1,24 @@
 # Blog image assets
 
+## EVE Online: Fractured Skies and WoW Forever — 2026-11-09
+
+Both stories use original editorial illustrations generated with built-in ImageGen, without reference images. The captions in both languages identify the art as AI-generated and describe the imagined settings. The 1672×941 originals were resized to the two web sizes and encoded as WebP at quality 85.
+
+| Article | Hero and social image (1200×675) | Card image (640×360) |
+| --- | --- | --- |
+| EVE Online: Fractured Skies | `web/assets/blog/eve-fractured-skies-training-hangar-1200.webp` | `web/assets/blog/eve-fractured-skies-training-hangar-640.webp` |
+| WoW Forever | `web/assets/blog/wow-forever-adventurers-camp-1200.webp` | `web/assets/blog/wow-forever-adventurers-camp-640.webp` |
+
+### Fractured Skies prompt
+
+Use case: stylized-concept. Original editorial hero illustration for a beginner guide about a space MMO expansion. Cinematic 16:9 landscape. Inside a vast orbital training hangar, a small original blue-gray scout spacecraft with a single amber running light is poised above a dark launch deck. Beyond the open hangar a huge crescent planet glows in deep turquoise and indigo; two small ships in the distance establish scale. Arrange the scout in the central portion with strong readable shapes even in a thumbnail. Sophisticated painterly hard sci-fi concept art, soft volumetric beams and restrained warm accents, quiet sense of a first flight. No lettering, logos, insignia, UI, exact game ship designs, or watermark. Original imaginative art rather than a screenshot.
+
+### WoW Forever prompt
+
+Use case: stylized-concept. Original editorial hero illustration for a guide on starting an adventure in a classic fantasy MMORPG. Wide 16:9 landscape. A small company of original adventurers with a staff, leather travel gear, and a round shield pause at a warmly glowing campfire in an open wooded meadow. The camp and its travelers form the clear focal point in the lower middle, with a rocky waytower and misty distant floating islands behind them. Cozy sunrise, mossy forest green, amber, and slate blue, a polished painterly fantasy look, legible as a thumbnail. No lettering, logos, HUD, copyrighted character likenesses, exact in-game places, or watermark. Original imaginative art rather than a screenshot.
+
+The RuneScape batch 2 update retains the existing plugin-hub illustration documented below.
+
 ## Guild Wars Afterlife and RuneScape plugin news — 2026-11-04
 
 Guild Wars Afterlife uses original AI-generated editorial art showing three travelers before jungle-covered ruins and a turquoise portal above mist. It is a fantasy illustration, not an exact in-game location, screenshot or official Guild Wars artwork; both language versions say this in the caption.

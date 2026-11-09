@@ -65,7 +65,7 @@ BLOG_PAGE = PublicPage(
     "Najnowsze informacje o MMORPG: Aion 2, Black Desert, RuneScape i inne gry MMO. "
     "Premiery, aktualizacje i wiadomości po polsku.",
     "Blog MMO — aktualności MMORPG i poradniki",
-    modified_date="2026-11-04",
+    modified_date="2026-11-09",
 )
 BLOG_ARTICLES = (
     PublicPage(
@@ -123,6 +123,33 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/eve-online-fractured-skies-jak-zaczac", "blog/eve-online-fractured-skies-jak-zaczac.html",
+        "EVE Online Fractured Skies — statki AIR, HUD i Vanguard",
+        "Fractured Skies w EVE Online zaplanowano na 10 listopada. Zobacz, jak odebrać darmowy statek AIR Academy, włączyć nowy HUD i znaleźć lokacje Vanguard.",
+        "EVE Online: Fractured Skies — czy to dobry moment, by zacząć?",
+        published_date="2026-11-09", category="EVE Online", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/eve-fractured-skies-training-hangar-1200.webp",
+                        "Niebieskoszary statek nad pokładem orbitalnego hangaru z widokiem na turkusową planetę", 1200, 675),
+    ),
+    PublicPage(
+        "/blog/wow-forever-jak-zaczac-tryby", "blog/wow-forever-jak-zaczac-tryby.html",
+        "WoW Forever — poradnik na start i wybór trybu",
+        "Jak zacząć w WoW Forever? Sprawdź dostęp w abonamencie, różnicę między ustawieniami Classic i Enhanced oraz tryby Normal, PvP, Roleplay i Roleplay PvP.",
+        "WoW Forever — jak zacząć i który tryb wybrać?",
+        published_date="2026-11-09", category="World of Warcraft", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/wow-forever-adventurers-camp-1200.webp",
+                        "Czworo podróżników przy ognisku z widokiem na kamienną wieżę i unoszące się wyspy", 1200, 675),
+    ),
+    PublicPage(
+        "/blog/runescape-3-nowe-pluginy-listopad-2026", "blog/runescape-3-nowe-pluginy-listopad-2026.html",
+        "RuneScape 3 — 13 nowych pluginów i jak je włączyć",
+        "Druga partia pluginów RuneScape 3 jest dostępna. Sprawdź wszystkie 13 dodatków, od Ground Items po Farming Timer, i dowiedz się, jak je włączyć.",
+        "RuneScape 3 — 13 nowych pluginów. Które warto włączyć?",
+        published_date="2026-11-04", modified_date="2026-11-09", category="RuneScape", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/runescape-plugin-hub-tools-1200.webp",
+                        "Pięć mosiężnych i kryształowych narzędzi połączonych nad mapą fantasy ze świetlistymi znacznikami nawigacji", 1200, 675),
+    ),
+    PublicPage(
         "/blog/guild-wars-afterlife-premiera-cena-unformed", "blog/guild-wars-afterlife-premiera-cena-unformed.html",
         "Guild Wars Afterlife: premiera, cena i nowy loch",
         "Guild Wars Afterlife zadebiutuje 13 stycznia 2027. Sprawdź, jak działa Unformed, ile kosztuje DLC i co muszą wiedzieć wracający gracze.",
@@ -130,15 +157,6 @@ NEWS_ARTICLES = (
         published_date="2026-11-04", category="Guild Wars", article_kind="NewsArticle",
         image=PageImage("/assets/blog/guild-wars-afterlife-misty-ruins-1200.webp",
                         "Troje podróżników spogląda na porośnięte dżunglą ruiny z turkusowym portalem ponad mgłą", 1200, 675),
-    ),
-    PublicPage(
-        "/blog/runescape-3-nowe-pluginy-listopad-2026", "blog/runescape-3-nowe-pluginy-listopad-2026.html",
-        "RuneScape 3: nowe pluginy planowane na 5 listopada",
-        "Nowe pluginy RuneScape 3: lista zatwierdzonych dodatków, plan wydania na 5 listopada, oczekujące projekty oraz instrukcja dostępu do Plugin Hub.",
-        "RuneScape 3: cztery nowe pluginy zatwierdzone. Wydanie planowane na 5 listopada",
-        published_date="2026-11-04", category="RuneScape", article_kind="NewsArticle",
-        image=PageImage("/assets/blog/runescape-plugin-hub-tools-1200.webp",
-                        "Pięć mosiężnych i kryształowych narzędzi połączonych nad mapą fantasy ze świetlistymi znacznikami nawigacji", 1200, 675),
     ),
     PublicPage(
         "/blog/vampir-swiat-klasy-mechaniki", "blog/vampir-swiat-klasy-mechaniki.html",

@@ -1,4 +1,37 @@
 {
+  "/blog/eve-online-fractured-skies-jak-zaczac": {
+    "path": "/en/blog/eve-online-fractured-skies-beginners-guide",
+    "title": "EVE Online Fractured Skies — AIR Ships, HUD and Vanguard",
+    "description": "EVE Online's Fractured Skies expansion is set for 10 November. Learn how to claim a free AIR Academy ship, enable the new HUD and find Vanguard sites.",
+    "name": "EVE Online: Fractured Skies — is now a good time to start?",
+    "category": "EVE Online",
+    "image_alt": "A blue-gray spacecraft above an orbital hangar deck overlooking a turquoise planet",
+    "card_kicker": "EVE Online · Expansion and beginner guide",
+    "card_description": "What changes on 10 November? Free training ships, a preview of the new HUD and Vanguard missions that open sites in EVE Online.",
+    "modified_date": "2026-11-09"
+  },
+  "/blog/wow-forever-jak-zaczac-tryby": {
+    "path": "/en/blog/wow-forever-how-to-start-rulesets",
+    "title": "WoW Forever Beginner Guide — Which Ruleset to Choose",
+    "description": "Learn how to start WoW Forever with a subscription, choose Classic or Enhanced settings and pick Normal, PvP, Roleplay or Roleplay PvP.",
+    "name": "WoW Forever — how to start and which ruleset to choose",
+    "category": "World of Warcraft",
+    "image_alt": "Four travelers beside a campfire overlooking a stone tower and floating islands",
+    "card_kicker": "World of Warcraft · Beginner guide",
+    "card_description": "Do you need a Skyborne pack? Which ruleset should you choose? Find out what to agree with friends before creating your characters.",
+    "modified_date": "2026-11-09"
+  },
+  "/blog/runescape-3-nowe-pluginy-listopad-2026": {
+    "path": "/en/blog/runescape-3-new-plugins-november-2026",
+    "title": "RuneScape 3 — 13 New Plugins and How to Enable Them",
+    "description": "RuneScape 3's second plugin batch is live. Explore all 13 additions, from Ground Items to Farming Timer, and learn how to find and enable them.",
+    "name": "RuneScape 3 — 13 new plugins and which ones to enable",
+    "category": "RuneScape",
+    "image_alt": "Five brass and crystal tools connect across a fantasy map with glowing green navigation markers",
+    "card_kicker": "RuneScape · Plugin batch 2",
+    "card_description": "Ground Items, Drop Log, Farming Timer and ten more. See the full batch and learn how to find and enable the new RS3 plugins.",
+    "modified_date": "2026-11-09"
+  },
   "/blog/guild-wars-afterlife-premiera-cena-unformed": {
     "path": "/en/blog/guild-wars-afterlife-release-date-price-unformed",
     "title": "Guild Wars Afterlife: Release Date, Price and Dungeon",
@@ -8,17 +41,6 @@
     "image_alt": "Three travelers overlook jungle-covered ruins with a turquoise portal above the mist",
     "card_kicker": "Guild Wars · New DLC",
     "card_description": "Guild Wars Afterlife launches on 13 January 2027. Learn about Unformed, DLC pricing, Reforged requirements and what returning players should check.",
-    "modified_date": "2026-11-04"
-  },
-  "/blog/runescape-3-nowe-pluginy-listopad-2026": {
-    "path": "/en/blog/runescape-3-new-plugins-november-2026",
-    "title": "RuneScape 3: New Plugins Target 5 November Release",
-    "description": "Explore the next RuneScape 3 plugin batch: approved additions, the 5 November release target, pending projects and how to access the Plugin Hub.",
-    "name": "RuneScape 3: four new plugins approved, with release targeted for 5 November",
-    "category": "RuneScape",
-    "image_alt": "Five brass and crystal tools connect across a fantasy map with glowing green navigation markers",
-    "card_kicker": "RuneScape · New plugins",
-    "card_description": "Explore the next RuneScape 3 plugin batch: approved additions, the 5 November release target, pending projects and how to access the Plugin Hub.",
     "modified_date": "2026-11-04"
   },
   "/blog/vampir-swiat-klasy-mechaniki": {
@@ -52,7 +74,7 @@
     "image_alt": "Bractwo Krain gameplay: Solna Przystań and a desert region",
     "card_kicker": "MMORPG news",
     "card_description": "MMORPG news, releases, updates and D&D guides in English.",
-    "modified_date": "2026-11-04"
+    "modified_date": "2026-11-09"
   },
   "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika": {
     "path": "/en/blog/aion-2-bots-rmt-4996-accounts-october-11",
