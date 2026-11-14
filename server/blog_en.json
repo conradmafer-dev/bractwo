@@ -23,14 +23,14 @@
   },
   "/blog/runescape-3-nowe-pluginy-listopad-2026": {
     "path": "/en/blog/runescape-3-new-plugins-november-2026",
-    "title": "RuneScape 3 — 13 New Plugins and How to Enable Them",
-    "description": "RuneScape 3's second plugin batch is live. Explore all 13 additions, from Ground Items to Farming Timer, and learn how to find and enable them.",
+    "title": "RuneScape 3: 13 New Plugins and How to Enable Them",
+    "description": "All 13 RS3 plugins released on 5 November, including Ground Items and Drop Log. Installation, permissions and the status of Clue Trainer and mobile.",
     "name": "RuneScape 3 — 13 new plugins and which ones to enable",
     "category": "RuneScape",
     "image_alt": "Five brass and crystal tools connect across a fantasy map with glowing green navigation markers",
     "card_kicker": "RuneScape · Plugin batch 2",
-    "card_description": "Ground Items, Drop Log, Farming Timer and ten more. See the full batch and learn how to find and enable the new RS3 plugins.",
-    "modified_date": "2026-11-09"
+    "card_description": "The 13 plugins released on 5 November, setup help and confirmed next-batch plans. Released tools and upcoming additions are clearly distinguished.",
+    "modified_date": "2026-11-14"
   },
   "/blog/guild-wars-afterlife-premiera-cena-unformed": {
     "path": "/en/blog/guild-wars-afterlife-release-date-price-unformed",
@@ -45,14 +45,14 @@
   },
   "/blog/vampir-swiat-klasy-mechaniki": {
     "path": "/en/blog/vampir-world-classes-gameplay",
-    "title": "VAMPIR: World, Classes and Gameplay Explained",
-    "description": "Explore Nocturne, VAMPIR’s five character classes, combat, progression and player competition through official Netmarble materials.",
-    "name": "VAMPIR: the vampire world, character classes and gameplay",
-    "category": "VAMPIR · World and gameplay",
+    "title": "VAMPIR classes: which to choose, combat and progression",
+    "description": "Compare VAMPIR’s five classes by weapon, range and combat style. Learn how to choose, use skills and understand Bloodshape with official Netmarble sources.",
+    "name": "VAMPIR classes: which to choose, combat and progression",
+    "category": "VAMPIR · Class guide",
     "image_alt": "A cloaked traveler before gothic archways beneath a red moon",
-    "card_kicker": "VAMPIR · World and gameplay",
-    "card_description": "A guide to Nocturne, the five classes, combat, character progression and player competition based on official information.",
-    "modified_date": "2026-10-22"
+    "card_kicker": "VAMPIR · Classes and progression",
+    "card_description": "Weapons, range and combat styles for all five classes, plus practical advice on choosing, skills and Bloodshape from official sources.",
+    "modified_date": "2026-11-14"
   },
   "/blog/runescape-3-czy-osrs-od-czego-zaczac": {
     "path": "/en/blog/runescape-3-vs-osrs-which-to-play",
@@ -67,57 +67,57 @@
   },
   "/blog": {
     "path": "/en/blog",
-    "title": "MMO Blog — Latest MMORPG News, Releases and D&D Guides",
-    "description": "Latest MMORPG news in English: AION 2, RuneScape, Black Desert and new online games. Release dates, updates, official sources and D&D guides.",
+    "title": "MMO Blog — MMORPG Guides and News | Bractwo Krain",
+    "description": "MMO guides and news: VAMPIR classes, RuneScape plugins, DDO events and AION 2. Practical answers, release updates and official sources.",
     "name": "MMO Blog — latest MMORPG news and guides",
     "category": "MMORPG news and D&D guides",
     "image_alt": "Bractwo Krain gameplay: Solna Przystań and a desert region",
     "card_kicker": "MMORPG news",
     "card_description": "MMORPG news, releases, updates and D&D guides in English.",
-    "modified_date": "2026-11-09"
+    "modified_date": "2026-11-14"
   },
   "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika": {
     "path": "/en/blog/aion-2-bots-rmt-4996-accounts-october-11",
     "title": "AION 2 RMT Bans: Kinah Buying, Penalties and Appeals",
-    "description": "Can buying Kinah get you banned in AION 2? Read the global RMT policy: 30/90-day penalties, security locks and the 15-day deadline to appeal.",
+    "description": "AION 2 global rules on Kinah buying, RMT penalties, security locks and the 15-day appeal deadline, plus the historical 11 October account action.",
     "name": "AION 2 RMT bans: buying Kinah, penalties and account appeals",
     "category": "MMORPG News",
     "image_alt": "AION 2 logo in front of a tall ruined tower — official NC artwork",
     "card_kicker": "AION 2 · RMT bans",
-    "card_description": "Can Kinah buyers be banned? Global RMT penalties, security locks and how to appeal within the policy deadline.",
-    "modified_date": "2026-10-24"
+    "card_description": "Verified global RMT and appeal rules, the distinction between penalties and security locks, and dated October account and transfer notices.",
+    "modified_date": "2026-11-14"
   },
   "/blog/aion-2-nowe-serwery-eu-nathara-tassin": {
     "path": "/en/blog/aion-2-new-eu-servers-nathara-tassin",
-    "title": "AION 2: New EU Servers Nathara and Tassin",
-    "description": "AION 2 announced EU servers Nathara and Tassin on 8 October. See faction assignments, maintenance times, wing buffs and EU outage compensation details.",
-    "name": "AION 2: new EU servers Nathara and Tassin, plus 9 October maintenance",
+    "title": "AION 2: Nathara and Tassin — October 2026 Archive",
+    "description": "Archived AION 2 announcements from 8–9 October 2026: Nathara and Tassin, maintenance plans, quest wings and announced EU compensation.",
+    "name": "AION 2: Nathara, Tassin and maintenance — October 2026 archive",
     "category": "MMORPG News",
     "image_alt": "AION 2 logo and “New Servers Opening!” text in front of a portal — official artwork for EU servers Nathara and Tassin",
-    "card_kicker": "AION 2 · European servers",
-    "card_description": "New EU servers for Elyos and Asmodians, the 9 October maintenance plan, quest wing buffs and compensation for the EU outage.",
+    "card_kicker": "AION 2 · EU server archive",
+    "card_description": "The 8–9 October 2026 server, maintenance and compensation announcements. The October character transfer windows have ended.",
     "modified_date": "2026-10-18"
   },
   "/blog/aion-2-rekord-steam-nagrody": {
     "path": "/en/blog/aion-2-steam-record-free-voucher-rewards",
-    "title": "AION 2 Steam Record: Free Voucher and Launch Rewards",
-    "description": "AION 2 reached 397,905 concurrent Steam players on 5 October. Read about the free Customization Voucher and the official 300,000 and 400,000 user gifts.",
-    "name": "AION 2: Steam record and a free Customization Voucher after launch",
+    "title": "AION 2: Steam Record and Rewards — Launch Archive",
+    "description": "An archived 6 October 2026 recap of AION 2’s launch-period Steam result, Customization Voucher and announced milestone gifts.",
+    "name": "AION 2: Steam record and rewards from October 2026",
     "category": "MMORPG News",
     "image_alt": "Animal-like character in white clothing beside the AION 2 logo — official Customization Voucher announcement artwork",
-    "card_kicker": "AION 2 · Launch rewards",
-    "card_description": "A 397,905-player Steam peak, a free cosmetic voucher and milestone gifts: a recap of AION 2’s launch-day announcements.",
+    "card_kicker": "AION 2 · Rewards archive",
+    "card_description": "The October 2026 launch recap: its Steam result, cosmetic voucher and announced milestone gifts. Historical figures and conditions.",
     "modified_date": "2026-10-18"
   },
   "/blog/aion-2-start-polska": {
     "path": "/en/blog/aion-2-global-launch-poland-time",
-    "title": "AION 2 Global Launch: 5 October Server Times in Poland",
-    "description": "AION 2 launched globally on PC on 5 October 2026. Revisit the Poland-time server schedule, the maintenance notice and the announced launch update changes.",
-    "name": "AION 2 global launch on 5 October: what time did servers open in Poland?",
+    "title": "AION 2: 5 October 2026 Global Launch Schedule — Archive",
+    "description": "Archived AION 2 global launch schedule for 5 October 2026: Poland-time maintenance hours and the changes announced for release.",
+    "name": "AION 2: global launch schedule for 5 October 2026",
     "category": "MMORPG News",
     "image_alt": "Winged character above the clouds facing a sky citadel — editorial illustration for the AION 2 launch article",
-    "card_kicker": "AION 2 · Global launch",
-    "card_description": "The original 5 October global launch schedule in Poland time, with maintenance details, character deletion changes and quest fixes.",
+    "card_kicker": "AION 2 · Launch archive",
+    "card_description": "The historical 5 October 2026 launch timetable and announced changes. These hours do not describe current server status.",
     "modified_date": "2026-10-18"
   },
   "/blog/runescape-2027-dragon-slayer-2-arposandra": {
@@ -144,14 +144,14 @@
   },
   "/blog/runescape-pluginy-beta": {
     "path": "/en/blog/runescape-plugins-beta",
-    "title": "RuneScape Plugin Beta: Quest Helper and the First Five Plugins",
-    "description": "RuneScape's official plugin beta was announced for 6 October, with Quest Helper supporting 62 quests. See the five plugins and planned RS Plugin Hub controls.",
-    "name": "RuneScape plugin beta on 6 October: Quest Helper supports 62 quests",
-    "category": "MMORPG news",
+    "title": "RuneScape Plugin Beta: October 2026 Announcement Archive",
+    "description": "Archived October 2026 announcement of the RS3 plugin beta. Follow the current installation and activation guide and the latest released plugin list.",
+    "name": "RuneScape plugin beta: October 2026 announcement archive",
+    "category": "RuneScape",
     "image_alt": "A compass, map and modular tools on a wooden table in an illustration for the RuneScape plugins article",
-    "card_kicker": "RuneScape · Plugins",
-    "card_description": "The original beta announcement: Quest Helper with 62 quests, four other plugins and the planned in-game RS Plugin Hub.",
-    "modified_date": "2026-10-20"
+    "card_kicker": "RuneScape · Beta archive",
+    "card_description": "The historical October 2026 beta announcement, with links to the current Plugin Hub installation guide and released additions.",
+    "modified_date": "2026-11-14"
   },
   "/blog/dnd-online": {
     "path": "/en/blog/dnd-online",
@@ -199,14 +199,14 @@
   },
   "/blog/vampir-premiera-polska-pobieranie-wymagania": {
     "path": "/en/blog/vampir-release-date-download-system-requirements",
-    "title": "VAMPIR Release Date, Download and PC Requirements | MMO Blog",
-    "description": "VAMPIR launches on 28 October in Poland. Check the CET start time, pre-download date, official PC and mobile links, requirements and the iOS date discrepancy.",
-    "name": "VAMPIR release date: Poland launch time, download and requirements",
-    "category": "New MMORPGs",
+    "title": "VAMPIR download: PC, Android and iOS requirements",
+    "description": "VAMPIR is available on PC, Android and iOS. Find official downloads, minimum requirements, language support and the confirmed global launch date.",
+    "name": "VAMPIR download: PC, Android and iOS requirements",
+    "category": "VAMPIR · Downloads and requirements",
     "image_alt": "VAMPIR characters beneath a red moon — promotional artwork for Netmarble’s vampire MMORPG",
-    "card_kicker": "Release · VAMPIR",
-    "card_description": "Poland launch times, pre-download, official store links and PC requirements, with a note on the Polish iOS listing.",
-    "modified_date": "2026-10-18"
+    "card_kicker": "VAMPIR · Downloads",
+    "card_description": "VAMPIR is available now. Official PC, Android and iOS downloads, minimum requirements and language support after the global launch.",
+    "modified_date": "2026-11-14"
   },
   "/blog/alien-colonies-gra-podobna-do-ogame-android": {
     "path": "/en/blog/alien-colonies-new-game-like-ogame-android",
@@ -221,14 +221,14 @@
   },
   "/blog/ddo-court-of-strahd": {
     "path": "/en/blog/ddo-court-of-strahd",
-    "title": "DDO The Court of Strahd: Lanterns and Hardcore Rules | MMO Blog",
-    "description": "Read our DDO Court of Strahd preview: the announced 14 October launch, lantern progression, the Hardcore death rule and details confirmed by the developers.",
-    "name": "DDO: The Court of Strahd’s 14 October launch, lanterns and Hardcore",
-    "category": "MMORPG news",
-    "image_alt": "A lantern lights the mist on a path to a gothic castle — an illustration for DDO’s The Court of Strahd preview.",
-    "card_kicker": "Dungeons & Dragons Online",
-    "card_description": "Our 4 October preview of The Court of Strahd: lantern progression, the announced launch and the Hardcore death rule.",
-    "modified_date": "2026-10-18"
+    "title": "DDO Court of Strahd: Dates, Lanterns and Rewards",
+    "description": "The Court of Strahd is running in DDO until its planned 17 February 2027 end. Check lantern rules, Hardcore requirements, rewards and updates.",
+    "name": "DDO Court of Strahd: dates, lanterns, Hardcore and rewards",
+    "category": "MMORPG Guides",
+    "image_alt": "A lantern lights the mist on a path to a gothic castle — an illustration for DDO’s The Court of Strahd event.",
+    "card_kicker": "Dungeons & Dragons Online · Guide",
+    "card_description": "The running event: how to begin, fill lanterns and choose Hardcore, with cosmetic rewards and the October and November fixes.",
+    "modified_date": "2026-11-14"
   },
   "/blog/pantheon-crafting-2027": {
     "path": "/en/blog/pantheon-crafting-2027",
@@ -287,13 +287,13 @@
   },
   "/blog/runescape-pluginy-hub-quest-helper": {
     "path": "/en/blog/runescape-plugins-hub-quest-helper",
-    "title": "RS3 Plugin Hub: How to Enable Plugins and Release Date",
-    "description": "Find the RS3 Plugin Hub, install and enable plugins in Manage, fix a missing toolbox and check the 6 October beta and 19 October 2026 release dates.",
-    "name": "RS3 Plugin Hub: how to enable plugins and release date",
+    "title": "RS3 Plugin Hub: How to Install and Enable Plugins",
+    "description": "Find the RS3 Plugin Hub and install and enable plugins in Manage. Official screenshots, permissions, missing plugins, new releases and mobile plans.",
+    "name": "RS3 Plugin Hub: how to install and enable plugins",
     "category": "RuneScape",
     "image_alt": "Five brass and crystal tools connect across a fantasy map with glowing green navigation markers",
     "card_kicker": "RS3 · Plugin guide",
-    "card_description": "Access the RS3 Plugin Hub, enable installed plugins, fix common problems and distinguish the beta from the live release.",
-    "modified_date": "2026-10-24"
+    "card_description": "Install and enable RS3 plugins with real interface screenshots. Fix permissions or missing Browse entries and check new releases and mobile plans.",
+    "modified_date": "2026-11-14"
   }
 }

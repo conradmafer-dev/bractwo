@@ -1,5 +1,18 @@
 # Blog image assets
 
+## RuneScape Plugin Hub interface screenshots — 2026-11-14
+
+Two genuine RuneScape interface screenshots published by Jagex in its 19 October 2026 Plugin Hub release announcement are used inside the PL and EN setup guides. Both were downloaded and visually inspected on 14 November 2026. The original PNG files were encoded as lossless WebP for delivery; decoded RGBA pixels were checked byte-for-byte against the originals. There is no crop, retouching, generation or resampling. These are attributed publisher screenshots, not original or public-domain artwork.
+
+Source article: https://secure.runescape.com/m=news/runescape-plugins-officially-available-now#access
+
+| Local file | Size | What it shows | Original source |
+| --- | --- | --- | --- |
+| `web/assets/blog/runescape-plugin-hub-settings-jagex.webp` | 643×274 | Default modern Ribbon, Settings and the toolbox icon | https://cdn.runescape.com/assets/img/external/news/2026/10/api/l2.png |
+| `web/assets/blog/runescape-plugin-hub-auth-jagex.webp` | 834×631 | Plugin Hub mod.io email authentication | https://cdn.runescape.com/assets/img/external/news/2026/10/api/l1.png |
+
+Both captions identify Jagex, link to the official source and explain the screen. Polish and English alt text are localized. The authentication screenshot is not labeled as the permissions-management screen. The existing clearly labeled editorial illustration remains the guide's hero/social asset.
+
 ## EVE Online: Fractured Skies and WoW Forever — 2026-11-09
 
 Both stories use original editorial illustrations generated with built-in ImageGen, without reference images. The captions in both languages identify the art as AI-generated and describe the imagined settings. The 1672×941 originals were resized to the two web sizes and encoded as WebP at quality 85.

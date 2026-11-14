@@ -83,3 +83,17 @@
 .alien-colonies-article .gameplay-screenshot figcaption { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.6; }
 .alien-colonies-article .gameplay-screenshot a:focus-visible { outline: 3px solid var(--gold); outline-offset: 4px; }
 @media (max-width: 600px) { .alien-colonies-article .alien-screenshot-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; } }
+
+.blog .updated-guides { margin: 8px 0 12px; padding: 20px 0 10px; }
+.blog .updated-guides-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; margin-bottom: 16px; }
+.blog .updated-guides h2 { margin: 0; font-size: 27px; }
+.blog .updated-guides-heading p { margin: 0; color: var(--muted); font-size: 14px; }
+.blog .updated-guides ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; list-style: none; margin: 0; padding: 0; }
+.blog .updated-guides li { min-width: 0; }
+.blog .updated-guides a { display: block; height: 100%; padding: 16px; border: 1px solid var(--line); border-radius: 3px; text-decoration: none; overflow-wrap: break-word; }
+.blog .updated-guides strong { display: block; color: var(--gold); font-size: 16px; font-weight: 600; }
+.blog .updated-guides span { display: block; margin-top: 6px; color: var(--muted); font-size: 14px; }
+.blog .updated-guides a:hover { border-color: var(--gold); }
+.blog .updated-guides a:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; }
+@media (max-width: 850px) { .blog .updated-guides ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 380px) { .blog .updated-guides ul { grid-template-columns: minmax(0, 1fr); } }

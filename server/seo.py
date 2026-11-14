@@ -61,11 +61,10 @@ class PublicPage:
 HOME_PAGE = PublicPage("/", "index.html", TITLE, DESCRIPTION, "Bractwo Krain")
 BLOG_PAGE = PublicPage(
     "/blog", "blog/index.html",
-    "Blog MMO — najnowsze informacje ze świata MMORPG",
-    "Najnowsze informacje o MMORPG: Aion 2, Black Desert, RuneScape i inne gry MMO. "
-    "Premiery, aktualizacje i wiadomości po polsku.",
+    "Blog MMO — poradniki i aktualności MMORPG | Bractwo Krain",
+    "Poradniki i aktualności MMORPG: VAMPIR, RuneScape, AION 2 i DDO. Wybór klas, pluginy, wydarzenia oraz informacje o premierach z oficjalnych źródeł.",
     "Blog MMO — aktualności MMORPG i poradniki",
-    modified_date="2026-11-09",
+    modified_date="2026-11-14",
 )
 BLOG_ARTICLES = (
     PublicPage(
@@ -143,9 +142,9 @@ NEWS_ARTICLES = (
     PublicPage(
         "/blog/runescape-3-nowe-pluginy-listopad-2026", "blog/runescape-3-nowe-pluginy-listopad-2026.html",
         "RuneScape 3 — 13 nowych pluginów i jak je włączyć",
-        "Druga partia pluginów RuneScape 3 jest dostępna. Sprawdź wszystkie 13 dodatków, od Ground Items po Farming Timer, i dowiedz się, jak je włączyć.",
+        "Pełna lista 13 pluginów RS3 wydanych 5 listopada: Ground Items, Drop Log i kolejne. Instalacja, uprawnienia oraz aktualny status Clue Trainer i mobile.",
         "RuneScape 3 — 13 nowych pluginów. Które warto włączyć?",
-        published_date="2026-11-04", modified_date="2026-11-09", category="RuneScape", article_kind="NewsArticle",
+        published_date="2026-11-04", modified_date="2026-11-14", category="RuneScape", article_kind="NewsArticle",
         image=PageImage("/assets/blog/runescape-plugin-hub-tools-1200.webp",
                         "Pięć mosiężnych i kryształowych narzędzi połączonych nad mapą fantasy ze świetlistymi znacznikami nawigacji", 1200, 675),
     ),
@@ -160,10 +159,10 @@ NEWS_ARTICLES = (
     ),
     PublicPage(
         "/blog/vampir-swiat-klasy-mechaniki", "blog/vampir-swiat-klasy-mechaniki.html",
-        "VAMPIR: świat, klasy postaci i mechaniki rozgrywki",
-        "Poznaj świat Nocturne, pięć klas VAMPIR oraz walkę, rozwój postaci i rywalizację między graczami. Co potwierdzają oficjalne materiały Netmarble?",
-        "VAMPIR: świat wampirów, klasy postaci i mechaniki rozgrywki",
-        published_date="2026-10-22", category="VAMPIR · Świat i rozgrywka", article_kind="NewsArticle",
+        "VAMPIR: jaką klasę wybrać? Klasy, walka i rozwój",
+        "Porównaj pięć klas VAMPIR: broń, dystans i styl walki. Sprawdź wybór na start, umiejętności, Bloodshape i ekonomię według źródeł Netmarble.",
+        "VAMPIR: jaką klasę wybrać? Porównanie klas, walka i rozwój",
+        published_date="2026-10-22", modified_date="2026-11-14", category="VAMPIR · Poradnik klas", article_kind="NewsArticle",
         image=PageImage("/assets/blog/vampir-class-choice-1200.webp",
                         "Podróżnik w płaszczu przed gotyckimi arkadami pod czerwonym księżycem", 1200, 675),
     ),
@@ -205,20 +204,19 @@ NEWS_ARTICLES = (
     ),
     PublicPage(
         "/blog/runescape-pluginy-hub-quest-helper", "blog/runescape-pluginy-hub-quest-helper.html",
-        "RS3 Plugin Hub: jak włączyć pluginy i data premiery",
-        "Gdzie jest RS3 Plugin Hub i jak włączyć pluginy? Instalacja, Manage, uprawnienia, brak ikony oraz daty bety i premiery 19 października 2026.",
-        "RS3 Plugin Hub: jak włączyć pluginy i kiedy była premiera?",
-        published_date="2026-10-20", modified_date="2026-10-24", category="RuneScape", article_kind="NewsArticle",
+        "RS3 Plugin Hub: jak zainstalować i włączyć pluginy",
+        "Jak otworzyć RS3 Plugin Hub, zainstalować dodatki i włączyć je w Manage. Oficjalne zrzuty, uprawnienia, nowe pluginy oraz informacje o Androidzie i iOS.",
+        "RS3 Plugin Hub: jak zainstalować i włączyć pluginy?",
+        published_date="2026-10-20", modified_date="2026-11-14", category="RuneScape", article_kind="NewsArticle",
         image=PageImage("/assets/blog/runescape-plugin-hub-tools-1200.webp",
                         "Pięć mosiężnych i kryształowych narzędzi połączonych nad mapą fantasy ze świetlistymi znacznikami nawigacji", 1200, 675),
     ),
     PublicPage(
         "/blog/vampir-premiera-polska-pobieranie-wymagania", "blog/vampir-premiera-polska-pobieranie-wymagania.html",
-        "VAMPIR: premiera w Polsce, pobieranie i wymagania PC",
-        "VAMPIR ma ruszyć 28 października o 03:00 w Polsce. Sprawdź wcześniejsze pobieranie, "
-        "wymagania PC, linki do sklepów i różnicę w terminie iOS.",
-        "VAMPIR: kiedy premiera w Polsce? Start, pobieranie i wymagania",
-        published_date="2026-10-18", category="Nowe MMORPG · VAMPIR", article_kind="NewsArticle",
+        "VAMPIR w Polsce: pobieranie i wymagania PC oraz telefonów",
+        "VAMPIR jest dostępne na PC, Androida i iOS. Pobierz grę z oficjalnych źródeł, sprawdź wymagania, języki i potwierdzoną datę globalnego startu.",
+        "VAMPIR w Polsce: pobieranie, wymagania PC i telefonów",
+        published_date="2026-10-18", modified_date="2026-11-14", category="VAMPIR · Pobieranie i wymagania", article_kind="NewsArticle",
         image=PageImage("/assets/blog/vampir-premiera-polska-pc-android-1200.webp",
                         "Bohaterowie VAMPIR na tle czerwonego księżyca — grafika promocyjna wampirzego MMORPG Netmarble", 1200, 630),
     ),
@@ -245,9 +243,9 @@ NEWS_ARTICLES = (
     PublicPage(
         "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika", "blog/aion-2-boty-rmt-4996-kont-11-pazdziernika.html",
         "AION 2: bany za RMT, kupowanie Kinah i odwołanie",
-        "Czy kupowanie Kinah grozi banem w AION 2? Globalne zasady RMT: kary 30 i 90 dni, blokady ochronne oraz termin 15 dni na odwołanie.",
+        "Globalne zasady AION 2: kupowanie Kinah, kary za RMT, blokady bezpieczeństwa i 15 dni na odwołanie. Historyczna akcja wobec 4996 kont z 11 października.",
         "AION 2: bany za RMT, kupowanie Kinah i odwołanie od blokady",
-        published_date="2026-10-11", modified_date="2026-10-24", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
+        published_date="2026-10-11", modified_date="2026-11-14", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
         image=PageImage("/assets/blog/aion-2-komunikat-ograniczenia-kont-800.webp",
                         "Logo AION 2 na tle wysokiej zrujnowanej wieży — oficjalna grafika NC", 800, 450),
     ),
@@ -263,10 +261,9 @@ NEWS_ARTICLES = (
     ),
     PublicPage(
         "/blog/aion-2-nowe-serwery-eu-nathara-tassin", "blog/aion-2-nowe-serwery-eu-nathara-tassin.html",
-        "AION 2: nowe serwery EU i konserwacja 9 października | Bractwo Krain",
-        "Nathara dla Elyos i Tassin dla Asmodian: nowe serwery EU w AION 2. "
-        "Godziny w Polsce, konserwacja 9 października o 08:30, zmiany skrzydeł i rekompensata za awarię EU.",
-        "AION 2: nowe serwery EU Nathara i Tassin. Konserwacja 9 października",
+        "AION 2: Nathara i Tassin — archiwum października 2026",
+        "Archiwum ogłoszeń AION 2 z 8–9 października 2026: serwery Nathara i Tassin, plan konserwacji, skrzydła i zapowiedziane rekompensaty.",
+        "AION 2: Nathara, Tassin i konserwacja — archiwum z października 2026",
         published_date="2026-10-08", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
         modified_date="2026-10-11",
         image=PageImage("/assets/blog/aion-2-nowe-serwery-eu-oficjalna-800.webp",
@@ -274,10 +271,9 @@ NEWS_ARTICLES = (
     ),
     PublicPage(
         "/blog/aion-2-rekord-steam-nagrody", "blog/aion-2-rekord-steam-nagrody.html",
-        "AION 2: rekord Steam, darmowy voucher i nagrody | Bractwo Krain",
-        "AION 2 po premierze: 397 905 graczy jednocześnie na Steam, darmowy Customization Voucher "
-        "i prezenty za 400 tysięcy aktywnych użytkowników. Sprawdź źródła i menu Closet.",
-        "AION 2: rekord na Steam i darmowy Customization Voucher po premierze",
+        "AION 2: rekord Steam i nagrody — archiwum premiery",
+        "Archiwalna relacja z 6 października 2026 o premierowym wyniku AION 2 na Steam, Customization Voucher i zapowiedzianych prezentach.",
+        "AION 2: rekord Steam i nagrody z października 2026",
         published_date="2026-10-06", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
         modified_date="2026-10-11",
         image=PageImage("/assets/blog/aion-2-customization-voucher-oficjalna-800.webp",
@@ -285,10 +281,9 @@ NEWS_ARTICLES = (
     ),
     PublicPage(
         "/blog/aion-2-start-polska", "blog/aion-2-start-polska.html",
-        "AION 2: start 5 października — godzina w Polsce | Bractwo Krain",
-        "Globalny start AION 2 zaplanowano na 5 października 2026. Sprawdź godzinę w Polsce, "
-        "harmonogram przerwy technicznej i zmiany w aktualizacji premierowej.",
-        "AION 2: globalny start 5 października. O której ruszą serwery w Polsce?",
+        "AION 2: premiera 5 października 2026 — archiwum",
+        "Archiwalny harmonogram globalnej premiery AION 2 z 5 października 2026: godziny w Polsce, przerwa techniczna i zapowiedziane zmiany.",
+        "AION 2: harmonogram globalnej premiery z 5 października 2026",
         published_date="2026-10-05", category="Newsy MMORPG · AION 2", article_kind="NewsArticle",
         modified_date="2026-10-11",
         image=PageImage("/assets/blog/aion-2-start-skrzydla-ilustracja-1200.webp",
@@ -306,23 +301,21 @@ NEWS_ARTICLES = (
     ),
     PublicPage(
         "/blog/runescape-pluginy-beta", "blog/runescape-pluginy-beta.html",
-        "RuneScape: beta pluginów 6 października i Quest Helper | Bractwo Krain",
-        "Beta pluginów RuneScape rusza 6 października 2026. Quest Helper obejmie "
-        "62 zadania. Poznaj potwierdzone informacje i ograniczenia testów.",
-        "RuneScape: beta pluginów 6 października. Quest Helper z 62 zadaniami",
-        published_date="2026-10-04", modified_date="2026-10-20", category="Newsy MMORPG · RuneScape", article_kind="NewsArticle",
+        "RuneScape: beta pluginów w październiku 2026 — archiwum",
+        "Archiwalna zapowiedź bety pluginów RS3 z października 2026. Przejdź do aktualnej instrukcji instalacji, włączania i listy nowych dodatków.",
+        "RuneScape: zapowiedź bety pluginów z października 2026 — archiwum",
+        published_date="2026-10-04", modified_date="2026-11-14", category="RuneScape", article_kind="NewsArticle",
         image=PageImage("/assets/blog/runescape-pluginy-narzedzia-ilustracja-1200.webp",
                         "Kompas, mapa i modułowe narzędzia na drewnianym stole — ilustracja do artykułu o pluginach RuneScape.", 1200, 675),
     ),
     PublicPage(
         "/blog/ddo-court-of-strahd", "blog/ddo-court-of-strahd.html",
-        "DDO: The Court of Strahd 14 października i Hardcore | Bractwo Krain",
-        "14 października 2026 w Dungeons & Dragons Online startuje The Court of Strahd. "
-        "Poznaj latarnie, zasady Hardcore i potwierdzone szczegóły wydarzenia.",
-        "DDO: The Court of Strahd rusza 14 października. Latarnie i tryb Hardcore",
-        published_date="2026-10-04", category="Newsy MMORPG · Dungeons & Dragons", article_kind="NewsArticle",
+        "DDO Court of Strahd: terminy, latarnie i nagrody",
+        "The Court of Strahd trwa w DDO. Planowany koniec: 17 lutego 2027. Sprawdź zasady latarni, wymagania Hardcore, nagrody i poprawki po premierze.",
+        "DDO Court of Strahd: terminy, latarnie, Hardcore i nagrody",
+        published_date="2026-10-04", modified_date="2026-11-14", category="Poradniki MMORPG · Dungeons & Dragons Online", article_kind="NewsArticle",
         image=PageImage("/assets/blog/ddo-court-of-strahd-latarnia-ilustracja-1200.webp",
-                        "Latarnia rozświetla mgłę na drodze do gotyckiego zamku — ilustracja do zapowiedzi The Court of Strahd w DDO.", 1200, 675),
+                        "Latarnia rozświetla mgłę na drodze do gotyckiego zamku — ilustracja wydarzenia The Court of Strahd w DDO.", 1200, 675),
     ),
     PublicPage(
         "/blog/pantheon-crafting-2027", "blog/pantheon-crafting-2027.html",
