@@ -64,7 +64,7 @@ BLOG_PAGE = PublicPage(
     "Blog MMO — poradniki i aktualności MMORPG | Bractwo Krain",
     "Poradniki i aktualności MMORPG: VAMPIR, RuneScape, AION 2 i DDO. Wybór klas, pluginy, wydarzenia oraz informacje o premierach z oficjalnych źródeł.",
     "Blog MMO — aktualności MMORPG i poradniki",
-    modified_date="2026-11-14",
+    modified_date="2026-11-22",
 )
 BLOG_ARTICLES = (
     PublicPage(
@@ -121,6 +121,24 @@ BLOG_ARTICLES = (
     ),
 )
 NEWS_ARTICLES = (
+    PublicPage(
+        "/blog/aion-2-world-market-world-exchange-25-listopada", "blog/aion-2-world-market-world-exchange-25-listopada.html",
+        "AION 2 World Market: 25 listopada, podatek i limity",
+        "AION 2 Global: World Market i World Exchange od 25 listopada. Membership, podatek 20%, limity ofert i osobny komunikat o ograniczeniach 7947 kont.",
+        "AION 2: World Market i World Exchange od 25 listopada",
+        published_date="2026-11-22", category="AION 2 · World Market", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/aion-2-world-market-nc-800.webp",
+                        "Logo AION 2 na tle osady z drewnianymi budynkami i jesiennymi drzewami — grafika NC", 800, 450),
+    ),
+    PublicPage(
+        "/blog/vampir-crest-skirmish-listopad-2026", "blog/vampir-crest-skirmish-listopad-2026.html",
+        "VAMPIR: Crest od 70. poziomu i Skirmish EU 28–29 listopada",
+        "VAMPIR zapowiada Crest od 70. poziomu. Sprawdź plan na 24 listopada, godziny Skirmish EU 28–29 listopada i bonusowe pule diamentów.",
+        "VAMPIR: Crest od 70. poziomu i Skirmish EU 28–29 listopada",
+        published_date="2026-11-22", category="VAMPIR · Zapowiedź aktualizacji", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/vampir-premiera-polska-pc-android-1200.webp",
+                        "Bohaterowie VAMPIR na tle czerwonego księżyca — grafika promocyjna wampirzego MMORPG Netmarble", 1200, 630),
+    ),
     PublicPage(
         "/blog/eve-online-fractured-skies-jak-zaczac", "blog/eve-online-fractured-skies-jak-zaczac.html",
         "EVE Online Fractured Skies — statki AIR, HUD i Vanguard",

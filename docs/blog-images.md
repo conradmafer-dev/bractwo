@@ -1,5 +1,15 @@
 # Blog image assets
 
+## AION 2 World Market announcement — 2026-11-22
+
+The new Polish and English World Market articles use the official NC artwork attached to the 21 November 2026 announcement. It shows the AION 2 logo over a village with wooden buildings and autumn trees, not the trading interface. The image was downloaded and visually inspected on 22 November. The original 800×450 PNG was encoded as lossless WebP with no crop, resampling or retouching; decoded RGBA pixels match the original byte-for-byte. This is attributed publisher artwork, not original or public-domain artwork.
+
+- Local hero and index card: `web/assets/blog/aion-2-world-market-nc-800.webp` (800×450).
+- Source article: https://store.steampowered.com/news/app/3393110/view/675137971401261911
+- Original image: https://clan.fastly.steamstatic.com/images/46074831/7e0eb87b60306a96bfeeb6dcf35cdf3515744ffb.png
+
+The new VAMPIR Crest/Skirmish articles reuse the previously documented Netmarble launch artwork (`vampir-premiera-polska-pc-android-1200.webp` and its 640-pixel variant). Both captions identify it as promotional artwork rather than a screenshot of the planned November update.
+
 ## RuneScape Plugin Hub interface screenshots — 2026-11-14
 
 Two genuine RuneScape interface screenshots published by Jagex in its 19 October 2026 Plugin Hub release announcement are used inside the PL and EN setup guides. Both were downloaded and visually inspected on 14 November 2026. The original PNG files were encoded as lossless WebP for delivery; decoded RGBA pixels were checked byte-for-byte against the originals. There is no crop, retouching, generation or resampling. These are attributed publisher screenshots, not original or public-domain artwork.
