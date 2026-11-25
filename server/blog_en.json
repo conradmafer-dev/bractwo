@@ -68,13 +68,13 @@
   "/blog": {
     "path": "/en/blog",
     "title": "MMO Blog — MMORPG Guides and News | Bractwo Krain",
-    "description": "MMO guides and news: VAMPIR classes, RuneScape plugins, DDO events and AION 2. Practical answers, release updates and official sources.",
+    "description": "New MMORPG coverage: WoW Forever, Albion Online, AION 2 and VAMPIR. Official update sources, dated announcements and practical guides.",
     "name": "MMO Blog — latest MMORPG news and guides",
     "category": "MMORPG news and D&D guides",
     "image_alt": "Bractwo Krain gameplay: Solna Przystań and a desert region",
     "card_kicker": "MMORPG news",
     "card_description": "MMORPG news, releases, updates and D&D guides in English.",
-    "modified_date": "2026-11-22"
+    "modified_date": "2026-11-26"
   },
   "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika": {
     "path": "/en/blog/aion-2-bots-rmt-4996-accounts-october-11",
@@ -299,23 +299,56 @@
   "/blog/aion-2-world-market-world-exchange-25-listopada": {
     "path": "/en/blog/aion-2-world-market-world-exchange-november-25",
     "title": "AION 2 World Market: November 25, Tax and Limits",
-    "description": "AION 2 Global’s World Market and World Exchange open November 25. Membership, 20% tax, listing limits and a separate notice on 7,947 restricted accounts.",
+    "description": "Archived AION 2 World Market and World Exchange preview: 20% tax, limits and access. Status after November 25 maintenance and links to the full patch notes.",
     "name": "AION 2 World Market and World Exchange open November 25",
-    "category": "AION 2 · World Market",
+    "category": "AION 2 · Archived preview",
     "image_alt": "AION 2 logo over a village with wooden buildings and autumn trees — NC artwork",
-    "card_kicker": "AION 2 · World Market",
-    "card_description": "Trading across servers after November 25 maintenance: faction, region, Membership, 20% tax and limits. Plus the latest account restrictions notice.",
-    "modified_date": "2026-11-22"
+    "card_kicker": "AION 2 · Archived preview",
+    "card_description": "The original market preview, with an updated status after November 25 maintenance and a link to the full patch notes.",
+    "modified_date": "2026-11-26"
   },
   "/blog/vampir-crest-skirmish-listopad-2026": {
     "path": "/en/blog/vampir-crest-skirmish-november-2026",
     "title": "VAMPIR: level 70 Crest and EU Skirmish on November 28–29",
     "name": "VAMPIR: level 70 Crest and EU Skirmish on November 28–29",
-    "description": "VAMPIR previews level 70 Crest. Check the November 24 plans, EU Skirmish times for November 28–29 and server-specific bonus Diamond pools.",
-    "category": "VAMPIR · Update preview",
+    "description": "VAMPIR’s archived level 70 Crest preview, EU Skirmish times on November 28–29 and Diamond pools. Updated status and the full patch notes.",
+    "category": "VAMPIR · Archived preview",
     "image_alt": "VAMPIR characters beneath a red moon — promotional artwork for Netmarble’s vampire MMORPG",
-    "card_kicker": "VAMPIR · Crest and Skirmish",
-    "card_description": "The new Crest slot, November 24 update plans and EU Skirmish on November 28–29: CET times and bonus Diamond prize pools.",
-    "modified_date": "2026-11-22"
+    "card_kicker": "VAMPIR · Archived preview",
+    "card_description": "Archived Crest and Skirmish preview, current status and full update notes. EU battles remain scheduled for November 28–29 at 19:30 CET.",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/wow-forever-alterac-valley-zmiany-25-listopada": {
+    "path": "/en/blog/wow-forever-alterac-valley-november-25-changes",
+    "title": "WoW Forever: Alterac Valley changes on November 25",
+    "description": "WoW Forever changes Alterac Valley rewards, objective buffs and commander behavior. See what changed and what to consider before your next match.",
+    "name": "WoW Forever: Alterac Valley changes on November 25",
+    "category": "MMORPG News",
+    "image_alt": "World of Warcraft adventurers around a campfire in a forest — official WoW: Forever artwork",
+    "card_kicker": "WoW Forever · Alterac Valley",
+    "card_description": "Blizzard shifts rewards toward objectives and strengthens commanders. Here is what to consider before your next match.",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/wow-forever-balance-druid-zmiany-25-listopada": {
+    "path": "/en/blog/wow-forever-balance-druid-november-25-changes",
+    "title": "WoW: Forever Balance Druid Changes and Talent Reset",
+    "description": "WoW: Forever’s November 25 Balance Druid changes are live. Starfire talents, Dreamstate, Moonkin Form and the exact condition for a full talent reset.",
+    "name": "WoW: Forever — Balance Druid changes on November 25",
+    "category": "MMORPG News",
+    "image_alt": "World of Warcraft adventurers around a campfire in a forest — official WoW: Forever artwork",
+    "card_kicker": "WoW: Forever · Balance Druid",
+    "card_description": "Live talent changes for Starfire, Eclipse, Dreamstate and Moonkin Form. Check which Druids receive a full talent reset before your next session.",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/albion-online-dragonfire-patch-5-26-listopada": {
+    "path": "/en/blog/albion-online-dragonfire-patch-5-november-26",
+    "title": "Albion Online moves Dragonfire Patch 5 to November 26",
+    "name": "Albion Online moves Dragonfire Patch 5 to November 26",
+    "description": "Dragonfire Patch 5 arrives early: all Albion Online servers go down November 26 at 10:00 UTC / 11:00 CET. Schedule and context from the test notes.",
+    "category": "MMORPG News · Albion Online",
+    "image_alt": "A red dragon facing a mage with a staff — official Albion Online: Dragonfire artwork",
+    "card_kicker": "Albion Online · Earlier Patch 5",
+    "card_description": "New date: November 26, 10:00 UTC / 11:00 CET. Around one hour of maintenance on all servers, plus four useful changes from the test notes.",
+    "modified_date": "2026-11-26"
   }
 }

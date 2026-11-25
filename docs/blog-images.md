@@ -286,3 +286,25 @@ Use case: stylized-concept. Asset type: original editorial hero illustration for
 Prompt:
 
 Use case: stylized-concept. Asset type: original editorial hero illustration for a fantasy MMO blog article about community plugins and navigation tools. Create a premium, richly textured painterly illustration, landscape 16:9, with tactile materials and a restrained emerald green and warm gold palette. Close three-quarter overhead view of an explorer's oak workbench in an atmospheric fantasy study. At the center lies a broad hand-drawn parchment map containing rivers, forests, mountain outlines and paths, completely without writing. Exactly five clearly distinguishable interlocking brass-and-crystal tool modules form a small elegant connected mechanism across the center of the map: a luminous crystal lens, a compass wheel, a faceted green prism, a brass gear ring, and a small amber crystal beacon. They should look like handcrafted physical instruments, not technology screens. A separate beautiful compass and a rolled parchment sit near the edges. Several subtle translucent emerald map-tile markers rise magically above the map, gently illuminated, suggesting community-made navigation and tools. Clear central focal point on the five connected modules, believable warm window light, luminous reflections, detailed wood grain, aged parchment and polished brass. Sophisticated editorial fantasy art, original conceptual illustration, no reproduction of any actual RuneScape item, character or location, no actual game screenshot. No readable text or letters, titles, labels, numbers, logos, game UI, HUD, screens, border or watermark. Compose the full map and apparatus inside the frame with breathing space.
+
+
+## Official MMO news artwork — 2026-11-26
+
+### WoW: Forever promotional campfire artwork
+
+- Local asset: `web/assets/blog/wow-forever-official-camp-1920.jpg` (1920×1080, JPEG).
+- Publisher: Blizzard Entertainment.
+- Source page: https://worldofwarcraft.blizzard.com/en-us/news/24315820
+- Original asset: https://bnetcmsus-a.akamaihd.net/cms/blog_header/bx/BXPRPCQR5J551793833689036.png
+- The source URL ends in `.png` but the downloaded file is JPEG. The local extension matches the actual format.
+- Downloaded and visually inspected on 26 November 2026 (CET). Preserved the original bytes, composition and dimensions; no generated content, cropping or recompression.
+- Used by the new Polish and English Alterac Valley and Balance Druid articles. Captions identify it as general official promotional art, rather than a screenshot of either change.
+
+### Albion Online: Dragonfire promotional banner
+
+- Local asset: `web/assets/blog/albion-dragonfire-official-792.jpg` (792×248, JPEG).
+- Publisher: Sandbox Interactive / Albion Online.
+- Source page: https://albiononline.com/news
+- Original asset: https://assets.albiononline.com/uploads/media/default/media/93bbc10b055598332f86307d45cb5eda04407b5d.jpeg
+- Downloaded and visually inspected on 26 November 2026 (CET). Preserved the original bytes, composition and dimensions; no generated content, cropping or recompression.
+- Used by the Polish and English Dragonfire Patch 5 maintenance articles. Captions identify it as artwork for Dragonfire generally, rather than a Patch 5 screenshot.

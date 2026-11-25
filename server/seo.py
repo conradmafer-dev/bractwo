@@ -62,9 +62,9 @@ HOME_PAGE = PublicPage("/", "index.html", TITLE, DESCRIPTION, "Bractwo Krain")
 BLOG_PAGE = PublicPage(
     "/blog", "blog/index.html",
     "Blog MMO — poradniki i aktualności MMORPG | Bractwo Krain",
-    "Poradniki i aktualności MMORPG: VAMPIR, RuneScape, AION 2 i DDO. Wybór klas, pluginy, wydarzenia oraz informacje o premierach z oficjalnych źródeł.",
+    "Nowe wiadomości MMORPG: WoW Forever, Albion Online, AION 2 i VAMPIR. Aktualizacje z oficjalnych źródeł, daty komunikatów i praktyczne poradniki.",
     "Blog MMO — aktualności MMORPG i poradniki",
-    modified_date="2026-11-22",
+    modified_date="2026-11-26",
 )
 BLOG_ARTICLES = (
     PublicPage(
@@ -122,20 +122,47 @@ BLOG_ARTICLES = (
 )
 NEWS_ARTICLES = (
     PublicPage(
+        "/blog/wow-forever-alterac-valley-zmiany-25-listopada", "blog/wow-forever-alterac-valley-zmiany-25-listopada.html",
+        "WoW Forever: zmiany Alterac Valley z 25 listopada",
+        "Nowe nagrody Alterac Valley w WoW Forever: mniej za generała, więcej za cele mapy oraz silniejsi dowódcy. Co uwzględnić przed kolejnym meczem?",
+        "WoW Forever: Alterac Valley po zmianach z 25 listopada",
+        published_date="2026-11-26", category="Newsy MMORPG", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/wow-forever-official-camp-1920.jpg",
+                        "Bohaterowie World of Warcraft przy ognisku w lesie — oficjalna grafika WoW: Forever", 1920, 1080, "image/jpeg"),
+    ),
+    PublicPage(
+        "/blog/wow-forever-balance-druid-zmiany-25-listopada", "blog/wow-forever-balance-druid-zmiany-25-listopada.html",
+        "WoW: Forever — Balance Druid i reset talentów 25.11",
+        "Zmiany Balance Druida w WoW: Forever już działają. Nowe talenty, Starfire, Dreamstate i dokładny warunek pełnego resetu po aktualizacji 25 listopada.",
+        "WoW: Forever — Balance Druid po zmianach z 25 listopada",
+        published_date="2026-11-26", category="Newsy MMORPG", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/wow-forever-official-camp-1920.jpg",
+                        "Bohaterowie World of Warcraft przy ognisku w lesie — oficjalna grafika WoW: Forever", 1920, 1080, "image/jpeg"),
+    ),
+    PublicPage(
+        "/blog/albion-online-dragonfire-patch-5-26-listopada", "blog/albion-online-dragonfire-patch-5-26-listopada.html",
+        "Albion Online przyspiesza Dragonfire Patch 5 na 26 listopada",
+        "Dragonfire Patch 5 wcześniej: wszystkie serwery Albion Online czeka przerwa 26 listopada o 11:00 CET. Harmonogram i kontekst testowych zmian.",
+        "Albion Online przyspiesza Dragonfire Patch 5 na 26 listopada",
+        published_date="2026-11-26", category="Newsy MMORPG · Albion Online", article_kind="NewsArticle",
+        image=PageImage("/assets/blog/albion-dragonfire-official-792.jpg",
+                        "Czerwony smok naprzeciw maga z kosturem — oficjalna grafika Albion Online: Dragonfire", 792, 248, "image/jpeg"),
+    ),
+    PublicPage(
         "/blog/aion-2-world-market-world-exchange-25-listopada", "blog/aion-2-world-market-world-exchange-25-listopada.html",
         "AION 2 World Market: 25 listopada, podatek i limity",
-        "AION 2 Global: World Market i World Exchange od 25 listopada. Membership, podatek 20%, limity ofert i osobny komunikat o ograniczeniach 7947 kont.",
+        "Archiwum zapowiedzi World Market i World Exchange w AION 2: podatek 20%, limity i dostęp. Status po konserwacji 25 listopada oraz pełne patch notes.",
         "AION 2: World Market i World Exchange od 25 listopada",
-        published_date="2026-11-22", category="AION 2 · World Market", article_kind="NewsArticle",
+        published_date="2026-11-22", modified_date="2026-11-26", category="AION 2 · Archiwum zapowiedzi", article_kind="NewsArticle",
         image=PageImage("/assets/blog/aion-2-world-market-nc-800.webp",
                         "Logo AION 2 na tle osady z drewnianymi budynkami i jesiennymi drzewami — grafika NC", 800, 450),
     ),
     PublicPage(
         "/blog/vampir-crest-skirmish-listopad-2026", "blog/vampir-crest-skirmish-listopad-2026.html",
         "VAMPIR: Crest od 70. poziomu i Skirmish EU 28–29 listopada",
-        "VAMPIR zapowiada Crest od 70. poziomu. Sprawdź plan na 24 listopada, godziny Skirmish EU 28–29 listopada i bonusowe pule diamentów.",
+        "VAMPIR: archiwum zapowiedzi Crest od 70. poziomu, godziny Skirmish EU 28–29 listopada i pule diamentów. Aktualny status oraz link do pełnych notatek.",
         "VAMPIR: Crest od 70. poziomu i Skirmish EU 28–29 listopada",
-        published_date="2026-11-22", category="VAMPIR · Zapowiedź aktualizacji", article_kind="NewsArticle",
+        published_date="2026-11-22", modified_date="2026-11-26", category="VAMPIR · Archiwum zapowiedzi", article_kind="NewsArticle",
         image=PageImage("/assets/blog/vampir-premiera-polska-pc-android-1200.webp",
                         "Bohaterowie VAMPIR na tle czerwonego księżyca — grafika promocyjna wampirzego MMORPG Netmarble", 1200, 630),
     ),
