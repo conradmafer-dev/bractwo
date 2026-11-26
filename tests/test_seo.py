@@ -19,6 +19,34 @@ from server import seo
 from server.server import create_app
 
 
+LEGACY_BILINGUAL_ARTICLES = {
+    "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika",
+    "/blog/aion-2-nowe-serwery-eu-nathara-tassin",
+    "/blog/aion-2-rekord-steam-nagrody",
+    "/blog/aion-2-start-polska",
+    "/blog/aion-2-world-market-world-exchange-25-listopada",
+    "/blog/albion-online-dragonfire-patch-5-26-listopada",
+    "/blog/alien-colonies-gra-podobna-do-ogame-android",
+    "/blog/archeage-chronicles-demo-klasy-walka",
+    "/blog/atuty-rozwoj-postaci",
+    "/blog/black-desert-poziom-75-exp-8-pazdziernika",
+    "/blog/ddo-court-of-strahd",
+    "/blog/dnd-online",
+    "/blog/eve-online-fractured-skies-dodatek",
+    "/blog/eve-online-fractured-skies-jak-zaczac",
+    "/blog/guild-wars-afterlife-premiera-cena-unformed",
+    "/blog/magia-kregi-czarow",
+    "/blog/pantheon-crafting-2027",
+    "/blog/runescape-3-nowe-pluginy-listopad-2026",
+    "/blog/runescape-pluginy-beta",
+    "/blog/vampir-crest-skirmish-listopad-2026",
+    "/blog/walka-k20",
+    "/blog/wow-forever-alterac-valley-zmiany-25-listopada",
+    "/blog/wow-forever-balance-druid-zmiany-25-listopada",
+    "/blog/wow-forever-jak-zaczac-tryby",
+}
+
+
 class Document(HTMLParser):
     def __init__(self, source):
         super().__init__()
@@ -57,27 +85,36 @@ class Document(HTMLParser):
 
 
 class SEOConfigTests(unittest.TestCase):
-    def test_every_published_blog_document_has_an_english_counterpart(self):
-        """Keep translations complete when another Polish article is added."""
-        originals = (seo.BLOG_PAGE, *seo.ALL_BLOG_ARTICLES)
-        translated = (seo.EN_BLOG_PAGE, *seo.EN_ALL_BLOG_ARTICLES)
-        self.assertGreaterEqual(len(originals), 17)
-        self.assertIsNotNone(seo.EN_BLOG_PAGE)
-        self.assertEqual(len(originals), len(translated))
-        metadata = json.loads((ROOT / "server/blog_en.json").read_text(encoding="utf-8"))
-        self.assertEqual(set(metadata), {page.path for page in originals})
-        self.assertEqual(len({page.path for page in translated}), len(translated))
-        for original, english in zip(originals, translated):
-            with self.subTest(path=original.path):
-                self.assertEqual(original.language, "pl")
-                self.assertEqual(english.language, "en")
-                self.assertTrue(english.path.startswith("/en/blog"))
-                self.assertEqual(english.published_date, original.published_date)
-                self.assertEqual(english.article_kind, original.article_kind)
-                self.assertNotEqual(english.title, original.title)
-                self.assertNotEqual(english.description, original.description)
-                self.assertIn(original, seo.PUBLIC_PAGES)
-                self.assertIn(english, seo.PUBLIC_PAGES)
+    def test_new_blog_documents_have_all_four_language_versions(self):
+        originals = {page.path: page for page in (seo.BLOG_PAGE, *seo.ALL_BLOG_ARTICLES)}
+        pages = {page.path: page for page in seo.PUBLIC_PAGES}
+        self.assertEqual(set(seo.BLOG_INDEXES), {"pl", "en", "es", "pt-BR"})
+        for tag in ("en", "es", "pt-BR"):
+            filename = f"blog_{tag.lower().replace('-', '_')}.json"
+            metadata = json.loads((ROOT / "server" / filename).read_text(encoding="utf-8"))
+            allowed_missing = set() if tag == "en" else LEGACY_BILINGUAL_ARTICLES
+            self.assertLessEqual(originals.keys() - metadata.keys(), allowed_missing, filename)
+            self.assertLessEqual(metadata.keys(), originals.keys(), filename)
+            self.assertEqual(len({entry["path"] for entry in metadata.values()}), len(metadata))
+            for path, entry in metadata.items():
+                with self.subTest(path=path, language=tag):
+                    original, translated = originals[path], pages[entry["path"]]
+                    self.assertEqual(translated.language, tag)
+                    self.assertTrue(translated.path.startswith(f"/{tag.lower()}/blog"))
+                    self.assertEqual(translated.published_date, original.published_date)
+                    self.assertEqual(translated.article_kind, original.article_kind)
+                    self.assertNotEqual(translated.title, original.title)
+                    self.assertNotEqual(translated.description, original.description)
+                    self.assertEqual(seo.BLOG_LANGUAGE_PATHS[path][tag], translated.path)
+
+    def test_vampir_class_guide_titles_cover_the_target_query(self):
+        versions = seo.BLOG_LANGUAGE_PATHS["/blog/vampir-swiat-klasy-mechaniki"]
+        self.assertEqual(set(versions), {"pl", "en", "es", "pt-BR"})
+        pages = {page.path: page for page in seo.PUBLIC_PAGES}
+        for path in versions.values():
+            with self.subTest(path=path):
+                self.assertIn("best class in vampir", pages[path].title)
+                self.assertIn("best class in vampir", pages[path].name)
 
     def test_normalized_origins(self):
         for given, expected in {
@@ -186,13 +223,13 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 graph = document.schemas[0]["@graph"]
                 webpage = next(item for item in graph if item["@type"] == "WebPage")
                 self.assertEqual(webpage["url"], self.origin + page.path)
-                self.assertEqual(webpage["inLanguage"], "en" if page.language == "en" else "pl-PL")
+                self.assertEqual(webpage["inLanguage"], seo.PUBLIC_LANGUAGES[page.language].tag)
                 self.assertEqual(webpage["isPartOf"]["@id"], self.origin + "/#website")
                 if page.path != "/":
                     breadcrumbs = next(item for item in graph if item["@type"] == "BreadcrumbList")
                     expected_paths = ["/"]
                     if page.published_date:
-                        expected_paths.append("/en/blog" if page.language == "en" else "/blog")
+                        expected_paths.append(seo.BLOG_INDEXES[page.language].path)
                     expected_paths.append(page.path)
                     self.assertEqual([item["item"] for item in breadcrumbs["itemListElement"]],
                                      [self.origin + path for path in expected_paths])
@@ -202,8 +239,8 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(len(descriptions), len(seo.PUBLIC_PAGES))
 
     async def test_blog_index_collection_links_to_every_published_article(self):
-        for index, published in ((seo.BLOG_PAGE, seo.ALL_BLOG_ARTICLES),
-                                 (seo.EN_BLOG_PAGE, seo.EN_ALL_BLOG_ARTICLES)):
+        for language, index in seo.BLOG_INDEXES.items():
+            published = seo.BLOG_ARTICLES_BY_LANGUAGE[language]
             with self.subTest(path=index.path):
                 response = await self.client.get(index.path)
                 self.assertEqual(response.status, 200)
@@ -214,7 +251,7 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 articles = next(item for item in graph if item["@type"] == "ItemList")
                 self.assertEqual(webpage["mainEntity"]["@id"], collection["@id"])
                 self.assertEqual(collection["url"], self.origin + index.path)
-                self.assertEqual(collection["inLanguage"], "en" if index.language == "en" else "pl-PL")
+                self.assertEqual(collection["inLanguage"], seo.PUBLIC_LANGUAGES[language].tag)
                 self.assertEqual(document.headlines, [index.name])
                 self.assertEqual(collection["mainEntity"]["@id"], articles["@id"])
                 self.assertEqual(document.find("meta", property="og:type")[0]["content"], "website")
@@ -227,7 +264,7 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertFalse(any(item["@type"] in ("BlogPosting", "NewsArticle") for item in graph))
 
     async def test_article_schema_matches_visible_headline_author_date_and_breadcrumbs(self):
-        for page in (*seo.ALL_BLOG_ARTICLES, *seo.EN_ALL_BLOG_ARTICLES):
+        for page in (page for page in seo.PUBLIC_PAGES if page.published_date):
             with self.subTest(path=page.path):
                 response = await self.client.get(page.path)
                 self.assertEqual(response.status, 200)
@@ -238,7 +275,8 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 article = next(item for item in graph if item["@type"] == page.article_kind)
                 breadcrumbs = next(item for item in graph if item["@type"] == "BreadcrumbList")
                 self.assertEqual(article["headline"], page.name)
-                self.assertEqual(article["inLanguage"], "en" if page.language == "en" else "pl-PL")
+                language = seo.PUBLIC_LANGUAGES[page.language]
+                self.assertEqual(article["inLanguage"], language.tag)
                 self.assertEqual(document.headlines, [article["headline"]])
                 self.assertEqual(article["url"], self.origin + page.path)
                 self.assertEqual(article["mainEntityOfPage"]["@id"], webpage["@id"])
@@ -253,8 +291,7 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                     self.assertNotIn("dateModified", article)
                 self.assertTrue(document.find("time", datetime=article["datePublished"]))
                 self.assertEqual(article["author"], {"@type": "Organization",
-                                 "name": "Bractwo Krain Team" if page.language == "en" else "Zespół Bractwa Krain",
-                                 "url": self.origin + "/"})
+                                 "name": language.author, "url": self.origin + "/"})
                 self.assertEqual(article["publisher"], article["author"])
                 self.assertIn(article["author"]["name"], source)
                 if page.article_kind == "NewsArticle":
@@ -277,11 +314,14 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                                  article["datePublished"])
                 self.assertEqual([item["position"] for item in breadcrumbs["itemListElement"]], [1, 2, 3])
                 self.assertEqual([item["item"] for item in breadcrumbs["itemListElement"]],
-                                 [self.origin + "/", self.origin + ("/en/blog" if page.language == "en" else "/blog"),
+                                 [self.origin + "/", self.origin + seo.BLOG_INDEXES[page.language].path,
                                   self.origin + page.path])
+                if page.language != "pl":
+                    original_url = self.origin + seo.BLOG_LANGUAGE_PATHS[page.path]["pl"]
+                    self.assertEqual(article["translationOfWork"]["url"], original_url)
 
     async def test_article_image_matches_visible_figure_metadata_and_public_asset(self):
-        for page in (*seo.ALL_BLOG_ARTICLES, *seo.EN_ALL_BLOG_ARTICLES):
+        for page in (page for page in seo.PUBLIC_PAGES if page.published_date):
             if page.image is None:
                 continue
             with self.subTest(path=page.path):
@@ -314,74 +354,82 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertNotIn("X-Robots-Tag", asset.headers)
                 self.assertTrue(await asset.read())
 
-    async def test_blog_language_pairs_have_reciprocal_alternates_and_visible_switches(self):
-        pairs = zip((seo.BLOG_PAGE, *seo.ALL_BLOG_ARTICLES),
-                    (seo.EN_BLOG_PAGE, *seo.EN_ALL_BLOG_ARTICLES))
-        for polish, english in pairs:
-            expected = {"pl": self.origin + polish.path, "en": self.origin + english.path}
-            for page in (polish, english):
-                with self.subTest(path=page.path):
-                    # Language comes from the public URL, not the browser's
-                    # preference, so these URLs stay stable for crawlers.
-                    other_language = "pl" if page.language == "en" else "en"
-                    response = await self.client.get(page.path, headers={"Accept-Language": other_language})
-                    self.assertEqual(response.status, 200)
-                    self.assertEqual(response.headers["Content-Language"], page.language)
-                    document = Document(await response.text())
-                    alternates = document.find("link", rel="alternate")
-                    self.assertEqual(len(alternates), 2)
-                    self.assertEqual({link["hreflang"]: link["href"] for link in alternates}, expected)
-                    for language, target in (("pl", polish.path), ("en", english.path)):
-                        switches = document.find("a", href=target, hreflang=language, lang=language)
-                        self.assertTrue(switches, "The language switch must retain the current article")
-                    if page.language == "en":
-                        self.assertTrue(document.find("nav", **{"aria-label": "Main navigation"}))
-                        self.assertTrue(document.find("a", **{"aria-label": "Bractwo Krain — home"}))
-                        header = seo.public_header(page)
-                        self.assertIn("MMO Blog", header)
-                        self.assertIn("characters created", header)
-                        self.assertNotIn("stworzonych postaci", header)
+    async def test_blog_languages_have_reciprocal_alternates_and_visible_switches(self):
+        for page in seo.PUBLIC_PAGES:
+            variants = seo.BLOG_LANGUAGE_PATHS.get(page.path)
+            if not variants:
+                continue
+            with self.subTest(path=page.path):
+                other_language = "pl" if page.language == "en" else "en"
+                response = await self.client.get(page.path, headers={"Accept-Language": other_language})
+                self.assertEqual(response.status, 200)
+                self.assertEqual(response.headers["Content-Language"], page.language)
+                document = Document(await response.text())
+                alternates = document.find("link", rel="alternate")
+                self.assertEqual(len(alternates), len(variants))
+                self.assertEqual({link["hreflang"]: link["href"] for link in alternates},
+                                 {tag: self.origin + target for tag, target in variants.items()})
+                self.assertEqual({link["content"] for link in document.find("meta", property="og:locale:alternate")},
+                                 {seo.PUBLIC_LANGUAGES[tag].open_graph for tag in variants if tag != page.language})
+                self.assertEqual(seo.BLOG_LANGUAGE_PATHS[variants["pl"]], variants)
+                for tag, target in variants.items():
+                    switches = document.find("a", href=target, hreflang=tag, lang=tag)
+                    self.assertTrue(switches, "The language switch must link to the equivalent article or index")
+                    self.assertEqual(switches[0].get("aria-current"), "true" if tag == page.language else None)
+                locale = seo.PUBLIC_LANGUAGES[page.language]
+                self.assertTrue(document.find("nav", **{"aria-label": locale.navigation_label}))
+                self.assertTrue(document.find("a", **{"aria-label": locale.home_label}))
+                self.assertIn(locale.blog_label, seo.public_header(page))
+                self.assertIn(locale.count_label, seo.public_header(page))
 
-    async def test_english_blog_navigation_stays_in_english_and_fragments_exist(self):
-        pages = (seo.EN_BLOG_PAGE, *seo.EN_ALL_BLOG_ARTICLES)
+    async def test_blog_navigation_uses_registered_locale_paths_and_fragments(self):
+        pages = {page.path: page for page in seo.PUBLIC_PAGES if page.path in seo.BLOG_LANGUAGE_PATHS}
+        blog_prefixes = tuple(index.path + "/" for index in seo.BLOG_INDEXES.values())
         documents = {}
-        for page in pages:
-            response = await self.client.get(page.path)
+        for path in pages:
+            response = await self.client.get(path)
             self.assertEqual(response.status, 200)
-            documents[page.path] = Document(await response.text())
+            documents[path] = Document(await response.text())
         internal_hosts = {urlsplit(self.origin).netloc, urlsplit(seo.DEFAULT_ORIGIN).netloc}
-        for page in pages:
+        for page in pages.values():
             for link in documents[page.path].find("a"):
                 href = link.get("href", "")
                 target = urlsplit(urljoin(self.origin + page.path, href))
                 if target.netloc not in internal_hosts:
                     continue
                 with self.subTest(page=page.path, href=href):
-                    if target.path == "/blog" or target.path.startswith("/blog/"):
-                        self.assertEqual(link.get("hreflang"), "pl",
-                                         "Only the explicit Polish language switch may leave the English blog")
-                        self.assertEqual(target.path, seo.BLOG_LANGUAGE_PATHS[page.path]["pl"])
-                    elif target.path == "/en/blog" or target.path.startswith("/en/blog/"):
-                        self.assertIn(target.path, documents, "Blog links must use registered English canonical URLs")
-                        if target.fragment:
-                            target_document = documents[target.path]
-                            ids = {attrs.get("id") for _, attrs in target_document.tags}
-                            ids.update(link.get("name") for link in target_document.find("a"))
-                            self.assertIn(target.fragment, ids, "The translated destination must retain its link anchor")
+                    if target.path not in pages:
+                        self.assertFalse(target.path.startswith(blog_prefixes), "Unknown article URL")
+                        continue
+                    destination = pages[target.path]
+                    if destination.language != page.language:
+                        self.assertEqual(link.get("hreflang"), destination.language)
+                        if link.get("lang"):
+                            self.assertEqual(target.path, seo.BLOG_LANGUAGE_PATHS[page.path][destination.language])
+                        else:
+                            self.assertNotIn(page.language, seo.BLOG_LANGUAGE_PATHS[destination.path])
+                    if target.fragment:
+                        target_document = documents[target.path]
+                        ids = {attrs.get("id") for _, attrs in target_document.tags}
+                        ids.update(anchor.get("name") for anchor in target_document.find("a"))
+                        self.assertIn(target.fragment, ids, "The destination must retain its link anchor")
 
     async def test_translations_preserve_article_images_with_localized_descriptions(self):
-        for polish, english in zip((seo.BLOG_PAGE, *seo.ALL_BLOG_ARTICLES),
-                                   (seo.EN_BLOG_PAGE, *seo.EN_ALL_BLOG_ARTICLES)):
-            with self.subTest(path=english.path):
+        pages = {page.path: page for page in seo.PUBLIC_PAGES}
+        for page in seo.PUBLIC_PAGES:
+            if page.language == "pl" or (not page.published_date and page.language != "en"):
+                continue
+            polish = pages[seo.BLOG_LANGUAGE_PATHS[page.path]["pl"]]
+            with self.subTest(path=page.path):
                 polish_response = await self.client.get(polish.path)
-                english_response = await self.client.get(english.path)
-                self.assertEqual(english_response.status, 200)
+                translated_response = await self.client.get(page.path)
+                self.assertEqual(translated_response.status, 200)
                 polish_images = Document(await polish_response.text()).find("img")
-                english_images = Document(await english_response.text()).find("img")
-                self.assertEqual([image.get("src") for image in english_images],
+                translated_images = Document(await translated_response.text()).find("img")
+                self.assertEqual([image.get("src") for image in translated_images],
                                  [image.get("src") for image in polish_images])
-                for original, translated in zip(polish_images, english_images):
-                    self.assertTrue(translated.get("alt", "").strip(), "Content images need descriptive English alt text")
+                for original, translated in zip(polish_images, translated_images):
+                    self.assertTrue(translated.get("alt", "").strip(), "Content images need descriptive localized alt text")
                     self.assertNotEqual(translated["alt"], original["alt"])
                     self.assertEqual(translated.get("srcset"), original.get("srcset"))
                     sources = [translated["src"]]
@@ -390,17 +438,19 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                         if source.startswith("/"):
                             self.assertTrue((ROOT / "web" / source.lstrip("/")).is_file(), source)
 
-    async def test_english_raw_index_alias_cannot_be_indexed_as_a_duplicate(self):
-        response = await self.client.get("/en/blog/index.html", allow_redirects=False)
-        if response.status in (301, 308):
-            self.assertEqual(response.headers["Location"], "/en/blog")
-        else:
-            self.assertIn(response.status, (200, 404))
-            self.assertIn("noindex", response.headers.get("X-Robots-Tag", ""))
-            if response.status == 200:
-                document = Document(await response.text())
-                self.assertEqual(document.find("link", rel="canonical"),
-                                 [{"rel": "canonical", "href": self.origin + "/en/blog"}])
+    async def test_raw_blog_index_aliases_cannot_be_indexed_as_duplicates(self):
+        for index in seo.BLOG_INDEXES.values():
+            with self.subTest(path=index.path):
+                response = await self.client.get(index.path + "/index.html", allow_redirects=False)
+                if response.status in (301, 308):
+                    self.assertEqual(response.headers["Location"], index.path)
+                else:
+                    self.assertIn(response.status, (200, 404))
+                    self.assertIn("noindex", response.headers.get("X-Robots-Tag", ""))
+                    if response.status == 200:
+                        document = Document(await response.text())
+                        self.assertEqual(document.find("link", rel="canonical"),
+                                         [{"rel": "canonical", "href": self.origin + index.path}])
 
     async def test_sitemap_lists_only_successful_canonical_documents(self):
         response = await self.client.get("/sitemap.xml")
@@ -463,7 +513,8 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
         self.assertIn("noindex", response.headers["X-Robots-Tag"])
 
     async def test_gzip_negotiation_head_and_conditional_cache(self):
-        for path in ("/", "/en/blog", "/robots.txt", "/sitemap.xml"):
+        languages = {page.path: page.language for page in seo.PUBLIC_PAGES}
+        for path in ("/", *(index.path for index in seo.BLOG_INDEXES.values()), "/robots.txt", "/sitemap.xml"):
             with self.subTest(path=path):
                 plain = await self.client.get(path, headers={"Accept-Encoding": "identity"})
                 source = await plain.read()
@@ -483,7 +534,7 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(head.headers["ETag"], plain.headers["ETag"])
                 self.assertEqual(int(head.headers["Content-Length"]), len(source))
                 if plain.content_type == "text/html":
-                    expected_language = "en" if path.startswith("/en/") else "pl"
+                    expected_language = languages[path]
                     self.assertEqual(head.headers["Content-Language"], expected_language)
                     self.assertEqual(not_modified.headers["Content-Language"], expected_language)
         for header in ("gzip;q=0", "gzip;q=0, *;q=1", "gzip;q=invalid", "gzip;q=-1"):

@@ -1,0 +1,86 @@
+{
+  "/blog": {
+    "path": "/es/blog",
+    "name": "Blog MMO en español",
+    "title": "Blog MMO en español — noticias y guías MMORPG | Bractwo Krain",
+    "description": "Guías y noticias de MMORPG en español. Empieza con las clases y la descarga de VAMPIR, los plugins de RuneScape 3 y Old School RuneScape.",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/vampir-swiat-klasy-mechaniki": {
+    "title": "best class in vampir — qué clase elegir para PvE y PvP",
+    "description": "Carnage para empezar a distancia, Bloodstained para un PvE defensivo y Akasha para el PvP cuerpo a cuerpo. Compara las cinco clases de VAMPIR.",
+    "name": "best class in vampir — qué clase elegir para PvE y PvP",
+    "category": "VAMPIR · Guía de clases",
+    "image_alt": "Viajero con capa ante arcos góticos bajo una luna roja",
+    "card_kicker": "VAMPIR · Clases y progresión",
+    "card_description": "Descubre qué clase encaja contigo para empezar, jugar PvE en solitario o competir en PvP. Comparamos las cinco opciones.",
+    "path": "/es/blog/vampir-mejor-clase-pve-pvp",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/vampir-premiera-polska-pobieranie-wymagania": {
+    "title": "Descargar VAMPIR para PC, Android y iOS — requisitos",
+    "description": "Descarga VAMPIR desde las tiendas oficiales y comprueba los requisitos mínimos de PC, Android y iOS. Consulta también los idiomas y la fecha del lanzamiento global.",
+    "name": "Cómo descargar VAMPIR y qué requisitos pide en PC, Android y iOS",
+    "category": "VAMPIR · Descarga y requisitos",
+    "image_alt": "Personajes de VAMPIR bajo una luna roja en una imagen promocional de Netmarble",
+    "card_kicker": "VAMPIR · Descarga",
+    "card_description": "Enlaces oficiales de descarga, requisitos mínimos de PC y móviles e idiomas de la versión global de VAMPIR.",
+    "path": "/es/blog/vampir-descarga-requisitos-pc-android-ios",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/runescape-pluginy-hub-quest-helper": {
+    "title": "Plugin Hub de RuneScape 3 — cómo instalar y activar plugins",
+    "description": "Abre el Plugin Hub oficial de RuneScape 3 e instala y activa los complementos desde Manage. Guía con capturas de Jagex, Quest Helper y Clue Trainer.",
+    "name": "Plugin Hub de RS3 — cómo instalar y activar los complementos",
+    "category": "RuneScape · Interfaz y misiones",
+    "image_alt": "Cinco herramientas de latón y cristal conectadas sobre un mapa de fantasía con marcadores verdes luminosos",
+    "card_kicker": "RS3 · Guía de complementos",
+    "card_description": "Aprende a usar el Plugin Hub, autorizar permisos y encontrar Quest Helper o Clue Trainer con capturas oficiales.",
+    "path": "/es/blog/runescape-3-plugin-hub-instalar-activar",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/runescape-3-czy-osrs-od-czego-zaczac": {
+    "title": "RuneScape 3 u OSRS — qué juego elegir y cómo empezar",
+    "description": "Compara el combate, la progresión, la membresía, el juego gratuito y los clientes para móviles de RuneScape 3 y Old School RuneScape.",
+    "name": "RuneScape 3 u Old School RuneScape — ¿cuál te conviene jugar?",
+    "category": "RuneScape · Comparación y primeros pasos",
+    "image_alt": "Un aventurero en una encrucijada entre una ciudad medieval y un reino mágico",
+    "card_kicker": "RuneScape · Comparación",
+    "card_description": "Compara RS3 y OSRS en combate, progresión, membresía y juego en móviles. Elige una versión y un objetivo para tu primera sesión.",
+    "path": "/es/blog/runescape-3-vs-osrs-que-jugar",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/osrs-fractured-archive-raid-poradnik": {
+    "title": "Guía de The Fractured Archive en OSRS — requisitos y recompensas",
+    "description": "Prepara la incursión The Fractured Archive en Old School RuneScape. Consulta la misión necesaria, el tamaño del equipo, los jefes, el modo de práctica y las recompensas.",
+    "name": "Guía de The Fractured Archive en OSRS — requisitos, equipos y recompensas",
+    "category": "Old School RuneScape · Incursiones",
+    "image_alt": "Cuatro aventureros se acercan a una cámara luminosa en un archivo subterráneo entre cristales",
+    "card_kicker": "Old School RuneScape · Guía de incursión",
+    "card_description": "Conoce los requisitos, las rutas y las recompensas de The Fractured Archive y aprende a activar el modo de práctica.",
+    "path": "/es/blog/osrs-the-fractured-archive-guia-incursion",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/runescape-2027-dragon-slayer-2-arposandra": {
+    "title": "RuneScape en 2027 — Dragon Slayer II, Arposandra y Agility",
+    "description": "El plan de RuneScape para 2027 incluye Dragon Slayer II, cambios de Agility, Arposandra y una nueva incursión en Karamja. Consulta el calendario anunciado por Jagex.",
+    "name": "RuneScape en 2027 — Dragon Slayer II, Arposandra y los cambios de Agility",
+    "category": "RuneScape · Calendario de 2027",
+    "image_alt": "Un dragón dorado, una ciudad de gnomos y una expedición en la selva en el arte oficial de RuneScape para 2027",
+    "card_kicker": "RuneScape · Hoja de ruta de 2027",
+    "card_description": "Dragon Slayer II, la renovación de Agility, Arposandra y una nueva incursión en Karamja. Estos son los tres ciclos previstos por Jagex.",
+    "path": "/es/blog/runescape-2027-dragon-slayer-2-arposandra",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/runescape-4-zapowiedz": {
+    "title": "RuneScape 4 — Ashenfall, lanzamiento y posible beta",
+    "description": "Jagex presentó RS4, un nuevo MMORPG ambientado en Ashenfall. Consulta lo confirmado sobre su mundo, el lanzamiento y el registro para recibir noticias.",
+    "name": "RuneScape 4 anunciado — el nuevo MMORPG empezará en Ashenfall",
+    "category": "RuneScape · Nuevo MMORPG",
+    "image_alt": "Viajero en una terraza rocosa sobre un valle volcánico en una ilustración del anuncio de RuneScape 4",
+    "card_kicker": "RuneScape · Nuevo MMORPG",
+    "card_description": "El nuevo MMORPG de Jagex empezará en Ashenfall. Conoce el escenario confirmado y el estado del lanzamiento y las pruebas.",
+    "path": "/es/blog/runescape-4-anuncio-ashenfall-lanzamiento",
+    "modified_date": "2026-11-26"
+  }
+}

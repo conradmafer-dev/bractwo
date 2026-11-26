@@ -1,22 +1,23 @@
-# Publishing the bilingual MMO blog
+# Publishing the MMO blog in four languages
 
-The blog is available in Polish at `/blog` and in English at `/en/blog`. This workflow applies to the blog index and every article, including D&D articles in the blog. Game screens and the separate `/poradniki/` section have their own scope.
+New posts are published together in Polish (`pl`), English (`en`), Spanish (`es`) and Brazilian Portuguese (`pt-BR`). This applies to the blog, including its D&D articles. The game screens and the separate `/poradniki/` guides have their own scope.
 
-## Add or update an article
+| Language | Index | Article templates | Metadata |
+| --- | --- | --- | --- |
+| Polish | `/blog` | `web/blog/` | `PublicPage` in `server/seo.py` |
+| English | `/en/blog` | `web/en/blog/` | `server/blog_en.json` |
+| Spanish | `/es/blog` | `web/es/blog/` | `server/blog_es.json` |
+| Brazilian Portuguese | `/pt-br/blog` | `web/pt-br/blog/` | `server/blog_pt_br.json` |
 
-1. Prepare the Polish template in `web/blog/` and its `PublicPage` entry in `server/seo.py`.
-2. Write the complete English translation in `web/en/blog/` with `lang="en"`, one H1 and the shared `SEO_HEAD` and `PUBLIC_HEADER` markers. Retain the source evidence, tables, image attribution and the distinction between actual screenshots and illustrations.
-3. Add its English metadata to `server/blog_en.json`, keyed by the Polish canonical path. Required fields are `path`, `title`, `description`, `name`, `category`, `image_alt`, `card_kicker` and `card_description` and `modified_date` (the actual English translation or update date). The English `name` must match the visible H1, and `image_alt` must match the hero's alt text. The English page reuses the original image asset with a translated description.
-4. Add a card to each blog index in the same order. Link English blog pages to English equivalents, including related articles. A link to a Polish-only game page or guide should say that the destination is in Polish.
-5. Keep original publication and source dates visible. Label the date of the English version separately. For later translations, set `modified_date` in the English metadata JSON to the actual translation or update date; do not present historical announcements as breaking news. Refresh time-sensitive facts in both languages when changing the substance.
-6. Run `python -m unittest tests.test_seo` and `git diff --check`. Verify the live Polish/English index and at least one translated article after deployment.
+1. Verify the source material and write the Polish article and its `PublicPage` entry. Give each translation a descriptive URL, the same publication date and a complete template with one H1 plus the `SEO_HEAD` and `PUBLIC_HEADER` markers.
+2. Key each translation's metadata by the Polish canonical path. Supply `path`, `title`, `description`, `name`, `category`, `image_alt` when the article has a hero image, and `modified_date`. Match `name` to the visible H1 and `image_alt` to the hero. Use `card_kicker` and `card_description` for the index copy.
+3. Translate the complete content, including image descriptions, captions, tables, navigation and link labels. Preserve original publication dates, source dates and image attribution. Show the translation or update date separately and make `modified_date` match it. Keep official product, item and interface names when readers need them to find the feature.
+4. Link each article from its language index. Use localized equivalents for related links. When an older link leads to a different language, identify that language in the link text. Review all existing versions when an article needs a factual correction.
+5. For existing articles that have fewer languages, check that the advice still applies before translating. Keep expired or superseded announcements in their existing editions.
+6. Run `python -m unittest tests.test_seo` and `git diff --check`. After deployment, verify the four indexes and the language links on the new article.
 
-## SEO behavior
+## Search metadata
 
-Each version has its own canonical URL and full server-rendered content. Reciprocal `hreflang="pl"` and `hreflang="en"` links in the head identify equivalent pages and include self-references. These annotations use absolute URLs. English is targeted by language, without limiting it to one country.
+Each published version has a canonical URL, server-rendered text, `Content-Language`, HTML `lang`, Open Graph labels and structured data in its own language. Reciprocal `hreflang` annotations and the visible language switch list the versions available for that article. The sitemap includes their canonical URLs. Spanish uses the language code `es` for readers across regions, while Brazilian Portuguese uses `pt-BR`.
 
-Both languages are listed in the sitemap. `Content-Language`, HTML `lang`, Open Graph labels, structured data and the blog collection follow the selected language. The language switch points to the matching article. Untranslated game pages are not advertised as English equivalents. Language selection is explicit through links; crawlers and readers receive the same content at a given URL.
-
-Google references:
-- https://developers.google.com/search/docs/specialty/international/localized-versions
-- https://developers.google.com/search/docs/specialty/international/managing-multi-regional-sites
+[Google Search Central guidance on localized pages](https://developers.google.com/search/docs/specialty/international/localized-versions)

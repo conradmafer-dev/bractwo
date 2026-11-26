@@ -1,0 +1,86 @@
+{
+  "/blog": {
+    "path": "/pt-br/blog",
+    "name": "Blog MMO em português",
+    "title": "Blog MMO em português — notícias e guias de MMORPG | Bractwo Krain",
+    "description": "Guias e notícias de MMORPG em português do Brasil. Conheça as classes e os requisitos de VAMPIR, os plugins de RuneScape 3 e Old School RuneScape.",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/vampir-swiat-klasy-mechaniki": {
+    "title": "best class in vampir — qual classe escolher para PvE e PvP",
+    "description": "Comece de Carnage, escolha Bloodstained para um PvE defensivo ou considere Akasha para o PvP corpo a corpo. Compare as cinco classes de VAMPIR.",
+    "name": "best class in vampir — qual classe escolher para PvE e PvP?",
+    "category": "VAMPIR · Guia de classes",
+    "image_alt": "Viajante de capa diante de arcos góticos sob uma lua vermelha",
+    "card_kicker": "VAMPIR · Classes e progressão",
+    "card_description": "Veja qual classe combina com seu primeiro personagem, com o PvE solo e com o PvP. O guia compara as cinco opções.",
+    "path": "/pt-br/blog/vampir-melhor-classe-pve-pvp",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/vampir-premiera-polska-pobieranie-wymagania": {
+    "title": "Como baixar VAMPIR no PC, Android e iOS — requisitos",
+    "description": "Baixe VAMPIR pelos canais oficiais e confira os requisitos mínimos para PC, Android e iOS, os idiomas e a data do lançamento global.",
+    "name": "Como baixar VAMPIR e conferir os requisitos para PC, Android e iOS",
+    "category": "VAMPIR · Download e requisitos",
+    "image_alt": "Personagens de VAMPIR sob uma lua vermelha em arte promocional da Netmarble",
+    "card_kicker": "VAMPIR · Download",
+    "card_description": "Links oficiais para baixar VAMPIR, requisitos mínimos para PC e celular e idiomas da versão global.",
+    "path": "/pt-br/blog/vampir-download-requisitos-pc-android-ios",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/runescape-pluginy-hub-quest-helper": {
+    "title": "Plugin Hub de RuneScape 3 — como instalar e ativar plugins",
+    "description": "Saiba como abrir o Plugin Hub de RuneScape 3 e instalar e ativar plugins em Manage. Veja as capturas oficiais, Quest Helper e Clue Trainer.",
+    "name": "Plugin Hub de RS3 — como instalar e ativar plugins",
+    "category": "RuneScape · Interface e missões",
+    "image_alt": "Cinco ferramentas de latão e cristal ligadas sobre um mapa de fantasia com marcadores verdes luminosos",
+    "card_kicker": "RS3 · Guia de plugins",
+    "card_description": "Aprenda a abrir o Plugin Hub, conferir permissões e encontrar Quest Helper ou Clue Trainer com capturas oficiais.",
+    "path": "/pt-br/blog/runescape-3-plugin-hub-instalar-ativar",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/runescape-3-czy-osrs-od-czego-zaczac": {
+    "title": "RuneScape 3 ou OSRS — qual escolher e como começar",
+    "description": "Compare o combate, a progressão, a assinatura, o conteúdo gratuito e os clientes para celular de RuneScape 3 e Old School RuneScape.",
+    "name": "RuneScape 3 ou Old School RuneScape — qual vale a pena jogar?",
+    "category": "RuneScape · Comparação e primeiros passos",
+    "image_alt": "Aventureiro numa encruzilhada entre uma cidade medieval e um reino mágico",
+    "card_kicker": "RuneScape · Comparação",
+    "card_description": "Compare combate, progressão, assinatura e jogo no celular em RS3 e OSRS. Escolha a versão e um objetivo para a primeira sessão.",
+    "path": "/pt-br/blog/runescape-3-vs-osrs-qual-jogar",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/osrs-fractured-archive-raid-poradnik": {
+    "title": "Guia de The Fractured Archive no OSRS — requisitos e recompensas",
+    "description": "Prepare-se para The Fractured Archive em Old School RuneScape. Veja missão exigida, tamanho da equipe, chefes, modo de treino e recompensas da raid.",
+    "name": "Guia de The Fractured Archive no OSRS — requisitos, equipes e recompensas",
+    "category": "Old School RuneScape · Raids",
+    "image_alt": "Quatro aventureiros se aproximam de uma câmara iluminada por cristais em um arquivo subterrâneo",
+    "card_kicker": "Old School RuneScape · Guia de raid",
+    "card_description": "Confira os requisitos, as rotas e as recompensas de The Fractured Archive e saiba como usar o modo de treino.",
+    "path": "/pt-br/blog/osrs-the-fractured-archive-guia-raid",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/runescape-2027-dragon-slayer-2-arposandra": {
+    "title": "RuneScape em 2027 — Dragon Slayer II, Arposandra e Agility",
+    "description": "Veja o plano de RuneScape para 2027 com Dragon Slayer II, mudanças em Agility, Arposandra e uma nova raid em Karamja, segundo a Jagex.",
+    "name": "RuneScape em 2027 — Dragon Slayer II, Arposandra e a reformulação de Agility",
+    "category": "RuneScape · Roteiro de 2027",
+    "image_alt": "Dragão dourado, cidade dos gnomos e expedição na selva na arte oficial de RuneScape para 2027",
+    "card_kicker": "RuneScape · Roteiro de 2027",
+    "card_description": "Dragon Slayer II, mudanças em Agility, Arposandra e uma raid em Karamja estão nos três ciclos anunciados pela Jagex.",
+    "path": "/pt-br/blog/runescape-2027-dragon-slayer-2-arposandra",
+    "modified_date": "2026-11-26"
+  },
+  "/blog/runescape-4-zapowiedz": {
+    "title": "RuneScape 4 — Ashenfall, lançamento e possíveis testes beta",
+    "description": "A Jagex anunciou RS4, um novo MMORPG que começa em Ashenfall. Confira o que se sabe sobre o mundo, o lançamento e o cadastro para acompanhar o projeto.",
+    "name": "RuneScape 4 anunciado — o novo MMORPG começa em Ashenfall",
+    "category": "RuneScape · Novo MMORPG",
+    "image_alt": "Viajante observa um vale vulcânico de um terraço rochoso em ilustração do anúncio de RuneScape 4",
+    "card_kicker": "RuneScape · Novo MMORPG",
+    "card_description": "O novo MMORPG da Jagex começa em Ashenfall. Veja o cenário confirmado e o que se sabe sobre o lançamento e os testes.",
+    "path": "/pt-br/blog/runescape-4-anuncio-ashenfall-lancamento",
+    "modified_date": "2026-11-26"
+  }
+}
