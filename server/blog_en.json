@@ -1,4 +1,15 @@
 {
+  "/blog/gry-mmorpg-na-telefon-android": {
+    "path": "/en/blog/best-mobile-mmorpg-android",
+    "title": "Best Mobile MMORPGs for Android – Four Games Compared",
+    "description": "Compare Albion Online, Broken Ranks, RuneScape and OSRS on Android. See how combat works, which languages are available and which PC progress carries over.",
+    "name": "Best mobile MMORPGs: which one should you play on Android?",
+    "category": "Android MMORPGs",
+    "image_alt": "An Albion Online adventurer strikes a glowing ore deposit with a pickaxe",
+    "card_kicker": "Android MMORPGs",
+    "card_description": "Compare combat controls, language support, space requirements and how to pick up the same character on PC.",
+    "modified_date": "2026-11-28"
+  },
   "/blog/eve-online-fractured-skies-jak-zaczac": {
     "path": "/en/blog/eve-online-fractured-skies-beginners-guide",
     "title": "EVE Online Fractured Skies — AIR Ships, HUD and Vanguard",
@@ -56,14 +67,14 @@
   },
   "/blog/runescape-3-czy-osrs-od-czego-zaczac": {
     "path": "/en/blog/runescape-3-vs-osrs-which-to-play",
-    "title": "RuneScape 3 vs OSRS: Which Should You Play?",
-    "description": "RuneScape 3 or Old School RuneScape? Compare combat, progression, free play, membership and mobile support, then choose a version and plan your first steps.",
-    "name": "RuneScape 3 vs Old School RuneScape: which should you play?",
+    "title": "RS3 vs OSRS – Which RuneScape Should You Play?",
+    "description": "RS3 vs OSRS for new and returning players. Find your old character, compare combat and membership, and try the same free Lumbridge quest in both games.",
+    "name": "RS3 vs OSRS – which RuneScape should you play?",
     "category": "RuneScape · Comparison",
     "image_alt": "An adventurer at a crossroads leading to a medieval town and a magical realm",
     "card_kicker": "RuneScape · Compare and get started",
-    "card_description": "Combat, progression, membership and playing on desktop or mobile. Compare both versions and choose the first goal for your adventure.",
-    "modified_date": "2026-10-22"
+    "card_description": "Coming back after years away? Find your old character and compare the same Lumbridge quest in both games.",
+    "modified_date": "2026-11-28"
   },
   "/blog": {
     "path": "/en/blog",
@@ -74,7 +85,7 @@
     "image_alt": "Bractwo Krain gameplay: Solna Przystań and a desert region",
     "card_kicker": "MMORPG news",
     "card_description": "MMORPG news, releases, updates and D&D guides in English.",
-    "modified_date": "2026-11-26"
+    "modified_date": "2026-11-28"
   },
   "/blog/aion-2-boty-rmt-4996-kont-11-pazdziernika": {
     "path": "/en/blog/aion-2-bots-rmt-4996-accounts-october-11",

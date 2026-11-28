@@ -154,7 +154,7 @@ class SEOConfigTests(unittest.TestCase):
         self.assertNotIn("<script>alert(1)</script>", output)
 
     def test_news_uses_only_its_explicit_image_without_game_topic_fallback(self):
-        page = replace(seo.NEWS_ARTICLES[0], image=None)
+        page = replace(next(p for p in seo.NEWS_ARTICLES if p.article_kind == "NewsArticle"), image=None)
         document = Document(seo.metadata_head(seo.SEOConfig(), page))
         graph = document.schemas[0]["@graph"]
         article = next(item for item in graph if item["@type"] == "NewsArticle")
@@ -216,7 +216,7 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(document.find("meta", property="og:url")[0]["content"], self.origin + page.path)
                 self.assertEqual(document.find("meta", property="og:title")[0]["content"], page.title)
                 self.assertEqual(document.find("meta", name="twitter:card")[0]["content"],
-                                 "summary" if page.article_kind == "NewsArticle" and not page.image
+                                 "summary" if page.article_kind in {"Article", "NewsArticle"} and not page.image
                                  else "summary_large_image")
                 self.assertEqual(len(document.find("meta", name="robots")), 1)
                 self.assertEqual(len(document.schemas), 1)
@@ -294,14 +294,14 @@ class SEOHTTPTests(unittest.IsolatedAsyncioTestCase):
                                  "name": language.author, "url": self.origin + "/"})
                 self.assertEqual(article["publisher"], article["author"])
                 self.assertIn(article["author"]["name"], source)
-                if page.article_kind == "NewsArticle":
+                if page.article_kind in {"Article", "NewsArticle"}:
                     self.assertNotIn("about", webpage)
                 else:
                     self.assertEqual(webpage["about"]["@id"], self.origin + "/#game")
                 if page.image:
                     self.assertEqual(article["image"], self.origin + page.image.path)
                     self.assertEqual(webpage["primaryImageOfPage"]["@id"], self.origin + page.path + "#image")
-                elif page.article_kind == "NewsArticle":
+                elif page.article_kind in {"Article", "NewsArticle"}:
                     self.assertNotIn("image", article)
                     self.assertNotIn("primaryImageOfPage", webpage)
                     self.assertFalse(document.find("meta", property="og:image"))

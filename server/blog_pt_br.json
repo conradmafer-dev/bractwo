@@ -1,10 +1,21 @@
 {
+  "/blog/gry-mmorpg-na-telefon-android": {
+    "path": "/pt-br/blog/melhores-mmorpg-para-celular-android",
+    "title": "Melhores MMORPGs para celular Android por estilo de jogo",
+    "description": "Compare Albion Online, Broken Ranks, RuneScape e OSRS no Android. Veja os idiomas, o combate, o espaço necessário e como continuar com o mesmo personagem no PC.",
+    "name": "Melhores MMORPGs para celular: qual jogar no Android?",
+    "category": "MMORPGs para Android",
+    "image_alt": "Um aventureiro de Albion Online usa uma picareta em um veio de minério brilhante",
+    "card_kicker": "MMORPGs para Android",
+    "card_description": "Confira o combate, os idiomas, o espaço necessário e como continuar no PC com o mesmo personagem.",
+    "modified_date": "2026-11-28"
+  },
   "/blog": {
     "path": "/pt-br/blog",
     "name": "Blog MMO em português",
     "title": "Blog MMO em português — notícias e guias de MMORPG | Bractwo Krain",
     "description": "Guias e notícias de MMORPG em português do Brasil. Conheça as classes e os requisitos de VAMPIR, os plugins de RuneScape 3 e Old School RuneScape.",
-    "modified_date": "2026-11-26"
+    "modified_date": "2026-11-28"
   },
   "/blog/vampir-swiat-klasy-mechaniki": {
     "title": "best class in vampir — qual classe escolher para PvE e PvP",
@@ -41,14 +52,14 @@
   },
   "/blog/runescape-3-czy-osrs-od-czego-zaczac": {
     "title": "RuneScape 3 ou OSRS — qual escolher e como começar",
-    "description": "Compare o combate, a progressão, a assinatura, o conteúdo gratuito e os clientes para celular de RuneScape 3 e Old School RuneScape.",
+    "description": "RS3 ou OSRS? Descubra onde está seu personagem antigo, o que a assinatura inclui e como experimentar a mesma missão gratuita em Lumbridge nos dois jogos.",
     "name": "RuneScape 3 ou Old School RuneScape — qual vale a pena jogar?",
     "category": "RuneScape · Comparação e primeiros passos",
     "image_alt": "Aventureiro numa encruzilhada entre uma cidade medieval e um reino mágico",
     "card_kicker": "RuneScape · Comparação",
-    "card_description": "Compare combate, progressão, assinatura e jogo no celular em RS3 e OSRS. Escolha a versão e um objetivo para a primeira sessão.",
+    "card_description": "Encontre seu personagem antigo e compare os dois jogos fazendo a mesma missão gratuita em Lumbridge.",
     "path": "/pt-br/blog/runescape-3-vs-osrs-qual-jogar",
-    "modified_date": "2026-11-26"
+    "modified_date": "2026-11-28"
   },
   "/blog/osrs-fractured-archive-raid-poradnik": {
     "title": "Guia de The Fractured Archive no OSRS — requisitos e recompensas",

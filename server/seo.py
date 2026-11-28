@@ -103,7 +103,7 @@ BLOG_PAGE = PublicPage(
     "Blog MMO — poradniki i aktualności MMORPG | Bractwo Krain",
     "Nowe wiadomości MMORPG: WoW Forever, Albion Online, AION 2 i VAMPIR. Aktualizacje z oficjalnych źródeł, daty komunikatów i praktyczne poradniki.",
     "Blog MMO — aktualności MMORPG i poradniki",
-    modified_date="2026-11-26",
+    modified_date="2026-11-28",
 )
 BLOG_ARTICLES = (
     PublicPage(
@@ -160,6 +160,15 @@ BLOG_ARTICLES = (
     ),
 )
 NEWS_ARTICLES = (
+    PublicPage(
+        "/blog/gry-mmorpg-na-telefon-android", "blog/gry-mmorpg-na-telefon-android.html",
+        "Najlepsze gry MMORPG na telefon z Androidem",
+        "Porównaj Albion Online, Broken Ranks, RuneScape i OSRS na Androidzie. Sprawdź, które mają polski interfejs, ile miejsca wymagają i jak wrócić do gry na PC.",
+        "Najlepsze gry MMORPG na telefon – w co zagrać na Androidzie?",
+        published_date="2026-11-28", modified_date="2026-11-28", category="MMORPG na Androida", article_kind="Article",
+        image=PageImage("/assets/blog/mobile-mmorpg-albion.webp",
+                        "Poszukiwacz przygód w Albion Online uderza kilofem w świecącą żyłę rudy", 800, 450),
+    ),
     PublicPage(
         "/blog/wow-forever-alterac-valley-zmiany-25-listopada", "blog/wow-forever-alterac-valley-zmiany-25-listopada.html",
         "WoW Forever: zmiany Alterac Valley z 25 listopada",
@@ -253,9 +262,9 @@ NEWS_ARTICLES = (
     PublicPage(
         "/blog/runescape-3-czy-osrs-od-czego-zaczac", "blog/runescape-3-czy-osrs-od-czego-zaczac.html",
         "RuneScape 3 czy OSRS? Różnice i poradnik na start",
-        "RuneScape 3 czy Old School RuneScape? Porównaj walkę, rozwój, darmową grę, abonament i wersje mobilne. Wybierz MMO i zaplanuj pierwsze kroki.",
+        "RS3 czy OSRS? Sprawdź, w której grze znajdziesz dawną postać. Porównaj walkę, abonament i to samo darmowe zadanie w zamku Lumbridge.",
         "RuneScape 3 czy Old School RuneScape? Różnice i od czego zacząć",
-        published_date="2026-10-22", category="RuneScape · Porównanie", article_kind="NewsArticle",
+        published_date="2026-10-22", modified_date="2026-11-28", category="RuneScape · Porównanie", article_kind="Article",
         image=PageImage("/assets/blog/runescape-rs3-osrs-crossroads-1200.webp",
                         "Podróżnik na rozstaju dróg prowadzących do średniowiecznego miasta i magicznej krainy", 1200, 675),
     ),
@@ -590,8 +599,8 @@ def metadata_head(config, page=HOME_PAGE):
     blog_page = BLOG_INDEXES.get(page.language, BLOG_PAGE)
     blog_articles = BLOG_ARTICLES_BY_LANGUAGE.get(page.language, ())
     alternates = BLOG_LANGUAGE_PATHS.get(page.path, {})
-    is_news = page.article_kind == "NewsArticle"
-    page_image = page.image or (None if is_news else DEFAULT_IMAGE)
+    is_editorial_article = page.article_kind in {"Article", "NewsArticle"}
+    page_image = page.image or (None if is_editorial_article else DEFAULT_IMAGE)
     if is_translation and page.image is None and page_image:
         page_image = replace(page_image, alt=language.default_image_alt)
     image_url = config.origin + page_image.path if page_image else None
@@ -643,7 +652,7 @@ def metadata_head(config, page=HOME_PAGE):
         "name": page.title, "description": page.description, "inLanguage": language.tag,
         "isPartOf": {"@id": homepage + "#website"},
     }
-    if not is_news:
+    if not is_editorial_article:
         webpage["about"] = {"@id": homepage + "#game"}
     if page_image:
         webpage["primaryImageOfPage"] = {"@id": image_id}
